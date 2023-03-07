@@ -1,2 +1,5 @@
-# exiftool
-ImageGlass Exif tool
+ExifGlass - Exif tool for ImageGlass
+===
+
+
+

@@ -21,9 +21,9 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
-using Avalonia.Themes.Fluent;
+using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using ExifGlass.ExifTools;
 using ImageGlass.Tools;
@@ -82,7 +82,7 @@ public partial class MainWindow : Window
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1)
         {
-            _ = LoadExifInfoAsync(args[1]);
+            _ = LoadExifMetadatAsync(args[1]);
         }
     }
 
@@ -90,7 +90,7 @@ public partial class MainWindow : Window
     /// <summary>
     /// Loads EXIF metadata.
     /// </summary>
-    private async Task LoadExifInfoAsync(string? filePath)
+    private async Task LoadExifMetadatAsync(string? filePath)
     {
         filePath ??= string.Empty;
         var toolPath = @"exiftool";
@@ -164,7 +164,7 @@ public partial class MainWindow : Window
 
             var filePath = obj.FilePath.ToString();
 
-            Dispatcher.UIThread.Post(() => _ = LoadExifInfoAsync(filePath));
+            Dispatcher.UIThread.Post(() => _ = LoadExifMetadatAsync(filePath));
 
             return;
         }
@@ -205,7 +205,7 @@ public partial class MainWindow : Window
             var attrs = File.GetAttributes(filePath);
             if (attrs.HasFlag(FileAttributes.Directory)) return;
 
-            _ = LoadExifInfoAsync(filePath);
+            _ = LoadExifMetadatAsync(filePath);
         }
     }
 
@@ -217,12 +217,21 @@ public partial class MainWindow : Window
 
     private void MainWindow_GotFocus(object? sender, GotFocusEventArgs e)
     {
-        TransparencyLevelHint = WindowTransparencyLevel.Mica;
+        this.SetDynamicResource(BackgroundProperty, "SystemAltMediumHighColor");
     }
 
     private void MainWindow_LostFocus(object? sender, RoutedEventArgs e)
     {
-        TransparencyLevelHint = WindowTransparencyLevel.None;
+        if (Application.Current is not Application app) return;
+
+        if (app.ActualThemeVariant == ThemeVariant.Dark)
+        {
+            Background = new SolidColorBrush(Color.FromRgb(32, 32, 32));
+        }
+        else
+        {
+            Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
+        }
     }
 
 
@@ -251,15 +260,17 @@ public partial class MainWindow : Window
     }
 
 
-    private async void BtnOpenFile_Click(object? sender, RoutedEventArgs e)
+    private void BtnOpenFile_Click(object? sender, RoutedEventArgs e)
     {
-        var openFd = new OpenFileDialog();
+        _ = PickFileAndLoadExifMetadataAsync();
+    }
 
-        if (await openFd.ShowAsync(this) is string[] files
-            && files.Length > 0)
-        {
-            _ = LoadExifInfoAsync(files[0]);
-        }
+    private async Task PickFileAndLoadExifMetadataAsync()
+    {
+        var files = await StorageProvider.OpenFilePickerAsync(new());
+        if (files.SingleOrDefault() is not IStorageFile file) return;
+
+        await LoadExifMetadatAsync(file.Path.AbsolutePath);
     }
 
 

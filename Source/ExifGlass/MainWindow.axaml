@@ -20,7 +20,7 @@
         <Border
             Name="TopContent"
             Grid.Row="0"
-            Background="{DynamicResource SystemAltMediumHighColor}">
+            Background="{DynamicResource SystemAltMediumColor}">
             <Border
                 Margin="15"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"

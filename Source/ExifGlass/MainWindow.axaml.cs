@@ -77,7 +77,10 @@ public partial class MainWindow : Window
         MnuExportCsv.Click += MnuExportCsv_Click;
     }
 
-    
+
+    // Protected methods
+    #region Protected methods
+
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
@@ -112,6 +115,30 @@ public partial class MainWindow : Window
         MnuExportJson.Click -= MnuExportJson_Click;
         MnuExportCsv.Click -= MnuExportCsv_Click;
     }
+
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        if (e.KeyModifiers == KeyModifiers.Control)
+        {
+            if (e.Key == Key.D1)
+            {
+                MnuExportText_Click(MnuExportText, new RoutedEventArgs());
+            }
+            else if (e.Key == Key.D2)
+            {
+                MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
+            }
+            else if (e.Key == Key.D3)
+            {
+                MnuExportCsv_Click(MnuExportCsv, new RoutedEventArgs());
+            }
+        }
+    }
+
+    #endregion // Protected methods
 
 
     /// <summary>
@@ -318,19 +345,21 @@ public partial class MainWindow : Window
     }
 
 
-    private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
+    private void MnuExportText_Click(object? sender, RoutedEventArgs e)
     {
 
     }
+
 
     private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
     {
 
     }
 
-    private void MnuExportText_Click(object? sender, RoutedEventArgs e)
+    
+    private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
     {
-        
+
     }
 
     #endregion // Control events

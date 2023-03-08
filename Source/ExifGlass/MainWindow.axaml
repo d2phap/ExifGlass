@@ -30,6 +30,7 @@
                     Name="DtGrid"
                     x:DataType="eg:ExifTagItem"
                     AutoGenerateColumns="False"
+                    ClipboardCopyMode="None"
                     IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding Index}" Header="Index">
@@ -99,7 +100,9 @@
                     Name="BtnOpenFile"
                     Grid.Column="0"
                     Background="{DynamicResource AccentButtonBackground}"
-                    Classes="accent">
+                    Classes="accent"
+                    HotKeyManager.HotKey="Ctrl+O"
+                    ToolTip.Tip="Ctrl+O">
                     Open file...
                 </Button>
 
@@ -108,20 +111,22 @@
                     Name="BtnCopy"
                     Grid.Column="1"
                     Margin="10,0,0,0"
-                    IsEnabled="False">
+                    HotKeyManager.HotKey="Ctrl+C"
+                    IsEnabled="False"
+                    ToolTip.Tip="Ctrl+C">
                     Copy selected value
                 </Button>
                 <DropDownButton
                     Name="BtnExport"
                     Grid.Column="2"
                     Margin="10,0,0,0"
-                    Content="Export..."
+                    Content="Export as..."
                     IsEnabled="False">
                     <DropDownButton.Flyout>
                         <MenuFlyout>
-                            <MenuItem Name="MnuExportText" Header="Text file" />
-                            <MenuItem Name="MnuExportCsv" Header="CSV file" />
-                            <MenuItem Name="MnuExportJson" Header="JSON file" />
+                            <MenuItem Name="MnuExportText" Header="Text file..." />
+                            <MenuItem Name="MnuExportCsv" Header="CSV file..." />
+                            <MenuItem Name="MnuExportJson" Header="JSON file..." />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
 
@@ -130,7 +135,9 @@
                     Name="BtnSettings"
                     Grid.Column="3"
                     Margin="10,0,0,0"
-                    Classes="btn">
+                    Classes="btn"
+                    HotKeyManager.HotKey="Ctrl+,"
+                    ToolTip.Tip="Ctrl+,">
                     Settings...
                 </Button>
             </Grid>

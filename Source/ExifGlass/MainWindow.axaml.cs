@@ -71,9 +71,13 @@ public partial class MainWindow : Window
         BtnSettings.Click += BtnSettings_Click;
         BtnOpenFile.Click += BtnOpenFile_Click;
         BtnCopy.Click += BtnCopy_Click;
+
+        MnuExportText.Click += MnuExportText_Click;
+        MnuExportJson.Click += MnuExportJson_Click;
+        MnuExportCsv.Click += MnuExportCsv_Click;
     }
 
-
+    
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
@@ -84,6 +88,29 @@ public partial class MainWindow : Window
         {
             _ = LoadExifMetadatAsync(args[1]);
         }
+    }
+
+
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+
+        // controls events
+        GotFocus -= MainWindow_GotFocus;
+        LostFocus -= MainWindow_LostFocus;
+        RemoveHandler(DragDrop.DragOverEvent, OnFileDragOver);
+        RemoveHandler(DragDrop.DropEvent, OnFileDrop);
+
+        DtGrid.LoadingRowGroup -= DtGrid_LoadingRowGroup;
+        DtGrid.LoadingRow -= DtGrid_LoadingRow;
+
+        BtnSettings.Click -= BtnSettings_Click;
+        BtnOpenFile.Click -= BtnOpenFile_Click;
+        BtnCopy.Click -= BtnCopy_Click;
+
+        MnuExportText.Click -= MnuExportText_Click;
+        MnuExportJson.Click -= MnuExportJson_Click;
+        MnuExportCsv.Click -= MnuExportCsv_Click;
     }
 
 
@@ -251,7 +278,6 @@ public partial class MainWindow : Window
         }
     }
 
-
     private void DtGrid_LoadingRowGroup(object? sender, DataGridRowGroupHeaderEventArgs e)
     {
         e.RowGroupHeader.FontSize = 14;
@@ -289,6 +315,22 @@ public partial class MainWindow : Window
     private void BtnSettings_Click(object? sender, RoutedEventArgs e)
     {
         if (Application.Current is not Application app) return;
+    }
+
+
+    private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void MnuExportText_Click(object? sender, RoutedEventArgs e)
+    {
+        
     }
 
     #endregion // Control events

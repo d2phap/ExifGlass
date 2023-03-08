@@ -128,11 +128,11 @@ public partial class MainWindow : Window
             {
                 MnuExportText_Click(MnuExportText, new RoutedEventArgs());
             }
-            else if (e.Key == Key.D3)
+            else if (e.Key == Key.D2)
             {
                 MnuExportCsv_Click(MnuExportCsv, new RoutedEventArgs());
             }
-            else if (e.Key == Key.D2)
+            else if (e.Key == Key.D3)
             {
                 MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
             }
@@ -140,49 +140,6 @@ public partial class MainWindow : Window
     }
 
     #endregion // Protected methods
-
-
-    /// <summary>
-    /// Loads EXIF metadata.
-    /// </summary>
-    private async Task LoadExifMetadatAsync(string? filePath)
-    {
-        filePath ??= string.Empty;
-        var toolPath = @"exiftool";
-
-        // show command preview
-        _filePath = filePath;
-        TxtCmd.Text = $"{toolPath} {ExifTool.DefaultCommands} \"{filePath}\"";
-
-        var exif = new ExifTool(toolPath);
-        try
-        {
-            _exifTags = await exif.ReadAsync(filePath);
-        }
-        catch
-        {
-            _exifTags = new();
-        }
-
-
-        // create groups
-        var groupView = new DataGridCollectionView(_exifTags);
-        groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.Group)));
-
-        // load results into grid
-        DtGrid.Items = groupView;
-
-
-        if (_exifTags.Any())
-        {
-            BtnCopy.IsEnabled = BtnExport.IsEnabled = true;
-        }
-        else
-        {
-            BtnCopy.IsEnabled = BtnExport.IsEnabled = false;
-        }
-    }
-
 
 
     // ImageGlass server connection
@@ -340,30 +297,159 @@ public partial class MainWindow : Window
     }
 
 
+    private void MnuExportText_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = ExportToFileAsync(".txt");
+    }
+
+
+    private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = ExportToFileAsync(".csv");
+    }
+
+
+    private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = ExportToFileAsync(".json");
+    }
+
+
     private void BtnSettings_Click(object? sender, RoutedEventArgs e)
     {
         if (Application.Current is not Application app) return;
     }
 
 
-    private void MnuExportText_Click(object? sender, RoutedEventArgs e)
+    #endregion // Control events
+
+
+    // Private methods
+    #region Private methods
+
+    /// <summary>
+    /// Loads EXIF metadata.
+    /// </summary>
+    private async Task LoadExifMetadatAsync(string? filePath)
     {
-        _ = ExportAsTextFileAsync();
+        filePath ??= string.Empty;
+        var toolPath = @"exiftool";
+
+        // show command preview
+        _filePath = filePath;
+        TxtCmd.Text = $"{toolPath} {ExifTool.DefaultCommands} \"{filePath}\"";
+
+        var exif = new ExifTool(toolPath);
+        try
+        {
+            _exifTags = await exif.ReadAsync(filePath);
+        }
+        catch
+        {
+            _exifTags = new();
+        }
+
+
+        // create groups
+        var groupView = new DataGridCollectionView(_exifTags);
+        groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.Group)));
+
+        // load results into grid
+        DtGrid.Items = groupView;
+
+
+        if (_exifTags.Any())
+        {
+            BtnCopy.IsEnabled = BtnExport.IsEnabled = true;
+        }
+        else
+        {
+            BtnCopy.IsEnabled = BtnExport.IsEnabled = false;
+        }
     }
 
-    
-    private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
+
+    /// <summary>
+    /// Exports Exif metadata to file.
+    /// </summary>
+    /// <param name="extension">
+    /// File extension, either <c>.txt</c>, <c>.csv</c>, or <c>.json</c>.
+    /// </param>
+    private async Task ExportToFileAsync(string extension)
     {
-        _ = ExportAsCsvFileAsync();
+        if (await OpenSaveFileDialog(extension) is not IStorageFile sFile) return;
+
+        var fileContent = string.Empty;
+        if (sFile.Name.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase))
+        {
+            fileContent = CreateTextContent();
+        }
+        else if (sFile.Name.EndsWith(".csv", StringComparison.InvariantCultureIgnoreCase))
+        {
+            fileContent = CreateCsvContent();
+        }
+        else if (sFile.Name.EndsWith(".json", StringComparison.InvariantCultureIgnoreCase))
+        {
+            fileContent = JsonEx.ToJson(_exifTags);
+        }
+
+        await WriteTextFileAsync(fileContent, sFile);
     }
 
-    private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
+
+    /// <summary>
+    /// Opens Save file dialog.
+    /// </summary>
+    private async Task<IStorageFile?> OpenSaveFileDialog(string defaultExt = "")
     {
-        _ = ExportAsJsonFileAsync();
+        var isExtEmpty = string.IsNullOrEmpty(defaultExt);
+        var fileName = Path.GetFileNameWithoutExtension(_filePath);
+        var defaultFilename = $"{fileName}{defaultExt}";
+        var typeChoices = new List<FilePickerFileType>();
+        
+        if (isExtEmpty || defaultExt.Equals(".txt", StringComparison.InvariantCultureIgnoreCase)) 
+        {
+            typeChoices.Add(new FilePickerFileType("Text file (*.txt)")
+            {
+                MimeTypes = new string[] { "text/plain" },
+                Patterns = new string[] { "*.txt" },
+            });
+        }
+        
+        if (isExtEmpty || defaultExt.Equals(".csv", StringComparison.InvariantCultureIgnoreCase))
+        {
+            typeChoices.Add(new FilePickerFileType("CSV file (*.csv)")
+            {
+                MimeTypes = new string[] { "text/csv" },
+                Patterns = new string[] { "*.csv" },
+            });
+        }
+        
+        if (isExtEmpty || defaultExt.Equals(".json", StringComparison.InvariantCultureIgnoreCase))
+        {
+            typeChoices.Add(new FilePickerFileType("JSON file (*.json)")
+            {
+                MimeTypes = new string[] { "application/json" },
+                Patterns = new string[] { "*.json" },
+            });
+        }
+
+        var fileSaver = await StorageProvider.SaveFilePickerAsync(new()
+        {
+            ShowOverwritePrompt = true,
+            SuggestedFileName = defaultFilename,
+            DefaultExtension = defaultExt,
+            FileTypeChoices = typeChoices,
+        });
+
+        return fileSaver;
     }
 
 
-    private async Task ExportAsTextFileAsync()
+    /// <summary>
+    /// Create text content.
+    /// </summary>
+    private string CreateTextContent()
     {
         var contentBuilder = new StringBuilder();
 
@@ -392,15 +478,14 @@ public partial class MainWindow : Window
             contentBuilder.AppendLine(item.Name.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.Value);
         }
 
-
-        await ExportToFileAsync(new FilePickerFileType("Text file (*.txt)")
-        {
-            Patterns = new string[] { "*.txt" },
-        }, contentBuilder.ToString());
+        return contentBuilder.ToString();
     }
 
 
-    private async Task ExportAsCsvFileAsync()
+    /// <summary>
+    /// Create CSV content.
+    /// </summary>
+    private string CreateCsvContent()
     {
         var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
             $"\"{nameof(ExifTagItem.TagId)}\"," +
@@ -412,43 +497,26 @@ public partial class MainWindow : Window
             .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
         var csvContent = string.Join("\r\n", csvRows);
 
-        await ExportToFileAsync(new FilePickerFileType("CSV file (*.csv)")
-        {
-            Patterns = new string[] { "*.csv" },
-        }, $"{csvHeader}{csvContent}");
+
+        return $"{csvHeader}{csvContent}";
     }
 
 
-    private async Task ExportAsJsonFileAsync()
+    /// <summary>
+    /// Writes the <paramref name="fileContent"/> to <paramref name="sFile"/>.
+    /// </summary>
+    private static async Task WriteTextFileAsync(string? fileContent, IStorageFile? sFile)
     {
-        var json = JsonEx.ToJson(_exifTags);
+        if (string.IsNullOrEmpty(fileContent) || sFile == null) return;
 
-        await ExportToFileAsync(new FilePickerFileType("JSON file (*.json)")
-        {
-            Patterns = new string[] { "*.json" },
-        }, json);
-    }
-
-
-    private async Task ExportToFileAsync(FilePickerFileType fileType, string fileContent)
-    {
-        var fileSaver = await StorageProvider.SaveFilePickerAsync(new()
-        {
-            ShowOverwritePrompt = true,
-            DefaultExtension = fileType.Patterns?.SingleOrDefault(),
-            FileTypeChoices = new FilePickerFileType[] { fileType },
-        });
-        if (fileSaver == null) return;
-
-
-        using var writer = await fileSaver.OpenWriteAsync();
+        using var writer = await sFile.OpenWriteAsync();
         var fileBuffer = Encoding.UTF8.GetBytes(fileContent);
 
         await writer.WriteAsync(new ReadOnlyMemory<byte>(fileBuffer));
         await writer.FlushAsync();
     }
 
-    #endregion // Control events
+    #endregion // Private methods
 
 
 }

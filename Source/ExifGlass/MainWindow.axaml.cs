@@ -348,7 +348,7 @@ public partial class MainWindow : Window
 
     private void MnuExportText_Click(object? sender, RoutedEventArgs e)
     {
-
+        _ = ExportAsTextFileAsync();
     }
 
     
@@ -360,6 +360,43 @@ public partial class MainWindow : Window
     private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
     {
         _ = ExportAsJsonFileAsync();
+    }
+
+
+    private async Task ExportAsTextFileAsync()
+    {
+        var contentBuilder = new StringBuilder();
+
+
+        // find the longest Tag Name in the list
+        var propMaxLength = _exifTags.Max(item => item.Name.Length);
+        var currentGroup = "";
+
+        foreach (var item in _exifTags)
+        {
+            // append group heading
+            if (item.Group != currentGroup)
+            {
+                var groupLine = item.Group.PadRight(propMaxLength + 5, '-') + ":";
+                if (currentGroup.Length > 0)
+                {
+                    groupLine = "\n" + groupLine;
+                }
+
+                contentBuilder.AppendLine(groupLine);
+
+                currentGroup = item.Group;
+            }
+
+            // append exif item
+            contentBuilder.AppendLine(item.Name.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.Value);
+        }
+
+
+        await ExportToFileAsync(new FilePickerFileType("Text file (*.txt)")
+        {
+            Patterns = new string[] { "*.txt" },
+        }, contentBuilder.ToString());
     }
 
 

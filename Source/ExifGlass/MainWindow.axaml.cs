@@ -34,6 +34,7 @@ using System.Dynamic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ExifGlass;
@@ -73,8 +74,8 @@ public partial class MainWindow : Window
         BtnCopy.Click += BtnCopy_Click;
 
         MnuExportText.Click += MnuExportText_Click;
-        MnuExportJson.Click += MnuExportJson_Click;
         MnuExportCsv.Click += MnuExportCsv_Click;
+        MnuExportJson.Click += MnuExportJson_Click;
     }
 
 
@@ -112,8 +113,8 @@ public partial class MainWindow : Window
         BtnCopy.Click -= BtnCopy_Click;
 
         MnuExportText.Click -= MnuExportText_Click;
-        MnuExportJson.Click -= MnuExportJson_Click;
         MnuExportCsv.Click -= MnuExportCsv_Click;
+        MnuExportJson.Click -= MnuExportJson_Click;
     }
 
 
@@ -127,13 +128,13 @@ public partial class MainWindow : Window
             {
                 MnuExportText_Click(MnuExportText, new RoutedEventArgs());
             }
-            else if (e.Key == Key.D2)
-            {
-                MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
-            }
             else if (e.Key == Key.D3)
             {
                 MnuExportCsv_Click(MnuExportCsv, new RoutedEventArgs());
+            }
+            else if (e.Key == Key.D2)
+            {
+                MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
             }
         }
     }
@@ -350,16 +351,44 @@ public partial class MainWindow : Window
 
     }
 
-
-    private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
-    {
-
-    }
-
     
     private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
     {
+    }
 
+    private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = ExportAsJsonFileAsync();
+    }
+
+
+    private async Task ExportAsJsonFileAsync()
+    {
+        var json = JsonEx.ToJson(_exifTags);
+
+        await ExportToFileAsync(new FilePickerFileType("JSON file (*.json)")
+        {
+            Patterns = new string[] { "*.json" },
+        }, json);
+    }
+
+
+    private async Task ExportToFileAsync(FilePickerFileType fileType, string fileContent)
+    {
+        var fileSaver = await StorageProvider.SaveFilePickerAsync(new()
+        {
+            ShowOverwritePrompt = true,
+            DefaultExtension = fileType.Patterns?.SingleOrDefault(),
+            FileTypeChoices = new FilePickerFileType[] { fileType },
+        });
+        if (fileSaver == null) return;
+
+
+        using var writer = await fileSaver.OpenWriteAsync();
+        var fileBuffer = Encoding.UTF8.GetBytes(fileContent);
+
+        await writer.WriteAsync(new ReadOnlyMemory<byte>(fileBuffer));
+        await writer.FlushAsync();
     }
 
     #endregion // Control events

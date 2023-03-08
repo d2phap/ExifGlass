@@ -19,4 +19,11 @@
     <PackageReference Include="CliWrap" Version="3.6.0" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
   </ItemGroup>
+
+
+  <ItemGroup>
+    <Reference Include="ImageGlass.Tools">
+      <HintPath>..\..\..\..\@d2phap\ImageGlass\v9\Components\ImageGlass.Tool\bin\Debug\net6.0\ImageGlass.Tools.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

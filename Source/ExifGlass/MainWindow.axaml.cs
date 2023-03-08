@@ -354,11 +354,31 @@ public partial class MainWindow : Window
     
     private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
     {
+        _ = ExportAsCsvFileAsync();
     }
 
     private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
     {
         _ = ExportAsJsonFileAsync();
+    }
+
+
+    private async Task ExportAsCsvFileAsync()
+    {
+        var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
+            $"\"{nameof(ExifTagItem.TagId)}\"," +
+            $"\"{nameof(ExifTagItem.Group)}\"," +
+            $"\"{nameof(ExifTagItem.Name)}\"," +
+            $"\"{nameof(ExifTagItem.Value)}\"\r\n";
+
+        var csvRows = _exifTags
+            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
+        var csvContent = string.Join("\r\n", csvRows);
+
+        await ExportToFileAsync(new FilePickerFileType("CSV file (*.csv)")
+        {
+            Patterns = new string[] { "*.csv" },
+        }, $"{csvHeader}{csvContent}");
     }
 
 

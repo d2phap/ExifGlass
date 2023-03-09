@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 
 namespace ExifGlass
 {
@@ -36,12 +37,30 @@ namespace ExifGlass
                 // load user configs
                 Config.Load();
 
+                if (Current != null)
+                {
+                    // load Theme mode
+                    var themeVariant = ThemeVariant.Default;
+                    if (Config.ThemeMode == ThemeMode.Dark)
+                    {
+                        themeVariant = ThemeVariant.Dark;
+                    }
+                    else if (Config.ThemeMode == ThemeMode.Light)
+                    {
+                        themeVariant = ThemeVariant.Light;
+                    }
+
+                    Current.RequestedThemeVariant = themeVariant;
+                }
+
+
                 desktop.MainWindow = new MainWindow()
                 {
                     Position = new PixelPoint(Config.WindowPositionX, Config.WindowPositionY),
                     Width = Config.WindowWidth,
                     Height = Config.WindowHeight,
                     WindowState = Config.WindowState,
+                    Topmost = Config.EnableWindowTopMost,
                 };
                 desktop.ShutdownRequested += Desktop_ShutdownRequested;
             }

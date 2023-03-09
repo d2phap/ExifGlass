@@ -63,6 +63,16 @@ public class Config
     /// </summary>
     public static WindowState WindowState { get; set; } = WindowState.Normal;
 
+    /// <summary>
+    /// Gets, sets value indicating that main window is always on top or not.
+    /// </summary>
+    public static bool EnableWindowTopMost { get; set; } = false;
+
+    /// <summary>
+    /// Gets, sets value of theme color mode.
+    /// </summary>
+    public static ThemeMode ThemeMode { get; set; } = ThemeMode.Default;
+
     #endregion
 
 
@@ -81,6 +91,8 @@ public class Config
         WindowWidth = items.GetValue(nameof(WindowWidth), WindowWidth);
         WindowHeight = items.GetValue(nameof(WindowHeight), WindowHeight);
         WindowState = items.GetValue(nameof(WindowState), WindowState);
+        EnableWindowTopMost = items.GetValue(nameof(EnableWindowTopMost), EnableWindowTopMost);
+        ThemeMode = items.GetValue(nameof(ThemeMode), ThemeMode);
     }
 
 
@@ -104,6 +116,8 @@ public class Config
         _ = settings.TryAdd(nameof(WindowWidth), WindowWidth);
         _ = settings.TryAdd(nameof(WindowHeight), WindowHeight);
         _ = settings.TryAdd(nameof(WindowState), WindowState);
+        _ = settings.TryAdd(nameof(EnableWindowTopMost), EnableWindowTopMost);
+        _ = settings.TryAdd(nameof(ThemeMode), ThemeMode);
 
 
         await JsonEx.WriteJsonAsync(ConfigFilePath, settings);
@@ -146,4 +160,12 @@ public class Config
 
     #endregion // Private methods
 
+}
+
+
+public enum ThemeMode
+{
+    Default,
+    Dark,
+    Light,
 }

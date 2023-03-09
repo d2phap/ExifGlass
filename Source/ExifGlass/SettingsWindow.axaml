@@ -8,6 +8,7 @@
     Width="450"
     Background="{DynamicResource SystemAltMediumHighColor}"
     CanResize="False"
+    CornerRadius="100"
     DragDrop.AllowDrop="True"
     FontFamily="Segoe UI"
     SizeToContent="Height"
@@ -23,7 +24,10 @@
             Padding="15"
             Background="{DynamicResource SystemAltMediumColor}">
             <StackPanel Orientation="Vertical">
-                <CheckBox Margin="0,0,0,15" Content="Keep window always on top" />
+                <CheckBox
+                    Name="ChkTopMost"
+                    Margin="0,0,0,15"
+                    Content="Keep window always on top" />
 
                 <TextBlock
                     Margin="0,0,0,10"
@@ -32,10 +36,35 @@
                     Exif tool configurations
                 </TextBlock>
 
+                <Border
+                    Margin="0,0,0,15"
+                    Background="{DynamicResource SystemRevealListLowColor}"
+                    CornerRadius="3">
+                    <SelectableTextBlock
+                        Padding="15,10"
+                        FontSize="13"
+                        SelectionBrush="{DynamicResource SelectionColorBrush}"
+                        TextWrapping="Wrap">
+                        Before using ExifGlass, you must set the path for binary file of
+                        <SelectableTextBlock
+                            FontStyle="Italic"
+                            SelectionBrush="{DynamicResource SelectionColorBrush}"
+                            Text="ExifTool by Phil Harvey." />
+                        Simply visit the official website at
+                        <SelectableTextBlock
+                            Foreground="{DynamicResource SystemAccentColor}"
+                            SelectionBrush="{DynamicResource SelectionColorBrush}"
+                            Text="https://exiftool.org"
+                            TextDecorations="Underline" />
+                        to download the file and get started.
+                    </SelectableTextBlock>
+                </Border>
+
                 <StackPanel Margin="15,0,0,0">
                     <TextBlock Margin="0,0,0,5">Executable path:</TextBlock>
                     <Grid Margin="0,0,0,15" ColumnDefinitions="*, Auto">
                         <TextBox
+                            Name="TxtExecutable"
                             Grid.Column="0"
                             MaxHeight="100"
                             AcceptsReturn="False"
@@ -44,6 +73,7 @@
                             exiftool
                         </TextBox>
                         <Button
+                            Name="BtnSelectExecutable"
                             Grid.Column="1"
                             Margin="15,0,0,0"
                             VerticalAlignment="Top"
@@ -55,6 +85,7 @@
 
                     <TextBlock Margin="0,0,0,5">Arguments:</TextBlock>
                     <TextBox
+                        Name="TxtArguments"
                         MaxHeight="100"
                         Margin="0,0,0,15"
                         AcceptsReturn="False"
@@ -66,7 +97,7 @@
                     <Border
                         MaxHeight="80"
                         Margin="0,0,0,15"
-                        Padding="5,5,0,5"
+                        Padding="10,5,0,5"
                         Background="{DynamicResource SystemRevealListLowColor}"
                         CornerRadius="3">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -74,7 +105,7 @@
                                 Name="TxtPreview"
                                 SelectionBrush="{DynamicResource SelectionColorBrush}"
                                 TextWrapping="Wrap">
-                                exiftool -fast -G -t -m -q  "C:\Users\d2pha\Desktop\file2.tif"
+                                exiftool -fast -G -t -m -q  "C:\Users\Desktop\file2.tif"
                             </SelectableTextBlock>
                         </ScrollViewer>
                     </Border>

@@ -89,7 +89,7 @@
                 MinHeight="40"
                 MaxHeight="80"
                 Margin="0,0,0,15"
-                Padding="5,5,0,5"
+                Padding="10,5,0,5"
                 Background="{DynamicResource SystemRevealListLowColor}"
                 CornerRadius="3">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">

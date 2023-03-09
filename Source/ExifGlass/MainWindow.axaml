@@ -85,21 +85,26 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Orientation="Vertical">
-            <TextBox
-                Name="TxtCmd"
-                Height="60"
+            <Border
+                MinHeight="40"
+                MaxHeight="80"
                 Margin="0,0,0,15"
-                BorderThickness="0"
-                Classes="txt"
-                IsReadOnly="True"
-                SelectionBrush="{DynamicResource SelectionColorBrush}"
-                TextWrapping="Wrap" />
+                Padding="5,5,0,5"
+                Background="{DynamicResource SystemRevealListLowColor}"
+                CornerRadius="3">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <SelectableTextBlock
+                        Name="TxtCmd"
+                        SelectionBrush="{DynamicResource SelectionColorBrush}"
+                        TextWrapping="Wrap" />
+                </ScrollViewer>
+            </Border>
+
 
             <Grid ColumnDefinitions="*, Auto, Auto, Auto">
                 <Button
                     Name="BtnOpenFile"
                     Grid.Column="0"
-                    Background="{DynamicResource AccentButtonBackground}"
                     Classes="accent"
                     HotKeyManager.HotKey="Ctrl+O"
                     ToolTip.Tip="Ctrl+O">

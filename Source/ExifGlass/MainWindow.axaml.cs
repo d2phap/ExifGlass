@@ -381,15 +381,26 @@ public partial class MainWindow : Window
 
     private void BtnSettings_Click(object? sender, RoutedEventArgs e)
     {
-        if (Application.Current is not Application app) return;
+        _ = ShowSettingsAsync();
+    }
 
+    private async Task ShowSettingsAsync()
+    {
         var win = new SettingsWindow()
         {
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
         };
-        win.ShowDialog(this);
-    }
+        await win.ShowDialog(this);
 
+        // apply settings
+        if (win.Result == SettingsResult.OK)
+        {
+            Topmost = Config.EnableWindowTopMost;
+
+            // reload exif metadata
+            await LoadExifMetadatAsync(_filePath);
+        }
+    }
 
     #endregion // Control events
 
@@ -403,16 +414,15 @@ public partial class MainWindow : Window
     private async Task LoadExifMetadatAsync(string? filePath)
     {
         filePath ??= string.Empty;
-        var toolPath = @"exiftool";
 
         // show command preview
         _filePath = filePath;
-        TxtCmd.Text = $"{toolPath} {ExifTool.DefaultCommands} \"{filePath}\"";
+        TxtCmd.Text = $"{Config.ExifToolExecutable} {ExifTool.DefaultCommands} {Config.ExifToolArguments} \"{filePath}\"";
 
-        _exifTool.ExifToolPath = toolPath;
+        _exifTool.ExifToolPath = Config.ExifToolExecutable;
         try
         {
-            await _exifTool.ReadAsync(filePath);
+            await _exifTool.ReadAsync(filePath, default, Config.ExifToolArguments);
         }
         catch (Exception) { }
 

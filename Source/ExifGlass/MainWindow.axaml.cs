@@ -382,6 +382,12 @@ public partial class MainWindow : Window
     private void BtnSettings_Click(object? sender, RoutedEventArgs e)
     {
         if (Application.Current is not Application app) return;
+
+        var win = new SettingsWindow()
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        };
+        win.ShowDialog(this);
     }
 
 

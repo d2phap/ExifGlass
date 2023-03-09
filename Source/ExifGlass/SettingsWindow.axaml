@@ -1,0 +1,115 @@
+<Window
+    x:Class="ExifGlass.SettingsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Settings"
+    Width="450"
+    Background="{DynamicResource SystemAltMediumHighColor}"
+    CanResize="False"
+    DragDrop.AllowDrop="True"
+    FontFamily="Segoe UI"
+    SizeToContent="Height"
+    TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
+    TransparencyLevelHint="Mica"
+    mc:Ignorable="d">
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        RowDefinitions="*, Auto">
+        <Border
+            Grid.Row="0"
+            Padding="15"
+            Background="{DynamicResource SystemAltMediumColor}">
+            <StackPanel Orientation="Vertical">
+                <CheckBox Margin="0,0,0,15" Content="Keep window always on top" />
+
+                <TextBlock
+                    Margin="0,0,0,10"
+                    FontSize="16"
+                    FontWeight="SemiBold">
+                    Exif tool configurations
+                </TextBlock>
+
+                <StackPanel Margin="15,0,0,0">
+                    <TextBlock Margin="0,0,0,5">Executable path:</TextBlock>
+                    <Grid Margin="0,0,0,15" ColumnDefinitions="*, Auto">
+                        <TextBox
+                            Grid.Column="0"
+                            MaxHeight="100"
+                            AcceptsReturn="False"
+                            SelectionBrush="{DynamicResource SelectionColorBrush}"
+                            TextWrapping="Wrap">
+                            exiftool
+                        </TextBox>
+                        <Button
+                            Grid.Column="1"
+                            Margin="15,0,0,0"
+                            VerticalAlignment="Top"
+                            HorizontalContentAlignment="Center">
+                            Select...
+                        </Button>
+                    </Grid>
+
+
+                    <TextBlock Margin="0,0,0,5">Arguments:</TextBlock>
+                    <TextBox
+                        MaxHeight="100"
+                        Margin="0,0,0,15"
+                        AcceptsReturn="False"
+                        SelectionBrush="{DynamicResource SelectionColorBrush}"
+                        TextWrapping="Wrap" />
+
+
+                    <TextBlock Margin="0,0,0,5">Preview:</TextBlock>
+                    <Border
+                        MaxHeight="80"
+                        Margin="0,0,0,15"
+                        Padding="5,5,0,5"
+                        Background="{DynamicResource SystemRevealListLowColor}"
+                        CornerRadius="3">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <SelectableTextBlock
+                                Name="TxtPreview"
+                                SelectionBrush="{DynamicResource SelectionColorBrush}"
+                                TextWrapping="Wrap">
+                                exiftool -fast -G -t -m -q  "C:\Users\d2pha\Desktop\file2.tif"
+                            </SelectableTextBlock>
+                        </ScrollViewer>
+                    </Border>
+                </StackPanel>
+
+
+            </StackPanel>
+        </Border>
+
+
+
+        <!--  Footer  -->
+        <Border
+            Grid.Row="1"
+            Padding="15"
+            ZIndex="1">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <Button
+                    Name="BtnOK"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    Margin="15,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    Classes="accent">
+                    OK
+                </Button>
+                <Button
+                    Name="BtnCancel"
+                    Grid.Column="2"
+                    MinWidth="80"
+                    Margin="15,0,0,0"
+                    HorizontalContentAlignment="Center">
+                    Cancel
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

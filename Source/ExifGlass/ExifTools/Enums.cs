@@ -26,3 +26,11 @@ public class ExifTagItem
     public string Name { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
 }
+
+
+public enum ExportFileType
+{
+    Text,
+    CSV,
+    JSON,
+}

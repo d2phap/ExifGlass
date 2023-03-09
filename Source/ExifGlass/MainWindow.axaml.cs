@@ -116,16 +116,21 @@ public partial class MainWindow : Window
 
 
         var args = Environment.GetCommandLineArgs();
-        if (args.Length > 1)
+        if (args.Length >= 2)
         {
-            _ = LoadExifMetadatAsync(args[1]);
+            // get path from params
+            var filePath = args
+                .Skip(1)
+                .FirstOrDefault(i => !i.StartsWith("-"));
+
+            _ = LoadExifMetadatAsync(filePath);
         }
     }
 
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         base.OnClosing(e);
-        
+
         // controls events
         GotFocus -= MainWindow_GotFocus;
         LostFocus -= MainWindow_LostFocus;

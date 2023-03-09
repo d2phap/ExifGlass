@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace ExifGlass.ExifTools;
 
-public class ExifTool
+public class ExifTool : List<ExifTagItem>
 {
     /// <summary>
     /// Gets, sets the path of Exiftool executable file.
@@ -46,6 +46,9 @@ public class ExifTool
         ExifToolPath = toolPath;
     }
 
+
+    // Public methods
+    #region Public methods
 
     /// <summary>
     /// Tests if the <see cref="ExifToolPath"/> is valid.
@@ -69,7 +72,7 @@ public class ExifTool
     /// </summary>
     /// <param name="filePath">Path of file to read.</param>
     /// <param name="exifToolCmd">Additional commands for Exiftool.</param>
-    public async Task<List<ExifTagItem>> ReadAsync(
+    public async Task ReadAsync(
         string filePath,
         CancellationToken cancelToken = default,
         params string[] exifToolCmd)
@@ -81,18 +84,22 @@ public class ExifTool
 
         var cmdOutput = cmdResult.StandardOutput;
         
-        return ParseExifTags(cmdOutput);
+        ParseExifTags(cmdOutput);
     }
 
+    #endregion // Public methods
+
+
+    // Private methods
+    #region Private methods
 
     /// <summary>
     /// Parses Exiftool's command-line output.
     /// </summary>
-    private static List<ExifTagItem> ParseExifTags(string cmdOutput)
+    private void ParseExifTags(string cmdOutput)
     {
-        var result = new List<ExifTagItem>();
         var index = 0;
-
+        Clear();
 
         while (cmdOutput.Length > 0)
         {
@@ -122,7 +129,7 @@ public class ExifTool
                 if (tpos1 >= 0)
                     _ = tagValue.Remove(tpos1, 26);
 
-                result.Add(new ExifTagItem()
+                Add(new ExifTagItem()
                 {
                     Index = index + 1,
                     TagId = tagId,
@@ -140,8 +147,8 @@ public class ExifTool
 
             cmdOutput = cmdOutput[epos..];
         }
-
-
-        return result;
     }
+
+    #endregion // Private methods
+
 }

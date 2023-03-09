@@ -46,7 +46,7 @@ public partial class MainWindow : Window
     private PipeClient? _client;
 
 
-    private List<ExifTagItem> _exifTags = new();
+    private ExifTool _exifTool = new("exiftool");
     private string _filePath = string.Empty;
 
 
@@ -339,33 +339,23 @@ public partial class MainWindow : Window
         _filePath = filePath;
         TxtCmd.Text = $"{toolPath} {ExifTool.DefaultCommands} \"{filePath}\"";
 
-        var exif = new ExifTool(toolPath);
+        _exifTool.ExifToolPath = toolPath;
         try
         {
-            _exifTags = await exif.ReadAsync(filePath);
+            await _exifTool.ReadAsync(filePath);
         }
-        catch
-        {
-            _exifTags = new();
-        }
+        catch (Exception) { }
 
 
         // create groups
-        var groupView = new DataGridCollectionView(_exifTags);
+        var groupView = new DataGridCollectionView(_exifTool);
         groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.Group)));
 
         // load results into grid
         DtGrid.Items = groupView;
 
 
-        if (_exifTags.Any())
-        {
-            BtnCopy.IsEnabled = BtnExport.IsEnabled = true;
-        }
-        else
-        {
-            BtnCopy.IsEnabled = BtnExport.IsEnabled = false;
-        }
+        BtnCopy.IsEnabled = BtnExport.IsEnabled = _exifTool.Any();
     }
 
 
@@ -390,7 +380,7 @@ public partial class MainWindow : Window
         }
         else if (sFile.Name.EndsWith(".json", StringComparison.InvariantCultureIgnoreCase))
         {
-            fileContent = JsonEx.ToJson(_exifTags);
+            fileContent = JsonEx.ToJson(_exifTool);
         }
 
         await WriteTextFileAsync(fileContent, sFile);
@@ -455,10 +445,10 @@ public partial class MainWindow : Window
 
 
         // find the longest Tag Name in the list
-        var propMaxLength = _exifTags.Max(item => item.Name.Length);
+        var propMaxLength = _exifTool.Max(item => item.Name.Length);
         var currentGroup = "";
 
-        foreach (var item in _exifTags)
+        foreach (var item in _exifTool)
         {
             // append group heading
             if (item.Group != currentGroup)
@@ -493,7 +483,7 @@ public partial class MainWindow : Window
             $"\"{nameof(ExifTagItem.Name)}\"," +
             $"\"{nameof(ExifTagItem.Value)}\"\r\n";
 
-        var csvRows = _exifTags
+        var csvRows = _exifTool
             .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
         var csvContent = string.Join("\r\n", csvRows);
 

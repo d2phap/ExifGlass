@@ -16,9 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Platform.Storage;
 using CliWrap;
 using CliWrap.Buffered;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,6 +90,96 @@ public class ExifTool : List<ExifTagItem>
         ParseExifTags(cmdOutput);
     }
 
+
+    /// <summary>
+    /// Exports Exif metadata to file.
+    /// </summary>
+    public async Task ExportAs(ExportFileType fileType, IStorageFile? destFile)
+    {
+        if (destFile == null) return;
+
+        var fileContent = string.Empty;
+        if (fileType == ExportFileType.Text)
+        {
+            fileContent = ToText();
+        }
+        else if (fileType == ExportFileType.CSV)
+        {
+            fileContent = ToCsv();
+        }
+        else if (fileType == ExportFileType.JSON)
+        {
+            fileContent = ToJson();
+        }
+
+        await WriteTextFileAsync(fileContent, destFile);
+    }
+
+
+    /// <summary>
+    /// Exports as text content.
+    /// </summary>
+    public string ToText()
+    {
+        var contentBuilder = new StringBuilder();
+
+        // find the longest Tag Name in the list
+        var propMaxLength = this.Max(item => item.Name.Length);
+        var currentGroup = "";
+
+        foreach (var item in this)
+        {
+            // append group heading
+            if (item.Group != currentGroup)
+            {
+                var groupLine = item.Group.PadRight(propMaxLength + 5, '-') + ":";
+                if (currentGroup.Length > 0)
+                {
+                    groupLine = "\n" + groupLine;
+                }
+
+                contentBuilder.AppendLine(groupLine);
+
+                currentGroup = item.Group;
+            }
+
+            // append exif item
+            contentBuilder.AppendLine(item.Name.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.Value);
+        }
+
+        return contentBuilder.ToString();
+    }
+
+
+    /// <summary>
+    /// Exports as CSV content.
+    /// </summary>
+    public string ToCsv()
+    {
+        var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
+            $"\"{nameof(ExifTagItem.TagId)}\"," +
+            $"\"{nameof(ExifTagItem.Group)}\"," +
+            $"\"{nameof(ExifTagItem.Name)}\"," +
+            $"\"{nameof(ExifTagItem.Value)}\"\r\n";
+
+        var csvRows = this
+            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
+        var csvContent = string.Join("\r\n", csvRows);
+
+
+        return $"{csvHeader}{csvContent}";
+    }
+
+
+    /// <summary>
+    /// Exports as JSON content.
+    /// </summary>
+    public string ToJson()
+    {
+        return JsonEx.ToJson(this);
+    }
+
+
     #endregion // Public methods
 
 
@@ -148,6 +241,22 @@ public class ExifTool : List<ExifTagItem>
             cmdOutput = cmdOutput[epos..];
         }
     }
+
+
+    /// <summary>
+    /// Writes the <paramref name="fileContent"/> to <paramref name="destFile"/>.
+    /// </summary>
+    private static async Task WriteTextFileAsync(string? fileContent, IStorageFile? destFile)
+    {
+        if (string.IsNullOrEmpty(fileContent) || destFile == null) return;
+
+        using var writer = await destFile.OpenWriteAsync();
+        var fileBuffer = Encoding.UTF8.GetBytes(fileContent);
+
+        await writer.WriteAsync(new ReadOnlyMemory<byte>(fileBuffer));
+        await writer.FlushAsync();
+    }
+
 
     #endregion // Private methods
 

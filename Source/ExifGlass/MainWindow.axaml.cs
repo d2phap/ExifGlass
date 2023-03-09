@@ -34,7 +34,6 @@ using System.Dynamic;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExifGlass;
@@ -299,19 +298,19 @@ public partial class MainWindow : Window
 
     private void MnuExportText_Click(object? sender, RoutedEventArgs e)
     {
-        _ = ExportToFileAsync(".txt");
+        _ = ExportToFileAsync(ExportFileType.Text);
     }
 
 
     private void MnuExportCsv_Click(object? sender, RoutedEventArgs e)
     {
-        _ = ExportToFileAsync(".csv");
+        _ = ExportToFileAsync(ExportFileType.CSV);
     }
 
 
     private void MnuExportJson_Click(object? sender, RoutedEventArgs e)
     {
-        _ = ExportToFileAsync(".json");
+        _ = ExportToFileAsync(ExportFileType.JSON);
     }
 
 
@@ -362,28 +361,19 @@ public partial class MainWindow : Window
     /// <summary>
     /// Exports Exif metadata to file.
     /// </summary>
-    /// <param name="extension">
-    /// File extension, either <c>.txt</c>, <c>.csv</c>, or <c>.json</c>.
-    /// </param>
-    private async Task ExportToFileAsync(string extension)
+    private async Task ExportToFileAsync(ExportFileType fileType)
     {
-        if (await OpenSaveFileDialog(extension) is not IStorageFile sFile) return;
+        var extension = fileType switch
+        {
+            ExportFileType.Text => ".txt",
+            ExportFileType.CSV => ".csv",
+            ExportFileType.JSON => ".json",
+            _ => "",
+        };
 
-        var fileContent = string.Empty;
-        if (sFile.Name.EndsWith(".txt", StringComparison.InvariantCultureIgnoreCase))
-        {
-            fileContent = CreateTextContent();
-        }
-        else if (sFile.Name.EndsWith(".csv", StringComparison.InvariantCultureIgnoreCase))
-        {
-            fileContent = CreateCsvContent();
-        }
-        else if (sFile.Name.EndsWith(".json", StringComparison.InvariantCultureIgnoreCase))
-        {
-            fileContent = JsonEx.ToJson(_exifTool);
-        }
+        if (await OpenSaveFileDialog(extension) is not IStorageFile destFile) return;
 
-        await WriteTextFileAsync(fileContent, sFile);
+        await _exifTool.ExportAs(fileType, destFile);
     }
 
 
@@ -435,76 +425,6 @@ public partial class MainWindow : Window
         return fileSaver;
     }
 
-
-    /// <summary>
-    /// Create text content.
-    /// </summary>
-    private string CreateTextContent()
-    {
-        var contentBuilder = new StringBuilder();
-
-
-        // find the longest Tag Name in the list
-        var propMaxLength = _exifTool.Max(item => item.Name.Length);
-        var currentGroup = "";
-
-        foreach (var item in _exifTool)
-        {
-            // append group heading
-            if (item.Group != currentGroup)
-            {
-                var groupLine = item.Group.PadRight(propMaxLength + 5, '-') + ":";
-                if (currentGroup.Length > 0)
-                {
-                    groupLine = "\n" + groupLine;
-                }
-
-                contentBuilder.AppendLine(groupLine);
-
-                currentGroup = item.Group;
-            }
-
-            // append exif item
-            contentBuilder.AppendLine(item.Name.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.Value);
-        }
-
-        return contentBuilder.ToString();
-    }
-
-
-    /// <summary>
-    /// Create CSV content.
-    /// </summary>
-    private string CreateCsvContent()
-    {
-        var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
-            $"\"{nameof(ExifTagItem.TagId)}\"," +
-            $"\"{nameof(ExifTagItem.Group)}\"," +
-            $"\"{nameof(ExifTagItem.Name)}\"," +
-            $"\"{nameof(ExifTagItem.Value)}\"\r\n";
-
-        var csvRows = _exifTool
-            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
-        var csvContent = string.Join("\r\n", csvRows);
-
-
-        return $"{csvHeader}{csvContent}";
-    }
-
-
-    /// <summary>
-    /// Writes the <paramref name="fileContent"/> to <paramref name="sFile"/>.
-    /// </summary>
-    private static async Task WriteTextFileAsync(string? fileContent, IStorageFile? sFile)
-    {
-        if (string.IsNullOrEmpty(fileContent) || sFile == null) return;
-
-        using var writer = await sFile.OpenWriteAsync();
-        var fileBuffer = Encoding.UTF8.GetBytes(fileContent);
-
-        await writer.WriteAsync(new ReadOnlyMemory<byte>(fileBuffer));
-        await writer.FlushAsync();
-    }
 
     #endregion // Private methods
 

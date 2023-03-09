@@ -89,6 +89,7 @@ public class ExifTool : List<ExifTagItem>
             var cmd = Cli.Wrap(ExifToolPath);
             var cmdResult = await cmd
                 .WithArguments($"{DefaultCommands} \"{cleanPath}\" {string.Join(" ", exifToolCmd)}")
+                .WithValidation(CommandResultValidation.None)
                 .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
 
             cmdOutput = cmdResult.StandardOutput;

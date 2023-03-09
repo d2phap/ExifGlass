@@ -111,7 +111,6 @@
                     Name="BtnCopy"
                     Grid.Column="1"
                     Margin="10,0,0,0"
-                    HotKeyManager.HotKey="Ctrl+C"
                     IsEnabled="False"
                     ToolTip.Tip="Ctrl+C">
                     Copy selected value
@@ -121,19 +120,23 @@
                     Grid.Column="2"
                     Margin="10,0,0,0"
                     Content="Export as..."
+                    FontFamily="Segoe UI"
                     IsEnabled="False">
                     <DropDownButton.Flyout>
                         <MenuFlyout>
                             <MenuItem
                                 Name="MnuExportText"
+                                FontFamily="Segoe UI"
                                 Header="Text file..."
                                 InputGesture="Ctrl+D1" />
                             <MenuItem
                                 Name="MnuExportCsv"
+                                FontFamily="Segoe UI"
                                 Header="CSV file..."
                                 InputGesture="Ctrl+D2" />
                             <MenuItem
                                 Name="MnuExportJson"
+                                FontFamily="Segoe UI"
                                 Header="JSON file..."
                                 InputGesture="Ctrl+D3" />
                         </MenuFlyout>
@@ -144,7 +147,6 @@
                     Name="BtnSettings"
                     Grid.Column="3"
                     Margin="10,0,0,0"
-                    Classes="btn"
                     HotKeyManager.HotKey="Ctrl+,"
                     ToolTip.Tip="Ctrl+,">
                     Settings...

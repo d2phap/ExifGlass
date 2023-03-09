@@ -67,6 +67,7 @@ public partial class MainWindow : Window
 
         DtGrid.LoadingRowGroup += DtGrid_LoadingRowGroup;
         DtGrid.LoadingRow += DtGrid_LoadingRow;
+        DtGrid.KeyDown += DtGrid_KeyDown;
 
         BtnSettings.Click += BtnSettings_Click;
         BtnOpenFile.Click += BtnOpenFile_Click;
@@ -106,6 +107,7 @@ public partial class MainWindow : Window
 
         DtGrid.LoadingRowGroup -= DtGrid_LoadingRowGroup;
         DtGrid.LoadingRow -= DtGrid_LoadingRow;
+        DtGrid.KeyDown -= DtGrid_KeyDown;
 
         BtnSettings.Click -= BtnSettings_Click;
         BtnOpenFile.Click -= BtnOpenFile_Click;
@@ -116,21 +118,23 @@ public partial class MainWindow : Window
         MnuExportJson.Click -= MnuExportJson_Click;
     }
 
-
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
 
         if (e.KeyModifiers == KeyModifiers.Control)
         {
+            // Ctrl + 1
             if (e.Key == Key.D1)
             {
                 MnuExportText_Click(MnuExportText, new RoutedEventArgs());
             }
+            // Ctrl + 2
             else if (e.Key == Key.D2)
             {
                 MnuExportCsv_Click(MnuExportCsv, new RoutedEventArgs());
             }
+            // Ctrl + 3
             else if (e.Key == Key.D3)
             {
                 MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
@@ -242,6 +246,19 @@ public partial class MainWindow : Window
         else
         {
             Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
+        }
+    }
+
+
+    private void DtGrid_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyModifiers == KeyModifiers.Control)
+        {
+            // Ctrl + C
+            if (e.Key == Key.C)
+            {
+                BtnCopy_Click(BtnCopy, new RoutedEventArgs());
+            }
         }
     }
 

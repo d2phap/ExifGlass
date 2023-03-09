@@ -45,7 +45,7 @@ public partial class MainWindow : Window
     private PipeClient? _client;
 
 
-    private ExifTool _exifTool = new("exiftool");
+    private readonly ExifTool _exifTool = new("exiftool");
     private string _filePath = string.Empty;
 
 
@@ -386,8 +386,8 @@ public partial class MainWindow : Window
         var fileName = Path.GetFileNameWithoutExtension(_filePath);
         var defaultFilename = $"{fileName}{defaultExt}";
         var typeChoices = new List<FilePickerFileType>();
-        
-        if (isExtEmpty || defaultExt.Equals(".txt", StringComparison.InvariantCultureIgnoreCase)) 
+
+        if (isExtEmpty || defaultExt.Equals(".txt", StringComparison.InvariantCultureIgnoreCase))
         {
             typeChoices.Add(new FilePickerFileType("Text file (*.txt)")
             {
@@ -395,7 +395,7 @@ public partial class MainWindow : Window
                 Patterns = new string[] { "*.txt" },
             });
         }
-        
+
         if (isExtEmpty || defaultExt.Equals(".csv", StringComparison.InvariantCultureIgnoreCase))
         {
             typeChoices.Add(new FilePickerFileType("CSV file (*.csv)")
@@ -404,7 +404,7 @@ public partial class MainWindow : Window
                 Patterns = new string[] { "*.csv" },
             });
         }
-        
+
         if (isExtEmpty || defaultExt.Equals(".json", StringComparison.InvariantCultureIgnoreCase))
         {
             typeChoices.Add(new FilePickerFileType("JSON file (*.json)")

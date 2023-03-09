@@ -21,6 +21,7 @@ using CliWrap;
 using CliWrap.Buffered;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -80,14 +81,32 @@ public class ExifTool : List<ExifTagItem>
         CancellationToken cancelToken = default,
         params string[] exifToolCmd)
     {
-        var cmd = Cli.Wrap(ExifToolPath);
-        var cmdResult = await cmd
-            .WithArguments($"{DefaultCommands} \"{filePath}\" {string.Join(" ", exifToolCmd)}")
-            .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
+        var cmdOutput = string.Empty;
+        var pathContainsUnicode = CheckAndPurifyUnicodePath(filePath, out var cleanPath);
 
-        var cmdOutput = cmdResult.StandardOutput;
-        
-        ParseExifTags(cmdOutput);
+        try
+        {
+            var cmd = Cli.Wrap(ExifToolPath);
+            var cmdResult = await cmd
+                .WithArguments($"{DefaultCommands} \"{cleanPath}\" {string.Join(" ", exifToolCmd)}")
+                .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
+
+            cmdOutput = cmdResult.StandardOutput;
+        }
+        finally
+        {
+            // delete temporary file
+            if (pathContainsUnicode)
+            {
+                try
+                {
+                    File.Delete(cleanPath);
+                }
+                catch { }
+            }
+        }
+
+        ParseExifTags(cmdOutput, Path.GetFileName(filePath));
     }
 
 
@@ -189,7 +208,7 @@ public class ExifTool : List<ExifTagItem>
     /// <summary>
     /// Parses Exiftool's command-line output.
     /// </summary>
-    private void ParseExifTags(string cmdOutput)
+    private void ParseExifTags(string cmdOutput, string originalFileName)
     {
         var index = 0;
         Clear();
@@ -221,6 +240,9 @@ public class ExifTool : List<ExifTagItem>
                 tpos1 = tagValue.IndexOf(", use -b option to extract");
                 if (tpos1 >= 0)
                     _ = tagValue.Remove(tpos1, 26);
+
+                // 
+                if (tagName.Equals("File Name")) tagValue = originalFileName;
 
                 Add(new ExifTagItem()
                 {
@@ -257,6 +279,41 @@ public class ExifTool : List<ExifTagItem>
         await writer.FlushAsync();
     }
 
+
+    /// <summary>
+    /// Purifies <paramref name="filePath"/> if it contains unicode character.
+    /// </summary>
+    /// <returns>
+    /// <c>true</c> if the <paramref name="filePath"/> contains unicode and is purified.
+    /// </returns>
+    private static bool CheckAndPurifyUnicodePath(string filePath, out string cleanPath)
+    {
+        const int MAX_ANSICODE = 255;
+
+
+        // exiftool does not support unicode filename
+        var dirPath = Path.GetDirectoryName(filePath) ?? "";
+        var fileNameNoExt = Path.GetFileNameWithoutExtension(filePath);
+        var ext = Path.GetExtension(filePath);
+
+
+        // directory has unicode char
+        if (filePath.Any(c => c > MAX_ANSICODE))
+        {
+            // copy and rename it
+            try
+            {
+                cleanPath = Path.GetTempFileName() + ext;
+                File.Copy(filePath, cleanPath, true);
+
+                return true;
+            }
+            catch (Exception) { }
+        }
+
+        cleanPath = filePath;
+        return false;
+    }
 
     #endregion // Private methods
 

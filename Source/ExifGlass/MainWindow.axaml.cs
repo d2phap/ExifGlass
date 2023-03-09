@@ -280,7 +280,7 @@ public partial class MainWindow : Window
         var files = await StorageProvider.OpenFilePickerAsync(new());
         if (files.SingleOrDefault() is not IStorageFile file) return;
 
-        await LoadExifMetadatAsync(file.Path.AbsolutePath);
+        await LoadExifMetadatAsync(file.Path.LocalPath);
     }
 
 

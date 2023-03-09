@@ -62,6 +62,8 @@ public partial class MainWindow : Window
         // controls events
         GotFocus += MainWindow_GotFocus;
         LostFocus += MainWindow_LostFocus;
+        SizeChanged += MainWindow_SizeChanged;
+        PropertyChanged += MainWindow_PropertyChanged;
         AddHandler(DragDrop.DragOverEvent, OnFileDragOver);
         AddHandler(DragDrop.DropEvent, OnFileDrop);
 
@@ -76,6 +78,32 @@ public partial class MainWindow : Window
         MnuExportText.Click += MnuExportText_Click;
         MnuExportCsv.Click += MnuExportCsv_Click;
         MnuExportJson.Click += MnuExportJson_Click;
+    }
+
+
+    private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if (WindowState == WindowState.Normal)
+        {
+            Config.WindowWidth = (int)e.PreviousSize.Width;
+            Config.WindowHeight = (int)e.PreviousSize.Height;
+        }
+    }
+
+    private void MainWindow_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property.Name == nameof(WindowState))
+        {
+            // restore
+            if (WindowState == WindowState.Normal && Config.WindowState == WindowState.Maximized)
+            {
+                Position = new PixelPoint(Config.WindowPositionX, Config.WindowPositionY);
+                Width = Config.WindowWidth;
+                Height = Config.WindowHeight;
+            }
+
+            Config.WindowState = WindowState;
+        }
     }
 
 
@@ -94,14 +122,15 @@ public partial class MainWindow : Window
         }
     }
 
-
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         base.OnClosing(e);
-
+        
         // controls events
         GotFocus -= MainWindow_GotFocus;
         LostFocus -= MainWindow_LostFocus;
+        SizeChanged -= MainWindow_SizeChanged;
+        PropertyChanged -= MainWindow_PropertyChanged;
         RemoveHandler(DragDrop.DragOverEvent, OnFileDragOver);
         RemoveHandler(DragDrop.DropEvent, OnFileDrop);
 
@@ -116,6 +145,20 @@ public partial class MainWindow : Window
         MnuExportText.Click -= MnuExportText_Click;
         MnuExportCsv.Click -= MnuExportCsv_Click;
         MnuExportJson.Click -= MnuExportJson_Click;
+
+
+        // save configs
+        Config.WindowState = WindowState == WindowState.Maximized
+                ? WindowState.Maximized
+                : WindowState.Normal;
+
+        if (Config.WindowState != WindowState.Maximized)
+        {
+            Config.WindowPositionX = Position.X;
+            Config.WindowPositionY = Position.Y;
+            Config.WindowWidth = (int)Width;
+            Config.WindowHeight = (int)Height;
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

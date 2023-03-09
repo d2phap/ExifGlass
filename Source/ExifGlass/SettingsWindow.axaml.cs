@@ -30,6 +30,11 @@ namespace ExifGlass;
 
 public partial class SettingsWindow : Window
 {
+    /// <summary>
+    /// Gets the result of <see cref="SettingsWindow"/>.
+    /// </summary>
+    public SettingsResult Result { get; private set; } = SettingsResult.Cancel;
+
     public SettingsWindow()
     {
         InitializeComponent();
@@ -45,9 +50,16 @@ public partial class SettingsWindow : Window
         TxtArguments.TextChanged += ExifToolConfig_Changed;
     }
 
-    private void ExifToolConfig_Changed(object? sender, TextChangedEventArgs e)
+
+    protected override void OnLoaded()
     {
-        TxtPreview.Text = $"{TxtExecutable.Text?.Trim()} {ExifTool.DefaultCommands} {TxtArguments.Text?.Trim()} \"C:\\path\\to\\photo.jpg\"";   
+        base.OnLoaded();
+
+        // Loads user settings
+        ChkTopMost.IsChecked = Topmost = Config.EnableWindowTopMost;
+        TxtExecutable.Text = Config.ExifToolExecutable;
+        TxtArguments.Text = Config.ExifToolArguments;
+        Result = SettingsResult.Cancel;
     }
 
 
@@ -58,6 +70,7 @@ public partial class SettingsWindow : Window
     {
         this.SetDynamicResource(BackgroundProperty, "SystemAltMediumHighColor");
     }
+
 
     private void SettingsWindow_LostFocus(object? sender, RoutedEventArgs e)
     {
@@ -74,10 +87,17 @@ public partial class SettingsWindow : Window
     }
 
 
+    private void ExifToolConfig_Changed(object? sender, TextChangedEventArgs e)
+    {
+        TxtPreview.Text = $"{TxtExecutable.Text?.Trim()} {ExifTool.DefaultCommands} {TxtArguments.Text?.Trim()} \"C:\\path\\to\\photo.jpg\"";
+    }
+
+
     private void BtnSelectExecutable_Click(object? sender, RoutedEventArgs e)
     {
         _ = OpenFilePickerAsync();
     }
+
 
     private async Task OpenFilePickerAsync()
     {
@@ -99,17 +119,28 @@ public partial class SettingsWindow : Window
 
     private void BtnOK_Click(object? sender, RoutedEventArgs e)
     {
+        Config.EnableWindowTopMost = ChkTopMost.IsChecked ?? false;
+        Config.ExifToolExecutable = (TxtExecutable.Text ?? "").Trim();
+        Config.ExifToolArguments = (TxtArguments.Text ?? "").Trim();
 
+        Result = SettingsResult.OK;
+        Close();
     }
 
     private void BtnCancel_Click(object? sender, RoutedEventArgs e)
     {
+        Result = SettingsResult.Cancel;
         Close();
     }
-
 
     #endregion // Control events
 
 
+}
 
+
+public enum SettingsResult
+{
+    OK,
+    Cancel,
 }

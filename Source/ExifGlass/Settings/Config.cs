@@ -73,6 +73,16 @@ public class Config
     /// </summary>
     public static ThemeMode ThemeMode { get; set; } = ThemeMode.Default;
 
+    /// <summary>
+    /// Gets, sets the executable path of ExifTool.
+    /// </summary>
+    public static string ExifToolExecutable { get; set; } = "exiftool";
+
+    /// <summary>
+    /// Gets, sets the command-line arguments of ExifTool.
+    /// </summary>
+    public static string ExifToolArguments { get; set; } = string.Empty;
+
     #endregion
 
 
@@ -93,6 +103,8 @@ public class Config
         WindowState = items.GetValue(nameof(WindowState), WindowState);
         EnableWindowTopMost = items.GetValue(nameof(EnableWindowTopMost), EnableWindowTopMost);
         ThemeMode = items.GetValue(nameof(ThemeMode), ThemeMode);
+        ExifToolExecutable = items.GetValue(nameof(ExifToolExecutable), ExifToolExecutable);
+        ExifToolArguments = items.GetValue(nameof(ExifToolArguments), ExifToolArguments);
     }
 
 
@@ -118,6 +130,8 @@ public class Config
         _ = settings.TryAdd(nameof(WindowState), WindowState);
         _ = settings.TryAdd(nameof(EnableWindowTopMost), EnableWindowTopMost);
         _ = settings.TryAdd(nameof(ThemeMode), ThemeMode);
+        _ = settings.TryAdd(nameof(ExifToolExecutable), ExifToolExecutable);
+        _ = settings.TryAdd(nameof(ExifToolArguments), ExifToolArguments);
 
 
         await JsonEx.WriteJsonAsync(ConfigFilePath, settings);

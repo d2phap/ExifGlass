@@ -104,9 +104,7 @@
                             <SelectableTextBlock
                                 Name="TxtPreview"
                                 SelectionBrush="{DynamicResource SelectionColorBrush}"
-                                TextWrapping="Wrap">
-                                exiftool -fast -G -t -m -q  "C:\Users\Desktop\file2.tif"
-                            </SelectableTextBlock>
+                                TextWrapping="Wrap" />
                         </ScrollViewer>
                     </Border>
                 </StackPanel>

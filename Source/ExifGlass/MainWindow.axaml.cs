@@ -22,6 +22,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -386,10 +387,44 @@ public partial class MainWindow : Window
 
     private async Task ShowSettingsAsync()
     {
+        if (Screens.ScreenFromVisual(this) is not Screen screen) return;
+
+
         var win = new SettingsWindow()
         {
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            WindowStartupLocation = WindowStartupLocation.Manual,
         };
+
+        // calculate the best position to show dialog
+        var ownerActualWidth = (int)(Width * screen.Scaling);
+        var childActualWidth = (int)(win.Width * screen.Scaling);
+        var minChildVisibleWidth = (int)(childActualWidth / 1.5f);
+
+        var ownerLeft = Position.X;
+        var ownerRight = ownerLeft + ownerActualWidth;
+        var childPosition = new PixelPoint(
+            Position.X + ownerActualWidth,
+            Position.Y);
+        
+        var leftGap = ownerLeft - screen.WorkingArea.X;
+        var rightGap = screen.WorkingArea.Right - ownerRight;
+
+        if (leftGap < minChildVisibleWidth && rightGap < minChildVisibleWidth)
+        {
+            win.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+        }
+        else if (rightGap > leftGap)
+        {
+            childPosition = childPosition.WithX(Math.Min(screen.WorkingArea.Right - childActualWidth, ownerRight));
+        }
+        else
+        {
+            var x = ownerLeft - childActualWidth;
+            childPosition = childPosition.WithX(Math.Max(screen.WorkingArea.X, x));
+        }
+
+
+        win.Position = childPosition;
         await win.ShowDialog(this);
 
         // apply settings

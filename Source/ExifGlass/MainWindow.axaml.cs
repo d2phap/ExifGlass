@@ -72,13 +72,15 @@ public partial class MainWindow : Window
         DtGrid.LoadingRow += DtGrid_LoadingRow;
         DtGrid.KeyDown += DtGrid_KeyDown;
 
-        BtnSettings.Click += BtnSettings_Click;
         BtnOpenFile.Click += BtnOpenFile_Click;
         BtnCopy.Click += BtnCopy_Click;
 
         MnuExportText.Click += MnuExportText_Click;
         MnuExportCsv.Click += MnuExportCsv_Click;
         MnuExportJson.Click += MnuExportJson_Click;
+
+        MnuSettings.Click += MnuSettings_Click;
+        MnuAbout.Click += MnuAbout_Click;
     }
 
 
@@ -144,13 +146,15 @@ public partial class MainWindow : Window
         DtGrid.LoadingRow -= DtGrid_LoadingRow;
         DtGrid.KeyDown -= DtGrid_KeyDown;
 
-        BtnSettings.Click -= BtnSettings_Click;
         BtnOpenFile.Click -= BtnOpenFile_Click;
         BtnCopy.Click -= BtnCopy_Click;
 
         MnuExportText.Click -= MnuExportText_Click;
         MnuExportCsv.Click -= MnuExportCsv_Click;
         MnuExportJson.Click -= MnuExportJson_Click;
+
+        MnuSettings.Click -= MnuSettings_Click;
+        MnuAbout.Click -= MnuAbout_Click;
 
 
         // save configs
@@ -187,6 +191,11 @@ public partial class MainWindow : Window
             else if (e.Key == Key.D3)
             {
                 MnuExportJson_Click(MnuExportJson, new RoutedEventArgs());
+            }
+            // Ctrl + ,
+            else if (e.Key == Key.OemComma)
+            {
+                MnuSettings_Click(MnuSettings, new RoutedEventArgs());
             }
         }
     }
@@ -372,10 +381,17 @@ public partial class MainWindow : Window
     }
 
 
-    private void BtnSettings_Click(object? sender, RoutedEventArgs e)
+    private void MnuSettings_Click(object? sender, RoutedEventArgs e)
     {
         _ = ShowSettingsAsync();
     }
+
+
+    private void MnuAbout_Click(object? sender, RoutedEventArgs e)
+    {
+
+    }
+
 
     private async Task ShowSettingsAsync()
     {

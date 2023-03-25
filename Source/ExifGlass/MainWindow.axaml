@@ -11,7 +11,7 @@
     d:DesignWidth="800"
     Background="{DynamicResource SystemAltMediumHighColor}"
     DragDrop.AllowDrop="True"
-    FontFamily="Segoe UI"
+    FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
     TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
     TransparencyLevelHint="Mica"
@@ -108,8 +108,10 @@
                     Grid.Column="0"
                     Classes="accent"
                     HotKeyManager.HotKey="Ctrl+O"
-                    ToolTip.Tip="Ctrl+O">
-                    Open file...
+                    ToolTip.Placement="Top"
+                    ToolTip.Tip="Open file… (Ctrl+O)"
+                    ToolTip.VerticalOffset="-5">
+                    Open file…
                 </Button>
 
 
@@ -118,45 +120,67 @@
                     Grid.Column="1"
                     Margin="10,0,0,0"
                     IsEnabled="False"
-                    ToolTip.Tip="Ctrl+C">
+                    ToolTip.Placement="Top"
+                    ToolTip.Tip="Copy selected value (Ctrl+C)"
+                    ToolTip.VerticalOffset="-5">
                     Copy selected value
                 </Button>
                 <DropDownButton
                     Name="BtnExport"
                     Grid.Column="2"
                     Margin="10,0,0,0"
-                    Content="Export as..."
-                    FontFamily="Segoe UI"
-                    IsEnabled="False">
+                    Content="Export as…"
+                    FontFamily="Segoe UI Variable, Segoe UI"
+                    IsEnabled="False"
+                    ToolTip.Placement="Top"
+                    ToolTip.Tip="Export as…"
+                    ToolTip.VerticalOffset="-5">
                     <DropDownButton.Flyout>
-                        <MenuFlyout>
+                        <MenuFlyout Placement="TopEdgeAlignedRight">
                             <MenuItem
                                 Name="MnuExportText"
-                                FontFamily="Segoe UI"
-                                Header="Text file..."
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="Text file…"
                                 InputGesture="Ctrl+D1" />
                             <MenuItem
                                 Name="MnuExportCsv"
-                                FontFamily="Segoe UI"
-                                Header="CSV file..."
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="CSV file…"
                                 InputGesture="Ctrl+D2" />
                             <MenuItem
                                 Name="MnuExportJson"
-                                FontFamily="Segoe UI"
-                                Header="JSON file..."
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="JSON file…"
                                 InputGesture="Ctrl+D3" />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
-
                 </DropDownButton>
-                <Button
-                    Name="BtnSettings"
+
+                <DropDownButton
+                    Name="BtnMenu"
                     Grid.Column="3"
                     Margin="10,0,0,0"
-                    HotKeyManager.HotKey="Ctrl+,"
-                    ToolTip.Tip="Ctrl+,">
-                    Settings...
-                </Button>
+                    Content="…"
+                    FontFamily="Segoe UI Variable, Segoe UI"
+                    ToolTip.Placement="Top"
+                    ToolTip.Tip="Menu"
+                    ToolTip.VerticalOffset="-5">
+                    <DropDownButton.Flyout>
+                        <MenuFlyout Placement="TopEdgeAlignedRight">
+                            <MenuItem
+                                Name="MnuSettings"
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="Settings…"
+                                InputGesture="Ctrl+," />
+                            <MenuItem Header="-" />
+                            <MenuItem
+                                Name="MnuAbout"
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="About…"
+                                InputGesture="F1" />
+                        </MenuFlyout>
+                    </DropDownButton.Flyout>
+                </DropDownButton>
             </Grid>
         </StackPanel>
     </Grid>

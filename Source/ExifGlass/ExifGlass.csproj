@@ -8,7 +8,13 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <EntryPointExe>$(AssemblyName).exe</EntryPointExe>
     <Platforms>AnyCPU;x64;x86</Platforms>
+    <ApplicationIcon>Assets\exifglass_icon_512.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <Content Include="Assets\exifglass_icon_512.ico" />
+  </ItemGroup>
+    
 
 
   <ItemGroup>

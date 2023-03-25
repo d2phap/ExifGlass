@@ -12,6 +12,7 @@
     Background="{DynamicResource SystemAltMediumHighColor}"
     DragDrop.AllowDrop="True"
     FontFamily="Segoe UI"
+    Icon="Assets\exifglass_icon_512.ico"
     TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
     TransparencyLevelHint="Mica"
     mc:Ignorable="d">

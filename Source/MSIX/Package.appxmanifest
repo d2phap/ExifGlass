@@ -11,12 +11,13 @@
   <Identity
     Name="ExifGlass"
     Publisher="CN=Duong Dieu Phap, O=Duong Dieu Phap, S=Tây Ninh, C=VN"
-    Version="1.0.2.0" />
+    Version="1.0.5.0" />
 
   <Properties>
     <DisplayName>ExifGlass</DisplayName>
     <PublisherDisplayName>Duong Dieu Phap</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
+    <Description>EXIF metadata viewer - a wrapper of ExifTool</Description>
   </Properties>
 
   <Dependencies>
@@ -34,11 +35,12 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="ExifGlass"
-        Description="Exif metadata viewer for ImageGlass"
+        Description="EXIF metadata viewer - a wrapper of ExifTool"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png">
+        </uap:DefaultTile >
         <uap:SplashScreen Image="Images\SplashScreen.png" />
       </uap:VisualElements>
     </Application>

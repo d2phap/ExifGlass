@@ -1,0 +1,155 @@
+<Window
+    x:Class="ExifGlass.AboutWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="About"
+    d:DesignHeight="450"
+    d:DesignWidth="400"
+    Background="{DynamicResource SystemAltMediumHighColor}"
+    CanResize="False"
+    CornerRadius="100"
+    DragDrop.AllowDrop="True"
+    ExtendClientAreaChromeHints="NoChrome"
+    ExtendClientAreaToDecorationsHint="True"
+    FontFamily="Segoe UI Variable, Segoe UI"
+    Icon="Assets\exifglass_icon_512.ico"
+    SizeToContent="WidthAndHeight"
+    TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
+    TransparencyLevelHint="Mica"
+    mc:Ignorable="d">
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        ColumnDefinitions="*, Auto">
+        <!--  Left side  -->
+        <StackPanel
+            Grid.Column="0"
+            Margin="15,15,30,15"
+            Orientation="Vertical">
+            <Image
+                Width="96"
+                Height="96"
+                Margin="0,15,0,15"
+                Source="Assets/exifglass_icon_512.ico" />
+
+            <Label
+                HorizontalContentAlignment="Center"
+                FontSize="24"
+                Foreground="{DynamicResource SystemAccentColor}">
+                ExifGlass
+            </Label>
+            <Label
+                Margin="0,-5,0,15"
+                HorizontalContentAlignment="Center"
+                FontSize="16">
+                EXIF metadata viewer
+            </Label>
+        </StackPanel>
+
+
+        <!--  Right side  -->
+        <Grid
+            Grid.Column="1"
+            Margin="0,30,0,0"
+            VerticalAlignment="Stretch"
+            RowDefinitions="*, Auto">
+            <Border
+                Grid.Row="0"
+                Padding="15,15,15,15"
+                Background="{DynamicResource SystemAltMediumColor}"
+                CornerRadius="10,0,0,10">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock
+                        FontSize="17"
+                        FontWeight="SemiBold"
+                        TextWrapping="Wrap">
+                        Version: 1.0.0.1
+                    </TextBlock>
+                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">Copyright (c) 2023 by Dương Diệu Pháp.</TextBlock>
+                    <TextBlock TextWrapping="Wrap">All rights reserved.</TextBlock>
+
+                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">
+                        Website:
+                        <TextBlock
+                            Name="LnkWebsite"
+                            Cursor="Hand"
+                            Foreground="{DynamicResource SystemAccentColor}"
+                            TextDecorations="Underline">
+                            https://github.com/d2phap/ExifGlass
+                        </TextBlock>
+                    </TextBlock>
+
+
+                    <Expander
+                        MinWidth="400"
+                        MaxWidth="500"
+                        Margin="0,20,0,0"
+                        Padding="0"
+                        HorizontalAlignment="Stretch"
+                        FontWeight="SemiBold"
+                        Header="Licenses and Credits">
+                        <ScrollViewer
+                            MaxHeight="150"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Auto">
+                            <SelectableTextBlock
+                                Margin="15,15,15,15"
+                                FontWeight="Normal"
+                                SelectionBrush="{DynamicResource SelectionColorBrush}"
+                                TextWrapping="Wrap">
+                                <StackPanel Orientation="Vertical">
+                                    <SelectableTextBlock FontWeight="SemiBold" SelectionBrush="{DynamicResource SelectionColorBrush}">
+                                        Avalonia
+                                    </SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) The AvaloniUI project.</SelectableTextBlock>
+
+
+                                    <SelectableTextBlock
+                                        Margin="0,10,0,0"
+                                        FontWeight="SemiBold"
+                                        SelectionBrush="{DynamicResource SelectionColorBrush}">
+                                        ExifTool
+                                    </SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Perl license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) Phil Harvey.</SelectableTextBlock>
+
+
+                                    <SelectableTextBlock
+                                        Margin="0,10,0,0"
+                                        FontWeight="SemiBold"
+                                        SelectionBrush="{DynamicResource SelectionColorBrush}">
+                                        CliWrap
+                                    </SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) Oleksii Holub.</SelectableTextBlock>
+                                </StackPanel>
+                            </SelectableTextBlock>
+                        </ScrollViewer>
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+
+            <!--  Footer  -->
+            <Border
+                Grid.Row="1"
+                Padding="15"
+                ZIndex="1">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Button
+                        Name="BtnClose"
+                        Grid.Column="1"
+                        MinWidth="80"
+                        Margin="15,0,0,0"
+                        HorizontalContentAlignment="Center">
+                        Close
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+</Window>

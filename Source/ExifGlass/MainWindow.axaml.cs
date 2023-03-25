@@ -198,6 +198,11 @@ public partial class MainWindow : Window
                 MnuSettings_Click(MnuSettings, new RoutedEventArgs());
             }
         }
+        // F1
+        else if (e.Key == Key.F1)
+        {
+            MnuAbout_Click(MnuAbout, new RoutedEventArgs());
+        }
     }
 
     #endregion // Protected methods
@@ -389,7 +394,13 @@ public partial class MainWindow : Window
 
     private void MnuAbout_Click(object? sender, RoutedEventArgs e)
     {
+        var win = new AboutWindow()
+        {
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Topmost = Config.EnableWindowTopMost,
+        };
 
+        _ = win.ShowDialog(this);
     }
 
 

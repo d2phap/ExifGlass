@@ -239,36 +239,28 @@ public partial class MainWindow : Window
 
     // File drag-n-drop
     #region File drag-n-drop
+
     private void OnFileDragOver(object? sender, DragEventArgs e)
     {
-        // Only allow Copy or Link as Drop Operations.
-        e.DragEffects = DragDropEffects.Copy | DragDropEffects.Link;
-
-        // block if dragged data do not contain file path
-        if (!e.Data.Contains(DataFormats.Files))
+        // check if the drag data contains a file
+        if (e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile
+            && !File.GetAttributes(sFile.Path.LocalPath).HasFlag(FileAttributes.Directory))
+        {
+            e.DragEffects = DragDropEffects.Copy | DragDropEffects.Link;
+        }
+        else
         {
             e.DragEffects = DragDropEffects.None;
         }
-        else if (e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile)
-        {
-            // block if the path is a dirrectory, not a file
-            var attrs = File.GetAttributes(sFile.Path.LocalPath);
-            if (attrs.HasFlag(FileAttributes.Directory))
-            {
-                e.DragEffects = DragDropEffects.None;
-            }
-        }
     }
+
 
     private void OnFileDrop(object? sender, DragEventArgs e)
     {
-        if (e.Data.Contains(DataFormats.Files)
-            && e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile)
+        // check if the drag data contains a file
+        if (e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile
+            && !File.GetAttributes(sFile.Path.LocalPath).HasFlag(FileAttributes.Directory))
         {
-            // check if the path is a dirrectory or a file
-            var attrs = File.GetAttributes(sFile.Path.LocalPath);
-            if (attrs.HasFlag(FileAttributes.Directory)) return;
-
             _ = LoadExifMetadatAsync(sFile.Path.LocalPath);
         }
     }

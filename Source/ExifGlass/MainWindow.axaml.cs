@@ -424,7 +424,7 @@ public partial class MainWindow : Window
         var childPosition = new PixelPoint(
             Position.X + ownerActualWidth,
             Position.Y);
-        
+
         var leftGap = ownerLeft - screen.WorkingArea.X;
         var rightGap = screen.WorkingArea.Right - ownerRight;
 

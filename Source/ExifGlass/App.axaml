@@ -22,6 +22,13 @@
         <x:Double x:Key="DataGridRowSelectedHoveredUnfocusedBackgroundOpacity">0.4</x:Double>
 
 
+
+        <!--  Expander  -->
+        <x:Double x:Key="ExpanderChevronButtonSize">24</x:Double>
+        <Thickness x:Key="ExpanderChevronMargin">20,0,4,0</Thickness>
+
+
+
         <!--  DataGrid: DataGridCell  -->
         <ControlTheme x:Key="{x:Type DataGridCell}" TargetType="DataGridCell">
             <Setter Property="Background" Value="{DynamicResource DataGridCellBackgroundBrush}" />
@@ -215,6 +222,7 @@
                 </Style>
             </Style>
         </ControlTheme>
+
 
 
     </Application.Resources>

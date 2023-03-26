@@ -26,26 +26,13 @@
         <!--  Left side  -->
         <StackPanel
             Grid.Column="0"
-            Margin="15,15,30,15"
+            Margin="30,15,30,15"
             Orientation="Vertical">
             <Image
                 Width="96"
                 Height="96"
                 Margin="0,15,0,15"
                 Source="Assets/exifglass_icon_512.ico" />
-
-            <Label
-                HorizontalContentAlignment="Center"
-                FontSize="24"
-                Foreground="{DynamicResource SystemAccentColor}">
-                ExifGlass
-            </Label>
-            <Label
-                Margin="0,-5,0,15"
-                HorizontalContentAlignment="Center"
-                FontSize="16">
-                EXIF metadata viewer
-            </Label>
         </StackPanel>
 
 
@@ -62,34 +49,57 @@
                 CornerRadius="10,0,0,10">
                 <StackPanel Orientation="Vertical">
                     <TextBlock
-                        FontSize="17"
+                        FontSize="24"
                         FontWeight="SemiBold"
+                        Foreground="{DynamicResource SystemAccentColor}"
                         TextWrapping="Wrap">
-                        Version: 1.0.0.1
+                        ExifGlass
                     </TextBlock>
-                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">Copyright (c) 2023 by Dương Diệu Pháp.</TextBlock>
+                    <TextBlock FontSize="15" TextWrapping="Wrap">
+                        EXIF metadata viewer
+                    </TextBlock>
+
+
+                    <StackPanel Margin="0,20,0,0" Orientation="Horizontal">
+                        <TextBlock
+                            Margin="0,0,5,0"
+                            FontSize="17"
+                            FontWeight="SemiBold">
+                            Version:
+                        </TextBlock>
+                        <TextBlock
+                            Name="TblVersion"
+                            FontSize="17"
+                            FontWeight="SemiBold">
+                            1.0.0.1
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">Copyright © 2023 by Dương Diệu Pháp.</TextBlock>
                     <TextBlock TextWrapping="Wrap">All rights reserved.</TextBlock>
 
-                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap">
-                        Website:
+                    <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,5,0">
+                            Website:
+                        </TextBlock>
                         <TextBlock
-                            Name="LnkWebsite"
+                            Name="TblWebsite"
                             Cursor="Hand"
                             Foreground="{DynamicResource SystemAccentColor}"
                             TextDecorations="Underline">
                             https://github.com/d2phap/ExifGlass
                         </TextBlock>
-                    </TextBlock>
+                    </StackPanel>
 
 
                     <Expander
                         MinWidth="400"
+                        MinHeight="32"
                         MaxWidth="500"
                         Margin="0,20,0,0"
                         Padding="0"
                         HorizontalAlignment="Stretch"
                         FontWeight="SemiBold"
-                        Header="Licenses and Credits">
+                        Header="Licensing and credits">
                         <ScrollViewer
                             MaxHeight="150"
                             HorizontalScrollBarVisibility="Disabled"
@@ -104,7 +114,7 @@
                                         Avalonia
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) The AvaloniUI project.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © The AvaloniUI project.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock
@@ -114,7 +124,7 @@
                                         ExifTool
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Perl license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) Phil Harvey.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Phil Harvey.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock
@@ -124,7 +134,7 @@
                                         CliWrap
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright (c) Oleksii Holub.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Oleksii Holub.</SelectableTextBlock>
                                 </StackPanel>
                             </SelectableTextBlock>
                         </ScrollViewer>

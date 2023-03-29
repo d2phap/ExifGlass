@@ -30,7 +30,6 @@ using ExifGlass.ExifTools;
 using ImageGlass.Tools;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.IO.Pipes;
@@ -41,10 +40,7 @@ namespace ExifGlass;
 
 public partial class MainWindow : Window
 {
-    // use executable path for server name
-    private static string ServerName => $"{ImageGlassTool.PIPENAME_PREFIX}{Process.GetCurrentProcess().MainModule?.FileName}";
     private PipeClient? _client;
-
 
     private readonly ExifTool _exifTool = new("exiftool");
     private string _filePath = string.Empty;
@@ -213,7 +209,9 @@ public partial class MainWindow : Window
 
     private void InitializePipeClient()
     {
-        _client = new PipeClient(ServerName, PipeDirection.InOut);
+        var serverName = ImageGlassTool.CreateServerName();
+
+        _client = new PipeClient(serverName, PipeDirection.InOut);
         _client.MessageReceived += Client_MessageReceived;
         _client.Disconnected += (_, _) => Dispatcher.UIThread.Post(Close);
     }

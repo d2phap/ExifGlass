@@ -468,6 +468,7 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrEmpty(filePath))
         {
+            Title = "ExifGlass";
             DtGrid.Items = Enumerable.Empty<object>();
             return;
         }
@@ -475,6 +476,7 @@ public partial class MainWindow : Window
 
         // show command preview
         _filePath = filePath;
+        Title = $"ExifGlass - {_filePath}";
         TxtCmd.Text = $"{Config.ExifToolExecutable} {ExifTool.DefaultCommands} {Config.ExifToolArguments} \"{filePath}\"";
 
         _exifTool.ExifToolPath = Config.ExifToolExecutable;

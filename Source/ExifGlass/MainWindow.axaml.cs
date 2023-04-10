@@ -123,6 +123,14 @@ public partial class MainWindow : Window
                 .Skip(1)
                 .FirstOrDefault(i => !i.StartsWith("-"));
 
+            filePath ??= string.Empty;
+
+            var protocol = "exifglass:";
+            if (filePath.StartsWith(protocol, StringComparison.InvariantCultureIgnoreCase))
+            {
+                filePath = filePath[protocol.Length..];
+            }
+
             _ = LoadExifMetadatAsync(filePath);
         }
     }

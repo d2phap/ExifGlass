@@ -11,7 +11,7 @@
   <Identity
     Name="ExifGlass"
     Publisher="CN=Duong Dieu Phap, O=Duong Dieu Phap, S=Tây Ninh, C=VN"
-    Version="1.0.5.0" />
+    Version="1.0.7.0" />
 
   <Properties>
     <DisplayName>ExifGlass</DisplayName>
@@ -43,6 +43,14 @@
         </uap:DefaultTile >
         <uap:SplashScreen Image="Images\SplashScreen.png" />
       </uap:VisualElements>
+
+        <Extensions>
+            <uap:Extension
+              Category="windows.protocol">
+                <uap:Protocol
+                  Name="exifglass" />
+            </uap:Extension>
+        </Extensions>
     </Application>
   </Applications>
 

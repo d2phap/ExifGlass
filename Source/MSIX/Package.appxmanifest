@@ -11,7 +11,7 @@
   <Identity
     Name="ExifGlass"
     Publisher="CN=Duong Dieu Phap, O=Duong Dieu Phap, S=Tây Ninh, C=VN"
-    Version="1.0.7.0" />
+    Version="1.0.8.0" />
 
   <Properties>
     <DisplayName>ExifGlass</DisplayName>
@@ -45,11 +45,15 @@
       </uap:VisualElements>
 
         <Extensions>
-            <uap:Extension
-              Category="windows.protocol">
-                <uap:Protocol
-                  Name="exifglass" />
+            <uap:Extension Category="windows.protocol">
+                <uap:Protocol Name="exifglass" />
             </uap:Extension>
+
+            <uap3:Extension Category="windows.appExecutionAlias" EntryPoint="Windows.FullTrustApplication">
+                <uap3:AppExecutionAlias>
+                    <desktop:ExecutionAlias Alias="exifglass.exe" />
+                </uap3:AppExecutionAlias>
+            </uap3:Extension>
         </Extensions>
     </Application>
   </Applications>

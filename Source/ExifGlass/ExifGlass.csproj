@@ -41,11 +41,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
   </ItemGroup>
+    
 
 
   <ItemGroup>
-    <Reference Include="ImageGlass.Tools">
-      <HintPath>..\..\..\..\@d2phap\ImageGlass\v9\Components\ImageGlass.Tool\bin\Debug\net6.0\ImageGlass.Tools.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\@imageglass\ImageGlass.Tools\Source\ImageGlass.Tools\ImageGlass.Tools.csproj" />
   </ItemGroup>
 </Project>

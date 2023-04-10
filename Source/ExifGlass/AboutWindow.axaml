@@ -99,7 +99,7 @@
                         Padding="0"
                         HorizontalAlignment="Stretch"
                         FontWeight="SemiBold"
-                        Header="Licensing and credits">
+                        Header="Credits">
                         <ScrollViewer
                             MaxHeight="150"
                             HorizontalScrollBarVisibility="Disabled"
@@ -121,10 +121,10 @@
                                         Margin="0,10,0,0"
                                         FontWeight="SemiBold"
                                         SelectionBrush="{DynamicResource SelectionColorBrush}">
-                                        ExifTool
+                                        ImageGlass.Tools
                                     </SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Perl license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Phil Harvey.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2013 Duong Dieu Phap.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock

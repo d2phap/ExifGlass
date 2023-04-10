@@ -101,6 +101,14 @@ public class Config
         WindowWidth = items.GetValue(nameof(WindowWidth), WindowWidth);
         WindowHeight = items.GetValue(nameof(WindowHeight), WindowHeight);
         WindowState = items.GetValue(nameof(WindowState), WindowState);
+
+        if (WindowPositionX < 0) WindowPositionX = 0;
+        if (WindowPositionY < 0) WindowPositionY = 0;
+        if (WindowWidth < 10) WindowWidth = 600;
+        if (WindowHeight < 10) WindowHeight = 800;
+        if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
+
+
         EnableWindowTopMost = items.GetValue(nameof(EnableWindowTopMost), EnableWindowTopMost);
         ThemeMode = items.GetValue(nameof(ThemeMode), ThemeMode);
         ExifToolExecutable = items.GetValue(nameof(ExifToolExecutable), ExifToolExecutable);

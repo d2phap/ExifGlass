@@ -82,7 +82,9 @@ public partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (WindowState == WindowState.Normal)
+        if (WindowState == WindowState.Normal
+            && e.PreviousSize.Width > 0
+            && e.PreviousSize.Height > 0)
         {
             Config.WindowWidth = (int)e.PreviousSize.Width;
             Config.WindowHeight = (int)e.PreviousSize.Height;
@@ -112,7 +114,6 @@ public partial class MainWindow : Window
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-
 
         var args = Environment.GetCommandLineArgs();
         if (args.Length >= 2)
@@ -158,7 +159,7 @@ public partial class MainWindow : Window
                 ? WindowState.Maximized
                 : WindowState.Normal;
 
-        if (Config.WindowState != WindowState.Maximized)
+        if (WindowState == WindowState.Normal)
         {
             Config.WindowPositionX = Position.X;
             Config.WindowPositionY = Position.Y;

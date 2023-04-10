@@ -152,19 +152,21 @@ public class ExifTool : List<ExifTagItem>
             // append group heading
             if (item.TagGroup != currentGroup)
             {
-                var groupLine = item.TagGroup.PadRight(propMaxLength + 5, '-') + ":";
+                var groupLine = $"[{item.TagGroup}]";
                 if (currentGroup.Length > 0)
                 {
                     groupLine = "\n" + groupLine;
                 }
 
                 contentBuilder.AppendLine(groupLine);
-
                 currentGroup = item.TagGroup;
             }
 
             // append exif item
-            contentBuilder.AppendLine(item.TagName.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.TagValue);
+            contentBuilder.AppendLine(
+                item.TagId + "\t" +
+                item.TagName + "\t" +
+                item.TagValue);
         }
 
         return contentBuilder.ToString();
@@ -177,13 +179,13 @@ public class ExifTool : List<ExifTagItem>
     public string ToCsv()
     {
         var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
-            $"\"{nameof(ExifTagItem.TagId)}\"," +
             $"\"{nameof(ExifTagItem.TagGroup)}\"," +
+            $"\"{nameof(ExifTagItem.TagId)}\"," +
             $"\"{nameof(ExifTagItem.TagName)}\"," +
             $"\"{nameof(ExifTagItem.TagValue)}\"\r\n";
 
         var csvRows = this
-            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.TagGroup}\",\"{i.TagName}\",\"{i.TagValue}\"");
+            .Select(i => $"\"{i.Index}\",\"{i.TagGroup}\",\"{i.TagId}\",\"{i.TagName}\",\"{i.TagValue}\"");
         var csvContent = string.Join("\r\n", csvRows);
 
 

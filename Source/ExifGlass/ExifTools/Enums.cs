@@ -22,9 +22,9 @@ public class ExifTagItem
 {
     public int Index { get; set; } = -1;
     public string TagId { get; set; } = string.Empty;
-    public string Group { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
+    public string TagGroup { get; set; } = string.Empty;
+    public string TagName { get; set; } = string.Empty;
+    public string TagValue { get; set; } = string.Empty;
 }
 
 

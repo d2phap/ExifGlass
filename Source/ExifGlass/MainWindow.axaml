@@ -34,7 +34,7 @@
                     ClipboardCopyMode="None"
                     IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Index}" Header="Index">
+                        <DataGridTextColumn Binding="{Binding Index}">
                             <DataGridTextColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -47,7 +47,20 @@
                             </DataGridTextColumn.HeaderTemplate>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Binding="{Binding Name}" Header="Name">
+                        <DataGridTextColumn Binding="{Binding TagId}">
+                            <DataGridTextColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource SystemBaseMediumHighColor}">
+                                        Tag ID
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTextColumn.HeaderTemplate>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Binding="{Binding TagName}">
                             <DataGridTextColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <TextBlock
@@ -60,7 +73,7 @@
                             </DataGridTextColumn.HeaderTemplate>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Binding="{Binding Value}" Header="Value">
+                        <DataGridTextColumn Binding="{Binding TagValue}">
                             <DataGridTextColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <TextBlock

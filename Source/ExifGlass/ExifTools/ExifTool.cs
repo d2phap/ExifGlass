@@ -144,15 +144,15 @@ public class ExifTool : List<ExifTagItem>
         var contentBuilder = new StringBuilder();
 
         // find the longest Tag Name in the list
-        var propMaxLength = this.Max(item => item.Name.Length);
+        var propMaxLength = this.Max(item => item.TagName.Length);
         var currentGroup = "";
 
         foreach (var item in this)
         {
             // append group heading
-            if (item.Group != currentGroup)
+            if (item.TagGroup != currentGroup)
             {
-                var groupLine = item.Group.PadRight(propMaxLength + 5, '-') + ":";
+                var groupLine = item.TagGroup.PadRight(propMaxLength + 5, '-') + ":";
                 if (currentGroup.Length > 0)
                 {
                     groupLine = "\n" + groupLine;
@@ -160,11 +160,11 @@ public class ExifTool : List<ExifTagItem>
 
                 contentBuilder.AppendLine(groupLine);
 
-                currentGroup = item.Group;
+                currentGroup = item.TagGroup;
             }
 
             // append exif item
-            contentBuilder.AppendLine(item.Name.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.Value);
+            contentBuilder.AppendLine(item.TagName.PadRight(propMaxLength + 5) + ":".PadRight(4) + item.TagValue);
         }
 
         return contentBuilder.ToString();
@@ -178,12 +178,12 @@ public class ExifTool : List<ExifTagItem>
     {
         var csvHeader = $"\"{nameof(ExifTagItem.Index)}\"," +
             $"\"{nameof(ExifTagItem.TagId)}\"," +
-            $"\"{nameof(ExifTagItem.Group)}\"," +
-            $"\"{nameof(ExifTagItem.Name)}\"," +
-            $"\"{nameof(ExifTagItem.Value)}\"\r\n";
+            $"\"{nameof(ExifTagItem.TagGroup)}\"," +
+            $"\"{nameof(ExifTagItem.TagName)}\"," +
+            $"\"{nameof(ExifTagItem.TagValue)}\"\r\n";
 
         var csvRows = this
-            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.Group}\",\"{i.Name}\",\"{i.Value}\"");
+            .Select(i => $"\"{i.Index}\",\"{i.TagId}\",\"{i.TagGroup}\",\"{i.TagName}\",\"{i.TagValue}\"");
         var csvContent = string.Join("\r\n", csvRows);
 
 
@@ -249,9 +249,9 @@ public class ExifTool : List<ExifTagItem>
                 {
                     Index = index + 1,
                     TagId = tagId,
-                    Name = tagName,
-                    Value = tagValue,
-                    Group = tagGroup,
+                    TagName = tagName,
+                    TagValue = tagValue,
+                    TagGroup = tagGroup,
                 });
 
                 index++;

@@ -323,7 +323,7 @@ public partial class MainWindow : Window
         e.Row.Padding = new Thickness(6);
         e.Row.Height = e.Row.FontSize + e.Row.Padding.Top + e.Row.Padding.Bottom;
 
-        if (item.Name.Equals("File Name", StringComparison.InvariantCultureIgnoreCase))
+        if (item.TagName.Equals("File Name", StringComparison.InvariantCultureIgnoreCase))
         {
             e.Row.FontWeight = FontWeight.SemiBold;
         }
@@ -482,7 +482,7 @@ public partial class MainWindow : Window
 
         // create groups
         var groupView = new DataGridCollectionView(_exifTool);
-        groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.Group)));
+        groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.TagGroup)));
 
         // load results into grid
         DtGrid.Items = groupView;

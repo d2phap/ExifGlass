@@ -93,6 +93,11 @@ public class ExifTool : List<ExifTagItem>
                 .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
 
             cmdOutput = cmdResult.StandardOutput;
+
+            if (!string.IsNullOrEmpty(cmdResult.StandardError))
+            {
+                throw new Exception(cmdResult.StandardError);
+            }
         }
         finally
         {
@@ -213,6 +218,7 @@ public class ExifTool : List<ExifTagItem>
     /// </summary>
     private void ParseExifTags(string cmdOutput, string originalFileName)
     {
+        var hasError = false;
         var index = 0;
         Clear();
 
@@ -226,7 +232,7 @@ public class ExifTool : List<ExifTagItem>
             var tpos2 = tmp.IndexOf('\t', tpos1 + 1);
             var tpos3 = tmp.IndexOf('\t', tpos2 + 1);
 
-            if (tpos1 > 0 && tpos2 > 0)
+            if (tpos1 > 0 && tpos2 > 0 && tpos3 > 0)
             {
                 var tagGroup = tmp[..tpos1];
                 ++tpos1;
@@ -258,12 +264,23 @@ public class ExifTool : List<ExifTagItem>
 
                 index++;
             }
+            else
+            {
+                hasError = true;
+            }
+
 
             // is \r followed by \n ?
             if (epos < cmdOutput.Length)
                 epos += (cmdOutput[epos + 1] == '\n') ? 2 : 1;
 
             cmdOutput = cmdOutput[epos..];
+        }
+
+
+        if (hasError && Count == 0)
+        {
+            throw new Exception("ExifGlass encountered an error while parsing the output of ExifTool. Please ensure that the command-line arguments for ExifTool are correct.");
         }
     }
 
@@ -291,6 +308,12 @@ public class ExifTool : List<ExifTagItem>
     /// </returns>
     private static bool CheckAndPurifyUnicodePath(string filePath, out string cleanPath)
     {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            cleanPath = string.Empty;
+            return false;
+        }
+
         const int MAX_ANSICODE = 255;
 
 

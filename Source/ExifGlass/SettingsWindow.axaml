@@ -104,6 +104,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <SelectableTextBlock
                                 Name="TxtPreview"
+                                FontFamily="Consolas"
                                 SelectionBrush="{DynamicResource SelectionColorBrush}"
                                 TextWrapping="Wrap" />
                         </ScrollViewer>

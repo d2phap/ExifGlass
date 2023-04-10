@@ -466,7 +466,12 @@ public partial class MainWindow : Window
     /// </summary>
     private async Task LoadExifMetadatAsync(string? filePath)
     {
-        filePath ??= string.Empty;
+        if (string.IsNullOrEmpty(filePath))
+        {
+            DtGrid.Items = Enumerable.Empty<object>();
+            return;
+        }
+
 
         // show command preview
         _filePath = filePath;
@@ -476,8 +481,24 @@ public partial class MainWindow : Window
         try
         {
             await _exifTool.ReadAsync(filePath, default, Config.ExifToolArguments);
+
+            BoxExifGrid.IsVisible = true;
+            BoxError.IsVisible = false;
         }
-        catch (Exception) { }
+        catch (Exception ex)
+        {
+            BoxExifGrid.IsVisible = false;
+            BoxError.IsVisible = true;
+
+            if (ex.Message.Contains("Target file or working directory doesn't exist"))
+            {
+                TxtError.Text = "Error:\nExifGlass was unable to locate the path to the ExifTool executable. To resolve this issue, please navigate to the Settings menu (using Ctrl+Comma) and update the path to ExifTool as necessary.";
+            }
+            else
+            {
+                TxtError.Text = ex.Message;
+            }
+        }
 
 
         // create groups

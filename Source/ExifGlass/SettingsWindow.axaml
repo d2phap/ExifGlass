@@ -34,7 +34,7 @@
                     Margin="0,0,0,10"
                     FontSize="16"
                     FontWeight="SemiBold">
-                    Exif tool configurations
+                    ExifTool configurations
                 </TextBlock>
 
                 <Border
@@ -46,7 +46,7 @@
                         FontSize="13"
                         SelectionBrush="{DynamicResource SelectionColorBrush}"
                         TextWrapping="Wrap">
-                        Before using ExifGlass, you must set the path for binary file of
+                        Before using ExifGlass, you need to set the path for binary file of
                         <SelectableTextBlock
                             FontStyle="Italic"
                             SelectionBrush="{DynamicResource SelectionColorBrush}"

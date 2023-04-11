@@ -20,11 +20,17 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using System;
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace ExifGlass
 {
     public partial class App : Application
     {
+        public static readonly UpdateService Updater = new();
+
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
@@ -36,6 +42,7 @@ namespace ExifGlass
             {
                 // load user configs
                 Config.Load();
+                _ = CheckAndRunAutoUpdateAsync();
 
                 if (Current != null)
                 {
@@ -73,6 +80,50 @@ namespace ExifGlass
         {
             _ = Config.SaveAsync();
         }
+
+
+        /// <summary>
+        /// Checks for new update.
+        /// </summary>
+        public static async Task CheckAndRunAutoUpdateAsync()
+        {
+            var shouldCheckForUpdate = false;
+
+            if (Config.AutoUpdate != "0")
+            {
+                if (DateTime.TryParseExact(
+                    Config.AutoUpdate,
+                    Config.DATETIME_FORMAT,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out var lastUpdate))
+                {
+                    // Check for update every 5 days
+                    if (DateTime.UtcNow.Subtract(lastUpdate).TotalDays > 5)
+                    {
+                        shouldCheckForUpdate = true;
+                    }
+                }
+                else
+                {
+                    shouldCheckForUpdate = true;
+                }
+            }
+
+
+            if (shouldCheckForUpdate == true)
+            {
+                await Updater.GetUpdatesAsync();
+
+                // save last update
+                Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
+
+                // show update window
+                var frm = new AboutWindow();
+                frm.Show();
+            }
+        }
+
 
     }
 }

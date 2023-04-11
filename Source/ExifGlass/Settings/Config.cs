@@ -31,6 +31,10 @@ namespace ExifGlass;
 
 public class Config
 {
+    public const string DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    public const string DATE_FORMAT = "yyyy/MM/dd";
+
+
     private static string ConfigFileName => "exifglass.config.json";
     private static string ConfigDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
     private static string ConfigFilePath => Path.Combine(ConfigDir, ConfigFileName);
@@ -49,6 +53,11 @@ public class Config
 
     // User settings
     #region User settings
+
+    /// <summary>
+    /// Gets, sets the last time to check for update. Set it to "0" to disable auto-update.
+    /// </summary>
+    public static string AutoUpdate { get; set; } = "2023/04/01 01:01:01";
 
     /// <summary>
     /// Gets, sets 'Left' position of main window
@@ -122,6 +131,7 @@ public class Config
         if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
 
 
+        AutoUpdate = items.GetValue(nameof(AutoUpdate), AutoUpdate);
         EnableWindowTopMost = items.GetValue(nameof(EnableWindowTopMost), EnableWindowTopMost);
         ThemeMode = items.GetValue(nameof(ThemeMode), ThemeMode);
         ExifToolExecutable = items.GetValue(nameof(ExifToolExecutable), ExifToolExecutable);
@@ -151,6 +161,8 @@ public class Config
         _ = settings.TryAdd(nameof(WindowWidth), WindowWidth);
         _ = settings.TryAdd(nameof(WindowHeight), WindowHeight);
         _ = settings.TryAdd(nameof(WindowState), WindowState);
+
+        _ = settings.TryAdd(nameof(AutoUpdate), AutoUpdate);
         _ = settings.TryAdd(nameof(EnableWindowTopMost), EnableWindowTopMost);
         _ = settings.TryAdd(nameof(ThemeMode), ThemeMode);
         _ = settings.TryAdd(nameof(ExifToolExecutable), ExifToolExecutable);

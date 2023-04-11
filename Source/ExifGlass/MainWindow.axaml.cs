@@ -77,8 +77,10 @@ public partial class MainWindow : Window
 
         MnuSettings.Click += MnuSettings_Click;
         MnuAbout.Click += MnuAbout_Click;
+        MnuCheckForUpdate.Click += MnuCheckForUpdate_Click;
     }
 
+    
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -408,6 +410,12 @@ public partial class MainWindow : Window
         };
 
         _ = win.ShowDialog(this);
+    }
+
+
+    private void MnuCheckForUpdate_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = App.CheckForUpdateAsync(true);
     }
 
 

@@ -205,6 +205,10 @@
                                 InputGesture="Ctrl+," />
                             <MenuItem Header="-" />
                             <MenuItem
+                                Name="MnuCheckForUpdate"
+                                FontFamily="Segoe UI Variable, Segoe UI"
+                                Header="Check for update…" />
+                            <MenuItem
                                 Name="MnuAbout"
                                 FontFamily="Segoe UI Variable, Segoe UI"
                                 Header="About…"

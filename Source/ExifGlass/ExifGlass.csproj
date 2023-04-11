@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <EntryPointExe>$(AssemblyName).exe</EntryPointExe>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
     <ApplicationIcon>Assets\exifglass_icon_512.ico</ApplicationIcon>
 
     <TrimMode>CopyUsed</TrimMode>
@@ -16,7 +16,7 @@
     <AssemblyTitle>ExifGlass</AssemblyTitle>
     <Copyright>Copyright © 2023 Duong Dieu Phap</Copyright>
     <FileVersion>$(Version)</FileVersion>
-    <Version>1.0.2.0</Version>
+    <Version>1.0.0.0</Version>
   </PropertyGroup>
     
   <ItemGroup>

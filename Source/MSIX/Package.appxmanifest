@@ -9,9 +9,9 @@
   IgnorableNamespaces="uap rescap desktop uap3">
 
   <Identity
-    Name="ExifGlass"
-    Publisher="CN=Duong Dieu Phap, O=Duong Dieu Phap, S=Tây Ninh, C=VN"
-    Version="1.0.8.0" />
+    Name="9662DuongDieuPhap.ExifGlass"
+    Publisher="CN=29F1B9EC-D220-4DC3-BEDB-01A9CCA51904"
+    Version="1.0.1.0" />
 
   <Properties>
     <DisplayName>ExifGlass</DisplayName>

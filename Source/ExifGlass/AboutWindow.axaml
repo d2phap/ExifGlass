@@ -146,10 +146,18 @@
                 Grid.Row="1"
                 Padding="15"
                 ZIndex="1">
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <Button
+                        Name="BtnCheckForUpdate"
+                        Grid.Column="1"
+                        MinWidth="80"
+                        Margin="15,0,0,0"
+                        HorizontalContentAlignment="Center">
+                        Check for update
+                    </Button>
                     <Button
                         Name="BtnClose"
-                        Grid.Column="1"
+                        Grid.Column="2"
                         MinWidth="80"
                         Margin="15,0,0,0"
                         HorizontalContentAlignment="Center">

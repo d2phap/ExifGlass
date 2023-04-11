@@ -22,6 +22,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
+using System;
 
 namespace ExifGlass;
 
@@ -35,6 +36,7 @@ public partial class AboutWindow : Window
         LostFocus += AboutWindow_LostFocus;
 
         BtnClose.Click += BtnClose_Click;
+        BtnCheckForUpdate.Click += BtnCheckForUpdate_Click;
 
         TblVersion.Text = Config.AppVersion.ToString();
     }
@@ -62,6 +64,13 @@ public partial class AboutWindow : Window
             Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
         }
     }
+
+
+    private void BtnCheckForUpdate_Click(object? sender, RoutedEventArgs e)
+    {
+        _ = App.CheckForUpdateAsync(true);
+    }
+
 
     private void BtnClose_Click(object? sender, RoutedEventArgs e)
     {

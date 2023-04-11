@@ -35,6 +35,8 @@ public partial class AboutWindow : Window
         LostFocus += AboutWindow_LostFocus;
 
         BtnClose.Click += BtnClose_Click;
+
+        TblVersion.Text = Config.AppVersion.ToString();
     }
 
 
@@ -61,7 +63,7 @@ public partial class AboutWindow : Window
         }
     }
 
-    private void BtnClose_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void BtnClose_Click(object? sender, RoutedEventArgs e)
     {
         Close();
     }

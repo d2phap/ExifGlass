@@ -70,9 +70,7 @@
                         <TextBlock
                             Name="TblVersion"
                             FontSize="17"
-                            FontWeight="SemiBold">
-                            1.0.0.1
-                        </TextBlock>
+                            FontWeight="SemiBold" />
                     </StackPanel>
                     <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">Copyright © 2023 by Dương Diệu Pháp.</TextBlock>
                     <TextBlock TextWrapping="Wrap">All rights reserved.</TextBlock>

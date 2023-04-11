@@ -1,5 +1,5 @@
 ﻿/*
-ExifGlass - Standalone Exif tool for ImageGlass
+ExifGlass - EXIF metadata viewer
 Copyright (C) 2023 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
@@ -21,6 +21,7 @@ using Avalonia.Controls;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -31,8 +32,19 @@ namespace ExifGlass;
 public class Config
 {
     private static string ConfigFileName => "exifglass.config.json";
-    private static string ConfigDir => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    private static string ConfigDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
     private static string ConfigFilePath => Path.Combine(ConfigDir, ConfigFileName);
+
+
+    /// <summary>
+    /// Gets app name.
+    /// </summary>
+    public static string AppName => Process.GetCurrentProcess().MainModule?.FileVersionInfo.ProductName ?? "[ExifGlass]";
+
+    /// <summary>
+    /// Gets app version.
+    /// </summary>
+    public static Version AppVersion => new(Process.GetCurrentProcess().MainModule?.FileVersionInfo.FileVersion ?? "1.0.0.0");
 
 
     // User settings
@@ -94,6 +106,7 @@ public class Config
     /// </summary>
     public static void Load()
     {
+        Directory.CreateDirectory(ConfigDir);
         if (LoadUserConfigs() is not IConfiguration items) return;
 
         WindowPositionX = items.GetValue(nameof(WindowPositionX), WindowPositionX);
@@ -121,6 +134,8 @@ public class Config
     /// </summary>
     public static async Task SaveAsync()
     {
+        Directory.CreateDirectory(ConfigDir);
+
         // metadata
         var metadata = new ExpandoObject();
         _ = metadata.TryAdd("Description", "ExifGlass configuration file");

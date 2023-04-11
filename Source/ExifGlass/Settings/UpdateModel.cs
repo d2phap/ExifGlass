@@ -36,5 +36,5 @@ public class UpdateModel
     [DataType(DataType.DateTime)]
     public DateTime PublishedDate { get; set; }
 
-    public Uri Url { get; set; }
+    public Uri DownloadUrl { get; set; }
 }

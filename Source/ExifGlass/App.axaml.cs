@@ -119,8 +119,11 @@ namespace ExifGlass
                 Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
 
                 // show update window
-                var frm = new AboutWindow();
-                frm.Show();
+                var win = new UpdateWindow()
+                {
+                    WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen,
+                };
+                win.Show();
             }
         }
 

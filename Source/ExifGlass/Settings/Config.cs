@@ -26,6 +26,7 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace ExifGlass;
 
@@ -170,6 +171,32 @@ public class Config
 
 
         await JsonEx.WriteJsonAsync(ConfigFilePath, settings);
+    }
+
+
+    /// <summary>
+    /// Open URL in the default browser.
+    /// </summary>
+    public static void OpenUrl(string? url, string campaign = "app_unknown")
+    {
+        if (string.IsNullOrEmpty(url)) return;
+
+        try
+        {
+            var ub = new UriBuilder(url);
+            var queries = HttpUtility.ParseQueryString(ub.Query);
+            queries["utm_source"] = "exifglass_" + AppVersion;
+            queries["utm_medium"] = "app_click";
+            queries["utm_campaign"] = campaign;
+
+            ub.Query = queries.ToString();
+
+            Process.Start(new ProcessStartInfo(ub.Uri.AbsoluteUri)
+            {
+                UseShellExecute = true,
+            });
+        }
+        catch { }
     }
 
     #endregion // Public methods

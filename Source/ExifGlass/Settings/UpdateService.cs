@@ -54,7 +54,6 @@ public class UpdateService
     /// <summary>
     /// Gets the latest updates
     /// </summary>
-    /// <returns></returns>
     public async Task GetUpdatesAsync()
     {
         var url = "https://raw.githubusercontent.com/d2phap/ExifGlass/main/update.json";
@@ -67,6 +66,7 @@ public class UpdateService
         {
             return;
         }
+
 
         using var stream = await response.Content.ReadAsStreamAsync();
         CurrentReleaseInfo = await JsonEx.ParseJson<UpdateModel>(stream);

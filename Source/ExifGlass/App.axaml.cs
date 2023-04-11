@@ -83,7 +83,7 @@ namespace ExifGlass
 
 
         /// <summary>
-        /// Checks for new update.
+        /// Checks and runs auto-update.
         /// </summary>
         public static async Task CheckAndRunAutoUpdateAsync()
         {
@@ -113,11 +113,28 @@ namespace ExifGlass
 
             if (shouldCheckForUpdate == true)
             {
-                await Updater.GetUpdatesAsync();
+                await CheckForUpdateAsync(false);
+            }
+        }
 
-                // save last update
-                Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
 
+        /// <summary>
+        /// Check for updatae
+        /// </summary>
+        /// <param name="alwaysShowUI">
+        /// Set to <c>true</c> if you want to show the Update dialog. Default value is <c>false</c>.
+        /// </param>
+        public static async Task CheckForUpdateAsync(bool? alwaysShowUI = null)
+        {
+            await Updater.GetUpdatesAsync();
+
+            // save last update
+            Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
+
+
+            alwaysShowUI ??= false;
+            if (Updater.HasNewUpdate || alwaysShowUI.Value)
+            {
                 // show update window
                 var win = new UpdateWindow()
                 {

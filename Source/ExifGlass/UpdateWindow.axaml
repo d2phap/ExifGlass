@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:svg="clr-namespace:Avalonia.Svg;assembly=Avalonia.Svg"
     Title="Check for update"
     MinWidth="350"
     d:DesignHeight="450"
@@ -34,6 +35,14 @@
                 <TextBlock Name="TxtCurrentVersion" Margin="0,15,15,0" />
                 <TextBlock Name="TxtNewVersion" Margin="0,0,15,0" />
                 <TextBlock Name="TxtPublishedDate" Margin="0,0,15,0" />
+
+                <Button
+                    Name="BtnExifGlassStore"
+                    Margin="0,15,0,0"
+                    Padding="0">
+                    <Svg Height="56" Path="/Assets/exifglass_store_badge.svg" />
+                </Button>
+
 
                 <TextBlock
                     Name="TxtReleaseTitle"

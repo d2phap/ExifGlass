@@ -37,6 +37,7 @@ public partial class UpdateWindow : Window
         BtnReadMore.Click += BtnReadMore_Click;
         BtnDownload.Click += BtnDownload_Click;
         BtnClose.Click += BtnClose_Click;
+        BtnExifGlassStore.Click += BtnExifGlassStore_Click;
 
 
         if (App.Updater.HasNewUpdate)
@@ -78,6 +79,12 @@ public partial class UpdateWindow : Window
         {
             Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
         }
+    }
+
+
+    private void BtnExifGlassStore_Click(object? sender, RoutedEventArgs e)
+    {
+        Config.OpenExifGlassMsStore();
     }
 
 

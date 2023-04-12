@@ -21,6 +21,7 @@
     
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <None Remove="Assets\exifglass_store_badge.svg" />
     <Content Include="Assets\exifglass_icon_512.ico" />
   </ItemGroup>
     
@@ -30,6 +31,7 @@
     <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0-preview6" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />

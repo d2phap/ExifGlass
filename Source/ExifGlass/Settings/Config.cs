@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,6 +35,7 @@ public class Config
 {
     public const string DATETIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
     public const string DATE_FORMAT = "yyyy/MM/dd";
+    public const string MS_APPSTORE_ID = "9MX8S9HZ57W8";
 
 
     private static string ConfigFileName => "exifglass.config.json";
@@ -197,6 +199,33 @@ public class Config
             });
         }
         catch { }
+    }
+
+
+    /// <summary>
+    /// Opens ExifGlass site om Microsoft Store.
+    /// </summary>
+    public static void OpenExifGlassMsStore()
+    {
+        var campaignId = $"InAppBadgeV{AppVersion}";
+        var source = "AboutWindow";
+
+        try
+        {
+            var url = $"ms-windows-store://pdp/?productid={MS_APPSTORE_ID}&cid={campaignId}&referrer=appbadge&source={source}";
+
+            OpenUrl(url);
+        }
+        catch
+        {
+            try
+            {
+                var url = $"https://www.microsoft.com/store/productId/{MS_APPSTORE_ID}?cid={campaignId}&referrer=appbadge&source={source}";
+
+                OpenUrl(url);
+            }
+            catch { }
+        }
     }
 
     #endregion // Public methods

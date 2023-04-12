@@ -37,10 +37,12 @@ public partial class AboutWindow : Window
 
         BtnClose.Click += BtnClose_Click;
         BtnCheckForUpdate.Click += BtnCheckForUpdate_Click;
+        BtnExifGlassStore.Click += BtnExifGlassStore_Click;
 
         TblVersion.Text = Config.AppVersion.ToString();
     }
 
+    
 
     // Control events
     #region Control events
@@ -63,6 +65,12 @@ public partial class AboutWindow : Window
         {
             Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
         }
+    }
+
+
+    private void BtnExifGlassStore_Click(object? sender, RoutedEventArgs e)
+    {
+        Config.OpenExifGlassMsStore();
     }
 
 

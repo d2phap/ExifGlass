@@ -116,6 +116,7 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Orientation="Vertical">
+
             <Border
                 MinHeight="40"
                 MaxHeight="80"

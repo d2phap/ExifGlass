@@ -50,6 +50,7 @@ Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 4
 ]
 ```
 Note that if you have installed [ExifGlass Store](https://www.microsoft.com/store/productId/9MX8S9HZ57W8), you can use "exifglass" for the `Executable` field.
+
 4. To assign hotkeys to the ExifGlass tool, add the following code:
 ```js
 // in igconfig.json

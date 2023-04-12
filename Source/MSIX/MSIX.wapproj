@@ -57,7 +57,7 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
     <EntryPointProjectUniqueName>..\ExifGlass\ExifGlass.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>3B6713C9747374F259FA3905490915B25F52E949</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>04EEC32C6D79D752C48C8BDE2BD94F3A32C7F435</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>

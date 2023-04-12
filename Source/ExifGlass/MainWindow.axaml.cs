@@ -32,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,7 +39,7 @@ namespace ExifGlass;
 
 public partial class MainWindow : Window
 {
-    private PipeClient? _client;
+    private readonly ImageGlassTool _igTool = new();
 
     private readonly ExifTool _exifTool = new("exiftool");
     private string _filePath = string.Empty;
@@ -50,11 +49,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-
-        // initialize pipe client
-        InitializePipeClient();
-        _ = _client?.ConnectAsync();
-
+        // ImageGlass tool events
+        _ = ConnectToImageGlassAsync();
 
         // controls events
         GotFocus += MainWindow_GotFocus;
@@ -80,7 +76,6 @@ public partial class MainWindow : Window
         MnuCheckForUpdate.Click += MnuCheckForUpdate_Click;
     }
 
-    
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -215,31 +210,25 @@ public partial class MainWindow : Window
     #endregion // Protected methods
 
 
-    // ImageGlass server connection
-    #region ImageGlass server connection
+    // ImageGlassTool connection
+    #region ImageGlassTool connection
 
-    private void InitializePipeClient()
+    private async Task ConnectToImageGlassAsync()
     {
-        var serverName = ImageGlassTool.CreateServerName();
-
-        _client = new PipeClient(serverName, PipeDirection.InOut);
-        _client.MessageReceived += Client_MessageReceived;
-        _client.Disconnected += (_, _) => Dispatcher.UIThread.Post(Close);
+        _igTool.ToolMessageReceived += IgTool_ToolMessageReceived;
+        _igTool.ToolClosingRequest += IgTool_ToolClosingRequest;
+        await _igTool.ConnectAsync();
     }
 
-    private void Client_MessageReceived(object? sender, MessageReceivedEventArgs e)
+
+    private void IgTool_ToolClosingRequest(object? sender, DisconnectedEventArgs e)
     {
-        if (string.IsNullOrEmpty(e.MessageName)) return;
+         Dispatcher.UIThread.Post(Close);
+    }
 
 
-        // terminate slideshow
-        if (e.MessageName == ToolServerMsgs.TOOL_TERMINATE)
-        {
-            Dispatcher.UIThread.Post(Close);
-            return;
-        }
-
-
+    private void IgTool_ToolMessageReceived(object? sender, MessageReceivedEventArgs e)
+    {
         if (string.IsNullOrEmpty(e.MessageData)) return;
 
 
@@ -251,13 +240,17 @@ public partial class MainWindow : Window
 
             var filePath = obj.FilePath.ToString();
 
-            Dispatcher.UIThread.Post(() => _ = LoadExifMetadatAsync(filePath));
+            Dispatcher.UIThread.Post(async delegate
+            {
+                await LoadExifMetadatAsync(filePath);
+            });
 
             return;
         }
     }
 
-    #endregion // ImageGlass server connection
+
+    #endregion // ImageGlassTool connection
 
 
     // File drag-n-drop

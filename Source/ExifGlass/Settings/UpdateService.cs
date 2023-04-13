@@ -19,6 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace ExifGlass;
@@ -60,6 +62,10 @@ public class UpdateService
 
 
         using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+        {
+            NoCache = true,
+        };
         var response = await httpClient.GetAsync(url);
 
         if (!response.IsSuccessStatusCode)
@@ -67,8 +73,7 @@ public class UpdateService
             return;
         }
 
-
-        using var stream = await response.Content.ReadAsStreamAsync();
-        CurrentReleaseInfo = await JsonEx.ParseJson<UpdateModel>(stream);
+        var json = await response.Content.ReadAsStringAsync();
+        CurrentReleaseInfo = UpdateModel.Deserialize(json);
     }
 }

@@ -19,6 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #nullable disable
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ExifGlass;
 
@@ -36,5 +39,27 @@ public class UpdateModel
     [DataType(DataType.DateTime)]
     public DateTime PublishedDate { get; set; }
 
+    [DataType(DataType.Url)]
     public Uri DownloadUrl { get; set; }
+
+
+    /// <summary>
+    /// Deserializes JSON string to <see cref="UpdateModel"/> object.
+    /// </summary>
+    public static UpdateModel Deserialize(string json)
+    {
+        var obj = JsonSerializer.Deserialize(json, UpdateModelJsonContext.Default.UpdateModel);
+
+        return obj;
+    }
 }
+[JsonSourceGenerationOptions(
+    GenerationMode = JsonSourceGenerationMode.Metadata,
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull,
+    IgnoreReadOnlyFields = true,
+    IgnoreReadOnlyProperties = true
+)]
+[JsonSerializable(typeof(UpdateModel))]
+public partial class UpdateModelJsonContext : JsonSerializerContext { }
+

@@ -45,7 +45,7 @@ Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 4
     "ToolName": "ExifGlass - Exif metadata viewer", // name of the tool
     "Executable": "path\\to\\ExifGlass.exe", // or "exifglass" for ExifGlass Store
     "Argument": "<file>",
-    "CanToggle": true
+    "IsIntegrated": true
   }
 ]
 ```
@@ -59,6 +59,10 @@ Note that if you have installed [ExifGlass Store](https://www.microsoft.com/stor
 }
 ```
 5. Save the file, and you're done! Now you can enjoy using ExifGlass as an external tool with ImageGlass 9 beta 4.
+
+## Build ExifGlass from source code
+- .NET 7.0 and Visual Studio 2022
+- Add [ImageGlass.Tools.csproj](https://github.com/ImageGlass/ImageGlass.Tools) as reference project.
 
 ## License
 ExifGlass is free for both personal and commercial use, except the Store version. It is released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE).

@@ -1,9 +1,9 @@
 {
-    "apiVersion": 1,
-    "version": "1.0.0.0",
-    "title": "ExifGlass 1.0",
-    "description": "Initial release of ExifGlass",
-    "changelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "publishedDate": "2023/04/16 10:10:10",
-    "url": "https://github.com/d2phap/ExifGlass/releases"
+    "ApiVersion": 1,
+    "Version": "1.0.0.0",
+    "Title": "ExifGlass 1.0",
+    "Description": "Initial release of ExifGlass",
+    "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
+    "PublishedDate": "2023/04/16 10:10:10",
+    "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

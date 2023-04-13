@@ -54,17 +54,6 @@ public partial class JsonEx
 
 
     /// <summary>
-    /// Parse JSON string to object
-    /// </summary>
-    public static T? ParseJson<T>(string? json)
-    {
-        if (json == null) return default;
-
-        return JsonSerializer.Deserialize<T>(json, JsonOptions);
-    }
-
-
-    /// <summary>
     /// Parse object to JSON string
     /// </summary>
     public static string ToJson<T>(T obj)
@@ -79,17 +68,6 @@ public partial class JsonEx
     public static async Task<T?> ParseJson<T>(Stream stream)
     {
         return await JsonSerializer.DeserializeAsync<T>(stream, JsonOptions);
-    }
-
-
-    /// <summary>
-    /// Reads JSON file and parses to object
-    /// </summary>
-    public static T? ReadJson<T>(string jsonFilePath)
-    {
-        using var stream = File.OpenRead(jsonFilePath);
-
-        return JsonSerializer.Deserialize<T>(stream, JsonOptions);
     }
 
 

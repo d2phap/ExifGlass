@@ -30,9 +30,9 @@ using ExifGlass.ExifTools;
 using ImageGlass.Tools;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ExifGlass;
@@ -235,14 +235,13 @@ public partial class MainWindow : Window
         // update image list
         if (e.MessageName.Equals(ImageGlassEvents.IMAGE_LOADING, StringComparison.InvariantCultureIgnoreCase))
         {
-            var obj = JsonEx.ParseJson<ExpandoObject>(e.MessageData) as dynamic;
+            var obj = JsonSerializer.Deserialize(e.MessageData, IgImageLoadingEventArgsJsonContext.Default.IgImageLoadingEventArgs);
             if (obj == null) return;
 
-            var filePath = obj.FilePath;
 
             Dispatcher.UIThread.Post(async delegate
             {
-                await LoadExifMetadatAsync(filePath);
+                await LoadExifMetadatAsync(obj.FilePath);
             });
 
             return;

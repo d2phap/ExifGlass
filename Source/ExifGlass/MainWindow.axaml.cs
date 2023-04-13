@@ -233,12 +233,12 @@ public partial class MainWindow : Window
 
 
         // update image list
-        if (e.MessageName.Equals(ToolServerMsgs.IMAGE_LOADING, StringComparison.InvariantCultureIgnoreCase))
+        if (e.MessageName.Equals(ImageGlassEvents.IMAGE_LOADING, StringComparison.InvariantCultureIgnoreCase))
         {
             var obj = JsonEx.ParseJson<ExpandoObject>(e.MessageData) as dynamic;
             if (obj == null) return;
 
-            var filePath = obj.FilePath.ToString();
+            var filePath = obj.FilePath;
 
             Dispatcher.UIThread.Post(async delegate
             {

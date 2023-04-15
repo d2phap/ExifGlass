@@ -20,8 +20,7 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 | Copy metadata | ✅ | ✅ |
 | Export as Text, JSON, CSV | ✅ | ✅ |
 | Custom ExifTool's command-line arguments | ✅ | ✅ |
-| Fast startup time with native code | ❌ | ✅ |
-| .NET 7 independency | ❌ | ✅ |
+| .NET 7 self-contained | ❌ | ✅ |
 | Seamless auto-update | ❌ | ✅ |
 | Launch ExifGlass with protocol `exifglass:` | ❌ | ✅ |
 | Launch ExifGlass with command `exifglass` | ❌ | ✅ |

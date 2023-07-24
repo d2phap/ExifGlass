@@ -28,11 +28,11 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 ## Configure ExifGlass
 If you want to configure ExifGlass to work with your system, follow these steps:
 1. Download [ExifTool by Phil Harvey](https://exiftool.org). You can also use the [ExifTool Windows Installer](https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows#toc-3) if you prefer, which will automatically register the executable file of ExifTool on your system. ExifGlass can detect it automatically.
-2. If you downloaded the ZIP file, extract its contents into a folder.
-3. Open ExifGlass Settings (press <kbd>Ctrl+,</kbd>) and go to "Executable path". Locate the `exiftool(-k).exe` file that you extracted in step 2.
+2. If you downloaded the ZIP file, extract its contents into a folder, rename `exiftool(-k).exe` to `exiftool.exe`.
+3. Open ExifGlass Settings (press <kbd>Ctrl+,</kbd>) and go to "Executable path". Locate the `exiftool.exe` file that you extracted in step 2.
 
 ## Integrate ExifGlass into [ImageGlass 9](https://imageglass.org)
-Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 4**:
+Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 5**:
 1. Open `igconfig.json` file with a text editor such as NotePad or VS Code.
 2. Ensure that ImageGlass app is not running.
 3. In the `Tools` section of the `igconfig.json` file, add the following code:
@@ -44,20 +44,14 @@ Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 4
     "ToolName": "ExifGlass - Exif metadata viewer", // name of the tool
     "Executable": "path\\to\\ExifGlass.exe", // or "exifglass" for ExifGlass Store
     "Argument": "<file>",
+    "Hotkeys": ["X", "Ctrl+E"] // press X or Ctrl+E to open/close ExifGlass tool
     "IsIntegrated": true
   }
 ]
 ```
-Note that if you have installed [ExifGlass Store](https://www.microsoft.com/store/productId/9MX8S9HZ57W8), you can use "exifglass" for the `Executable` field.
+Note that if you have installed [ExifGlass Store](https://www.microsoft.com/store/productId/9MX8S9HZ57W8), you can just use `exifglass` for the `Executable` field.
 
-4. To assign hotkeys to the ExifGlass tool, add the following code:
-```js
-// in igconfig.json
-"MenuHotkeys": {
-  "Tool_ExifGlass": ["X", "Ctrl+E"] // press X or Ctrl+E to open/close ExifGlass tool
-}
-```
-5. Save the file, and you're done! Now you can enjoy using ExifGlass as an external tool with ImageGlass 9 beta 4.
+4. Save the file, and you're done! Now you can enjoy using ExifGlass as an external tool with ImageGlass 9 beta 5.
 
 ## Build ExifGlass from source code
 - .NET 7.0 and Visual Studio 2022

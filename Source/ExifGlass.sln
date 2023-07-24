@@ -7,9 +7,9 @@ Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "MSIX", "MSIX\MSIX.wapproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageGlass.Tools", "..\..\..\@imageglass\ImageGlass.Tools\Source\ImageGlass.Tools\ImageGlass.Tools.csproj", "{6452B078-9F10-4673-BE73-97DC238E4AE3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExifGlass", "ExifGlass\ExifGlass.csproj", "{76743518-7B1C-45F2-977E-139B2F022B71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExifGlass.Core", "ExifGlass.Core\ExifGlass.Core.csproj", "{76743518-7B1C-45F2-977E-139B2F022B71}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExifGlass.Desktop", "ExifGlass.Desktop\ExifGlass.Desktop.csproj", "{26F88771-AEF6-4652-9876-3D1B1B9335B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExifGlass", "ExifGlass\ExifGlass.csproj", "{26F88771-AEF6-4652-9876-3D1B1B9335B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

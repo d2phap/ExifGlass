@@ -1,9 +1,8 @@
 ﻿using System;
 
 using Avalonia;
-using Avalonia.ReactiveUI;
 
-namespace ExifGlass.Desktop;
+namespace ExifGlass;
 
 class Program
 {
@@ -19,6 +18,5 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace()
-            .UseReactiveUI();
+            .LogToTrace();
 }

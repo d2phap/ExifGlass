@@ -65,7 +65,7 @@
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxPackageSigningTimestampServerUrl>http://timestamp.sectigo.com</AppxPackageSigningTimestampServerUrl>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
-    <EntryPointProjectUniqueName>..\ExifGlass.Desktop\ExifGlass.Desktop.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\ExifGlass\ExifGlass.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AppxBundle>Never</AppxBundle>
@@ -161,6 +161,6 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExifGlass.Desktop\ExifGlass.Desktop.csproj" />
+    <ProjectReference Include="..\ExifGlass\ExifGlass.csproj" />
   </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using Avalonia.Controls;
+using ImageGlass.Tools;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -239,22 +240,29 @@ public class Config
     /// </summary>
     private static IConfigurationRoot? LoadUserConfigs()
     {
-        // filter the command lines begin with '-'
-        // example: ExifGlass.exe -WindowWidth=900
+        // filter the command lines begin with '/'
+        // example: ExifGlass.exe /WindowWidth=900
         var args = Environment.GetCommandLineArgs()
-            .Where(cmd => cmd.StartsWith("-"))
-            .Select(cmd => cmd[1..]) // trim '-' from the command
+            .Where(cmd => cmd.StartsWith("/") && !cmd.StartsWith(ImageGlassTool.PIPE_CODE_CMD_LINE))
+            .Select(cmd => cmd[1..]) // trim '/' from the command
             .ToArray();
 
         try
         {
-            var userConfig = new ConfigurationBuilder()
+            // build with command lines by default
+            return new ConfigurationBuilder()
                 .SetBasePath(ConfigDir)
                 .AddJsonFile(ConfigFileName, optional: true)
                 .AddCommandLine(args)
                 .Build();
-
-            return userConfig;
+        }
+        catch (FormatException)
+        {
+            // build without command lines
+            return new ConfigurationBuilder()
+                .SetBasePath(ConfigDir)
+                .AddJsonFile(ConfigFileName, optional: true)
+                .Build();
         }
         catch { }
 

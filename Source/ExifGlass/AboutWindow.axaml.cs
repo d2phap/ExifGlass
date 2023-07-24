@@ -22,7 +22,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
-using System;
 
 namespace ExifGlass;
 

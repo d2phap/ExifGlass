@@ -56,7 +56,6 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
-    <EntryPointProjectUniqueName>..\ExifGlass\ExifGlass.csproj</EntryPointProjectUniqueName>
     <PackageCertificateThumbprint>04EEC32C6D79D752C48C8BDE2BD94F3A32C7F435</PackageCertificateThumbprint>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -66,6 +65,7 @@
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <AppxPackageSigningTimestampServerUrl>http://timestamp.sectigo.com</AppxPackageSigningTimestampServerUrl>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+    <EntryPointProjectUniqueName>..\ExifGlass.Desktop\ExifGlass.Desktop.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AppxBundle>Never</AppxBundle>
@@ -161,6 +161,6 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExifGlass\ExifGlass.csproj" />
+    <ProjectReference Include="..\ExifGlass.Desktop\ExifGlass.Desktop.csproj" />
   </ItemGroup>
 </Project>

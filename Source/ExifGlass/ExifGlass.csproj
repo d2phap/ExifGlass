@@ -1,50 +1,55 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>latest</LangVersion>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <EntryPointExe>$(AssemblyName).exe</EntryPointExe>
-    <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
-    <ApplicationIcon>Assets\exifglass_icon_512.ico</ApplicationIcon>
-
-    <TrimMode>CopyUsed</TrimMode>
-    <PublishTrimmed>true</PublishTrimmed>
-
-    <AssemblyTitle>ExifGlass</AssemblyTitle>
-    <Copyright>Copyright © 2023 Duong Dieu Phap</Copyright>
-    <FileVersion>$(Version)</FileVersion>
-    <Version>1.0.0.0</Version>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
-    
+
+  
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-    <None Remove="Assets\exifglass_store_badge.svg" />
-    <Content Include="Assets\exifglass_icon_512.ico" />
   </ItemGroup>
-    
 
+  
+  <ItemGroup>
+    <None Remove="Assets\exifglass_icon_512.ico" />
+    <None Remove="Assets\exifglass_store_badge.svg" />
+  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0-preview6" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview6" />
+    <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview6" />
-    <PackageReference Include="CliWrap" Version="3.6.0" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="CliWrap" Version="3.6.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
   </ItemGroup>
-    
-
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\@imageglass\ImageGlass.Tools\Source\ImageGlass.Tools\ImageGlass.Tools.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="AboutWindow.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="MainWindow.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="SettingsWindow.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="UpdateWindow.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExifGlass.Desktop": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

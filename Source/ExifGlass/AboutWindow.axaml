@@ -131,7 +131,7 @@
                                         ImageGlass.Tools
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2013 Duong Dieu Phap.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2023 Duong Dieu Phap.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock

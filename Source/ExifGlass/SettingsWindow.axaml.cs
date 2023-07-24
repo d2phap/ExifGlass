@@ -51,9 +51,9 @@ public partial class SettingsWindow : Window
     }
 
 
-    protected override void OnLoaded()
+    protected override void OnLoaded(RoutedEventArgs e)
     {
-        base.OnLoaded();
+        base.OnLoaded(e);
 
         // Loads user settings
         ChkTopMost.IsChecked = Topmost = Config.EnableWindowTopMost;

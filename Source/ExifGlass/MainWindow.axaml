@@ -46,12 +46,15 @@
                     CornerRadius="0 0 5 5">
                     <DataGrid
                         Name="DtGrid"
+                        MinHeight="0"
                         x:DataType="eg:ExifTagItem"
                         AutoGenerateColumns="False"
                         ClipboardCopyMode="None"
+                        FontSize="13"
+                        Foreground="{DynamicResource SystemBaseMediumHighColor}"
                         IsReadOnly="True">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Index}">
+                            <DataGridTextColumn Binding="{Binding Index}" Tag="Index">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
@@ -64,7 +67,7 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagId}">
+                            <DataGridTextColumn Binding="{Binding TagId}" Tag="TagId">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
@@ -77,7 +80,7 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagName}">
+                            <DataGridTextColumn Binding="{Binding TagName}" Tag="TagName">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
@@ -90,7 +93,7 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagValue}">
+                            <DataGridTextColumn Binding="{Binding TagValue}" Tag="TagValue">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock

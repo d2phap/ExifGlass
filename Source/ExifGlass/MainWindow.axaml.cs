@@ -223,7 +223,7 @@ public partial class MainWindow : Window
 
     private void IgTool_ToolClosingRequest(object? sender, DisconnectedEventArgs e)
     {
-         Dispatcher.UIThread.Post(Close);
+        Dispatcher.UIThread.Post(Close);
     }
 
 
@@ -361,11 +361,12 @@ public partial class MainWindow : Window
     {
         if (DtGrid.SelectedItem is not ExifTagItem item) return;
 
-        var header = DtGrid.CurrentColumn.Header?.ToString() ?? string.Empty;
+        var header = DtGrid.CurrentColumn.Tag?.ToString() ?? string.Empty;
         var value = item.GetType().GetProperty(header)?.GetValue(item)?.ToString();
         if (value == null) return;
 
-        _ = Application.Current?.Clipboard?.SetTextAsync(value);
+        var clipboard = GetTopLevel(this)?.Clipboard;
+        _ = clipboard?.SetTextAsync(value);
     }
 
 
@@ -477,7 +478,7 @@ public partial class MainWindow : Window
         if (string.IsNullOrEmpty(filePath))
         {
             Title = "ExifGlass";
-            DtGrid.Items = Enumerable.Empty<object>();
+            DtGrid.ItemsSource = Enumerable.Empty<object>();
             return;
         }
 
@@ -516,7 +517,7 @@ public partial class MainWindow : Window
         groupView.GroupDescriptions.Add(new DataGridPathGroupDescription(nameof(ExifTagItem.TagGroup)));
 
         // load results into grid
-        DtGrid.Items = groupView;
+        DtGrid.ItemsSource = groupView;
 
 
         BtnCopy.IsEnabled = BtnExport.IsEnabled = _exifTool.Any();

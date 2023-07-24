@@ -1,149 +1,130 @@
-/*
-ExifGlass - Standalone Exif tool for ImageGlass
-Copyright (C) 2023 DUONG DIEU PHAP
-Project homepage: https://github.com/d2phap/ExifGlass
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
-using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using System;
 
-namespace ExifGlass
+namespace ExifGlass;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public static readonly UpdateService Updater = new();
+
+
+    public override void Initialize()
     {
-        public static readonly UpdateService Updater = new();
+        AvaloniaXamlLoader.Load(this);
+    }
 
 
-        public override void Initialize()
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            AvaloniaXamlLoader.Load(this);
-        }
+            // load user configs
+            Config.Load();
+            _ = CheckAndRunAutoUpdateAsync();
 
-        public override void OnFrameworkInitializationCompleted()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            if (Current != null)
             {
-                // load user configs
-                Config.Load();
-                _ = CheckAndRunAutoUpdateAsync();
-
-                if (Current != null)
+                // load Theme mode
+                var themeVariant = ThemeVariant.Default;
+                if (Config.ThemeMode == ThemeMode.Dark)
                 {
-                    // load Theme mode
-                    var themeVariant = ThemeVariant.Default;
-                    if (Config.ThemeMode == ThemeMode.Dark)
-                    {
-                        themeVariant = ThemeVariant.Dark;
-                    }
-                    else if (Config.ThemeMode == ThemeMode.Light)
-                    {
-                        themeVariant = ThemeVariant.Light;
-                    }
-
-                    Current.RequestedThemeVariant = themeVariant;
+                    themeVariant = ThemeVariant.Dark;
+                }
+                else if (Config.ThemeMode == ThemeMode.Light)
+                {
+                    themeVariant = ThemeVariant.Light;
                 }
 
-
-                desktop.MainWindow = new MainWindow()
-                {
-                    Position = new PixelPoint(Config.WindowPositionX, Config.WindowPositionY),
-                    Width = Config.WindowWidth,
-                    Height = Config.WindowHeight,
-                    WindowState = Config.WindowState,
-                    Topmost = Config.EnableWindowTopMost,
-                };
-                desktop.ShutdownRequested += Desktop_ShutdownRequested;
+                Current.RequestedThemeVariant = themeVariant;
             }
 
-            base.OnFrameworkInitializationCompleted();
-        }
 
-
-        private void Desktop_ShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
-        {
-            _ = Config.SaveAsync();
-        }
-
-
-        /// <summary>
-        /// Checks and runs auto-update.
-        /// </summary>
-        public static async Task CheckAndRunAutoUpdateAsync()
-        {
-            var shouldCheckForUpdate = false;
-
-            if (Config.AutoUpdate != "0")
+            desktop.MainWindow = new MainWindow()
             {
-                if (DateTime.TryParseExact(
-                    Config.AutoUpdate,
-                    Config.DATETIME_FORMAT,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out var lastUpdate))
-                {
-                    // Check for update every 5 days
-                    if (DateTime.UtcNow.Subtract(lastUpdate).TotalDays > 5)
-                    {
-                        shouldCheckForUpdate = true;
-                    }
-                }
-                else
+                Position = new PixelPoint(Config.WindowPositionX, Config.WindowPositionY),
+                Width = Config.WindowWidth,
+                Height = Config.WindowHeight,
+                WindowState = Config.WindowState,
+                Topmost = Config.EnableWindowTopMost,
+            };
+            desktop.ShutdownRequested += Desktop_ShutdownRequested;
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+
+
+    private void Desktop_ShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
+    {
+        _ = Config.SaveAsync();
+    }
+
+
+    /// <summary>
+    /// Checks and runs auto-update.
+    /// </summary>
+    public static async Task CheckAndRunAutoUpdateAsync()
+    {
+        var shouldCheckForUpdate = false;
+
+        if (Config.AutoUpdate != "0")
+        {
+            if (DateTime.TryParseExact(
+                Config.AutoUpdate,
+                Config.DATETIME_FORMAT,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var lastUpdate))
+            {
+                // Check for update every 5 days
+                if (DateTime.UtcNow.Subtract(lastUpdate).TotalDays > 5)
                 {
                     shouldCheckForUpdate = true;
                 }
             }
-
-
-            if (shouldCheckForUpdate == true)
+            else
             {
-                await CheckForUpdateAsync(false);
+                shouldCheckForUpdate = true;
             }
         }
 
 
-        /// <summary>
-        /// Check for updatae
-        /// </summary>
-        /// <param name="alwaysShowUI">
-        /// Set to <c>true</c> if you want to show the Update dialog. Default value is <c>false</c>.
-        /// </param>
-        public static async Task CheckForUpdateAsync(bool? alwaysShowUI = null)
+        if (shouldCheckForUpdate == true)
         {
-            await Updater.GetUpdatesAsync();
-
-            // save last update
-            Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
-
-
-            alwaysShowUI ??= false;
-            if (Updater.HasNewUpdate || alwaysShowUI.Value)
-            {
-                // show update window
-                var win = new UpdateWindow()
-                {
-                    WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen,
-                };
-                win.Show();
-            }
+            await CheckForUpdateAsync(false);
         }
-
-
     }
+
+
+    /// <summary>
+    /// Check for updatae
+    /// </summary>
+    /// <param name="alwaysShowUI">
+    /// Set to <c>true</c> if you want to show the Update dialog. Default value is <c>false</c>.
+    /// </param>
+    public static async Task CheckForUpdateAsync(bool? alwaysShowUI = null)
+    {
+        await Updater.GetUpdatesAsync();
+
+        // save last update
+        Config.AutoUpdate = DateTime.UtcNow.ToString(Config.DATETIME_FORMAT);
+
+
+        alwaysShowUI ??= false;
+        if (Updater.HasNewUpdate || alwaysShowUI.Value)
+        {
+            // show update window
+            var win = new UpdateWindow()
+            {
+                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen,
+            };
+            win.Show();
+        }
+    }
+
 }

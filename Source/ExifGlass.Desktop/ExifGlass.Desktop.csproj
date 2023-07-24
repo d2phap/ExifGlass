@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!--If you are willing to use Windows/MacOS native APIs you will need to create 3 projects.
+    One for Windows with net7.0-windows TFM, one for MacOS with net7.0-macos and one with net7.0 TFM for Linux.-->
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
+
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <EntryPointExe>$(AssemblyName).exe</EntryPointExe>
+    <ApplicationIcon>..\ExifGlass\Assets\exifglass_icon_512.ico</ApplicationIcon>
+
+    <TrimMode>CopyUsed</TrimMode>
+    <PublishTrimmed>true</PublishTrimmed>
+
+    <AssemblyTitle>ExifGlass</AssemblyTitle>
+    <Copyright>Copyright © 2023 Duong Dieu Phap</Copyright>
+    <FileVersion>$(Version)</FileVersion>
+    <Version>1.0.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExifGlass\ExifGlass.csproj" />
+  </ItemGroup>
+</Project>

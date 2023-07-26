@@ -58,7 +58,7 @@
                             <!--  Style cell content  -->
                             <Style Selector="TextBlock">
                                 <Setter Property="TextWrapping" Value="Wrap" />
-                                <Setter Property="Padding" Value="0,6,0,6" />
+                                <Setter Property="Padding" Value="0,5,0,5" />
                                 <Setter Property="VerticalAlignment" Value="Top" />
                             </Style>
                         </DataGrid.Styles>
@@ -101,7 +101,7 @@
 
                             <DataGridTextColumn
                                 Width="Auto"
-                                MinWidth="100"
+                                MinWidth="110"
                                 Binding="{Binding TagName}"
                                 Tag="TagName">
                                 <DataGridTextColumn.HeaderTemplate>

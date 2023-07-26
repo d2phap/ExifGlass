@@ -88,6 +88,7 @@ public partial class MainWindow : Window
         }
     }
 
+
     private void MainWindow_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property.Name == nameof(WindowState))
@@ -111,6 +112,8 @@ public partial class MainWindow : Window
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
+
+        Title = $"ExifGlass v{Config.AppVersion.ToString(2)}";
 
         var args = Environment.GetCommandLineArgs();
         if (args.Length >= 2)
@@ -475,7 +478,7 @@ public partial class MainWindow : Window
     {
         if (string.IsNullOrEmpty(filePath))
         {
-            Title = "ExifGlass";
+            Title = $"ExifGlass v{Config.AppVersion.ToString(2)}";
             DtGrid.ItemsSource = Enumerable.Empty<object>();
             return;
         }
@@ -483,7 +486,7 @@ public partial class MainWindow : Window
 
         // show command preview
         _filePath = filePath;
-        Title = $"ExifGlass - {_filePath}";
+        Title = $"ExifGlass v{Config.AppVersion.ToString(2)} - {_filePath}";
         TxtCmd.Text = $"{Config.ExifToolExecutable} {ExifTool.DefaultCommands} {Config.ExifToolArguments} \"{filePath}\"";
 
         _exifTool.ExifToolPath = Config.ExifToolExecutable;
@@ -501,11 +504,12 @@ public partial class MainWindow : Window
 
             if (ex.Message.Contains("Target file or working directory doesn't exist"))
             {
-                TxtError.Text = "Error:\nExifGlass was unable to locate the path to the ExifTool executable. To resolve this issue, please navigate to the Settings menu (using Ctrl+Comma) and update the path to ExifTool as necessary.";
+                TxtError.Text = "Error:\nExifGlass was unable to locate the path to the ExifTool executable. To resolve this issue, please open the app settings and update the path as necessary.";
             }
             else
             {
-                TxtError.Text = ex.Message;
+                TxtError.Text = ex.Message + "\r\n\r\n" +
+                    ex.ToString();
             }
         }
 

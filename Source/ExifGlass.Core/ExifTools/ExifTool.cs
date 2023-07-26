@@ -94,7 +94,8 @@ public class ExifTool : List<ExifTagItem>
 
             cmdOutput = cmdResult.StandardOutput;
 
-            if (!string.IsNullOrEmpty(cmdResult.StandardError))
+            if (!string.IsNullOrEmpty(cmdResult.StandardError)
+                && !cmdResult.StandardError.StartsWith("-- press ENTER --\r\n"))
             {
                 throw new Exception(cmdResult.StandardError);
             }

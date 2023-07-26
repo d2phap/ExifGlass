@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.0.0.0",
-    "Title": "ExifGlass 1.0",
-    "Description": "Initial release of ExifGlass",
+    "Version": "1.1.0.0",
+    "Title": "ExifGlass 1.1",
+    "Description": "- Adds support for ImageGlass 9.0 beta 5.\r\n- Adds support for auto-updating accent color when the system accent color is changed.\r\n- Fixed a bug where user cannot copy the selected value",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-04-16T10:10:10",
+    "PublishedDate": "2023-07-25T21:11:30",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

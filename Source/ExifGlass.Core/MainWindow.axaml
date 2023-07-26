@@ -49,12 +49,27 @@
                         MinHeight="0"
                         x:DataType="eg:ExifTagItem"
                         AutoGenerateColumns="False"
+                        CanUserResizeColumns="True"
                         ClipboardCopyMode="None"
                         FontSize="13"
                         Foreground="{DynamicResource SystemBaseMediumHighColor}"
                         IsReadOnly="True">
+                        <DataGrid.Styles>
+                            <!--  Style cell content  -->
+                            <Style Selector="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                                <Setter Property="Padding" Value="0,6,0,6" />
+                                <Setter Property="VerticalAlignment" Value="Top" />
+                            </Style>
+                        </DataGrid.Styles>
+
+
                         <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Index}" Tag="Index">
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding Index}"
+                                CanUserResize="False"
+                                Tag="Index">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
@@ -67,7 +82,11 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagId}" Tag="TagId">
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding TagId}"
+                                CanUserResize="False"
+                                Tag="TagId">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
@@ -80,26 +99,38 @@
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagName}" Tag="TagName">
+                            <DataGridTextColumn
+                                Width="Auto"
+                                MinWidth="100"
+                                Binding="{Binding TagName}"
+                                Tag="TagName">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
                                             FontWeight="SemiBold"
-                                            Foreground="{DynamicResource SystemBaseMediumHighColor}">
+                                            Foreground="{DynamicResource SystemBaseMediumHighColor}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap">
                                             Tag name
                                         </TextBlock>
                                     </DataTemplate>
                                 </DataGridTextColumn.HeaderTemplate>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Binding="{Binding TagValue}" Tag="TagValue">
+                            <DataGridTextColumn
+                                Width="*"
+                                MinWidth="150"
+                                Binding="{Binding TagValue}"
+                                Tag="TagValue">
                                 <DataGridTextColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
                                             FontWeight="SemiBold"
-                                            Foreground="{DynamicResource SystemBaseMediumHighColor}">
+                                            Foreground="{DynamicResource SystemBaseMediumHighColor}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap">
                                             Tag value
                                         </TextBlock>
                                     </DataTemplate>

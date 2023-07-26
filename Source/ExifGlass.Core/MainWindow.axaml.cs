@@ -322,8 +322,6 @@ public partial class MainWindow : Window
     private void DtGrid_LoadingRow(object? sender, DataGridRowEventArgs e)
     {
         if (e.Row.DataContext is not ExifTagItem item) return;
-        e.Row.Padding = new Thickness(6);
-        e.Row.Height = e.Row.FontSize + e.Row.Padding.Top + e.Row.Padding.Bottom;
 
         if (item.TagName.Equals("File Name", StringComparison.InvariantCultureIgnoreCase))
         {
@@ -518,7 +516,6 @@ public partial class MainWindow : Window
 
         // load results into grid
         DtGrid.ItemsSource = groupView;
-
 
         BtnCopy.IsEnabled = BtnExport.IsEnabled = _exifTool.Any();
     }

@@ -41,6 +41,21 @@ public class ExifTool : List<ExifTagItem>
     /// </summary>
     public static string DefaultCommands => "-fast -G -t -m -q -H";
 
+    /// <summary>
+    /// Gets the original file path.
+    /// </summary>
+    public string OriginalFilePath { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the actual file path where EXIF metadata fetched from.
+    /// </summary>
+    public string CleanedFilePath { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Check if file path contains unsupported characters.
+    /// </summary>
+    public bool IsFilePathDirty { get; private set; } = false;
+
 
     /// <summary>
     /// Initialize new instance of <see cref="ExifTool"/>.
@@ -55,23 +70,6 @@ public class ExifTool : List<ExifTagItem>
     #region Public methods
 
     /// <summary>
-    /// Tests if the <see cref="ExifToolPath"/> is valid.
-    /// </summary>
-    public async Task<bool> Test()
-    {
-        var cmd = Cli.Wrap(ExifToolPath);
-
-        var cmdResult = await cmd
-                .WithArguments("-ver")
-                .ExecuteBufferedAsync(Encoding.UTF8);
-
-        //var cmdOutput = cmdResult.StandardOutput;
-
-        return true;
-    }
-
-
-    /// <summary>
     /// Reads file's metadata.
     /// </summary>
     /// <param name="filePath">Path of file to read.</param>
@@ -81,39 +79,45 @@ public class ExifTool : List<ExifTagItem>
         CancellationToken cancelToken = default,
         params string[] exifToolCmd)
     {
-        var cmdOutput = string.Empty;
-        var pathContainsUnicode = CheckAndPurifyUnicodePath(filePath, out var cleanPath);
+        DeleteTempFiles();
 
-        try
+        IsFilePathDirty = CheckAndPurifyUnicodePath(filePath, out var cleanPath);
+        OriginalFilePath = filePath;
+        CleanedFilePath = cleanPath;
+
+
+        var cmd = Cli.Wrap(ExifToolPath);
+        var cmdResult = await cmd
+            .WithArguments($"{DefaultCommands} {string.Join(" ", exifToolCmd)} \"{cleanPath}\"")
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
+
+        var cmdOutput = cmdResult.StandardOutput;
+
+        if (!string.IsNullOrEmpty(cmdResult.StandardError)
+            && !cmdResult.StandardError.StartsWith("-- press ENTER --\r\n"))
         {
-            var cmd = Cli.Wrap(ExifToolPath);
-            var cmdResult = await cmd
-                .WithArguments($"{DefaultCommands} {string.Join(" ", exifToolCmd)} \"{cleanPath}\"")
-                .WithValidation(CommandResultValidation.None)
-                .ExecuteBufferedAsync(Encoding.UTF8, cancelToken);
-
-            cmdOutput = cmdResult.StandardOutput;
-
-            if (!string.IsNullOrEmpty(cmdResult.StandardError)
-                && !cmdResult.StandardError.StartsWith("-- press ENTER --\r\n"))
-            {
-                throw new Exception(cmdResult.StandardError);
-            }
+            throw new Exception(cmdResult.StandardError);
         }
-        finally
+
+        ParseExifTags(cmdOutput);
+    }
+
+
+    /// <summary>
+    /// Deletes the <see cref="CleanedFilePath"/>.
+    /// </summary>
+    public void DeleteTempFiles()
+    {
+        if (IsFilePathDirty && OriginalFilePath != CleanedFilePath)
         {
             // delete temporary file
-            if (pathContainsUnicode)
+            try
             {
-                try
-                {
-                    File.Delete(cleanPath);
-                }
-                catch { }
+                File.Delete(CleanedFilePath);
             }
+            catch { }
         }
-
-        ParseExifTags(cmdOutput, Path.GetFileName(filePath));
     }
 
 
@@ -208,6 +212,35 @@ public class ExifTool : List<ExifTagItem>
     }
 
 
+    /// <summary>
+    /// Extracts tag binary data to file.
+    /// </summary>
+    /// <exception cref="Exception"></exception>
+    public async Task ExtractTagAsync(string tagName, string destFilePath)
+    {
+        if (string.IsNullOrWhiteSpace(tagName)) return;
+
+        var tagNameNoSpace = tagName.Replace(" ", "");
+        var extractedDir = Path.Combine(Config.ConfigDir, "ExtractOutput");
+
+        var cmd = Cli.Wrap(ExifToolPath);
+        var cmdResult = await cmd
+            .WithArguments($"-{tagNameNoSpace} -b -w! \"{extractedDir}\\%f_{tagNameNoSpace}\" \"{CleanedFilePath}\"")
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync();
+
+        if (!string.IsNullOrEmpty(cmdResult.StandardError))
+        {
+            throw new Exception(cmdResult.StandardError);
+        }
+
+        var extractedFileName = $"{Path.GetFileNameWithoutExtension(CleanedFilePath)}_{tagNameNoSpace}";
+        var extractedFilePath = Path.Combine(extractedDir, extractedFileName);
+
+        File.Move(extractedFilePath, destFilePath);
+    }
+
+
     #endregion // Public methods
 
 
@@ -217,10 +250,11 @@ public class ExifTool : List<ExifTagItem>
     /// <summary>
     /// Parses Exiftool's command-line output.
     /// </summary>
-    private void ParseExifTags(string cmdOutput, string originalFileName)
+    private void ParseExifTags(string cmdOutput)
     {
         var hasError = false;
         var index = 0;
+        var originalFileName = Path.GetFileName(OriginalFilePath);
         Clear();
 
         while (cmdOutput.Length > 0)

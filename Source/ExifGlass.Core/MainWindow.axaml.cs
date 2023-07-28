@@ -60,6 +60,7 @@ public partial class MainWindow : StyledWindow
         DtGrid.LoadingRowGroup += DtGrid_LoadingRowGroup;
         DtGrid.LoadingRow += DtGrid_LoadingRow;
         DtGrid.KeyDown += DtGrid_KeyDown;
+        DtGrid.CellPointerPressed += DtGrid_CellPointerPressed;
 
         BtnOpenFile.Click += BtnOpenFile_Click;
         BtnCopy.Click += BtnCopy_Click;
@@ -72,7 +73,7 @@ public partial class MainWindow : StyledWindow
         MnuAbout.Click += MnuAbout_Click;
         MnuCheckForUpdate.Click += MnuCheckForUpdate_Click;
     }
-
+    
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -145,6 +146,7 @@ public partial class MainWindow : StyledWindow
         DtGrid.LoadingRowGroup -= DtGrid_LoadingRowGroup;
         DtGrid.LoadingRow -= DtGrid_LoadingRow;
         DtGrid.KeyDown -= DtGrid_KeyDown;
+        DtGrid.CellPointerPressed -= DtGrid_CellPointerPressed;
 
         BtnOpenFile.Click -= BtnOpenFile_Click;
         BtnCopy.Click -= BtnCopy_Click;
@@ -283,6 +285,16 @@ public partial class MainWindow : StyledWindow
 
     // Control events
     #region Control events
+
+    private void DtGrid_CellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
+    {
+        // fixed: selected cell is not updated when context menu is open
+        if (e.Column.Tag != DtGrid.CurrentColumn.Tag)
+        {
+            DtGrid.CurrentColumn = e.Column;
+        }
+    }
+
 
     private void DtGrid_KeyDown(object? sender, KeyEventArgs e)
     {

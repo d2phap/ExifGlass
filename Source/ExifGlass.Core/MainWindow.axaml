@@ -15,6 +15,17 @@
     TransparencyLevelHint="Mica"
     mc:Ignorable="d">
 
+    <Window.Resources>
+        <ContextMenu x:Key="MnuContext" FontFamily="Segoe UI Variable, Segoe UI">
+            <MenuItem
+                Padding="10,0"
+                Click="BtnCopy_Click"
+                Header="Copy"
+                InputGesture="Ctrl+C" />
+        </ContextMenu>
+    </Window.Resources>
+
+
     <Grid RowDefinitions="*, Auto">
         <Border Name="TopContent" Grid.Row="0">
             <Grid RowDefinitions="*">
@@ -45,6 +56,7 @@
                         x:DataType="eg:ExifTagItem"
                         AutoGenerateColumns="False"
                         CanUserResizeColumns="True"
+                        CanUserSortColumns="True"
                         ClipboardCopyMode="None"
                         FontSize="13"
                         Foreground="{DynamicResource SystemBaseMediumHighColor}"
@@ -60,29 +72,44 @@
 
 
                         <DataGrid.Columns>
-                            <DataGridTextColumn
+
+                            <DataGridTemplateColumn
                                 Width="Auto"
-                                Binding="{Binding Index}"
                                 CanUserResize="False"
+                                SortMemberPath="Index"
                                 Tag="Index">
-                                <DataGridTextColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
                                             FontWeight="SemiBold"
                                             Foreground="{DynamicResource SystemBaseMediumHighColor}">
-                                            No.
+                                            Index
                                         </TextBlock>
                                     </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
-                            </DataGridTextColumn>
+                                </DataGridTemplateColumn.HeaderTemplate>
 
-                            <DataGridTextColumn
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="eg:ExifTagItem">
+                                        <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
+                                            <TextBlock
+                                                Padding="10,5,10,5"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Text="{Binding Index}"
+                                                TextWrapping="Wrap" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+
+                            <DataGridTemplateColumn
                                 Width="Auto"
-                                Binding="{Binding TagId}"
                                 CanUserResize="False"
+                                SortMemberPath="TagId"
                                 Tag="TagId">
-                                <DataGridTextColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
@@ -91,15 +118,29 @@
                                             Tag ID
                                         </TextBlock>
                                     </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
-                            </DataGridTextColumn>
+                                </DataGridTemplateColumn.HeaderTemplate>
 
-                            <DataGridTextColumn
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="eg:ExifTagItem">
+                                        <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
+                                            <TextBlock
+                                                Padding="10,5,10,5"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Text="{Binding TagId}"
+                                                TextWrapping="Wrap" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+
+                            <DataGridTemplateColumn
                                 Width="Auto"
                                 MinWidth="110"
-                                Binding="{Binding TagName}"
+                                SortMemberPath="TagName"
                                 Tag="TagName">
-                                <DataGridTextColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
@@ -110,15 +151,30 @@
                                             Tag name
                                         </TextBlock>
                                     </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
-                            </DataGridTextColumn>
+                                </DataGridTemplateColumn.HeaderTemplate>
 
-                            <DataGridTextColumn
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="eg:ExifTagItem">
+                                        <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
+                                            <TextBlock
+                                                Padding="10,5,10,5"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Text="{Binding TagName}"
+                                                TextWrapping="Wrap" />
+
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+
+                            <DataGridTemplateColumn
                                 Width="*"
                                 MinWidth="150"
-                                Binding="{Binding TagValue}"
+                                SortMemberPath="TagValue"
                                 Tag="TagValue">
-                                <DataGridTextColumn.HeaderTemplate>
+                                <DataGridTemplateColumn.HeaderTemplate>
                                     <DataTemplate>
                                         <TextBlock
                                             FontSize="13"
@@ -129,13 +185,30 @@
                                             Tag value
                                         </TextBlock>
                                     </DataTemplate>
-                                </DataGridTextColumn.HeaderTemplate>
-                            </DataGridTextColumn>
+                                </DataGridTemplateColumn.HeaderTemplate>
+
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="eg:ExifTagItem">
+                                        <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
+                                            <TextBlock
+                                                Padding="10,5,10,5"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                Text="{Binding TagValue}"
+                                                TextWrapping="Wrap" />
+
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
             </Grid>
         </Border>
+
 
 
         <StackPanel
@@ -249,5 +322,7 @@
             </Grid>
         </StackPanel>
     </Grid>
+
+
 
 </Window>

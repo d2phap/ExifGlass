@@ -16,12 +16,21 @@
     mc:Ignorable="d">
 
     <Window.Resources>
-        <ContextMenu x:Key="MnuContext" FontFamily="Segoe UI Variable, Segoe UI">
+        <ContextMenu
+            x:Key="MnuContext"
+            Name="MnuContext"
+            FontFamily="Segoe UI Variable, Segoe UI"
+            Opening="MnuContext_Opening">
             <MenuItem
                 Padding="10,0"
                 Click="BtnCopy_Click"
                 Header="Copy"
                 InputGesture="Ctrl+C" />
+            <MenuItem
+                x:Name="MnuExtractData"
+                Padding="10,0"
+                Click="MnuExtractData_Click"
+                Header="Extract data" />
         </ContextMenu>
     </Window.Resources>
 
@@ -196,7 +205,6 @@
                                                 VerticalAlignment="Top"
                                                 Text="{Binding TagValue}"
                                                 TextWrapping="Wrap" />
-
                                         </Border>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

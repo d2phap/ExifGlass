@@ -1,4 +1,4 @@
-/*
+﻿/*
 ExifGlass - Standalone Exif tool for ImageGlass
 Copyright (C) 2023 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
@@ -27,6 +27,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ExifGlass.ExifTools;
 using ImageGlass.Tools;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Dto;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,6 +67,7 @@ public partial class MainWindow : StyledWindow
         BtnOpenFile.Click += BtnOpenFile_Click;
         BtnCopy.Click += BtnCopy_Click;
 
+
         MnuExportText.Click += MnuExportText_Click;
         MnuExportCsv.Click += MnuExportCsv_Click;
         MnuExportJson.Click += MnuExportJson_Click;
@@ -73,7 +76,7 @@ public partial class MainWindow : StyledWindow
         MnuAbout.Click += MnuAbout_Click;
         MnuCheckForUpdate.Click += MnuCheckForUpdate_Click;
     }
-    
+
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -171,6 +174,9 @@ public partial class MainWindow : StyledWindow
             Config.WindowWidth = (int)Width;
             Config.WindowHeight = (int)Height;
         }
+
+        // delete temporary files
+        _exifTool.DeleteTempFiles();
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -355,6 +361,82 @@ public partial class MainWindow : StyledWindow
 
         var clipboard = GetTopLevel(this)?.Clipboard;
         _ = clipboard?.SetTextAsync(value);
+    }
+
+
+    private void MnuContext_Opening(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (sender is not ContextMenu mnu) return;
+        if (DtGrid.SelectedItem is not ExifTagItem item) return;
+
+        var header = DtGrid.CurrentColumn.Tag?.ToString() ?? string.Empty;
+        var value = item.GetType().GetProperty(header)?.GetValue(item)?.ToString();
+        if (value == null) return;
+
+        if (mnu.ItemsView
+            .FirstOrDefault(i => (i as MenuItem)
+                ?.Name == nameof(MnuExtractData)) is not MenuItem mnuItem)
+            return;
+
+        mnuItem.IsVisible = value.Contains("use -b option to extract", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+
+    private void MnuExtractData_Click(object? sender, RoutedEventArgs e)
+    {
+        if (e.Source is not MenuItem mnu) return;
+        if (mnu.DataContext is not ExifTagItem item) return;
+
+        _ = ExtractTagBinaryDataAsync(item.TagName);
+    }
+
+
+    private async Task ExtractTagBinaryDataAsync(string tagName)
+    {
+        var tagNameNoSpace = tagName.Replace(" ", "");
+        var defaultFilename = $"{Path.GetFileNameWithoutExtension(_exifTool.OriginalFilePath)}_{tagNameNoSpace}.jpg";
+        var typeChoices = new List<FilePickerFileType>
+        {
+            new FilePickerFileType("JPG file (*.jpg)")
+            {
+                Patterns = new string[] { "*.jpg" },
+            },
+            new FilePickerFileType("All files (*.*)")
+            {
+                Patterns = new string[] { "*.*" },
+            }
+        };
+
+        var destFile = await StorageProvider.SaveFilePickerAsync(new()
+        {
+            ShowOverwritePrompt = true,
+            SuggestedFileName = defaultFilename,
+            DefaultExtension = Path.GetExtension(defaultFilename),
+            FileTypeChoices = typeChoices,
+        });
+        if (destFile?.TryGetLocalPath() is not string destFilePath) return;
+
+
+        try
+        {
+            await _exifTool.ExtractTagAsync(tagName, destFilePath);
+        }
+        catch (Exception ex)
+        {
+            var msg = MessageBoxManager.GetMessageBoxStandard(
+                new MessageBoxStandardParams
+                {
+                    ButtonDefinitions = MsBox.Avalonia.Enums.ButtonEnum.Ok,
+                    ContentMessage = $"#### ❌ **{ex.Message}**",
+                    Markdown = true,
+                    WindowIcon = Icon,
+                    EscDefaultButton = MsBox.Avalonia.Enums.ClickEnum.Ok,
+                    EnterDefaultButton = MsBox.Avalonia.Enums.ClickEnum.Ok,
+                    FontFamily = "Segoe UI Variant, Segoe UI",
+                });
+
+            await msg.ShowAsPopupAsync(this);
+        }
     }
 
 

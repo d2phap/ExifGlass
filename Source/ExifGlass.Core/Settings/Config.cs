@@ -39,7 +39,7 @@ public class Config
 
 
     private static string ConfigFileName => "exifglass.config.json";
-    private static string ConfigDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
+    public static string ConfigDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
     private static string ConfigFilePath => Path.Combine(ConfigDir, ConfigFileName);
 
 

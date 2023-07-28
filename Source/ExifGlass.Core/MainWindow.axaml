@@ -9,25 +9,19 @@
     Width="600"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    Background="{DynamicResource SystemAltMediumHighColor}"
     DragDrop.AllowDrop="True"
     FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
-    TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
     TransparencyLevelHint="Mica"
     mc:Ignorable="d">
 
     <Grid RowDefinitions="*, Auto">
-        <Border
-            Name="TopContent"
-            Grid.Row="0"
-            Background="{DynamicResource SystemAltMediumColor}">
+        <Border Name="TopContent" Grid.Row="0">
             <Grid RowDefinitions="*">
                 <Border
                     Name="BoxError"
                     Grid.Row="0"
-                    Padding="15,10,15,10"
-                    IsVisible="False">
+                    Padding="15,10,15,10">
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <SelectableTextBlock
                             Name="TxtError"
@@ -40,10 +34,11 @@
                 <Border
                     Name="BoxExifGrid"
                     Grid.Row="1"
-                    Margin="15"
+                    Margin="15,10,15,0"
+                    Background="{DynamicResource SystemControlBackgroundAltMediumBrush}"
                     BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                     BorderThickness="1"
-                    CornerRadius="0 0 5 5">
+                    CornerRadius="5">
                     <DataGrid
                         Name="DtGrid"
                         MinHeight="0"

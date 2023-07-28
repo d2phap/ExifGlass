@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace ExifGlass;
 
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : StyledWindow
 {
     /// <summary>
     /// Gets the result of <see cref="SettingsWindow"/>.
@@ -38,9 +38,6 @@ public partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
-
-        GotFocus += SettingsWindow_GotFocus;
-        LostFocus += SettingsWindow_LostFocus;
 
         BtnSelectExecutable.Click += BtnSelectExecutable_Click;
         BtnOK.Click += BtnOK_Click;
@@ -65,27 +62,6 @@ public partial class SettingsWindow : Window
 
     // Control events
     #region Control events
-
-    private void SettingsWindow_GotFocus(object? sender, GotFocusEventArgs e)
-    {
-        this.SetDynamicResource(BackgroundProperty, "SystemAltMediumHighColor");
-    }
-
-
-    private void SettingsWindow_LostFocus(object? sender, RoutedEventArgs e)
-    {
-        if (Application.Current is not Application app) return;
-
-        if (app.ActualThemeVariant == ThemeVariant.Dark)
-        {
-            Background = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-        }
-        else
-        {
-            Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
-        }
-    }
-
 
     private void ExifToolConfig_Changed(object? sender, TextChangedEventArgs e)
     {

@@ -8,7 +8,6 @@
     Title="About"
     d:DesignHeight="450"
     d:DesignWidth="400"
-    Background="{DynamicResource SystemAltMediumHighColor}"
     CanResize="False"
     CornerRadius="100"
     DragDrop.AllowDrop="True"
@@ -17,7 +16,6 @@
     FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
     SizeToContent="WidthAndHeight"
-    TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
     TransparencyLevelHint="Mica"
     mc:Ignorable="d">
     <Grid

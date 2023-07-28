@@ -24,7 +24,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
-using Avalonia.Styling;
 using Avalonia.Threading;
 using ExifGlass.ExifTools;
 using ImageGlass.Tools;
@@ -37,7 +36,7 @@ using System.Threading.Tasks;
 
 namespace ExifGlass;
 
-public partial class MainWindow : Window
+public partial class MainWindow : StyledWindow
 {
     private readonly ImageGlassTool _igTool = new();
 
@@ -53,8 +52,6 @@ public partial class MainWindow : Window
         _ = ConnectToImageGlassAsync();
 
         // controls events
-        GotFocus += MainWindow_GotFocus;
-        LostFocus += MainWindow_LostFocus;
         SizeChanged += MainWindow_SizeChanged;
         PropertyChanged += MainWindow_PropertyChanged;
         AddHandler(DragDrop.DragOverEvent, OnFileDragOver);
@@ -140,8 +137,6 @@ public partial class MainWindow : Window
         base.OnClosing(e);
 
         // controls events
-        GotFocus -= MainWindow_GotFocus;
-        LostFocus -= MainWindow_LostFocus;
         SizeChanged -= MainWindow_SizeChanged;
         PropertyChanged -= MainWindow_PropertyChanged;
         RemoveHandler(DragDrop.DragOverEvent, OnFileDragOver);
@@ -288,26 +283,6 @@ public partial class MainWindow : Window
 
     // Control events
     #region Control events
-
-    private void MainWindow_GotFocus(object? sender, GotFocusEventArgs e)
-    {
-        this.SetDynamicResource(BackgroundProperty, "SystemAltMediumHighColor");
-    }
-
-    private void MainWindow_LostFocus(object? sender, RoutedEventArgs e)
-    {
-        if (Application.Current is not Application app) return;
-
-        if (app.ActualThemeVariant == ThemeVariant.Dark)
-        {
-            Background = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-        }
-        else
-        {
-            Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
-        }
-    }
-
 
     private void DtGrid_KeyDown(object? sender, KeyEventArgs e)
     {

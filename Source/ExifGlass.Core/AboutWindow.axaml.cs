@@ -16,23 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia.Styling;
 
 namespace ExifGlass;
 
-public partial class AboutWindow : Window
+public partial class AboutWindow : StyledWindow
 {
     public AboutWindow()
     {
         InitializeComponent();
-
-        GotFocus += AboutWindow_GotFocus;
-        LostFocus += AboutWindow_LostFocus;
 
         BtnClose.Click += BtnClose_Click;
         BtnCheckForUpdate.Click += BtnCheckForUpdate_Click;
@@ -45,27 +37,6 @@ public partial class AboutWindow : Window
 
     // Control events
     #region Control events
-
-    private void AboutWindow_GotFocus(object? sender, GotFocusEventArgs e)
-    {
-        this.SetDynamicResource(BackgroundProperty, "SystemAltMediumHighColor");
-    }
-
-
-    private void AboutWindow_LostFocus(object? sender, RoutedEventArgs e)
-    {
-        if (Application.Current is not Application app) return;
-
-        if (app.ActualThemeVariant == ThemeVariant.Dark)
-        {
-            Background = new SolidColorBrush(Color.FromRgb(32, 32, 32));
-        }
-        else
-        {
-            Background = new SolidColorBrush(Color.FromRgb(243, 243, 243));
-        }
-    }
-
 
     private void BtnExifGlassStore_Click(object? sender, RoutedEventArgs e)
     {

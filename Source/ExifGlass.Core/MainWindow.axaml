@@ -92,9 +92,7 @@
                                         <TextBlock
                                             FontSize="13"
                                             FontWeight="SemiBold"
-                                            Foreground="{DynamicResource SystemBaseMediumHighColor}">
-                                            Index
-                                        </TextBlock>
+                                            Foreground="{DynamicResource SystemBaseMediumHighColor}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
 

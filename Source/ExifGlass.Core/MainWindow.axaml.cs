@@ -373,9 +373,9 @@ public partial class MainWindow : StyledWindow
         var value = item.GetType().GetProperty(header)?.GetValue(item)?.ToString();
         if (value == null) return;
 
-        if (mnu.ItemsView
-            .FirstOrDefault(i => (i as MenuItem)
-                ?.Name == nameof(MnuExtractData)) is not MenuItem mnuItem)
+        if (mnu.ItemsView.FirstOrDefault(i => i is MenuItem {
+            Name: nameof(MnuExtractData)
+        }) is not MenuItem mnuItem)
             return;
 
         mnuItem.IsVisible = value.Contains("use -b option to extract", StringComparison.InvariantCultureIgnoreCase);

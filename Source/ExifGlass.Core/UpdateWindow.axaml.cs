@@ -27,7 +27,6 @@ public partial class UpdateWindow : StyledWindow
         InitializeComponent();
 
         BtnReadMore.Click += BtnReadMore_Click;
-        BtnDownload.Click += BtnDownload_Click;
         BtnClose.Click += BtnClose_Click;
         BtnExifGlassStore.Click += BtnExifGlassStore_Click;
 
@@ -63,13 +62,6 @@ public partial class UpdateWindow : StyledWindow
     {
         Config.OpenUrl(App.Updater.CurrentReleaseInfo?.ChangelogUrl.ToString(), "app_update");
     }
-
-
-    private void BtnDownload_Click(object? sender, RoutedEventArgs e)
-    {
-        Config.OpenUrl(App.Updater.CurrentReleaseInfo?.DownloadUrl.ToString(), "app_update");
-    }
-
 
     private void BtnClose_Click(object? sender, RoutedEventArgs e)
     {

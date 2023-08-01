@@ -60,7 +60,7 @@
             Grid.Row="1"
             Padding="15"
             ZIndex="1">
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto">
                 <Button
                     Name="BtnReadMore"
                     Grid.Column="1"
@@ -71,16 +71,8 @@
                     Read more
                 </Button>
                 <Button
-                    Name="BtnDownload"
-                    Grid.Column="2"
-                    MinWidth="80"
-                    Margin="10,0,0,0"
-                    HorizontalContentAlignment="Center">
-                    Download
-                </Button>
-                <Button
                     Name="BtnClose"
-                    Grid.Column="3"
+                    Grid.Column="2"
                     MinWidth="80"
                     Margin="10,0,0,0"
                     HorizontalContentAlignment="Center">

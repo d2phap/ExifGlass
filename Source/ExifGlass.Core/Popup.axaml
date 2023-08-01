@@ -30,10 +30,11 @@
                     Foreground="{DynamicResource SystemAccentColor}"
                     Text="Heading" />
 
-                <TextBlock
+                <SelectableTextBlock
                     Name="TxtContent"
                     MaxWidth="400"
                     Margin="30,0,0,0"
+                    SelectionBrush="{DynamicResource SelectionColorBrush}"
                     Text="Content"
                     TextWrapping="WrapWithOverflow" />
 

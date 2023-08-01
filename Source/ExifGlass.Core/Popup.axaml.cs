@@ -94,7 +94,7 @@ public partial class Popup : StyledWindow
         {
             txtHeading.Text = heading ?? string.Empty;
         }
-        if (this.FindControl<TextBlock>(nameof(TxtContent)) is TextBlock txtContent)
+        if (this.FindControl<SelectableTextBlock>(nameof(TxtContent)) is SelectableTextBlock txtContent)
         {
             txtContent.Text = content ?? string.Empty;
         }

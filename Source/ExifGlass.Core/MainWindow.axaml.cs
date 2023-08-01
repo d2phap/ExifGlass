@@ -25,10 +25,9 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using ExifGlass.Core;
 using ExifGlass.ExifTools;
 using ImageGlass.Tools;
-using MsBox.Avalonia;
-using MsBox.Avalonia.Dto;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -373,9 +372,10 @@ public partial class MainWindow : StyledWindow
         var value = item.GetType().GetProperty(header)?.GetValue(item)?.ToString();
         if (value == null) return;
 
-        if (mnu.ItemsView.FirstOrDefault(i => i is MenuItem {
-            Name: nameof(MnuExtractData)
-        }) is not MenuItem mnuItem)
+        if (mnu.ItemsView.FirstOrDefault(i => i is MenuItem
+            {
+                Name: nameof(MnuExtractData)
+            }) is not MenuItem mnuItem)
             return;
 
         mnuItem.IsVisible = value.Contains("use -b option to extract", StringComparison.InvariantCultureIgnoreCase);
@@ -423,19 +423,7 @@ public partial class MainWindow : StyledWindow
         }
         catch (Exception ex)
         {
-            var msg = MessageBoxManager.GetMessageBoxStandard(
-                new MessageBoxStandardParams
-                {
-                    ButtonDefinitions = MsBox.Avalonia.Enums.ButtonEnum.Ok,
-                    ContentMessage = $"#### ❌ **{ex.Message}**",
-                    Markdown = true,
-                    WindowIcon = Icon,
-                    EscDefaultButton = MsBox.Avalonia.Enums.ClickEnum.Ok,
-                    EnterDefaultButton = MsBox.Avalonia.Enums.ClickEnum.Ok,
-                    FontFamily = "Segoe UI Variant, Segoe UI",
-                });
-
-            await msg.ShowAsPopupAsync(this);
+            _ = await Popup.ShowAsync(this, ex.Message, "❌ Error");
         }
     }
 

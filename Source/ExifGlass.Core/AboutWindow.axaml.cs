@@ -33,7 +33,7 @@ public partial class AboutWindow : StyledWindow
         TblVersion.Text = Config.AppVersion.ToString();
     }
 
-    
+
 
     // Control events
     #region Control events

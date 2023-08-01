@@ -2,9 +2,9 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using System;
 
 namespace ExifGlass;
 

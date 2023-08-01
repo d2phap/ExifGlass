@@ -13,7 +13,6 @@
     DragDrop.AllowDrop="True"
     ExtendClientAreaChromeHints="NoChrome"
     ExtendClientAreaToDecorationsHint="True"
-    FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
     SizeToContent="WidthAndHeight"
     TransparencyLevelHint="Mica"

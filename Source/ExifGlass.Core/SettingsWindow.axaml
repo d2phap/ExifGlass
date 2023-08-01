@@ -9,7 +9,6 @@
     CanResize="False"
     CornerRadius="100"
     DragDrop.AllowDrop="True"
-    FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
     SizeToContent="Height"
     TransparencyLevelHint="Mica"

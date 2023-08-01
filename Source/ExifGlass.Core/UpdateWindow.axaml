@@ -9,12 +9,9 @@
     MinWidth="350"
     d:DesignHeight="450"
     d:DesignWidth="400"
-    Background="{DynamicResource SystemAltMediumHighColor}"
     CanResize="False"
-    FontFamily="Segoe UI Variable, Segoe UI"
     Icon="Assets\exifglass_icon_512.ico"
     SizeToContent="WidthAndHeight"
-    TransparencyBackgroundFallback="{DynamicResource ThemeBackgroundBrush}"
     TransparencyLevelHint="Mica"
     mc:Ignorable="d">
     <Grid
@@ -24,7 +21,7 @@
         <Border
             Grid.Row="0"
             Padding="15"
-            Background="{DynamicResource SystemAltMediumColor}">
+            Background="{DynamicResource SystemControlBackgroundAltMediumBrush}">
             <StackPanel Orientation="Vertical">
                 <TextBlock
                     Name="TxtHeading"

@@ -33,6 +33,7 @@ public class StyledWindow : Window
 
     public StyledWindow()
     {
+        FontFamily = new FontFamily("Segoe UI Variable, Segoe UI");
         this.SetDynamicResource(TransparencyBackgroundFallbackProperty, "SystemControlBackgroundAltHighBrush");
 
         // controls events

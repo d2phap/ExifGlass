@@ -1,0 +1,63 @@
+<Window
+    x:Class="ExifGlass.Core.Popup"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Popup"
+    MinWidth="350"
+    d:DesignHeight="250"
+    d:DesignWidth="200"
+    CanResize="False"
+    Icon="Assets\exifglass_icon_512.ico"
+    SizeToContent="WidthAndHeight"
+    TransparencyLevelHint="Mica"
+    mc:Ignorable="d">
+    <Grid
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        RowDefinitions="*, Auto">
+        <Border
+            Grid.Row="0"
+            Padding="15"
+            Background="{DynamicResource SystemControlBackgroundAltMediumBrush}">
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+                    Name="TxtHeading"
+                    Margin="0,0,0,15"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Foreground="{DynamicResource SystemAccentColor}"
+                    Text="Heading" />
+
+                <TextBlock
+                    Name="TxtContent"
+                    MaxWidth="400"
+                    Margin="30,0,0,0"
+                    Text="Content"
+                    TextWrapping="WrapWithOverflow" />
+
+            </StackPanel>
+        </Border>
+
+
+        <!--  Footer  -->
+        <Border
+            Grid.Row="1"
+            Padding="15"
+            ZIndex="1">
+            <Grid ColumnDefinitions="*,Auto">
+                <Button
+                    Name="BtnOK"
+                    Grid.Column="1"
+                    MinWidth="80"
+                    Margin="10,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    Classes="accent"
+                    Click="BtnOK_Click">
+                    OK
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

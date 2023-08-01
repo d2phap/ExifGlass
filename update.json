@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.1.0.0",
-    "Title": "ExifGlass 1.1",
-    "Description": "- Adds support for ImageGlass 9.0 beta 5.\r\n- Adds support for auto-updating accent color when the system accent color is changed.\r\n- Fixed a bug where user cannot copy the selected value",
+    "Version": "1.2.0.0",
+    "Title": "ExifGlass 1.2",
+    "Description": "- Adds support for ImageGlass 9.0 beta 5.\r\n- Adds support for extracting embedded thumbnail via context menu.\r\n- Improves viewing long text data by auto-wrapping tag value\r\n-Fixed a bug where ExifGlass shows `-- press ENTER --` message when using the default filename of ExifTool: exiftool(-k).exe ",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-07-25T21:11:30",
+    "PublishedDate": "2023-08-01T23:29:50",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

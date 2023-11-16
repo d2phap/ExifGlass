@@ -49,7 +49,8 @@
                 <TextBlock
                     Name="TxtReleaseDescription"
                     MaxWidth="400"
-                    Margin="0,0,0,15" />
+                    Margin="0,0,0,15"
+                    TextWrapping="Wrap" />
 
             </StackPanel>
         </Border>

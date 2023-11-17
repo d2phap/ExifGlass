@@ -35,7 +35,7 @@
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
         DisplayName="ExifGlass"
-        Description="EXIF metadata viewer - a wrapper of ExifTool"
+        Description="EXIF metadata viewing tool"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">

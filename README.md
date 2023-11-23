@@ -9,6 +9,15 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 
 [![ExifGlass on Microsoft Store](https://user-images.githubusercontent.com/3154213/231506294-1baee922-3283-48a4-ba70-25662a4a90db.svg)](https://www.microsoft.com/store/productId/9MX8S9HZ57W8)
 
+
+<a href="https://github.com/d2phap/ExifGlass/releases">
+  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" /></a>
+  
+<a href="https://github.com/d2phap/ExifGlass/releases">
+  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" /></a>
+
+
+
 <img src="https://raw.githubusercontent.com/d2phap/ExifGlass/main/Screenshots/main.png" width="600" />
 
 ## ExifGlass features
@@ -20,7 +29,7 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 | Copy metadata | ✅ | ✅ |
 | Export as Text, JSON, CSV | ✅ | ✅ |
 | Custom ExifTool's command-line arguments | ✅ | ✅ |
-| .NET 7 self-contained | ❌ | ✅ |
+| .NET 8 self-contained | ❌ | ✅ |
 | Seamless auto-update | ❌ | ✅ |
 | Launch ExifGlass with protocol `exifglass:` | ❌ | ✅ |
 | Launch ExifGlass with command `exifglass` | ❌ | ✅ |
@@ -32,30 +41,15 @@ If you want to configure ExifGlass to work with your system, follow these steps:
 3. Open ExifGlass Settings (press <kbd>Ctrl+,</kbd>) and go to "Executable path". Locate the `exiftool.exe` file that you extracted in step 2.
 
 ## Integrate ExifGlass into [ImageGlass 9](https://imageglass.org)
-Follow these steps to add ExifGlass as an external tool to **ImageGlass 9 beta 5**:
-1. Open `igconfig.json` file with a text editor such as NotePad or VS Code.
-2. Ensure that ImageGlass app is not running.
-3. In the `Tools` section of the `igconfig.json` file, add the following code:
-```js
-// in igconfig.json
-"Tools": [
-  {
-    "ToolId": "Tool_ExifGlass", // a unique ID
-    "ToolName": "ExifGlass - Exif metadata viewer", // name of the tool
-    "Executable": "path\\to\\ExifGlass.exe", // or "exifglass" for ExifGlass Store
-    "Argument": "<file>",
-    "Hotkeys": ["X", "Ctrl+E"] // press X or Ctrl+E to open/close ExifGlass tool
-    "IsIntegrated": true
-  }
-]
-```
-Note that if you have installed [ExifGlass Store](https://www.microsoft.com/store/productId/9MX8S9HZ57W8), you can just use `exifglass` for the `Executable` field.
+Please refer to [ImageGlass Docs / ImageGlass tools](https://imageglass.org/docs/imageglass-tools#add-your-tool-to-imageglass).
 
-4. Save the file, and you're done! Now you can enjoy using ExifGlass as an external tool with ImageGlass 9 beta 5.
+> [!TIP]
+> Note that if you have installed [ExifGlass Store](https://www.microsoft.com/store/productId/9MX8S9HZ57W8), you can just use `exifglass` for the `Executable` field.
+
 
 ## Build ExifGlass from source code
-- .NET 7.0 and Visual Studio 2022
-- Add [ImageGlass.Tools.csproj](https://github.com/ImageGlass/ImageGlass.Tools) as reference project.
+- .NET 8.0 and Visual Studio 2022
+- Add [ImageGlass.Tools](https://www.nuget.org/packages/ImageGlass.Tools) package.
 
 ## License
 ExifGlass is free for both personal and commercial use, except the Store version. It is released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE).

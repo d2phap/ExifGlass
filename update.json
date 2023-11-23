@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.2.0.0",
-    "Title": "ExifGlass 1.2",
-    "Description": "- Adds support for ImageGlass 9.0 beta 5.\r\n- Adds support for extracting embedded thumbnail via context menu.\r\n- Improves viewing long text data by auto-wrapping tag value\r\n-Fixed a bug where ExifGlass shows `-- press ENTER --` message when using the default filename of ExifTool: exiftool(-k).exe ",
+    "Version": "1.3.0.0",
+    "Title": "ExifGlass 1.3",
+    "Description": "- Adds support for ImageGlass 9.0 official release.\r\n- Builts against .NET Desktop Runtime 8",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-08-01T23:29:50",
+    "PublishedDate": "2023-11-23T10:35:50",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

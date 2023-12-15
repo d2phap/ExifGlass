@@ -299,7 +299,7 @@
                     Name="BtnMenu"
                     Grid.Column="3"
                     Margin="10,0,0,0"
-                    Content="…"
+                    Content="Menu…"
                     FontFamily="Segoe UI Variable, Segoe UI"
                     ToolTip.Placement="Top"
                     ToolTip.Tip="Menu"

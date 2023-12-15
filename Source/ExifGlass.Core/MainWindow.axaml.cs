@@ -121,7 +121,7 @@ public partial class MainWindow : StyledWindow
             // get path from params
             var filePath = args
                 .Skip(1)
-                .FirstOrDefault(i => !i.StartsWith("-"));
+                .FirstOrDefault(i => !i.StartsWith('-'));
 
             filePath ??= string.Empty;
 
@@ -397,13 +397,13 @@ public partial class MainWindow : StyledWindow
         var defaultFilename = $"{Path.GetFileNameWithoutExtension(_exifTool.OriginalFilePath)}_{tagNameNoSpace}.jpg";
         var typeChoices = new List<FilePickerFileType>
         {
-            new FilePickerFileType("JPG file (*.jpg)")
+            new("JPG file (*.jpg)")
             {
-                Patterns = new string[] { "*.jpg" },
+                Patterns = ["*.jpg"],
             },
-            new FilePickerFileType("All files (*.*)")
+            new("All files (*.*)")
             {
-                Patterns = new string[] { "*.*" },
+                Patterns = ["*.*"],
             }
         };
 
@@ -615,8 +615,8 @@ public partial class MainWindow : StyledWindow
         {
             typeChoices.Add(new FilePickerFileType("Text file (*.txt)")
             {
-                MimeTypes = new string[] { "text/plain" },
-                Patterns = new string[] { "*.txt" },
+                MimeTypes = ["text/plain"],
+                Patterns = ["*.txt"],
             });
         }
 
@@ -624,8 +624,8 @@ public partial class MainWindow : StyledWindow
         {
             typeChoices.Add(new FilePickerFileType("CSV file (*.csv)")
             {
-                MimeTypes = new string[] { "text/csv" },
-                Patterns = new string[] { "*.csv" },
+                MimeTypes = ["text/csv"],
+                Patterns = ["*.csv"],
             });
         }
 
@@ -633,8 +633,8 @@ public partial class MainWindow : StyledWindow
         {
             typeChoices.Add(new FilePickerFileType("JSON file (*.json)")
             {
-                MimeTypes = new string[] { "application/json" },
-                Patterns = new string[] { "*.json" },
+                MimeTypes = ["application/json"],
+                Patterns = ["*.json"],
             });
         }
 

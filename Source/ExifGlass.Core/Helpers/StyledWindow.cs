@@ -30,6 +30,8 @@ namespace ExifGlass;
 /// </summary>
 public class StyledWindow : Window
 {
+    public static bool IsWindows10 => Environment.OSVersion.Version.Major == 10
+        && Environment.OSVersion.Version.Build< 22000;
 
     public StyledWindow()
     {
@@ -61,7 +63,7 @@ public class StyledWindow : Window
 
     private void MainWindow_Activated(object? sender, EventArgs e)
     {
-        if (!TransparencyLevelHint.Contains(WindowTransparencyLevel.None))
+        if (!TransparencyLevelHint.Contains(WindowTransparencyLevel.None) && !IsWindows10)
         {
             Background = Brushes.Transparent;
         }

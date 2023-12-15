@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.3.0.0",
-    "Title": "ExifGlass 1.3",
-    "Description": "- Added support for ImageGlass 9.0 official release.\r\n- Built against .NET Desktop Runtime 8",
+    "Version": "1.4.0.0",
+    "Title": "ExifGlass 1.4",
+    "Description": "Fixed an issue where ExifGlass window became transparent on Windows 10",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-11-23T10:35:50",
+    "PublishedDate": "2023-12-15T16:30:50",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

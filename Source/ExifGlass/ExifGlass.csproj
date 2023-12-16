@@ -19,7 +19,7 @@
     <AssemblyTitle>ExifGlass</AssemblyTitle>
     <Copyright>Copyright © 2023 - 2024 Duong Dieu Phap</Copyright>
     <FileVersion>$(Version)</FileVersion>
-    <Version>1.4.0.0</Version>
+    <Version>1.4.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

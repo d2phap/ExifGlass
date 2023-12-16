@@ -23,6 +23,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,13 +31,15 @@ namespace ExifGlass;
 
 public partial class JsonEx
 {
-    private static JsonSerializerOptions JsonOptions { get; } = new()
+    private static JsonSerializerOptions JsonOptions => new()
     {
         PropertyNameCaseInsensitive = true,
         AllowTrailingCommas = true,
         WriteIndented = true,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
+
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
 
         Converters =
         {
@@ -83,18 +86,16 @@ public partial class JsonEx
 }
 
 
-public class CustomDateTimeConverter : JsonConverter<DateTime>
+public class CustomDateTimeConverter(string format) : JsonConverter<DateTime>
 {
-    private readonly string Format;
-    public CustomDateTimeConverter(string format)
-    {
-        Format = format;
-    }
+    private readonly string Format = format;
+
 
     public override void Write(Utf8JsonWriter writer, DateTime date, JsonSerializerOptions options)
     {
         writer.WriteStringValue(date.ToString(Format));
     }
+
 
     public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

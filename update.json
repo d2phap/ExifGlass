@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.4.0.0",
-    "Title": "ExifGlass 1.4",
-    "Description": "Fixed an issue where ExifGlass window became transparent on Windows 10",
+    "Version": "1.4.1.0",
+    "Title": "ExifGlass 1.4.1",
+    "Description": "- Fixed an issue where ExifGlass window became transparent on Windows 10.\r\n- Fixed an issue where ExifGlass failed to save user settings.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-12-15T16:30:50",
+    "PublishedDate": "2023-12-18T19:38:20",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

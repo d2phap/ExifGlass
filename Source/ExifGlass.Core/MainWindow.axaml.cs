@@ -113,7 +113,7 @@ public partial class MainWindow : StyledWindow
     {
         base.OnOpened(e);
 
-        Title = $"ExifGlass v{Config.AppVersion.ToString(2)}";
+        Title = $"ExifGlass {Config.AppVersion}";
 
         var args = Environment.GetCommandLineArgs();
         if (args.Length >= 2)
@@ -561,7 +561,7 @@ public partial class MainWindow : StyledWindow
 
             if (ex.Message.Contains("Target file or working directory doesn't exist"))
             {
-                TxtError.Text = "Error:\nExifGlass was unable to locate the path to the ExifTool executable. To resolve this issue, please open the app settings and update the path as necessary.";
+                TxtError.Text = "\"exiftool.exe\" is not installed or ExifGlass could not find the path. To resolve this issue, please open the app settings and update the \"Excutable path\".";
             }
             else
             {

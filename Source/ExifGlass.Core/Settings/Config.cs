@@ -39,6 +39,7 @@ public class Config
 
 
     private static string ConfigFileName => "exifglass.config.json";
+
     public static string ConfigDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AppName);
     private static string ConfigFilePath => Path.Combine(ConfigDir, ConfigFileName);
 
@@ -100,7 +101,7 @@ public class Config
     /// <summary>
     /// Gets, sets the executable path of ExifTool.
     /// </summary>
-    public static string ExifToolExecutable { get; set; } = "exiftool";
+    public static string ExifToolExecutable { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets, sets the command-line arguments of ExifTool.

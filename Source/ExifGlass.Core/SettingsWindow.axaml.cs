@@ -18,7 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
 using ExifGlass.ExifTools;
 using System.Threading.Tasks;
 
@@ -61,7 +60,11 @@ public partial class SettingsWindow : StyledWindow
 
     private void ExifToolConfig_Changed(object? sender, TextChangedEventArgs e)
     {
-        TxtPreview.Text = $"{TxtExecutable.Text?.Trim()} {ExifTool.DefaultCommands} {TxtArguments.Text?.Trim()} \"C:\\path\\to\\photo.jpg\"";
+        var exiftoolPath = string.IsNullOrWhiteSpace(TxtExecutable.Text)
+            ? ExifTool.DefaultExifToolPath
+            : TxtExecutable.Text.Trim();
+
+        TxtPreview.Text = $"{exiftoolPath} {ExifTool.DefaultCommands} {TxtArguments.Text?.Trim()} \"C:\\path\\to\\photo.jpg\"";
     }
 
 
@@ -76,13 +79,13 @@ public partial class SettingsWindow : StyledWindow
         var filePicker = await StorageProvider.OpenFilePickerAsync(new()
         {
             AllowMultiple = false,
-            FileTypeFilter = new FilePickerFileType[]
-            {
-                new FilePickerFileType("ExifTool's binary file")
+            FileTypeFilter =
+            [
+                new("ExifTool's binary file")
                 {
-                    Patterns = new[] { "*.exe" }
+                    Patterns = ["*.exe"]
                 },
-            },
+            ],
         });
         if (filePicker == null || filePicker.Count == 0) return;
 

@@ -29,17 +29,32 @@ using System.Threading.Tasks;
 
 namespace ExifGlass.ExifTools;
 
-public class ExifTool : List<ExifTagItem>
+/// <summary>
+/// Initialize new instance of <see cref="ExifTool"/>.
+/// </summary>
+public class ExifTool(string toolPath = "") : List<ExifTagItem>
 {
     /// <summary>
     /// Gets, sets the path of Exiftool executable file.
+    /// If empty, it will use the default "exiftool.exe" file
     /// </summary>
-    public string ExifToolPath { get; set; } = string.Empty;
+    public string ExifToolPath { get; set; } = toolPath;
+
+
+    /// <summary>
+    /// Gets the current path of ExifTool.
+    /// </summary>
+    public string CurrentExifToolPath => string.IsNullOrWhiteSpace(ExifToolPath) ? DefaultExifToolPath : ExifToolPath;
 
     /// <summary>
     /// Gets default commands to pass to Exiftool.
     /// </summary>
     public static string DefaultCommands => "-fast -G -t -m -q -H";
+
+    /// <summary>
+    /// Gets the default exiftool executable path.
+    /// </summary>
+    public static string DefaultExifToolPath => Path.Combine(AppContext.BaseDirectory, "exiftool.exe");
 
     /// <summary>
     /// Gets the original file path.
@@ -55,15 +70,6 @@ public class ExifTool : List<ExifTagItem>
     /// Check if file path contains unsupported characters.
     /// </summary>
     public bool IsFilePathDirty { get; private set; } = false;
-
-
-    /// <summary>
-    /// Initialize new instance of <see cref="ExifTool"/>.
-    /// </summary>
-    public ExifTool(string toolPath = "")
-    {
-        ExifToolPath = toolPath;
-    }
 
 
     // Public methods
@@ -86,7 +92,7 @@ public class ExifTool : List<ExifTagItem>
         CleanedFilePath = cleanPath;
 
 
-        var cmd = Cli.Wrap(ExifToolPath);
+        var cmd = Cli.Wrap(CurrentExifToolPath);
         var cmdResult = await cmd
             .WithArguments($"{DefaultCommands} {string.Join(" ", exifToolCmd)} \"{cleanPath}\"")
             .WithValidation(CommandResultValidation.None)
@@ -223,7 +229,7 @@ public class ExifTool : List<ExifTagItem>
         var tagNameNoSpace = tagName.Replace(" ", "");
         var extractedDir = Path.Combine(Config.ConfigDir, "ExtractOutput");
 
-        var cmd = Cli.Wrap(ExifToolPath);
+        var cmd = Cli.Wrap(CurrentExifToolPath);
         var cmdResult = await cmd
             .WithArguments($"-{tagNameNoSpace} -b -w! \"{extractedDir}\\%f_{tagNameNoSpace}\" \"{CleanedFilePath}\"")
             .WithValidation(CommandResultValidation.None)

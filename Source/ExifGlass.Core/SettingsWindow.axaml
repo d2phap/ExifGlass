@@ -67,7 +67,8 @@
                             MaxHeight="100"
                             AcceptsReturn="False"
                             SelectionBrush="{DynamicResource SelectionColorBrush}"
-                            TextWrapping="Wrap">
+                            TextWrapping="Wrap"
+                            Watermark="(default)">
                             exiftool
                         </TextBox>
                         <Button

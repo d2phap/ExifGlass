@@ -41,7 +41,7 @@ public partial class MainWindow : StyledWindow
 {
     private readonly ImageGlassTool _igTool = new();
 
-    private readonly ExifTool _exifTool = new("exiftool");
+    private readonly ExifTool _exifTool = [];
     private string _filePath = string.Empty;
 
 
@@ -543,10 +543,11 @@ public partial class MainWindow : StyledWindow
 
         // show command preview
         _filePath = filePath;
-        Title = $"ExifGlass v{Config.AppVersion.ToString(2)} - {_filePath}";
-        TxtCmd.Text = $"{Config.ExifToolExecutable} {ExifTool.DefaultCommands} {Config.ExifToolArguments} \"{filePath}\"";
-
         _exifTool.ExifToolPath = Config.ExifToolExecutable;
+
+        Title = $"ExifGlass v{Config.AppVersion.ToString(2)} - {_filePath}";
+        TxtCmd.Text = $"{_exifTool.CurrentExifToolPath} {ExifTool.DefaultCommands} {Config.ExifToolArguments} \"{filePath}\"";
+
         try
         {
             await _exifTool.ReadAsync(filePath, default, Config.ExifToolArguments);

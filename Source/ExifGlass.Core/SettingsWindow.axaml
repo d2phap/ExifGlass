@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Settings"
-    Width="450"
+    Width="500"
     CanResize="False"
     CornerRadius="100"
     DragDrop.AllowDrop="True"
@@ -22,6 +22,18 @@
             Padding="15"
             Background="{DynamicResource SystemAltMediumColor}">
             <StackPanel Orientation="Vertical">
+
+
+                <Label Margin="-5,0,0,5" FontWeight="SemiBold">App Theme</Label>
+                <ComboBox
+                    Name="CmbTheme"
+                    Margin="0,0,0,15"
+                    SelectedIndex="0">
+                    <ComboBoxItem>System setting</ComboBoxItem>
+                    <ComboBoxItem>Dark</ComboBoxItem>
+                    <ComboBoxItem>Light</ComboBoxItem>
+                </ComboBox>
+
                 <CheckBox
                     Name="ChkTopMost"
                     Margin="0,0,0,15"
@@ -31,7 +43,7 @@
                     Margin="0,0,0,10"
                     FontSize="16"
                     FontWeight="SemiBold">
-                    ExifTool configurations
+                    ExifTool Configurations
                 </TextBlock>
 
                 <Border
@@ -59,7 +71,7 @@
                 </Border>
 
                 <StackPanel Margin="15,0,0,0">
-                    <TextBlock Margin="0,0,0,5">Executable path:</TextBlock>
+                    <TextBlock Margin="0,0,0,5">Executable Path</TextBlock>
                     <Grid Margin="0,0,0,15" ColumnDefinitions="*, Auto">
                         <TextBox
                             Name="TxtExecutable"
@@ -82,7 +94,7 @@
                     </Grid>
 
 
-                    <TextBlock Margin="0,0,0,5">Arguments:</TextBlock>
+                    <TextBlock Margin="0,0,0,5">Arguments</TextBlock>
                     <TextBox
                         Name="TxtArguments"
                         MaxHeight="100"
@@ -92,7 +104,7 @@
                         TextWrapping="Wrap" />
 
 
-                    <TextBlock Margin="0,0,0,5">Preview:</TextBlock>
+                    <TextBlock Margin="0,0,0,5">Preview</TextBlock>
                     <Border
                         MaxHeight="80"
                         Margin="0,0,0,15"

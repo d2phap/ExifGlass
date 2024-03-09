@@ -27,21 +27,8 @@ public partial class App : Application
             Config.Load();
             _ = CheckAndRunAutoUpdateAsync();
 
-            if (Current != null)
-            {
-                // load Theme mode
-                var themeVariant = ThemeVariant.Default;
-                if (Config.ThemeMode == ThemeMode.Dark)
-                {
-                    themeVariant = ThemeVariant.Dark;
-                }
-                else if (Config.ThemeMode == ThemeMode.Light)
-                {
-                    themeVariant = ThemeVariant.Light;
-                }
-
-                Current.RequestedThemeVariant = themeVariant;
-            }
+            // load Theme mode
+            Config.ApplyThemeMode(Config.ThemeMode);
 
 
             desktop.MainWindow = new MainWindow()

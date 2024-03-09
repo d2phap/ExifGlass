@@ -48,6 +48,7 @@ public partial class SettingsWindow : StyledWindow
         base.OnLoaded(e);
 
         // Loads user settings
+        CmbTheme.SelectedIndex = (int)Config.ThemeMode;
         ChkTopMost.IsChecked = Topmost = Config.EnableWindowTopMost;
         TxtExecutable.Text = Config.ExifToolExecutable;
         TxtArguments.Text = Config.ExifToolArguments;
@@ -94,9 +95,13 @@ public partial class SettingsWindow : StyledWindow
 
     private void BtnOK_Click(object? sender, RoutedEventArgs e)
     {
+        Config.ThemeMode = (ThemeMode)CmbTheme.SelectedIndex;
         Config.EnableWindowTopMost = ChkTopMost.IsChecked ?? false;
         Config.ExifToolExecutable = (TxtExecutable.Text ?? "").Trim();
         Config.ExifToolArguments = (TxtArguments.Text ?? "").Trim();
+
+        // apply Theme mode
+        Config.ApplyThemeMode(Config.ThemeMode);
 
         Result = SettingsResult.OK;
         Close();

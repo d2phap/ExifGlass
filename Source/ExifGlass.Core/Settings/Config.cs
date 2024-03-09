@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Styling;
 using ImageGlass.Tools;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -229,6 +230,27 @@ public class Config
         }
     }
 
+
+    /// <summary>
+    /// Applies theme mode to the app.
+    /// </summary>
+    public static void ApplyThemeMode(ThemeMode mode)
+    {
+        if (Application.Current == null) return;
+
+        var themeVariant = ThemeVariant.Default;
+        if (mode == ThemeMode.Dark)
+        {
+            themeVariant = ThemeVariant.Dark;
+        }
+        else if (mode == ThemeMode.Light)
+        {
+            themeVariant = ThemeVariant.Light;
+        }
+
+        Application.Current.RequestedThemeVariant = themeVariant;
+    }
+
     #endregion // Public methods
 
 
@@ -276,9 +298,9 @@ public class Config
 }
 
 
-public enum ThemeMode
+public enum ThemeMode : int
 {
-    Default,
-    Dark,
-    Light,
+    Default = 0,
+    Dark = 1,
+    Light = 2,
 }

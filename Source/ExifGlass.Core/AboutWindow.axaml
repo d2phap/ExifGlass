@@ -149,6 +149,16 @@
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Oleksii Holub.</SelectableTextBlock>
+
+
+                                    <SelectableTextBlock
+                                        Margin="0,10,0,0"
+                                        FontWeight="SemiBold"
+                                        SelectionBrush="{DynamicResource SelectionColorBrush}">
+                                        ExifTool
+                                    </SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Perl license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Phil Harvey.</SelectableTextBlock>
                                 </StackPanel>
                             </SelectableTextBlock>
                         </ScrollViewer>

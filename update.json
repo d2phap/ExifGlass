@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.4.1.0",
-    "Title": "ExifGlass 1.4.1",
-    "Description": "- Fixed an issue where ExifGlass window became transparent on Windows 10.\r\n- Fixed an issue where ExifGlass failed to save user settings.",
+    "Version": "1.5.0.0",
+    "Title": "ExifGlass 1.5",
+    "Description": "- Added support for Windows 10 version 1809 (build 17763).\r\n- Added support for changing app theme mode in Settings.\r\n- If user does not specify the path for ExifTool, it will use the included 'exiftool.exe' by default",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2023-12-18T19:38:20",
+    "PublishedDate": "2024-03-11T21:38:20",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

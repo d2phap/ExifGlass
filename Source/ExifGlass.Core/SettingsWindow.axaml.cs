@@ -1,6 +1,6 @@
 /*
 ExifGlass - Standalone Exif tool for ImageGlass
-Copyright (C) 2023 DUONG DIEU PHAP
+Copyright (C) 2023-2024 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using ExifGlass.ExifTools;
 using System.Threading.Tasks;
@@ -53,6 +54,18 @@ public partial class SettingsWindow : StyledWindow
         TxtExecutable.Text = Config.ExifToolExecutable;
         TxtArguments.Text = Config.ExifToolArguments;
         Result = SettingsResult.Cancel;
+    }
+
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        // Escape
+        if (e.Key == Key.Escape)
+        {
+            Close();
+        }
     }
 
 

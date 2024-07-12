@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.5.0.0",
-    "Title": "ExifGlass 1.5",
-    "Description": "- Added support for Windows 10 version 1809 (build 17763).\r\n- Added support for changing app theme mode in Settings.\r\n- If user does not specify the path for ExifTool, it will use the included 'exiftool.exe' by default",
+    "Version": "1.6.0.0",
+    "Title": "ExifGlass 1.6",
+    "Description": "- Added Exit menu to Main Menu.\r\n- Added support for pressing ESC key to close the app & other windows.\r\n- Updated the internal ExifTool.exe to v12.88.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2024-03-11T21:38:20",
+    "PublishedDate": "2024-07-12T16:11:10",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

@@ -467,7 +467,7 @@ public partial class MainWindow : StyledWindow
             Topmost = Config.EnableWindowTopMost,
         };
 
-        _ = win.ShowDialog(this);
+        win.Show(this);
     }
 
 

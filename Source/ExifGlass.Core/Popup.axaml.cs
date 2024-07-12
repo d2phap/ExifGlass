@@ -1,6 +1,6 @@
 /*
 ExifGlass - Standalone Exif tool for ImageGlass
-Copyright (C) 2023 DUONG DIEU PHAP
+Copyright (C) 2023-2024 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify

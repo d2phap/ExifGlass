@@ -573,13 +573,15 @@ public partial class MainWindow : StyledWindow
             BoxExifGrid.IsVisible = false;
             BoxError.IsVisible = true;
 
+
+            TxtError.Text = "\r\n❌ Error:\r\n";
             if (ex.Message.Contains("Target file or working directory doesn't exist"))
             {
-                TxtError.Text = "\"exiftool.exe\" is not installed or ExifGlass could not find the path. To resolve this issue, please open the app settings and update the \"Excutable path\".";
+                TxtError.Text += "\"exiftool.exe\" is not installed or ExifGlass could not find the path. To resolve this issue, please open the app settings and update the \"Excutable path\".";
             }
             else
             {
-                TxtError.Text = ex.Message + "\r\n\r\n" +
+                TxtError.Text += ex.Message + "\r\n\r\nℹ️ Details:\r\n" +
                     ex.ToString();
             }
         }

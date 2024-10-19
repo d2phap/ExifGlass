@@ -2,8 +2,9 @@
     x:Class="ExifGlass.MainWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="using:ExifGlass"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:eg="using:ExifGlass.ExifTools"
+    xmlns:exiftool="using:ExifGlass.ExifTools"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="ExifGlass"
     Width="600"
@@ -15,6 +16,60 @@
     mc:Ignorable="d">
 
     <Window.Resources>
+        <ContextMenu
+            x:Key="MnuColumnOptions"
+            Name="MnuColumnOptions"
+            FontFamily="Segoe UI Variable, Segoe UI">
+            <MenuItem
+                Padding="10,0"
+                FontWeight="SemiBold"
+                Header="Column Options"
+                IsHitTestVisible="false"
+                IsTabStop="false"
+                IsTextSearchEnabled="false" />
+            <MenuItem
+                x:Name="MnuToggleColumnIndex"
+                Padding="10,0"
+                Click="MnuColumnOptions_Click"
+                Header="Index"
+                IsChecked="{Binding Source={x:Static app:Config.ShowColumnIndex}, Mode=OneWay}">
+                <MenuItem.Icon>
+                    <CheckBox IsChecked="{Binding $parent.IsChecked, Mode=OneWay}" IsHitTestVisible="false" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                x:Name="MnuToggleColumnTagId"
+                Padding="10,0"
+                Click="MnuColumnOptions_Click"
+                Header="Tag ID"
+                IsChecked="{Binding Source={x:Static app:Config.ShowColumnTagId}, Mode=OneWay}">
+                <MenuItem.Icon>
+                    <CheckBox IsChecked="{Binding $parent.IsChecked}" IsHitTestVisible="false" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                x:Name="MnuToggleColumnTagName"
+                Padding="10,0"
+                Click="MnuColumnOptions_Click"
+                Header="Tag Name"
+                IsChecked="{Binding Source={x:Static app:Config.ShowColumnTagName}, Mode=OneWay}">
+                <MenuItem.Icon>
+                    <CheckBox IsChecked="{Binding $parent.IsChecked}" IsHitTestVisible="false" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                x:Name="MnuToggleColumnTagValue"
+                Padding="10,0"
+                Click="MnuColumnOptions_Click"
+                Header="Value"
+                IsChecked="{Binding Source={x:Static app:Config.ShowColumnTagValue}, Mode=OneWay}">
+                <MenuItem.Icon>
+                    <CheckBox IsChecked="{Binding $parent.IsChecked}" IsHitTestVisible="false" />
+                </MenuItem.Icon>
+            </MenuItem>
+        </ContextMenu>
+
+
         <ContextMenu
             x:Key="MnuContext"
             Name="MnuContext"
@@ -61,11 +116,12 @@
                     <DataGrid
                         Name="DtGrid"
                         MinHeight="0"
-                        x:DataType="eg:ExifTagItem"
+                        x:DataType="exiftool:ExifTagItem"
                         AutoGenerateColumns="False"
                         CanUserResizeColumns="True"
                         CanUserSortColumns="True"
                         ClipboardCopyMode="None"
+                        ContextMenu="{StaticResource MnuColumnOptions}"
                         FontSize="13"
                         Foreground="{DynamicResource SystemBaseMediumHighColor}"
                         IsReadOnly="True">
@@ -84,6 +140,7 @@
                             <DataGridTemplateColumn
                                 Width="Auto"
                                 CanUserResize="False"
+                                IsVisible="{Binding Source={x:Static app:Config.ShowColumnIndex}}"
                                 SortMemberPath="Index"
                                 Tag="Index">
                                 <DataGridTemplateColumn.HeaderTemplate>
@@ -96,7 +153,7 @@
                                 </DataGridTemplateColumn.HeaderTemplate>
 
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="eg:ExifTagItem">
+                                    <DataTemplate DataType="exiftool:ExifTagItem">
                                         <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
                                             <TextBlock
                                                 Padding="10,5,10,5"
@@ -113,6 +170,7 @@
                             <DataGridTemplateColumn
                                 Width="Auto"
                                 CanUserResize="False"
+                                IsVisible="{Binding Source={x:Static app:Config.ShowColumnTagId}}"
                                 SortMemberPath="TagId"
                                 Tag="TagId">
                                 <DataGridTemplateColumn.HeaderTemplate>
@@ -127,7 +185,7 @@
                                 </DataGridTemplateColumn.HeaderTemplate>
 
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="eg:ExifTagItem">
+                                    <DataTemplate DataType="exiftool:ExifTagItem">
                                         <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
                                             <TextBlock
                                                 Padding="10,5,10,5"
@@ -144,6 +202,7 @@
                             <DataGridTemplateColumn
                                 Width="Auto"
                                 MinWidth="110"
+                                IsVisible="{Binding Source={x:Static app:Config.ShowColumnTagName}}"
                                 SortMemberPath="TagName"
                                 Tag="TagName">
                                 <DataGridTemplateColumn.HeaderTemplate>
@@ -154,13 +213,13 @@
                                             Foreground="{DynamicResource SystemBaseMediumHighColor}"
                                             TextTrimming="CharacterEllipsis"
                                             TextWrapping="NoWrap">
-                                            Tag name
+                                            Tag Name
                                         </TextBlock>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
 
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="eg:ExifTagItem">
+                                    <DataTemplate DataType="exiftool:ExifTagItem">
                                         <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
                                             <TextBlock
                                                 Padding="10,5,10,5"
@@ -178,6 +237,7 @@
                             <DataGridTemplateColumn
                                 Width="*"
                                 MinWidth="150"
+                                IsVisible="{Binding Source={x:Static app:Config.ShowColumnTagValue}}"
                                 SortMemberPath="TagValue"
                                 Tag="TagValue">
                                 <DataGridTemplateColumn.HeaderTemplate>
@@ -188,13 +248,13 @@
                                             Foreground="{DynamicResource SystemBaseMediumHighColor}"
                                             TextTrimming="CharacterEllipsis"
                                             TextWrapping="NoWrap">
-                                            Tag value
+                                            Tag Value
                                         </TextBlock>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.HeaderTemplate>
 
                                 <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate DataType="eg:ExifTagItem">
+                                    <DataTemplate DataType="exiftool:ExifTagItem">
                                         <Border Background="Transparent" ContextMenu="{StaticResource MnuContext}">
                                             <TextBlock
                                                 Padding="10,5,10,5"

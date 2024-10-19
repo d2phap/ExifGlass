@@ -301,7 +301,7 @@ public partial class MainWindow : StyledWindow
     private void DtGrid_CellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
     {
         // fixed: selected cell is not updated when context menu is open
-        if (e.Column.Tag != DtGrid.CurrentColumn.Tag)
+        if (e.Column != null && e.Column.Tag != DtGrid.CurrentColumn.Tag)
         {
             DtGrid.CurrentColumn = e.Column;
         }
@@ -386,6 +386,43 @@ public partial class MainWindow : StyledWindow
             return;
 
         mnuItem.IsVisible = value.Contains("use -b option to extract", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+
+    private void MnuColumnOptions_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem mnu) return;
+
+        // don't allow to uncheck the last visible column
+        var visibleColumnCount = DtGrid.Columns.Count(i => i.IsVisible);
+        if (visibleColumnCount < 2 && mnu.IsChecked) return;
+
+
+        if (mnu.Name == nameof(MnuToggleColumnIndex)) {
+            Config.ShowColumnIndex = !Config.ShowColumnIndex;
+            mnu.IsChecked = Config.ShowColumnIndex;
+            DtGrid.Columns[0].IsVisible = Config.ShowColumnIndex;
+        }
+        else if (mnu.Name == nameof(MnuToggleColumnTagId))
+        {
+            Config.ShowColumnTagId = !Config.ShowColumnTagId;
+            mnu.IsChecked = Config.ShowColumnTagId;
+            DtGrid.Columns[1].IsVisible = Config.ShowColumnTagId;
+        }
+        else if (mnu.Name == nameof(MnuToggleColumnTagName))
+        {
+            Config.ShowColumnTagName = !Config.ShowColumnTagName;
+            mnu.IsChecked = Config.ShowColumnTagName;
+            DtGrid.Columns[2].IsVisible = Config.ShowColumnTagName;
+        }
+        else if (mnu.Name == nameof(MnuToggleColumnTagValue))
+        {
+            Config.ShowColumnTagValue = !Config.ShowColumnTagValue;
+            mnu.IsChecked = Config.ShowColumnTagValue;
+            DtGrid.Columns[3].IsVisible = Config.ShowColumnTagValue;
+        }
+
+        
     }
 
 

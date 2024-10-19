@@ -109,6 +109,12 @@ public class Config
     /// </summary>
     public static string ExifToolArguments { get; set; } = string.Empty;
 
+
+    public static bool ShowColumnIndex { get; set; } = true;
+    public static bool ShowColumnTagId { get; set; } = true;
+    public static bool ShowColumnTagName { get; set; } = true;
+    public static bool ShowColumnTagValue { get; set; } = true;
+
     #endregion
 
 
@@ -136,11 +142,26 @@ public class Config
         if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
 
 
-        AutoUpdate = items.GetValue(nameof(AutoUpdate), AutoUpdate);
+        AutoUpdate = items.GetValue(nameof(AutoUpdate), AutoUpdate) ?? "";
         EnableWindowTopMost = items.GetValue(nameof(EnableWindowTopMost), EnableWindowTopMost);
         ThemeMode = items.GetValue(nameof(ThemeMode), ThemeMode);
-        ExifToolExecutable = items.GetValue(nameof(ExifToolExecutable), ExifToolExecutable);
-        ExifToolArguments = items.GetValue(nameof(ExifToolArguments), ExifToolArguments);
+        ExifToolExecutable = items.GetValue(nameof(ExifToolExecutable), ExifToolExecutable) ?? "";
+        ExifToolArguments = items.GetValue(nameof(ExifToolArguments), ExifToolArguments) ?? "";
+
+        // colum options
+        ShowColumnIndex = items.GetValue(nameof(ShowColumnIndex), ShowColumnIndex);
+        ShowColumnTagId = items.GetValue(nameof(ShowColumnTagId), ShowColumnTagId);
+        ShowColumnTagName = items.GetValue(nameof(ShowColumnTagName), ShowColumnTagName);
+        ShowColumnTagValue = items.GetValue(nameof(ShowColumnTagValue), ShowColumnTagValue);
+
+        // if all columns are hidden, restore default
+        if (!ShowColumnIndex && !ShowColumnTagId && !ShowColumnTagName && !ShowColumnTagValue)
+        {
+            ShowColumnIndex = true;
+            ShowColumnTagId = true;
+            ShowColumnTagName = true;
+            ShowColumnTagValue = true;
+        }
     }
 
 
@@ -172,6 +193,11 @@ public class Config
         _ = settings.TryAdd(nameof(ThemeMode), ThemeMode);
         _ = settings.TryAdd(nameof(ExifToolExecutable), ExifToolExecutable);
         _ = settings.TryAdd(nameof(ExifToolArguments), ExifToolArguments);
+
+        _ = settings.TryAdd(nameof(ShowColumnIndex), ShowColumnIndex);
+        _ = settings.TryAdd(nameof(ShowColumnTagId), ShowColumnTagId);
+        _ = settings.TryAdd(nameof(ShowColumnTagName), ShowColumnTagName);
+        _ = settings.TryAdd(nameof(ShowColumnTagValue), ShowColumnTagValue);
 
 
         await JsonEx.WriteJsonAsync(ConfigFilePath, settings);

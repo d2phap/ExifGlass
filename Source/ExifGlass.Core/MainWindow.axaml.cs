@@ -244,7 +244,7 @@ public partial class MainWindow : StyledWindow
         if (string.IsNullOrEmpty(e.MessageData)) return;
 
 
-        // update image list
+        // update image
         if (e.MessageName.Equals(ImageGlassEvents.IMAGE_LOADING, StringComparison.InvariantCultureIgnoreCase))
         {
             var obj = JsonSerializer.Deserialize(e.MessageData, IgImageLoadingEventArgsJsonContext.Default.IgImageLoadingEventArgs);

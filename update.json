@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.6.0.0",
-    "Title": "ExifGlass 1.6",
-    "Description": "- Added Exit menu to Main Menu.\r\n- Added support for pressing ESC key to close the app & other windows.\r\n- Updated the internal ExifTool.exe to v12.88.",
+    "Version": "1.7.0.0",
+    "Title": "ExifGlass 1.7",
+    "Description": "- Added support for choosing which columns to show via context menu.\r\n- Updated the internal ExifTool.exe to v12.99.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2024-07-12T16:11:10",
+    "PublishedDate": "2024-10-21T13:54:17",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

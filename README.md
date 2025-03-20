@@ -1,4 +1,4 @@
-ExifGlass - EXIF metadata viewing tool
+ExifGlass - EXIF Metadata Viewing Tool
 ===
 
 ExifGlass is an EXIF metadata viewing tool, designed to work seamlessly with [ImageGlass 9](https://imageglass.org), but can also be used as a standalone software on your computer. To use ExifGlass, you need to have [ExifTool by Phil Harvey](https://exiftool.org) installed on your system.
@@ -30,7 +30,7 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 | Copy metadata | ✅ | ✅ |
 | Export as Text, JSON, CSV | ✅ | ✅ |
 | Custom ExifTool's command-line arguments | ✅ | ✅ |
-| .NET 8 self-contained | ❌ | ✅ |
+| .NET self-contained | ✅ | ✅ |
 | Seamless auto-update | ❌ | ✅ |
 | Launch ExifGlass with protocol `exifglass:` | ❌ | ✅ |
 | Launch ExifGlass with command `exifglass` | ❌ | ✅ |
@@ -51,7 +51,7 @@ Please refer to [ImageGlass Docs / ImageGlass tools](https://imageglass.org/docs
 
 
 ## Build ExifGlass from source code
-- .NET 8.0 and Visual Studio 2022
+- .NET 9.0 and Visual Studio 2022
 - Add [ImageGlass.Tools](https://www.nuget.org/packages/ImageGlass.Tools) package.
 
 

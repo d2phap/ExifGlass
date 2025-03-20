@@ -1,4 +1,4 @@
-<Window
+﻿<Window
     x:Class="ExifGlass.SettingsWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -40,37 +40,14 @@
                     Content="Keep window always on top" />
 
                 <TextBlock
-                    Margin="0,0,0,10"
+                    Margin="0,20,0,10"
                     FontSize="16"
                     FontWeight="SemiBold">
                     ExifTool Configurations
                 </TextBlock>
 
-                <Border
-                    Margin="0,0,0,15"
-                    Background="{DynamicResource SystemRevealListLowColor}"
-                    CornerRadius="3">
-                    <SelectableTextBlock
-                        Padding="15,10"
-                        FontSize="13"
-                        SelectionBrush="{DynamicResource SelectionColorBrush}"
-                        TextWrapping="Wrap">
-                        Before using ExifGlass, you need to set the path for binary file of
-                        <SelectableTextBlock
-                            FontStyle="Italic"
-                            SelectionBrush="{DynamicResource SelectionColorBrush}"
-                            Text="ExifTool by Phil Harvey." />
-                        Simply visit the official website at
-                        <SelectableTextBlock
-                            Foreground="{DynamicResource SystemAccentColor}"
-                            SelectionBrush="{DynamicResource SelectionColorBrush}"
-                            Text="https://exiftool.org"
-                            TextDecorations="Underline" />
-                        to download the file and get started.
-                    </SelectableTextBlock>
-                </Border>
 
-                <StackPanel Margin="15,0,0,0">
+                <StackPanel>
                     <TextBlock Margin="0,0,0,5">Executable Path</TextBlock>
                     <Grid Margin="0,0,0,15" ColumnDefinitions="*, Auto">
                         <TextBox

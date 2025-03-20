@@ -1,4 +1,4 @@
-<Window
+﻿<Window
     x:Class="ExifGlass.MainWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -19,7 +19,7 @@
         <ContextMenu
             x:Key="MnuColumnOptions"
             Name="MnuColumnOptions"
-            FontFamily="Segoe UI Variable, Segoe UI">
+            >
             <MenuItem
                 Padding="10,0"
                 FontWeight="SemiBold"
@@ -73,7 +73,7 @@
         <ContextMenu
             x:Key="MnuContext"
             Name="MnuContext"
-            FontFamily="Segoe UI Variable, Segoe UI"
+            
             Opening="MnuContext_Opening">
             <MenuItem
                 Padding="10,0"
@@ -329,7 +329,7 @@
                     Grid.Column="2"
                     Margin="10,0,0,0"
                     Content="Export as…"
-                    FontFamily="Segoe UI Variable, Segoe UI"
+                    
                     IsEnabled="False"
                     ToolTip.Placement="Top"
                     ToolTip.Tip="Export as…"
@@ -338,17 +338,17 @@
                         <MenuFlyout Placement="TopEdgeAlignedRight">
                             <MenuItem
                                 Name="MnuExportText"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="Text file…"
                                 InputGesture="Ctrl+D1" />
                             <MenuItem
                                 Name="MnuExportCsv"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="CSV file…"
                                 InputGesture="Ctrl+D2" />
                             <MenuItem
                                 Name="MnuExportJson"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="JSON file…"
                                 InputGesture="Ctrl+D3" />
                         </MenuFlyout>
@@ -360,7 +360,7 @@
                     Grid.Column="3"
                     Margin="10,0,0,0"
                     Content="Menu…"
-                    FontFamily="Segoe UI Variable, Segoe UI"
+                    
                     ToolTip.Placement="Top"
                     ToolTip.Tip="Menu"
                     ToolTip.VerticalOffset="-5">
@@ -368,23 +368,23 @@
                         <MenuFlyout Placement="TopEdgeAlignedRight">
                             <MenuItem
                                 Name="MnuSettings"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="Settings…"
                                 InputGesture="Ctrl+," />
                             <MenuItem Header="-" />
                             <MenuItem
                                 Name="MnuCheckForUpdate"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="Check for update…" />
                             <MenuItem
                                 Name="MnuAbout"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="About…"
                                 InputGesture="F1" />
                             <MenuItem Header="-" />
                             <MenuItem
                                 Name="MnuExit"
-                                FontFamily="Segoe UI Variable, Segoe UI"
+                                
                                 Header="Exit"
                                 InputGesture="Escape" />
                         </MenuFlyout>

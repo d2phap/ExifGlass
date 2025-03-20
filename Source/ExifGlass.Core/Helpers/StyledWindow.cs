@@ -31,11 +31,10 @@ namespace ExifGlass;
 public class StyledWindow : Window
 {
     public static bool IsWindows10 => Environment.OSVersion.Version.Major == 10
-        && Environment.OSVersion.Version.Build< 22000;
+        && Environment.OSVersion.Version.Build < 22000;
 
     public StyledWindow()
     {
-        FontFamily = new FontFamily("Segoe UI Variable, Segoe UI");
         this.SetDynamicResource(TransparencyBackgroundFallbackProperty, "SystemControlBackgroundAltHighBrush");
 
         // controls events

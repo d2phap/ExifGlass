@@ -1,4 +1,4 @@
-<Application
+﻿<Application
     x:Class="ExifGlass.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,6 +8,10 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+
+        <Style Selector=":is(TopLevel)">
+            <Setter Property="FontFamily" Value="Segoe UI Variable, Segoe UI" />
+        </Style>
     </Application.Styles>
 
 

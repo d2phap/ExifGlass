@@ -1,4 +1,4 @@
-<Window
+﻿<Window
     x:Class="ExifGlass.AboutWindow"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -137,7 +137,7 @@
                                         ImageGlass.Tools
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2023-2024 Duong Dieu Phap.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2023-2025 Duong Dieu Phap.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock

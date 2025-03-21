@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.7.0.0",
-    "Title": "ExifGlass 1.7",
-    "Description": "- Added support for choosing which columns to show via context menu.\r\n- Updated the internal ExifTool.exe to v12.99.",
+    "Version": "1.8.0.0",
+    "Title": "ExifGlass 1.8",
+    "Description": "- Upgraded to .NET 9.\r\n- Updated the internal ExifTool.exe to v13.25.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2024-10-21T13:54:17",
+    "PublishedDate": "2025-03-21T10:53:26",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

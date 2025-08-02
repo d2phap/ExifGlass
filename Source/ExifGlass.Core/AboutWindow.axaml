@@ -69,7 +69,7 @@
                             FontSize="17"
                             FontWeight="SemiBold" />
                     </StackPanel>
-                    <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">Copyright © 2023-2014 by Dương Diệu Pháp.</TextBlock>
+                    <TextBlock Margin="0,15,0,0" TextWrapping="Wrap">Copyright © 2023 - 2025 by Dương Diệu Pháp.</TextBlock>
                     <TextBlock TextWrapping="Wrap">All rights reserved.</TextBlock>
 
                     <StackPanel Margin="0,15,0,0" Orientation="Horizontal">
@@ -124,10 +124,10 @@
                                         Margin="0,10,0,0"
                                         FontWeight="SemiBold"
                                         SelectionBrush="{DynamicResource SelectionColorBrush}">
-                                        Avalonia.Svg.Skia
+                                        Svg.Controls.Skia.Avalonia
                                     </SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the MIT license.</SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2020 Wiesław Šoltés.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © 2025 Wiesław Šoltés.</SelectableTextBlock>
 
 
                                     <SelectableTextBlock
@@ -156,7 +156,7 @@
                                         SelectionBrush="{DynamicResource SelectionColorBrush}">
                                         ExifTool
                                     </SelectableTextBlock>
-                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Perl license.</SelectableTextBlock>
+                                    <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Distributed under the terms of the Artistic license.</SelectableTextBlock>
                                     <SelectableTextBlock SelectionBrush="{DynamicResource SelectionColorBrush}">Copyright © Phil Harvey.</SelectableTextBlock>
                                 </StackPanel>
                             </SelectableTextBlock>

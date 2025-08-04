@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.8.0.0",
-    "Title": "ExifGlass 1.8",
-    "Description": "- Upgraded to .NET 9.\r\n- Updated the internal ExifTool.exe to v13.25.",
+    "Version": "1.9.0.0",
+    "Title": "ExifGlass 1.9",
+    "Description": "Updated the internal ExifTool.exe to v13.33.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2025-03-21T10:53:26",
+    "PublishedDate": "2025-08-02T12:45:26",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

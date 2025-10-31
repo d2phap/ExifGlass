@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "1.9.0.0",
-    "Title": "ExifGlass 1.9",
-    "Description": "Updated the internal ExifTool.exe to v13.33.",
+    "Version": "1.10.0.0",
+    "Title": "ExifGlass 1.10",
+    "Description": "- Enjoy the MSIX installer\r\n-Updated the internal ExifTool.exe to v13.40.",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2025-08-02T12:45:26",
+    "PublishedDate": "2025-10-31T14:24:26",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

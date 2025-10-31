@@ -61,7 +61,7 @@ public partial class JsonEx
     /// </summary>
     public static string ToJson<T>(T obj)
     {
-        return JsonSerializer.Serialize(obj, typeof(T), JsonOptions);
+        return JsonSerializer.Serialize(obj, JsonOptions);
     }
 
 

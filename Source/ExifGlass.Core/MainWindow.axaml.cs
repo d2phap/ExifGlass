@@ -77,7 +77,7 @@ public partial class MainWindow : StyledWindow
         MnuExit.Click += MnuExit_Click;
     }
 
-    
+
 
     private void MainWindow_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
@@ -270,7 +270,7 @@ public partial class MainWindow : StyledWindow
     private void OnFileDragOver(object? sender, DragEventArgs e)
     {
         // check if the drag data contains a file
-        if (e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile
+        if (e.DataTransfer.TryGetFile() is IStorageItem sFile
             && !File.GetAttributes(sFile.Path.LocalPath).HasFlag(FileAttributes.Directory))
         {
             e.DragEffects = DragDropEffects.Copy | DragDropEffects.Link;
@@ -285,7 +285,7 @@ public partial class MainWindow : StyledWindow
     private void OnFileDrop(object? sender, DragEventArgs e)
     {
         // check if the drag data contains a file
-        if (e.Data.GetFiles()?.FirstOrDefault() is IStorageItem sFile
+        if (e.DataTransfer.TryGetFile() is IStorageItem sFile
             && !File.GetAttributes(sFile.Path.LocalPath).HasFlag(FileAttributes.Directory))
         {
             _ = LoadExifMetadatAsync(sFile.Path.LocalPath);
@@ -398,7 +398,8 @@ public partial class MainWindow : StyledWindow
         if (visibleColumnCount < 2 && mnu.IsChecked) return;
 
 
-        if (mnu.Name == nameof(MnuToggleColumnIndex)) {
+        if (mnu.Name == nameof(MnuToggleColumnIndex))
+        {
             Config.ShowColumnIndex = !Config.ShowColumnIndex;
             mnu.IsChecked = Config.ShowColumnIndex;
             DtGrid.Columns[0].IsVisible = Config.ShowColumnIndex;
@@ -422,7 +423,7 @@ public partial class MainWindow : StyledWindow
             DtGrid.Columns[3].IsVisible = Config.ShowColumnTagValue;
         }
 
-        
+
     }
 
 

@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Styling;
+using ExifGlass.Core.Common;
 using ExifGlass.Core.Diagnostics;
 using ExifGlass.Diagnostics;
 
@@ -43,10 +44,14 @@ public static class AppBootstrap
     /// <summary>
     /// Runs every self-test check without starting the UI; returns the process exit code.
     /// </summary>
-    public static int RunSelfTest()
+    public static int RunSelfTest(string[] args)
     {
+        // a redirected console on Windows uses the ANSI code page: the report scripts read UTF-8
+        Console.OutputEncoding = new System.Text.UTF8Encoding(false);
+
+        var options = CommandLine.Parse(args);
         var test = new SelfTest()
-            .AddCoreChecks()
+            .AddCoreChecks(options.FixturesDirectory)
             .AddLibChecks();
 
         // Nothing else runs yet, so waiting here blocks no UI.

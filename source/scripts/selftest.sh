@@ -14,7 +14,7 @@ if [ ! -x "$EXE" ]; then
 fi
 
 set +e
-OUTPUT="$("$EXE" --selftest 2>&1)"
+OUTPUT="$("$EXE" --selftest --fixtures "$SOURCE_DIR/tests/fixtures/ai" 2>&1)"
 CODE=$?
 set -e
 echo "$OUTPUT" | while IFS= read -r line; do report "$line"; done

@@ -27,7 +27,7 @@ public sealed class SelfTest
 {
     #region Fields
 
-    private readonly List<(string Name, Func<CancellationToken, Task<string>> Check)> _checks = [];
+    private readonly List<(string Name, Func<TextWriter, CancellationToken, Task<string>> Check)> _checks = [];
 
     #endregion // Fields
 
@@ -45,6 +45,16 @@ public sealed class SelfTest
     /// Adds a check that returns a short detail on success and throws on failure.
     /// </summary>
     public SelfTest Add(string name, Func<CancellationToken, Task<string>> check)
+    {
+        _checks.Add((name, (_, ct) => check(ct)));
+        return this;
+    }
+
+
+    /// <summary>
+    /// Adds a check that may also print detail lines of its own (the AI corpus prints one per fixture).
+    /// </summary>
+    public SelfTest Add(string name, Func<TextWriter, CancellationToken, Task<string>> check)
     {
         _checks.Add((name, check));
         return this;
@@ -65,7 +75,7 @@ public sealed class SelfTest
 
             try
             {
-                var detail = await check(cancellationToken).ConfigureAwait(false);
+                var detail = await check(output, cancellationToken).ConfigureAwait(false);
                 passed++;
                 line = $"PASS {name}: {detail} ({watch.ElapsedMilliseconds} ms)";
             }

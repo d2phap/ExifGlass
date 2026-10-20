@@ -33,7 +33,7 @@ internal static class Program
         AppInfo.BuildInfo = new AppBuildInfo();
         BundledExifTool.EnsureExecutable();
 
-        if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest();
+        if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
 
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }

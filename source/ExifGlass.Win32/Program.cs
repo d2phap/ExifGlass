@@ -34,7 +34,7 @@ internal static class Program
         AppInfo.BuildInfo = new AppBuildInfo();
         PlatformServices.Shell = new Win32ShellProvider();
 
-        if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest();
+        if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
 
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }

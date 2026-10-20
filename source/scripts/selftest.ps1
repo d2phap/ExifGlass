@@ -19,7 +19,8 @@ if (-not (Test-Path $exePath)) {
 # A WinExe has no console, so its output comes back through redirected files
 $outFile = [System.IO.Path]::GetTempFileName()
 $errFile = [System.IO.Path]::GetTempFileName()
-$proc = Start-Process -FilePath $exePath -ArgumentList '--selftest' -NoNewWindow -Wait -PassThru -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+$fixtures = Join-Path $SourceDir 'tests/fixtures/ai'
+$proc = Start-Process -FilePath $exePath -ArgumentList @('--selftest', '--fixtures', "`"$fixtures`"") -NoNewWindow -Wait -PassThru -RedirectStandardOutput $outFile -RedirectStandardError $errFile
 
 Get-Content $outFile -Encoding utf8 | ForEach-Object { Write-Report $report $_ }
 Get-Content $errFile -Encoding utf8 | Where-Object { $_ } | ForEach-Object { Write-Report $report "stderr: $_" }

@@ -1,161 +1,94 @@
 {
-  // Tasks assume the workspace folder is the repo root. Each task is a thin wrapper
-  // around a platform script under source/__assets/<platform>/.
+  // Run from the repo root; each task wraps a script under source/scripts or source/__assets/<platform>.
   "version": "2.0.0",
   "tasks": [
-    // ExifTool: compile the self-contained binary (Perl via PAR::Packer; Linux only), cached and
-    // reused. Prerequisites + usage are documented in __assets/linux/build-exiftool.sh.
+    {
+      "label": "build",
+      "type": "process",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/source/ExifGlass.slnx", "-c", "Debug", "-p:Platform=x64"],
+      "osx": { "args": ["build", "${workspaceFolder}/source/ExifGlass.slnx", "-c", "Debug", "-p:Platform=ARM64"] },
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "test",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/scripts/test.ps1"],
+      "osx": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/test.sh"] },
+      "linux": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/test.sh"] },
+      "problemMatcher": "$msCompile",
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "selftest",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/scripts/selftest.ps1"],
+      "osx": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/selftest.sh"] },
+      "linux": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/selftest.sh"] },
+      "problemMatcher": [],
+      "group": "test"
+    },
+
+
+    // NativeAOT can't cross-compile between operating systems: publish each head on its own OS.
+    {
+      "label": "publish-aot-win-x64",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/scripts/publish-aot.ps1", "win-x64"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "publish-aot-win-arm64",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/scripts/publish-aot.ps1", "win-arm64"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "publish-aot-mac-arm64",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/scripts/publish-aot.sh", "osx-arm64"],
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
+      "label": "publish-aot-linux-x64",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/scripts/publish-aot.sh", "linux-x64"],
+      "problemMatcher": "$msCompile",
+      "dependsOn": ["build-exiftool-linux-x64"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+
+
+    // ExifTool for Linux: one PAR-packed binary so the app needs no system Perl; cached per RID.
     {
       "label": "build-exiftool-linux-x64",
       "type": "process",
       "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/linux/build-exiftool.sh",
-        "x64"
-      ],
+      "args": ["${workspaceFolder}/source/__assets/linux/build-exiftool.sh", "x64"],
       "problemMatcher": [],
       "group": "build"
     },
 
 
-    // --- Build tasks (Debug) -------------------------------------------------------------------
-    {
-      "label": "build-win-x64",
-      "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/build.ps1",
-        "x64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-    {
-      "label": "build-win-arm64",
-      "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/build.ps1",
-        "arm64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-    {
-      // Compiles the self-contained ExifTool first, then the app; the csproj bundles that binary.
-      "label": "build-linux-x64",
-      "type": "process",
-      "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/linux/build.sh",
-        "x64"
-      ],
-      "problemMatcher": "$msCompile",
-      "dependsOn": [
-        "build-exiftool-linux-x64"
-      ],
-      "dependsOrder": "sequence",
-      "group": "build"
-    },
-    {
-      // macOS bundles the ExifTool Perl script + lib/ (PAR binaries can't be notarized), so there
-      // is no build-exiftool step; the csproj bundles the script directly.
-      "label": "build-mac-arm64",
-      "type": "process",
-      "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/mac/build.sh",
-        "arm64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-
-
-    // --- Publish tasks (Release; self-contained NativeAOT is configured in the csprojs) --------
-    // NativeAOT can't cross-compile, so publish each head on its own OS (Linux/WSL for linux-*).
-    {
-      "label": "publish-win-x64",
-      "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/publish.ps1",
-        "x64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-    {
-      "label": "publish-win-arm64",
-      "type": "process",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/publish.ps1",
-        "arm64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-    {
-      "label": "publish-linux-x64",
-      "type": "process",
-      "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/linux/publish.sh",
-        "x64"
-      ],
-      "problemMatcher": "$msCompile",
-      "dependsOn": [
-        "build-exiftool-linux-x64"
-      ],
-      "dependsOrder": "sequence",
-      "group": "build"
-    },
-    {
-      // NativeAOT can't cross-compile, so run on Apple Silicon. Output: __artifacts/publish/osx-arm64.
-      "label": "publish-mac-arm64",
-      "type": "process",
-      "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/mac/publish.sh",
-        "arm64"
-      ],
-      "problemMatcher": "$msCompile",
-      "group": "build"
-    },
-
-
-    // macOS pack tasks. build the .app from a fresh publish, then produce a signed+notarized DMG
-    // for GitHub distribution (Developer ID / website). The signing identity and notarytool
-    // credentials are read from env vars (see the scripts' headers).
-    // Output: __artifacts/bundle/ExifGlass_<version>_mac-arm64.dmg (+ ExifGlass.app)
+    // Packing scripts carried over from v2; they publish the same head projects.
     {
       "label": "pack-mac-arm64-app",
       "type": "process",
       "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/mac/pack-app.sh"
-      ],
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-app.sh"],
       "problemMatcher": [],
-      "dependsOn": [
-        "publish-mac-arm64"
-      ],
+      "dependsOn": ["publish-aot-mac-arm64"],
       "dependsOrder": "sequence",
       "group": "build"
     },
@@ -163,65 +96,28 @@
       "label": "pack-mac-arm64-dmg",
       "type": "process",
       "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/mac/pack-dmg.sh"
-      ],
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-dmg.sh"],
       "problemMatcher": [],
-      "dependsOn": [
-        "pack-mac-arm64-app"
-      ],
+      "dependsOn": ["pack-mac-arm64-app"],
       "dependsOrder": "sequence",
       "group": "build"
     },
-
-
-    // Flatpak pack (linux-x64 only): publishes a fresh AOT build, then builds a signed .flatpak.
-    // Outputs the .flatpak + .tar.gz to __artifacts/bundle/. See __assets/linux/flatpak/README.md.
     {
       "label": "pack-linux-x64-flatpak",
       "type": "process",
       "command": "bash",
-      "args": [
-        "${workspaceFolder}/source/__assets/linux/pack-flatpak.sh"
-      ],
-      "options": {
-        "env": {
-          // Prompts on each run; leave blank to build an unsigned bundle.
-          "GPG_KEY": "${input:gpgKey}"
-        }
-      },
+      "args": ["${workspaceFolder}/source/__assets/linux/pack-flatpak.sh"],
+      "options": { "env": { "GPG_KEY": "${input:gpgKey}" } },
       "problemMatcher": [],
-      "dependsOn": [
-        "build-exiftool-linux-x64"
-      ],
+      "dependsOn": ["build-exiftool-linux-x64"],
       "dependsOrder": "sequence",
       "group": "build"
     },
-
-
-    // Windows MSIX pack tasks. Each publishes a fresh self-contained AOT build, then
-    // packs the app with logo-rendered tile artwork. See __assets/win/README.md.
-    //
-    //   Self-host (GitHub): a SIGNED .msix per architecture (pack-win-<arch>-msix).
-    //                       Built UNSIGNED (with a warning) if no signing cert is found.
-    //   Microsoft Store:    one UNSIGNED x64+arm64 .msixbundle (pack-win-msstore-msixbundle),
-    //                       Store-reserved identity; the Store re-signs on submission.
-    // Output: __artifacts/bundle/ExifGlass_<version>_win-<arch>.msix
-    //         __artifacts/bundle/ExifGlass_<version>_win-msstore.msixbundle
     {
       "label": "pack-win-x64-msix",
       "type": "process",
       "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/pack-msix.ps1",
-        "-Platform",
-        "x64",
-        "-Sign"
-      ],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-Platform", "x64", "-Sign"],
       "problemMatcher": [],
       "group": "build"
     },
@@ -229,41 +125,21 @@
       "label": "pack-win-arm64-msix",
       "type": "process",
       "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/pack-msix.ps1",
-        "-Platform",
-        "arm64",
-        "-Sign"
-      ],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-Platform", "arm64", "-Sign"],
       "problemMatcher": [],
       "group": "build"
     },
-    // Microsoft Store: one UNSIGNED .msixbundle (x64 + arm64), Store-reserved identity.
-    // The script builds both architectures, so this does NOT depend on the per-arch tasks.
     {
       "label": "pack-win-msstore-msixbundle",
       "type": "process",
       "command": "pwsh",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "${workspaceFolder}/source/__assets/win/pack-msix.ps1",
-        "-MsStore"
-      ],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-MsStore"],
       "problemMatcher": [],
       "group": "build"
     }
   ],
   "inputs": [
     {
-      // Used by "pack-linux-x64-flatpak". Not stored on disk -- VS Code only keeps
-      // the last value for the current session. Blank => unsigned bundle.
       "id": "gpgKey",
       "type": "promptString",
       "description": "GPG key (email or key ID) to sign the .flatpak bundle. Leave blank for an unsigned bundle.",

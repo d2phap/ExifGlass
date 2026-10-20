@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "ExifGlass": {
-      "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\d2pha\\Desktop\\pic.jpg\""
-    }
-  }
-}

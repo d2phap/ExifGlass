@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ExifGlass.Windows.MainWindow"
+        Title="ExifGlass"
+        Width="1240"
+        Height="820"
+        MinWidth="420"
+        MinHeight="480"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://ExifGlass.Lib/Assets/ExifGlass.ico"
+        FontFamily="{StaticResource FontUi}"
+        FontSize="13"
+        Foreground="{DynamicResource TextPrimaryBrush}">
+
+  <Grid Margin="8">
+    <Border HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Padding="24,20"
+            Background="{DynamicResource BgPanelBrush}"
+            BorderBrush="{DynamicResource StrokeHairlineBrush}"
+            BorderThickness="1"
+            CornerRadius="18">
+      <StackPanel Spacing="4">
+        <TextBlock HorizontalAlignment="Center"
+                   FontSize="22"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource AccentTextBrush}"
+                   Text="ExifGlass" />
+        <TextBlock x:Name="VersionText"
+                   HorizontalAlignment="Center"
+                   FontSize="12"
+                   Foreground="{DynamicResource TextSecondaryBrush}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+
+</Window>

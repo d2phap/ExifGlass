@@ -1,0 +1,61 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--  Colour tokens from the design spec, Appendix A  -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <Color x:Key="EmphasisColor">#000000</Color>
+      <SolidColorBrush x:Key="BgWindowBrush" Color="#F2F5F8" />
+      <SolidColorBrush x:Key="BgPanelBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="BgElevatedBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="BgHeaderBrush" Color="#F2F5F8" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#212529" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BF212529" />
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80212529" />
+      <SolidColorBrush x:Key="StrokeHairlineBrush" Color="#14000000" />
+      <SolidColorBrush x:Key="StrokeControlBrush" Color="#24000000" />
+      <SolidColorBrush x:Key="StateHoverBrush" Color="#10000000" />
+      <SolidColorBrush x:Key="StatePressedBrush" Color="#1F000000" />
+      <SolidColorBrush x:Key="AccentTextBrush" Color="#225EDB" />
+      <SolidColorBrush x:Key="Accent2TextBrush" Color="#BF3298" />
+      <SolidColorBrush x:Key="SuccessTextBrush" Color="#198754" />
+      <SolidColorBrush x:Key="DangerTextBrush" Color="#DC3545" />
+      <SolidColorBrush x:Key="SegmentedThumbBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="InverseBgBrush" Color="#212529" />
+      <SolidColorBrush x:Key="InverseFgBrush" Color="#FFFFFF" />
+    </ResourceDictionary>
+
+    <ResourceDictionary x:Key="Dark">
+      <Color x:Key="EmphasisColor">#FFFFFF</Color>
+      <SolidColorBrush x:Key="BgWindowBrush" Color="#212529" />
+      <SolidColorBrush x:Key="BgPanelBrush" Color="#282E31" />
+      <SolidColorBrush x:Key="BgElevatedBrush" Color="#343A40" />
+      <SolidColorBrush x:Key="BgHeaderBrush" Color="#343A40" />
+      <SolidColorBrush x:Key="TextPrimaryBrush" Color="#DEE2E6" />
+      <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BFDEE2E6" />
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80DEE2E6" />
+      <SolidColorBrush x:Key="StrokeHairlineBrush" Color="#14FFFFFF" />
+      <SolidColorBrush x:Key="StrokeControlBrush" Color="#24FFFFFF" />
+      <SolidColorBrush x:Key="StateHoverBrush" Color="#10FFFFFF" />
+      <SolidColorBrush x:Key="StatePressedBrush" Color="#1FFFFFFF" />
+      <SolidColorBrush x:Key="AccentTextBrush" Color="#6EA8FE" />
+      <SolidColorBrush x:Key="Accent2TextBrush" Color="#D77BBE" />
+      <SolidColorBrush x:Key="SuccessTextBrush" Color="#75B798" />
+      <SolidColorBrush x:Key="DangerTextBrush" Color="#EA868F" />
+      <SolidColorBrush x:Key="SegmentedThumbBrush" Color="#495057" />
+      <SolidColorBrush x:Key="InverseBgBrush" Color="#FFFFFF" />
+      <SolidColorBrush x:Key="InverseFgBrush" Color="#212529" />
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+
+  <SolidColorBrush x:Key="AccentBrush" Color="#225EDB" />
+  <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="Accent2Brush" Color="#BF3298" />
+  <SolidColorBrush x:Key="DangerBrush" Color="#DC3545" />
+  <SolidColorBrush x:Key="SuccessBrush" Color="#198754" />
+  <SolidColorBrush x:Key="HighlightBrush" Color="#99FFBA68" />
+
+  <!--  One family name on Windows: a fallback list switches non-400 weights to static Segoe UI  -->
+  <OnPlatform x:Key="FontUi" x:TypeArguments="FontFamily" Default="fonts:Inter#Inter" Windows="Segoe UI Variable Text" />
+
+</ResourceDictionary>

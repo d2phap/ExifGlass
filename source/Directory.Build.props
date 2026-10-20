@@ -1,0 +1,71 @@
+<Project>
+  <PropertyGroup>
+    <!-- Central app version: change it only here -->
+    <ExifGlassVersion>3.0.0.1020</ExifGlassVersion>
+    <ExifGlassReleaseType>alpha</ExifGlassReleaseType>
+
+    <!-- Store bundle version (Major.Minor.BundleBuild.0); BundleBuild only ever goes up -->
+    <ExifGlassBundleShortVersion>3.0.0</ExifGlassBundleShortVersion>
+    <ExifGlassBundleBuild>1</ExifGlassBundleBuild>
+
+    <!-- Direct or MacAppStore; Windows and Linux flavors are detected at run time -->
+    <ExifGlassChannel Condition="'$(ExifGlassChannel)' == ''">Direct</ExifGlassChannel>
+
+    <!-- .NET 11 Runtime Async, switchable for the A/B test run -->
+    <ExifGlassRuntimeAsync Condition="'$(ExifGlassRuntimeAsync)' == ''">true</ExifGlassRuntimeAsync>
+  </PropertyGroup>
+
+
+  <PropertyGroup>
+    <Authors>Duong Dieu Phap</Authors>
+    <Product>ExifGlass</Product>
+    <Company>Duong Dieu Phap</Company>
+    <Copyright>Copyright © 2023 - 2026 Duong Dieu Phap</Copyright>
+
+    <LangVersion>15</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>x64;ARM64</Platforms>
+
+    <!-- JSON is always source-generated, so Debug behaves like AOT -->
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+
+    <!-- Trim and AOT warnings fail the build in analyzers, ILLink and ILC -->
+    <WarningsAsErrors>$(WarningsAsErrors);IL2026;IL2046;IL2050;IL2055;IL2057;IL2058;IL2059;IL2060;IL2062;IL2067;IL2068;IL2069;IL2070;IL2072;IL2075;IL2077;IL2080;IL2087;IL2088;IL2090;IL2091;IL2092;IL2093;IL2094;IL2095;IL2096;IL2111;IL3000;IL3001;IL3002;IL3050;IL3051</WarningsAsErrors>
+    <ILLinkTreatWarningsAsErrors>true</ILLinkTreatWarningsAsErrors>
+    <IlcTreatWarningsAsErrors>true</IlcTreatWarningsAsErrors>
+
+    <!-- Reviewed third-party assemblies collapse into one IL2104/IL3053 each, which stay warnings -->
+    <ExifGlassSingleWarnAssemblies>Avalonia.Controls.DataGrid</ExifGlassSingleWarnAssemblies>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2104;IL3053</WarningsNotAsErrors>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
+  </ItemGroup>
+
+
+  <!-- Target architecture: RID first, then Platform, then the build host -->
+  <PropertyGroup>
+    <ExifGlassArch Condition="$(RuntimeIdentifier.EndsWith('-arm64'))">arm64</ExifGlassArch>
+    <ExifGlassArch Condition="'$(ExifGlassArch)' == '' And $(RuntimeIdentifier.EndsWith('-x64'))">x64</ExifGlassArch>
+    <ExifGlassArch Condition="'$(ExifGlassArch)' == '' And '$(Platform)' == 'ARM64'">arm64</ExifGlassArch>
+    <ExifGlassArch Condition="'$(ExifGlassArch)' == '' And '$(Platform)' == 'x64'">x64</ExifGlassArch>
+    <ExifGlassArch Condition="'$(ExifGlassArch)' == '' And '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">arm64</ExifGlassArch>
+    <ExifGlassArch Condition="'$(ExifGlassArch)' == ''">x64</ExifGlassArch>
+  </PropertyGroup>
+
+
+  <!-- The constant makes a mode flip recompile instead of reusing the other mode's binaries -->
+  <PropertyGroup Condition="'$(ExifGlassRuntimeAsync)' == 'true'">
+    <Features>$(Features);runtime-async=on</Features>
+    <DefineConstants>$(DefineConstants);EG_RUNTIME_ASYNC</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ExifGlassChannel)' == 'MacAppStore'">
+    <DefineConstants>$(DefineConstants);EG_MAS</DefineConstants>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,28 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.{axaml,xaml,csproj,props,targets,slnx,xml,manifest,plist}]
+indent_size = 2
+
+[*.sh]
+end_of_line = lf
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_using_directive_placement = outside_namespace:suggestion
+dotnet_sort_system_directives_first = true
+
+# Banned APIs (BannedSymbols.txt) fail the build
+dotnet_diagnostic.RS0030.severity = error
+
+# Folders group files; namespaces follow the project, not the folder
+dotnet_diagnostic.IDE0130.severity = none

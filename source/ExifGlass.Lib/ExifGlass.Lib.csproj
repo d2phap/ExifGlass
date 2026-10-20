@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <RootNamespace>ExifGlass</RootNamespace>
+    <IsAotCompatible>true</IsAotCompatible>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\ExifGlass.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExifGlass.UI.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Skia" />
+    <PackageReference Include="Avalonia.Themes.Simple" />
+    <PackageReference Include="ProDataGrid" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="ImageGlass.SDK" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExifGlass.Core\ExifGlass.Core.csproj" />
+    <ProjectReference Include="..\ExifGlass.UI\ExifGlass.UI.csproj" />
+  </ItemGroup>
+</Project>

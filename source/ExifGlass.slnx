@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="ARM64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="BannedSymbols.txt" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExifGlass.Benchmarks/ExifGlass.Benchmarks.csproj" />
+    <Project Path="tests/ExifGlass.Core.Tests/ExifGlass.Core.Tests.csproj" />
+    <Project Path="tests/ExifGlass.UI.Tests/ExifGlass.UI.Tests.csproj" />
+  </Folder>
+  <Project Path="ExifGlass.Core/ExifGlass.Core.csproj" />
+  <Project Path="ExifGlass.UI/ExifGlass.UI.csproj" />
+  <Project Path="ExifGlass.Lib/ExifGlass.Lib.csproj" />
+  <Project Path="ExifGlass.Win32/ExifGlass.Win32.csproj" />
+  <Project Path="ExifGlass.Mac/ExifGlass.Mac.csproj" />
+  <Project Path="ExifGlass.Linux/ExifGlass.Linux.csproj" />
+</Solution>

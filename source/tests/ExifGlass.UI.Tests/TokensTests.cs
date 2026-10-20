@@ -1,0 +1,63 @@
+/*
+ExifGlass - AI & EXIF metadata viewer
+Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Project homepage: https://github.com/d2phap/ExifGlass
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+using Avalonia;
+using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Styling;
+using ExifGlass.UI.Tokens;
+using Xunit;
+
+namespace ExifGlass.UI.Tests;
+
+public class TokensTests
+{
+    #region Tests
+
+    [AvaloniaTheory]
+    [InlineData("Light", "#F2F5F8", "#FFFFFF")]
+    [InlineData("Dark", "#212529", "#282E31")]
+    public void SurfacesFollowTheThemeVariant(string variant, string window, string panel)
+    {
+        var theme = variant == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+
+        Assert.Equal(Color.Parse(window), BrushColor(TokenKeys.BG_WINDOW_BRUSH, theme));
+        Assert.Equal(Color.Parse(panel), BrushColor(TokenKeys.BG_PANEL_BRUSH, theme));
+    }
+
+
+    [AvaloniaFact]
+    public void TheUiFontResolves()
+    {
+        Assert.True(Application.Current!.TryGetResource(TokenKeys.FONT_UI, null, out var font));
+        Assert.IsType<FontFamily>(font);
+    }
+
+    #endregion // Tests
+
+
+    #region Private methods
+
+    private static Color BrushColor(string key, ThemeVariant theme)
+    {
+        Assert.True(Application.Current!.TryGetResource(key, theme, out var value), $"{key} is missing for {theme}");
+        return Assert.IsType<SolidColorBrush>(value).Color;
+    }
+
+    #endregion // Private methods
+}

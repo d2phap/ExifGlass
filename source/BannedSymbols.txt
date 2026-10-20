@@ -1,0 +1,11 @@
+M:System.Diagnostics.FileVersionInfo.GetVersionInfo(System.String);Read the version from AppInfo.BuildInfo: file versions don't exist under AOT on macOS and Linux
+P:System.Reflection.Assembly.Location;Empty in single-file and NativeAOT builds: use AppContext.BaseDirectory
+P:System.Diagnostics.Process.MainModule;Fails or is slow under AOT and sandboxes: use AppContext.BaseDirectory
+T:System.Net.Http.HttpClient;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.Http.HttpMessageHandler;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.Http.SocketsHttpHandler;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.WebClient;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.WebRequest;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.Sockets.Socket;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.Sockets.TcpClient;Only the update check talks to the network; prompts and metadata never leave the machine
+T:System.Net.Sockets.UdpClient;Only the update check talks to the network; prompts and metadata never leave the machine

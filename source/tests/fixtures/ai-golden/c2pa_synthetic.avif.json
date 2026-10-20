@@ -1,0 +1,60 @@
+{
+  "generator": "Example AI Service",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Example AI Service",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "Example AI Service 1.2.3",
+        "aiSystem": "Example Image Model 2.0"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "Example AI Service",
+            "claimGeneratorVersion": "1.2.3",
+            "title": "image.jpg",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "Example Image Model",
+                "softwareAgentVersion": "2.0",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+                "description": "AI Generated Image"
+              }
+            ],
+            "ingredients": []
+          },
+          {
+            "active": false,
+            "claimVersion": 1,
+            "claimGenerator": "Adobe Firefly",
+            "claimGeneratorVersion": "0.12.4",
+            "title": "Generated image",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "Adobe Firefly",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator",
+        "JUMBF:CBOR:Claim_generator_info",
+        "JUMBF:CBOR:Copy1:Actions",
+        "JUMBF:CBOR:Copy1:Claim_generator_info"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "generator": "Google",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Google",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "Google C2PA Core Generator Library 1.0:1.0"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "Google C2PA Core Generator Library",
+            "claimGeneratorVersion": "1.0:1.0",
+            "title": "image.png",
+            "actions": [
+              {
+                "action": "c2pa.opened"
+              },
+              {
+                "action": "c2pa.edited",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+                "description": "Added imperceptible SynthID watermark"
+              },
+              {
+                "action": "c2pa.converted",
+                "description": "Converted to .png"
+              }
+            ],
+            "ingredients": [
+              {
+                "relationship": "parentOf",
+                "linked": true
+              }
+            ]
+          },
+          {
+            "active": false,
+            "claimVersion": 2,
+            "claimGenerator": "Google C2PA Core Generator Library",
+            "claimGeneratorVersion": "1.0:1.0",
+            "title": "image.png",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+                "description": "Created by Google Generative AI."
+              },
+              {
+                "action": "c2pa.edited",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+                "description": "Applied imperceptible SynthID watermark."
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator_info",
+        "JUMBF:CBOR:Copy1:Actions",
+        "JUMBF:CBOR:Copy1:Claim_generator_info"
+      ]
+    },
+    {
+      "source": "Iptc",
+      "generator": "Google AI",
+      "kind": "Generated",
+      "parameters": {
+        "digitalSourceType": "Trained algorithmic media",
+        "credit": "Made with Google AI"
+      },
+      "iptc": {
+        "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+        "credit": "Made with Google AI"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType",
+        "XMP:XMP-photoshop:Credit"
+      ]
+    }
+  ]
+}

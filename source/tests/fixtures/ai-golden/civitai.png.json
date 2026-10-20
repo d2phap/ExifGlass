@@ -1,0 +1,49 @@
+{
+  "generator": "Civitai",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "Civitai",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a portrait of a knight in silver armor"
+        },
+        {
+          "role": "negative",
+          "text": "bad hands, lowres"
+        }
+      ],
+      "parameters": {
+        "sampler": "DPM++ 2M Karras",
+        "steps": "25",
+        "cfg": "7",
+        "seed": "1234567",
+        "size": "832x1216",
+        "clipSkip": "2",
+        "createdDate": "2026-08-26T18:33:26.71Z"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "Pony Diffusion V6 XL (V6 (start with this one))",
+          "hash": "Civitai 290640"
+        },
+        {
+          "kind": "Lora",
+          "name": "Detail Tweaker 'XL' (v1.0)",
+          "weight": "0.8",
+          "hash": "Civitai 12345"
+        }
+      ],
+      "sourceTags": [
+        "EXIF:ExifIFD:UserComment",
+        "EXIF:IFD0:Artist",
+        "EXIF:IFD0:Software"
+      ]
+    }
+  ]
+}

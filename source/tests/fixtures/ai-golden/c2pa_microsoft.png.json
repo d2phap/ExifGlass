@@ -1,0 +1,40 @@
+{
+  "generator": "Microsoft",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Microsoft",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "Microsoft Responsible AI Image Provenance",
+        "aiSystem": "Azure OpenAI DALL-E"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 1,
+            "claimGenerator": "Microsoft Responsible AI Image Provenance",
+            "title": "image.png",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "Azure OpenAI DALL-E",
+                "description": "AI Generated Image"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator",
+        "JUMBF:CBOR:Claim_generator_info"
+      ]
+    }
+  ]
+}

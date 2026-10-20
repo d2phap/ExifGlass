@@ -1,0 +1,39 @@
+{
+  "generator": "InvokeAI",
+  "version": "2.3.5",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "InvokeAi",
+      "generator": "InvokeAI",
+      "version": "2.3.5",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a castle on a hill"
+        }
+      ],
+      "parameters": {
+        "model": "stable-diffusion-1.5",
+        "sampler": "k_lms",
+        "steps": "50",
+        "cfg": "7.5",
+        "seed": "3357757885",
+        "size": "512x512",
+        "type": "txt2img"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "stable-diffusion-1.5"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Sd-metadata",
+        "PNG:Dream"
+      ]
+    }
+  ]
+}

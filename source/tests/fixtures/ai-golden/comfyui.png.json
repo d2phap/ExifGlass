@@ -1,0 +1,67 @@
+{
+  "generator": "ComfyUI",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "ComfyUi",
+      "generator": "ComfyUI",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "beautiful scenery, 日本の風景"
+        },
+        {
+          "role": "negative",
+          "text": "text, watermark"
+        }
+      ],
+      "parameters": {
+        "model": "v1-5-pruned-emaonly.safetensors",
+        "sampler": "euler",
+        "scheduler": "normal",
+        "steps": "20",
+        "cfg": "8.0",
+        "seed": "156680208700286",
+        "size": "512x512",
+        "denoise": "1.0"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "v1-5-pruned-emaonly.safetensors"
+        },
+        {
+          "kind": "Lora",
+          "name": "add_detail.safetensors",
+          "weight": "0.8"
+        }
+      ],
+      "workflows": [
+        {
+          "format": "ComfyUI workflow 0.4",
+          "nodes": 1,
+          "links": 1,
+          "samplers": 1,
+          "models": 0,
+          "subgraphs": 0,
+          "bytes": 599
+        },
+        {
+          "format": "ComfyUI API prompt",
+          "nodes": 9,
+          "links": 11,
+          "samplers": 1,
+          "models": 2,
+          "subgraphs": 1,
+          "bytes": 1456
+        }
+      ],
+      "sourceTags": [
+        "PNG:Prompt",
+        "PNG:Workflow"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "generator": "ChatGPT",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "ChatGPT",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "ChatGPT",
+        "aiSystem": "DALL·E"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 1,
+            "claimGenerator": "ChatGPT",
+            "title": "image.webp",
+            "actions": [
+              {
+                "action": "c2pa.opened"
+              }
+            ],
+            "ingredients": [
+              {
+                "relationship": "parentOf",
+                "linked": true
+              }
+            ]
+          },
+          {
+            "active": false,
+            "claimVersion": 1,
+            "claimGenerator": "OpenAI-API",
+            "title": "image.webp",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "DALL·E",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+              },
+              {
+                "action": "c2pa.converted"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator",
+        "JUMBF:CBOR:Claim_generator_info",
+        "JUMBF:CBOR:Copy1:Actions",
+        "JUMBF:CBOR:Copy1:Claim_generator",
+        "JUMBF:CBOR:Copy1:Claim_generator_info"
+      ]
+    }
+  ]
+}

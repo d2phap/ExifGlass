@@ -1,0 +1,21 @@
+{
+  "generator": "IPTC",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Iptc",
+      "generator": "IPTC",
+      "kind": "Generated",
+      "parameters": {
+        "digitalSourceType": "Trained algorithmic media"
+      },
+      "iptc": {
+        "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType"
+      ]
+    }
+  ]
+}

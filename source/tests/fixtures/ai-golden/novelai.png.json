@@ -1,0 +1,55 @@
+{
+  "generator": "NovelAI",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "NovelAi",
+      "generator": "NovelAI",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "1girl, solo, rain"
+        },
+        {
+          "role": "negative",
+          "text": "lowres"
+        },
+        {
+          "role": "positive",
+          "label": "Character 1 (0.5, 0.5)",
+          "text": "girl, umbrella"
+        }
+      ],
+      "parameters": {
+        "model": "NovelAI Diffusion V4.5",
+        "sampler": "k_euler_ancestral",
+        "scheduler": "karras",
+        "steps": "28",
+        "cfg": "5.0",
+        "seed": "2222",
+        "size": "832x1216",
+        "cfgRescale": "0.0",
+        "uncondScale": "0.0",
+        "requestType": "PromptGenerateRequest",
+        "generationTime": "3.2"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "NovelAI Diffusion V4.5",
+          "hash": "4BDE2A90"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Software",
+        "PNG:Title",
+        "PNG:Description",
+        "PNG:Source",
+        "PNG:GenerationTime",
+        "PNG:Comment"
+      ]
+    }
+  ]
+}

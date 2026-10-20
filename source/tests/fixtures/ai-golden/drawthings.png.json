@@ -1,0 +1,49 @@
+{
+  "generator": "Draw Things",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "DrawThings",
+      "generator": "Draw Things",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a cozy cabin, <snow>"
+        },
+        {
+          "role": "negative",
+          "text": "blurry"
+        }
+      ],
+      "parameters": {
+        "model": "flux_1_schnell_q8p.ckpt",
+        "sampler": "Euler A Trailing",
+        "steps": "4",
+        "cfg": "1.0",
+        "seed": "99",
+        "size": "1024x1024",
+        "denoise": "1.0",
+        "seedMode": "Scale Alike",
+        "guidanceEmbed": "3.5"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "flux_1_schnell_q8p.ckpt"
+        },
+        {
+          "kind": "Lora",
+          "name": "detail_f16.ckpt",
+          "weight": "0.6"
+        }
+      ],
+      "sourceTags": [
+        "XMP:XMP-exif:UserComment",
+        "XMP:XMP-xmp:CreatorTool",
+        "XMP:XMP-dc:Description"
+      ]
+    }
+  ]
+}

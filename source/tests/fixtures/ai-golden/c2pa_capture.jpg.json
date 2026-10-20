@@ -1,0 +1,38 @@
+{
+  "generator": "Example Camera",
+  "kind": "Not AI",
+  "isAi": false,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Example Camera",
+      "kind": "Not AI",
+      "parameters": {
+        "claimGenerator": "Example Camera 1.0"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "Example Camera",
+            "claimGeneratorVersion": "1.0",
+            "title": "IMG_0001.jpg",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator_info"
+      ]
+    }
+  ]
+}

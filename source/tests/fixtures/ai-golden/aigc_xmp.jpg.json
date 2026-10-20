@@ -1,0 +1,30 @@
+{
+  "generator": "Kling",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Aigc",
+      "generator": "Kling",
+      "kind": "Generated",
+      "parameters": {
+        "aigcLabel": "AI-generated",
+        "contentProducer": "001191110108MA01KP2T7U00000",
+        "produceID": "kling-0123456789abcdef",
+        "contentPropagator": "001191110108MA01KP2T7U00000",
+        "propagateID": "kling-0123456789abcdef"
+      },
+      "aigc": {
+        "label": "1",
+        "meaning": "AI-generated",
+        "contentProducer": "001191110108MA01KP2T7U00000",
+        "produceId": "kling-0123456789abcdef",
+        "contentPropagator": "001191110108MA01KP2T7U00000",
+        "propagateId": "kling-0123456789abcdef"
+      },
+      "sourceTags": [
+        "XMP:XMP-TC260:Aigc"
+      ]
+    }
+  ]
+}

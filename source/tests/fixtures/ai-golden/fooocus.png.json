@@ -1,0 +1,61 @@
+{
+  "generator": "Fooocus",
+  "version": "2.5.5",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Fooocus",
+      "generator": "Fooocus",
+      "version": "2.5.5",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a cat café ☕"
+        },
+        {
+          "role": "positive",
+          "label": "Expanded",
+          "text": "a cat, cinematic, high detail"
+        },
+        {
+          "role": "negative",
+          "label": "Expanded",
+          "text": "unrealistic, saturated"
+        }
+      ],
+      "parameters": {
+        "model": "juggernautXL_v8Rundiffusion",
+        "sampler": "dpmpp_2m_sde_gpu",
+        "scheduler": "karras",
+        "steps": "30",
+        "cfg": "4",
+        "seed": "123",
+        "size": "1152x896",
+        "performance": "Speed",
+        "styles": "['Fooocus V2', 'Fooocus Enhance']",
+        "sharpness": "2",
+        "admGuidance": "(1.5, 0.8, 0.3)",
+        "refinerSwitch": "0.5"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "juggernautXL_v8Rundiffusion",
+          "hash": "aeb7e9e689"
+        },
+        {
+          "kind": "Lora",
+          "name": "sd_xl_offset_example-lora_1.0",
+          "weight": "0.1",
+          "hash": "4852686128"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters",
+        "PNG:Fooocus_scheme"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "generator": "ComfyUI",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "ComfyUi",
+      "generator": "ComfyUI",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a red fox in the snow, 雪, golden hour"
+        }
+      ],
+      "parameters": {
+        "model": "flux1-dev.safetensors",
+        "sampler": "euler",
+        "scheduler": "simple",
+        "steps": "20",
+        "seed": "987654321",
+        "size": "1024x1024",
+        "denoise": "1.0",
+        "guidance": "3.5"
+      },
+      "models": [
+        {
+          "kind": "Unet",
+          "name": "flux1-dev.safetensors"
+        },
+        {
+          "kind": "TextEncoder",
+          "name": "t5xxl_fp16.safetensors"
+        },
+        {
+          "kind": "TextEncoder",
+          "name": "clip_l.safetensors"
+        },
+        {
+          "kind": "Vae",
+          "name": "ae.safetensors"
+        },
+        {
+          "kind": "Lora",
+          "name": "flux_realism.safetensors",
+          "weight": "0.7"
+        },
+        {
+          "kind": "Upscaler",
+          "name": "4x-UltraSharp.pth"
+        }
+      ],
+      "workflows": [
+        {
+          "format": "ComfyUI workflow 1.0",
+          "nodes": 6,
+          "links": 3,
+          "samplers": 1,
+          "models": 1,
+          "subgraphs": 1,
+          "bytes": 1949
+        },
+        {
+          "format": "ComfyUI API prompt",
+          "nodes": 18,
+          "links": 17,
+          "samplers": 1,
+          "models": 5,
+          "subgraphs": 1,
+          "bytes": 2595
+        }
+      ],
+      "sourceTags": [
+        "PNG:Prompt",
+        "PNG:Workflow"
+      ]
+    }
+  ]
+}

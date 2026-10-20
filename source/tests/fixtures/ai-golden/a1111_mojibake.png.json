@@ -1,0 +1,29 @@
+{
+  "generator": "A1111 format",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "A1111 format",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "猫の少女 café"
+        }
+      ],
+      "parameters": {
+        "sampler": "Euler a",
+        "steps": "20",
+        "cfg": "7"
+      },
+      "sourceTags": [
+        "PNG:Parameters"
+      ],
+      "warnings": [
+        "Parameters was stored as UTF-8 in a Latin-1 PNG chunk; shown repaired"
+      ]
+    }
+  ]
+}

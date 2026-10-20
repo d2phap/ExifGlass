@@ -1,0 +1,65 @@
+{
+  "generator": "Adobe Photoshop",
+  "kind": "Composite",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Adobe Photoshop",
+      "kind": "Composite",
+      "parameters": {
+        "claimGenerator": "Adobe Photoshop 26.11.0",
+        "aiSystem": "Adobe Firefly"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "Adobe Photoshop",
+            "claimGeneratorVersion": "26.11.0",
+            "title": "IMG_0001.jpg",
+            "actions": [
+              {
+                "action": "c2pa.opened"
+              },
+              {
+                "action": "c2pa.edited",
+                "softwareAgent": "Adobe Firefly",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia",
+                "description": "Generative Fill"
+              }
+            ],
+            "ingredients": [
+              {
+                "relationship": "parentOf",
+                "linked": true
+              }
+            ]
+          },
+          {
+            "active": false,
+            "claimVersion": 2,
+            "claimGenerator": "Example Camera",
+            "claimGeneratorVersion": "1.0",
+            "title": "IMG_0001.jpg",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator_info",
+        "JUMBF:CBOR:Copy1:Actions",
+        "JUMBF:CBOR:Copy1:Claim_generator_info"
+      ]
+    }
+  ]
+}

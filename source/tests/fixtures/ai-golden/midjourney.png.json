@@ -1,0 +1,48 @@
+{
+  "generator": "Midjourney",
+  "version": "7",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Midjourney",
+      "generator": "Midjourney",
+      "version": "7",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a koi pond in autumn"
+        }
+      ],
+      "parameters": {
+        "aspectRatio": "16:9",
+        "stylize": "250",
+        "version": "7",
+        "jobID": "0123abcd-4567-89ef-0123-456789abcdef",
+        "author": "some_user",
+        "created": "2025-10-05T10:20:30+00:00"
+      },
+      "sourceTags": [
+        "PNG:Description",
+        "PNG:Author",
+        "PNG:CreationTime",
+        "XMP:XMP-iptcExt:DigitalImageGUID"
+      ]
+    },
+    {
+      "source": "Iptc",
+      "generator": "IPTC",
+      "kind": "Generated",
+      "parameters": {
+        "digitalSourceType": "Trained algorithmic media"
+      },
+      "iptc": {
+        "digitalSourceType": "https://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType"
+      ]
+    }
+  ]
+}

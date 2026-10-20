@@ -1,0 +1,64 @@
+{
+  "generator": "Fooocus-MRE",
+  "version": "2.0.78.5",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Fooocus",
+      "generator": "Fooocus-MRE",
+      "version": "2.0.78.5",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a cat in a garden, ?"
+        },
+        {
+          "role": "negative",
+          "text": "blurry"
+        },
+        {
+          "role": "positive",
+          "label": "Expanded",
+          "text": "a cat in a garden, ?, highly detailed"
+        },
+        {
+          "role": "negative",
+          "label": "Expanded",
+          "text": "blurry"
+        }
+      ],
+      "parameters": {
+        "model": "sd_xl_base_1.0_0.9vae.safetensors",
+        "sampler": "dpmpp_2m_sde_gpu",
+        "scheduler": "karras",
+        "steps": "30",
+        "cfg": "7.0",
+        "seed": "1234",
+        "size": "1152x896",
+        "styles": "['Fooocus V2']",
+        "sharpness": "2.0",
+        "refinerSwitch": "20"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "sd_xl_base_1.0_0.9vae.safetensors"
+        },
+        {
+          "kind": "Refiner",
+          "name": "sd_xl_refiner_1.0_0.9vae.safetensors"
+        },
+        {
+          "kind": "Lora",
+          "name": "sd_xl_offset_example-lora_1.0.safetensors",
+          "weight": "0.5"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Comment"
+      ]
+    }
+  ]
+}

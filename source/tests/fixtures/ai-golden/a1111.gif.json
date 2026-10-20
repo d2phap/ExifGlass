@@ -1,0 +1,104 @@
+{
+  "generator": "AUTOMATIC1111",
+  "version": "1.10.1",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "AUTOMATIC1111",
+      "version": "1.10.1",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "masterpiece, 1girl, (detailed eyes:1.2), <lora:add_detail:0.8>, embedding:easynegative\nsecond prompt line, BREAK sunset"
+        },
+        {
+          "role": "negative",
+          "text": "lowres, bad anatomy, easynegative"
+        },
+        {
+          "role": "positive",
+          "label": "ADetailer",
+          "text": "smiling, blue eyes"
+        },
+        {
+          "role": "positive",
+          "label": "Hires",
+          "text": "a \"quoted\" hires prompt,\nwith newline"
+        }
+      ],
+      "parameters": {
+        "model": "realisticVision_v51",
+        "sampler": "DPM++ 2M",
+        "scheduler": "Karras",
+        "steps": "28",
+        "cfg": "7",
+        "seed": "1234567890",
+        "size": "832x1216",
+        "modelHash": "6ce0161689",
+        "vaeHash": "735e4c3a44",
+        "vae": "vae-ft-mse-840000",
+        "denoise": "0.4",
+        "clipSkip": "2",
+        "aDetailerModel": "face_yolov8n.pt",
+        "aDetailerConfidence": "0.3",
+        "aDetailerDenoisingStrength": "0.4",
+        "aDetailerModel2nd": "hand_yolov8n.pt",
+        "aDetailerConfidence2nd": "0.3",
+        "aDetailerDenoisingStrength2nd": "0.4",
+        "aDetailerVersion": "24.11.1",
+        "controlNet0": "Module: canny, Model: control_v11p_sd15_canny [d14c016b], Weight: 1.0, Resize Mode: Crop and Resize, Processor Res: 512, Threshold A: 100.0, Threshold B: 200.0, Guidance Start: 0.0, Guidance End: 1.0, Pixel Perfect: False, Control Mode: Balanced",
+        "hiresUpscale": "2",
+        "hiresSteps": "15",
+        "hiresUpscaler": "4x-UltraSharp",
+        "emphasis": "Original",
+        "version": "v1.10.1"
+      },
+      "models": [
+        {
+          "kind": "Lora",
+          "name": "add_detail",
+          "weight": "0.8",
+          "hash": "7c6bad76eb54"
+        },
+        {
+          "kind": "Embedding",
+          "name": "easynegative",
+          "hash": "c74b4e810b03"
+        },
+        {
+          "kind": "Checkpoint",
+          "name": "realisticVision_v51",
+          "hash": "6ce0161689"
+        },
+        {
+          "kind": "Vae",
+          "name": "vae-ft-mse-840000",
+          "hash": "735e4c3a44"
+        },
+        {
+          "kind": "Upscaler",
+          "name": "4x-UltraSharp"
+        },
+        {
+          "kind": "Detailer",
+          "name": "face_yolov8n.pt"
+        },
+        {
+          "kind": "Detailer",
+          "name": "hand_yolov8n.pt"
+        },
+        {
+          "kind": "ControlNet",
+          "name": "control_v11p_sd15_canny",
+          "hash": "d14c016b"
+        }
+      ],
+      "sourceTags": [
+        "File:Comment"
+      ]
+    }
+  ]
+}

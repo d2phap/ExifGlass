@@ -1,0 +1,24 @@
+{
+  "generator": "Google AI",
+  "kind": "Composite",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Iptc",
+      "generator": "Google AI",
+      "kind": "Composite",
+      "parameters": {
+        "digitalSourceType": "Composite with trained algorithmic media",
+        "credit": "Edited with Google AI"
+      },
+      "iptc": {
+        "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/compositeWithTrainedAlgorithmicMedia",
+        "credit": "Edited with Google AI"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType",
+        "XMP:XMP-photoshop:Credit"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "generator": "AUTOMATIC1111",
+  "version": "1.10.1",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "AUTOMATIC1111",
+      "version": "1.10.1",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a portrait of a knight, <lora:add_detail:0.6>"
+        },
+        {
+          "role": "negative",
+          "text": "lowres"
+        }
+      ],
+      "parameters": {
+        "model": "realisticVision_v51",
+        "sampler": "Euler a",
+        "steps": "30",
+        "cfg": "7",
+        "seed": "99",
+        "size": "512x768",
+        "modelHash": "6ce0161689",
+        "version": "v1.10.1"
+      },
+      "models": [
+        {
+          "kind": "Lora",
+          "name": "add_detail",
+          "weight": "0.6",
+          "hash": "7c6bad76eb54"
+        },
+        {
+          "kind": "Checkpoint",
+          "name": "realisticVision_v51",
+          "hash": "6ce0161689"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

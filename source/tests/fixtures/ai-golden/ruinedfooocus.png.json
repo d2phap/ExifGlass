@@ -1,0 +1,50 @@
+{
+  "generator": "RuinedFooocus",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Fooocus",
+      "generator": "RuinedFooocus",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a lighthouse on a cliff"
+        },
+        {
+          "role": "negative",
+          "text": "lowres"
+        }
+      ],
+      "parameters": {
+        "model": "sd_xl_base_1.0.safetensors",
+        "sampler": "dpmpp_2m_sde_gpu",
+        "scheduler": "karras",
+        "steps": "30",
+        "cfg": "7.0",
+        "seed": "4242",
+        "size": "1152x896",
+        "denoise": "1.0",
+        "clipSkip": "1",
+        "startStep": "0"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "sd_xl_base_1.0.safetensors",
+          "hash": "31e35c80fc"
+        },
+        {
+          "kind": "Lora",
+          "name": "detail_tweaker_xl.safetensors",
+          "weight": "0.5",
+          "hash": "0123456789abcdef"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

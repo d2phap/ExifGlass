@@ -1,0 +1,63 @@
+{
+  "generator": "Forge",
+  "version": "2.0.1",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "Forge",
+      "version": "2.0.1",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a futuristic city at night, neon lights"
+        }
+      ],
+      "parameters": {
+        "model": "flux1-dev-bnb-nf4-v2",
+        "sampler": "Euler",
+        "scheduler": "Simple",
+        "steps": "20",
+        "cfg": "1",
+        "seed": "42",
+        "size": "896x1152",
+        "distilledCfg": "3.5",
+        "modelHash": "275ef623d3",
+        "module1": "ae",
+        "module2": "clip_l",
+        "module3": "t5xxl_fp16",
+        "diffusionInLowBits": "Automatic (fp16 LoRA)",
+        "version": "f2.0.1v1.10.1-previous-669-gdfdcbab6"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "flux1-dev-bnb-nf4-v2",
+          "hash": "275ef623d3"
+        },
+        {
+          "kind": "Vae",
+          "name": "ae"
+        },
+        {
+          "kind": "TextEncoder",
+          "name": "clip_l"
+        },
+        {
+          "kind": "TextEncoder",
+          "name": "t5xxl_fp16"
+        },
+        {
+          "kind": "Lora",
+          "name": "flux_realism",
+          "hash": "a1b2c3d4e5f6"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "generator": "Character card",
+  "version": "chara_card_v3",
+  "kind": "Character card",
+  "isAi": false,
+  "sources": [
+    {
+      "source": "CharacterCard",
+      "generator": "Character card",
+      "version": "chara_card_v3",
+      "kind": "Character card",
+      "characterName": "Test Character",
+      "sourceTags": [
+        "PNG:Ccv3",
+        "PNG:Chara"
+      ]
+    }
+  ]
+}

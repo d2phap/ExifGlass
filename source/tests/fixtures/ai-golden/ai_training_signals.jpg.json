@@ -1,0 +1,20 @@
+{
+  "generator": "AI-training signals",
+  "kind": "None",
+  "isAi": false,
+  "sources": [
+    {
+      "source": "TrainingSignals",
+      "generator": "AI-training signals",
+      "kind": "None",
+      "aiTraining": {
+        "dataMining": "Prohibited for AI/ML training",
+        "learningOptOutIn": "Generative AI/ML Training; Opt-out; Input to Foundation Model (Trained AI/ML Model); Opt-out"
+      },
+      "sourceTags": [
+        "XMP:XMP-plus:DataMining",
+        "EXIF:ExifIFD:LearningOptOutIn"
+      ]
+    }
+  ]
+}

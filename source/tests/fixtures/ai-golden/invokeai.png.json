@@ -1,0 +1,74 @@
+{
+  "generator": "InvokeAI",
+  "version": "6.9.0",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "InvokeAi",
+      "generator": "InvokeAI",
+      "version": "6.9.0",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a lighthouse at dusk"
+        },
+        {
+          "role": "negative",
+          "text": "blurry"
+        }
+      ],
+      "parameters": {
+        "model": "Juggernaut XL v9",
+        "scheduler": "dpmpp_2m_k",
+        "steps": "30",
+        "cfg": "6.5",
+        "seed": "42",
+        "size": "1024x1024",
+        "generationMode": "sdxl_txt2img",
+        "cfgRescale": "0",
+        "randomDevice": "cpu",
+        "metadataVersion": "1.0.0"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "Juggernaut XL v9",
+          "hash": "blake3:abcd"
+        },
+        {
+          "kind": "Lora",
+          "name": "detail-tweaker-xl",
+          "weight": "0.75",
+          "hash": "blake3:ef01"
+        }
+      ],
+      "workflows": [
+        {
+          "format": "InvokeAI workflow 3.0.0",
+          "nodes": 0,
+          "links": 0,
+          "samplers": 0,
+          "models": 0,
+          "subgraphs": 0,
+          "bytes": 68
+        },
+        {
+          "format": "InvokeAI graph",
+          "nodes": 0,
+          "links": 0,
+          "samplers": 0,
+          "models": 0,
+          "subgraphs": 0,
+          "bytes": 38
+        }
+      ],
+      "sourceTags": [
+        "PNG:Invokeai_metadata",
+        "PNG:Invokeai_workflow",
+        "PNG:Invokeai_graph"
+      ]
+    }
+  ]
+}

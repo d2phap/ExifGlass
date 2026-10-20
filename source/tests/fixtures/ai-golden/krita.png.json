@@ -1,0 +1,45 @@
+{
+  "generator": "Krita AI Diffusion",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "Krita AI Diffusion",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a watercolor fox <lora:ink:0.5>"
+        },
+        {
+          "role": "negative",
+          "text": "photo"
+        }
+      ],
+      "parameters": {
+        "model": "zavychroma",
+        "sampler": "Euler a",
+        "steps": "20",
+        "cfg": "7.0",
+        "seed": "5",
+        "size": "768x768",
+        "modelHash": "unknown"
+      },
+      "models": [
+        {
+          "kind": "Lora",
+          "name": "ink",
+          "weight": "0.5"
+        },
+        {
+          "kind": "Checkpoint",
+          "name": "zavychroma"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "generator": "AUTOMATIC1111",
+  "version": "1.10.1",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "AUTOMATIC1111",
+      "version": "1.10.1",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "猫の少女, \uD83C\uDF38 cherry blossom"
+        },
+        {
+          "role": "negative",
+          "text": "worst quality"
+        }
+      ],
+      "parameters": {
+        "sampler": "Euler a",
+        "steps": "20",
+        "cfg": "7",
+        "seed": "1",
+        "size": "512x512",
+        "modelHash": "abc",
+        "version": "v1.10.1"
+      },
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

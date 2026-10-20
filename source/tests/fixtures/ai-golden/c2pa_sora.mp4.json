@@ -1,0 +1,39 @@
+{
+  "generator": "Sora",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Sora",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "Sora",
+        "aiSystem": "Sora"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "Sora",
+            "title": "video.mp4",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "Sora",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator_info"
+      ]
+    }
+  ]
+}

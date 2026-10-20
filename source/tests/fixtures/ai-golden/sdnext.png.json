@@ -1,0 +1,60 @@
+{
+  "generator": "SD.Next",
+  "version": "0a0cbd5e",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "A1111",
+      "generator": "SD.Next",
+      "version": "0a0cbd5e",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a cat wearing a wizard hat"
+        },
+        {
+          "role": "negative",
+          "text": "lowres, blurry"
+        }
+      ],
+      "parameters": {
+        "model": "sdxl-base-1.0",
+        "sampler": "DPM++ 2M",
+        "steps": "20",
+        "cfg": "6",
+        "seed": "1620085323",
+        "size": "1024x1024",
+        "batch": "1x1",
+        "modelHash": "31e35c80fc",
+        "vae": "sdxl-vae",
+        "app": "SD.Next",
+        "version": "0a0cbd5e",
+        "pipeline": "StableDiffusionXLPipeline",
+        "operations": "txt2img; hires",
+        "parser": "native",
+        "hiresUpscaler": "ESRGAN 4x",
+        "template": "masterpiece, {prompt}"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "sdxl-base-1.0",
+          "hash": "31e35c80fc"
+        },
+        {
+          "kind": "Vae",
+          "name": "sdxl-vae"
+        },
+        {
+          "kind": "Upscaler",
+          "name": "ESRGAN 4x"
+        }
+      ],
+      "sourceTags": [
+        "PNG:Parameters"
+      ]
+    }
+  ]
+}

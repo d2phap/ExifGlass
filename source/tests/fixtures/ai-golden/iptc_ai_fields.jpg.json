@@ -1,0 +1,39 @@
+{
+  "generator": "Example Image Model",
+  "version": "2.1",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "Iptc",
+      "generator": "Example Image Model",
+      "version": "2.1",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "label": "Prompt information",
+          "text": "a lighthouse at dusk, oil painting"
+        }
+      ],
+      "parameters": {
+        "promptWriter": "Jane Prompter",
+        "digitalSourceType": "Trained algorithmic media"
+      },
+      "iptc": {
+        "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+        "aiSystem": "Example Image Model",
+        "aiSystemVersion": "2.1",
+        "promptInformation": "a lighthouse at dusk, oil painting",
+        "promptWriter": "Jane Prompter"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType",
+        "XMP:XMP-iptcExt:AISystemUsed",
+        "XMP:XMP-iptcExt:AISystemVersionUsed",
+        "XMP:XMP-iptcExt:AIPromptInformation",
+        "XMP:XMP-iptcExt:AIPromptWriterName"
+      ]
+    }
+  ]
+}

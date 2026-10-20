@@ -1,0 +1,40 @@
+{
+  "generator": "Adobe Firefly",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "Adobe Firefly",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "Adobe_Firefly",
+        "aiSystem": "Adobe Firefly"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 1,
+            "claimGenerator": "Adobe_Firefly",
+            "title": "Generated image",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "Adobe Firefly",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator",
+        "JUMBF:CBOR:Claim_generator_info"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "generator": "Tensor.art",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "TensorArt",
+      "generator": "Tensor.art",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a snowy mountain village at dusk"
+        },
+        {
+          "role": "negative",
+          "text": "lowres"
+        }
+      ],
+      "parameters": {
+        "model": "Example XL",
+        "sampler": "dpmpp_2m",
+        "scheduler": "karras",
+        "steps": "25",
+        "cfg": "7",
+        "seed": "123456789",
+        "size": "768x1152",
+        "clipSkip": "2"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "Example XL",
+          "hash": "600000000000000001"
+        },
+        {
+          "kind": "Lora",
+          "name": "Example LoRA",
+          "weight": "0.7",
+          "hash": "ABCDEF0123"
+        }
+      ],
+      "workflows": [
+        {
+          "format": "ComfyUI API prompt",
+          "nodes": 5,
+          "links": 6,
+          "samplers": 1,
+          "models": 1,
+          "subgraphs": 0,
+          "bytes": 836
+        }
+      ],
+      "sourceTags": [
+        "PNG:Generation_data",
+        "PNG:Prompt"
+      ]
+    }
+  ]
+}

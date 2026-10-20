@@ -1,0 +1,46 @@
+{
+  "generator": "OpenAI Media Service API",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "C2pa",
+      "generator": "OpenAI Media Service API",
+      "kind": "Generated",
+      "parameters": {
+        "claimGenerator": "OpenAI Media Service API",
+        "aiSystem": "gpt-image 2.0"
+      },
+      "c2pa": {
+        "verified": false,
+        "manifests": [
+          {
+            "active": true,
+            "claimVersion": 2,
+            "claimGenerator": "OpenAI Media Service API",
+            "title": "image.png",
+            "actions": [
+              {
+                "action": "c2pa.created",
+                "softwareAgent": "gpt-image",
+                "softwareAgentVersion": "2.0",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"
+              },
+              {
+                "action": "c2pa.converted"
+              },
+              {
+                "action": "c2pa.watermarked.unbound"
+              }
+            ],
+            "ingredients": []
+          }
+        ]
+      },
+      "sourceTags": [
+        "JUMBF:CBOR:Actions",
+        "JUMBF:CBOR:Claim_generator_info"
+      ]
+    }
+  ]
+}

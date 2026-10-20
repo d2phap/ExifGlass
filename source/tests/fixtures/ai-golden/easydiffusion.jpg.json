@@ -1,0 +1,36 @@
+{
+  "generator": "Easy Diffusion",
+  "kind": "Generated",
+  "isAi": true,
+  "sources": [
+    {
+      "source": "EasyDiffusion",
+      "generator": "Easy Diffusion",
+      "kind": "Generated",
+      "prompts": [
+        {
+          "role": "positive",
+          "text": "a photograph of an astronaut riding a horse"
+        }
+      ],
+      "parameters": {
+        "model": "sd-v1-5",
+        "sampler": "euler_a",
+        "steps": "25",
+        "cfg": "7.5",
+        "seed": "1234",
+        "size": "512x512",
+        "clipSkip": "False"
+      },
+      "models": [
+        {
+          "kind": "Checkpoint",
+          "name": "sd-v1-5"
+        }
+      ],
+      "sourceTags": [
+        "EXIF:ExifIFD:UserComment"
+      ]
+    }
+  ]
+}

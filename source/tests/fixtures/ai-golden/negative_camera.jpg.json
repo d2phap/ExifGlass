@@ -1,0 +1,21 @@
+{
+  "generator": "IPTC",
+  "kind": "Not AI",
+  "isAi": false,
+  "sources": [
+    {
+      "source": "Iptc",
+      "generator": "IPTC",
+      "kind": "Not AI",
+      "parameters": {
+        "digitalSourceType": "Digital capture"
+      },
+      "iptc": {
+        "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/digitalCapture"
+      },
+      "sourceTags": [
+        "XMP:XMP-iptcExt:DigitalSourceType"
+      ]
+    }
+  ]
+}

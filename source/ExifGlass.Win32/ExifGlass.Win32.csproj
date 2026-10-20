@@ -7,6 +7,9 @@
     <RootNamespace>ExifGlass</RootNamespace>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
 
+    <!-- Lets the whole solution build on macOS and Linux (CI, VS Code build task) -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>full</TrimMode>

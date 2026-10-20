@@ -24,7 +24,7 @@ jobs:
           global-json-file: source/global.json
 
       - name: Build
-        run: dotnet build source/ExifGlass.slnx -c Debug -p:Platform=x64
+        run: dotnet build source/ExifGlass.slnx -c Debug -p:Platform=${{ runner.arch == 'ARM64' && 'ARM64' || 'x64' }}
 
       - name: Test (Windows)
         if: runner.os == 'Windows'

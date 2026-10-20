@@ -105,8 +105,33 @@ first.
 > result: PAR appends its archive as a trailing ELF overlay and `strip` discards it,
 > silently truncating the binary into a broken PAR loader.
 
+## After a version bump
+
+The app embeds ExifTool's tag table (writable flag, type and groups of every tag) generated
+from the bundled build. Regenerate it whenever ExifTool changes, then run the tests:
+
+```bash
+cd source/tools && dotnet run gen-tagdb.cs     # writes ExifGlass.Core/Metadata/TagDb.bin.br
+```
+
+## exifglass.config
+
+[`exifglass.config`](exifglass.config) is ExifGlass's own ExifTool config. Every head copies it
+next to ExifTool, and the app passes it with `-config` as the very first argument of its
+`-stay_open` process (ExifTool ignores a later `-config`). It:
+
+- reads ComfyUI's animated-PNG `comf` chunks as `PNG:Prompt` / `PNG:Workflow`;
+- defines the PNG text and QuickTime keys AI tools write, so "Remove AI generation data" can
+  delete them (ExifTool deletes only tags it knows);
+- on macOS and Linux, ends an orphaned ExifTool once the app that started it is gone
+  (Windows uses a job object instead).
+
+A terminal user who wants to see what the app sees runs the same `-config` first, as the
+command bar shows.
+
 ## Runtime resolution
 
 The app runs the ExifTool next to its executable (`BundledExifTool`): `exiftool.exe`
 on Windows, the compiled `exiftool` on Linux (or the Perl script fallback), and the
-`exiftool` Perl script on macOS.
+`exiftool` Perl script on macOS. A custom path from Settings comes first and `PATH` last
+(`ExifToolLocator`).

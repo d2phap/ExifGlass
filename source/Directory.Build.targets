@@ -110,6 +110,8 @@ if (!System.IO.File.Exists(OutputPath) || System.IO.File.ReadAllText(OutputPath)
 
   <ItemGroup Condition="'$(ExifGlassPlatformId)' != ''">
     <None Include="$(ExifToolDir)LICENSE" Condition="Exists('$(ExifToolDir)LICENSE')" Link="exiftool.LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+    <!-- ExifGlass's own config, passed with -config as the daemon's first argument (S5, S9) -->
+    <None Include="$(ExifToolDir)exifglass.config" Link="exifglass.config" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(ExifGlassPlatformId)' == 'win'">

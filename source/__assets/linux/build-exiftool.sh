@@ -24,7 +24,7 @@
 #
 # pp bundles the *host* Perl + native libs, so it can only build for the OS/arch it runs on --
 # build on Linux (a Linux CI runner, or WSL on Windows), per target architecture. Driven by the
-# VS Code "build-exiftool-linux-<arch>" tasks (see ../../.vscode/tasks.json); run it by hand as:
+# VS Code "build-exiftool-linux-<arch>" tasks (see ../../../.vscode/tasks.json); run it by hand as:
 #
 #   ./build-exiftool.sh <arch> [--force]
 #     x64       the only supported Linux arch (maps to the linux-x64 RID)

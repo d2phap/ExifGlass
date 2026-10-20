@@ -1,12 +1,12 @@
 <Project>
   <PropertyGroup>
     <!-- App version -->
-    <ExifGlassVersion>2.0.0.0</ExifGlassVersion>
+    <ExifGlassVersion>2.0.0.1</ExifGlassVersion>
 
     <!-- App bundle version (store packages). Leave empty to derive from ExifGlassVersion. -->
     <ExifGlassBundleShortVersion>2.0.0</ExifGlassBundleShortVersion>
     <!-- App bundle build number (store packages) -->
-    <ExifGlassBundleBuild>0</ExifGlassBundleBuild>
+    <ExifGlassBundleBuild>1</ExifGlassBundleBuild>
 
     <!-- Shared product identity for all assemblies. -->
     <Authors>Duong Dieu Phap</Authors>

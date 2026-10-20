@@ -6,9 +6,9 @@ builds are dropped in.
 
 Both subfolders are **git-ignored** (large + freely re-obtainable) — only the shared
 [`LICENSE`](LICENSE) is tracked. A fresh clone therefore has neither, so re-populate them
-from an [exiftool.org](https://exiftool.org) release before publishing (the csprojs guard
-every ExifTool item on `Exists(...)`, so a clone *without* the assets still builds —
-ExifTool then just resolves from `PATH` at runtime).
+from an [exiftool.org](https://exiftool.org) release before publishing (`Directory.Build.targets`
+guards every ExifTool item on `Exists(...)`, so a clone *without* the assets still builds —
+but the app then has no ExifTool and `--selftest` fails its `exiftool` check).
 
 | Folder  | Used by         | Contents                                                                |
 |---------|-----------------|-------------------------------------------------------------------------|
@@ -59,7 +59,7 @@ unix/
 
 ### Windows
 
-Nothing to build — the bundled `exiftool.exe` runs as-is. `ExifGlass.Win32.csproj`
+Nothing to build — the bundled `exiftool.exe` runs as-is. The Windows head
 bundles `win/exiftool.exe` + `exiftool_files/` verbatim.
 
 ### macOS
@@ -94,12 +94,11 @@ sudo cpanm --notest PAR::Packer Archive::Zip Compress::Zlib Digest::SHA \
                     IO::Compress::Bzip2 Time::Piece IO::String
 ```
 
-The output is cached per-RID at `unix/build/linux-<arch>/exiftool`. `ExifGlass.Linux.csproj`
+The output is cached per-RID at `unix/build/linux-<arch>/exiftool`. The Linux head
 bundles that binary **if it exists**; otherwise it falls back to bundling the raw
-`unix/exiftool` script + `lib/` (which then needs system Perl at runtime — the resolver's
-`PATH` fallback covers a distro-installed ExifTool otherwise). The `build-linux-*` /
-`publish-linux-*` tasks `dependsOn` the build-exiftool task, so building the Linux head
-compiles ExifTool first.
+`unix/exiftool` script + `lib/` (which then needs system Perl at runtime). The VS Code
+`publish-aot-linux-x64` and `pack-linux-x64-flatpak` tasks run `build-exiftool-linux-x64`
+first.
 
 > `pp` bundles the *host* Perl + native libs, so it only builds for the OS/arch it runs on
 > — build on a Linux runner (or WSL), per target architecture. Do **not** `strip` the
@@ -108,7 +107,6 @@ compiles ExifTool first.
 
 ## Runtime resolution
 
-At runtime `ExifToolPathResolver` picks the executable in this order:
-**Settings-override → bundled ExifTool → `PATH`**. The bundled entry is `exiftool.exe`
+The app runs the ExifTool next to its executable (`BundledExifTool`): `exiftool.exe`
 on Windows, the compiled `exiftool` on Linux (or the Perl script fallback), and the
 `exiftool` Perl script on macOS.

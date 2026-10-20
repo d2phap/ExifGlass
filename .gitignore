@@ -338,5 +338,6 @@ MigrationBackup/
 .ionide/
 /source/__assets/exiftool/unix
 /source/__assets/exiftool/win
+/source/tests/fixtures/c2pa-public
 .DS_Store
 /__temp

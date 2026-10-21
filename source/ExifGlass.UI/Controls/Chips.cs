@@ -20,6 +20,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Media.Immutable;
+using Avalonia.Styling;
+using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Controls;
 
@@ -270,4 +274,80 @@ public class Kbd : TemplatedControl
     }
 
     #endregion // Properties
+}
+
+
+/// <summary>
+/// A group's colour dot (plan 5.2): 8 px, round, in the group's colour for the current theme; Width, Height and Radius make a composition bar segment.
+/// </summary>
+public class GroupDot : Control
+{
+    #region Fields and constants
+
+    public static readonly StyledProperty<string?> GroupProperty =
+        AvaloniaProperty.Register<GroupDot, string?>(nameof(Group));
+
+    public static readonly StyledProperty<int?> RingIndexProperty =
+        AvaloniaProperty.Register<GroupDot, int?>(nameof(RingIndex));
+
+    public static readonly StyledProperty<double> RadiusProperty =
+        AvaloniaProperty.Register<GroupDot, double>(nameof(Radius), 4);
+
+    #endregion // Fields and constants
+
+
+    #region Properties
+
+    public string? Group
+    {
+        get => GetValue(GroupProperty);
+        set => SetValue(GroupProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets a ring colour to draw instead of a group's; the gallery shows the ring this way.
+    /// </summary>
+    public int? RingIndex
+    {
+        get => GetValue(RingIndexProperty);
+        set => SetValue(RingIndexProperty, value);
+    }
+
+    public double Radius
+    {
+        get => GetValue(RadiusProperty);
+        set => SetValue(RadiusProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Constructors
+
+    static GroupDot()
+    {
+        AffectsRender<GroupDot>(GroupProperty, RingIndexProperty, RadiusProperty);
+        WidthProperty.OverrideDefaultValue<GroupDot>(8);
+        HeightProperty.OverrideDefaultValue<GroupDot>(8);
+    }
+
+
+    public GroupDot()
+    {
+        ActualThemeVariantChanged += (_, _) => InvalidateVisual();
+    }
+
+    #endregion // Constructors
+
+
+    #region Public methods
+
+    public override void Render(DrawingContext context)
+    {
+        var dark = ActualThemeVariant == ThemeVariant.Dark;
+        var color = Group is { } group ? GroupPalette.Get(group, dark) : GroupPalette.GetRing(RingIndex ?? 0, dark);
+        context.DrawRectangle(new ImmutableSolidColorBrush(color), null, new RoundedRect(new Rect(Bounds.Size), Radius));
+    }
+
+    #endregion // Public methods
 }

@@ -451,3 +451,156 @@ public class CountUpText : TextBlock
 
     #endregion // Private methods
 }
+
+
+/// <summary>
+/// The drag-over ring (DS 5.2): an accent squircle ring that grows from 0.94 to 1.5 while it fades, every 1.4 s on the render thread.
+/// </summary>
+public class PulseRing : SquircleBorder
+{
+    #region Fields and constants
+
+    private const float START_SCALE = 0.94f;
+    private const float END_SCALE = 1.5f;
+    private const float START_OPACITY = 0.7f;
+
+    public static readonly StyledProperty<bool> IsPulsingProperty =
+        AvaloniaProperty.Register<PulseRing, bool>(nameof(IsPulsing));
+
+    #endregion // Fields and constants
+
+
+    #region Properties
+
+    public bool IsPulsing
+    {
+        get => GetValue(IsPulsingProperty);
+        set => SetValue(IsPulsingProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Protected methods
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UpdatePulse();
+    }
+
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == IsPulsingProperty || change.Property == BoundsProperty) UpdatePulse();
+    }
+
+    #endregion // Protected methods
+
+
+    #region Private methods
+
+    private void UpdatePulse()
+    {
+        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+
+        visual.CenterPoint = new Vector3D(Bounds.Width / 2, Bounds.Height / 2, 0);
+        var scale = visual.Compositor.CreateVector3DKeyFrameAnimation();
+        var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
+        if (IsPulsing && !MotionTokens.IsFrozen)
+        {
+            scale.InsertKeyFrame(0f, new Vector3D(START_SCALE, START_SCALE, 1));
+            scale.InsertKeyFrame(1f, new Vector3D(END_SCALE, END_SCALE, 1), MotionTokens.DragRingEasing);
+            fade.InsertKeyFrame(0f, START_OPACITY);
+            fade.InsertKeyFrame(1f, 0f, MotionTokens.DragRingEasing);
+            scale.Duration = fade.Duration = MotionTokens.DragRing;
+            scale.IterationBehavior = fade.IterationBehavior = AnimationIterationBehavior.Forever;
+        }
+        else
+        {
+            scale.InsertKeyFrame(1f, new Vector3D(1, 1, 1));
+            fade.InsertKeyFrame(1f, 0f);
+            scale.Duration = fade.Duration = TimeSpan.FromMilliseconds(1);
+        }
+
+        visual.StartAnimation("Scale", scale);
+        visual.StartAnimation("Opacity", fade);
+    }
+
+    #endregion // Private methods
+}
+
+
+/// <summary>
+/// Floats its child 4 px up and back every 4 s on the render thread: the empty card's logo (DS 6.9).
+/// </summary>
+public class FloatingPanel : Decorator
+{
+    #region Fields and constants
+
+    private const float RISE = -4f;
+
+    public static readonly StyledProperty<bool> IsFloatingProperty =
+        AvaloniaProperty.Register<FloatingPanel, bool>(nameof(IsFloating), true);
+
+    #endregion // Fields and constants
+
+
+    #region Properties
+
+    public bool IsFloating
+    {
+        get => GetValue(IsFloatingProperty);
+        set => SetValue(IsFloatingProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Protected methods
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        UpdateFloat();
+    }
+
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == IsFloatingProperty) UpdateFloat();
+    }
+
+    #endregion // Protected methods
+
+
+    #region Private methods
+
+    private void UpdateFloat()
+    {
+        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+
+        var animation = visual.Compositor.CreateVector3DKeyFrameAnimation();
+        if (IsFloating && !MotionTokens.IsFrozen)
+        {
+            animation.InsertKeyFrame(0f, default);
+            animation.InsertKeyFrame(0.5f, new Vector3D(0, RISE, 0), MotionTokens.LogoFloatEasing);
+            animation.InsertKeyFrame(1f, default, MotionTokens.LogoFloatEasing);
+            animation.Duration = MotionTokens.LogoFloat;
+            animation.IterationBehavior = AnimationIterationBehavior.Forever;
+        }
+        else
+        {
+            animation.InsertKeyFrame(1f, default);
+            animation.Duration = TimeSpan.FromMilliseconds(1);
+        }
+
+        visual.StartAnimation("Translation", animation);
+    }
+
+    #endregion // Private methods
+}

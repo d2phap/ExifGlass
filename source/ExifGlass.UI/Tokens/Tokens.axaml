@@ -25,6 +25,8 @@
       <SolidColorBrush x:Key="BgToastBrush" Color="#FAFFFFFF" />
       <Color x:Key="BgEmptyCardColor">#F0FFFFFF</Color>
       <SolidColorBrush x:Key="BgEmptyCardBrush" Color="#F0FFFFFF" />
+      <Color x:Key="BgDragScrimColor">#D9F2F5F8</Color>
+      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9F2F5F8" />
       <Color x:Key="BgTerminalTileColor">#0F000000</Color>
       <SolidColorBrush x:Key="BgTerminalTileBrush" Color="#0F000000" />
       <Color x:Key="FgTerminalTileColor">#212529</Color>
@@ -145,6 +147,8 @@
       <SolidColorBrush x:Key="BgToastBrush" Color="#FA343A40" />
       <Color x:Key="BgEmptyCardColor">#F0282E31</Color>
       <SolidColorBrush x:Key="BgEmptyCardBrush" Color="#F0282E31" />
+      <Color x:Key="BgDragScrimColor">#D9212529</Color>
+      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9212529" />
       <Color x:Key="BgTerminalTileColor">#212529</Color>
       <SolidColorBrush x:Key="BgTerminalTileBrush" Color="#212529" />
       <Color x:Key="FgTerminalTileColor">#FFBA68</Color>
@@ -362,6 +366,10 @@
   <x:Double x:Key="ToastHeight">44</x:Double>
   <x:Double x:Key="ToastBottomOffset">62</x:Double>
   <x:Double x:Key="StoreBadgeHeight">52</x:Double>
+  <x:Double x:Key="RailWidth">236</x:Double>
+  <x:Double x:Key="RailColumn">244</x:Double>
+  <x:Double x:Key="InspectorWidth">304</x:Double>
+  <x:Double x:Key="InspectorColumn">312</x:Double>
   <x:Double x:Key="IconToolbar">18</x:Double>
   <x:Double x:Key="IconButton">16</x:Double>
   <x:Double x:Key="IconChip">14</x:Double>
@@ -374,6 +382,8 @@
   <BoxShadows x:Key="ShadowSegmentedThumb">0 1 3.46 0 #29000000</BoxShadows>
   <BoxShadows x:Key="ShadowSelectedCard">0 0 0 3 #14225EDB</BoxShadows>
   <BoxShadows x:Key="ShadowTooltip">0 8 32.91 -6 #40000000</BoxShadows>
+  <BoxShadows x:Key="ElevationOverlay">0 24 102.19 -16 #73000000</BoxShadows>
+  <BoxShadows x:Key="ShadowEmptyCard">0 30 119.51 -30 #59000000</BoxShadows>
 
   <!--  Font sizes (DS 1.1); mono +1 off Windows cancels the -1 pt coercion (S3)  -->
   <x:Double x:Key="FontSizeDisplay">22</x:Double>

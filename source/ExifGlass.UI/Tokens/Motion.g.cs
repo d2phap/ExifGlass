@@ -38,6 +38,10 @@ public static partial class MotionTokens
     public static readonly Easing QuarticOutEasing = new QuarticEaseOut();
     // linear
     public static readonly Easing LinearEasing = new LinearEasing();
+    // ease-out
+    public static readonly Easing EaseOutEasing = new CubicBezierEasing(0, 0, 0.58, 1);
+    // ease-in-out
+    public static readonly Easing EaseInOutEasing = new CubicBezierEasing(0.42, 0, 0.58, 1);
 
     // Hover, colour, border: 160 ms, Standard
     public static readonly TimeSpan Hover = TimeSpan.FromMilliseconds(160);
@@ -206,4 +210,16 @@ public static partial class MotionTokens
     // In-window dialog in: 260 ms, Emphasized
     public static readonly TimeSpan Dialog = TimeSpan.FromMilliseconds(260);
     public static readonly Easing DialogEasing = EmphasizedEasing;
+
+    // Drag-over logo ring: scale 0.94 to 1.5 while it fades, looped: 1400 ms, EaseOut
+    public static readonly TimeSpan DragRing = TimeSpan.FromMilliseconds(1400);
+    public static readonly Easing DragRingEasing = EaseOutEasing;
+
+    // Empty-card logo: 4 px up and back, looped: 4000 ms, EaseInOut
+    public static readonly TimeSpan LogoFloat = TimeSpan.FromMilliseconds(4000);
+    public static readonly Easing LogoFloatEasing = EaseInOutEasing;
+
+    // Empty card grows to 1.04 while a file is over it: 380 ms, Spring
+    public static readonly TimeSpan DropScale = TimeSpan.FromMilliseconds(380);
+    public static readonly Easing DropScaleEasing = SpringEasing;
 }

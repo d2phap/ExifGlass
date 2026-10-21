@@ -64,6 +64,10 @@ public static class TokenKeys
     public const string BG_EMPTY_CARD_COLOR = "BgEmptyCardColor";
     // Empty-state card: Bg.Panel 94%, no blur
     public const string BG_EMPTY_CARD_BRUSH = "BgEmptyCardBrush";
+    // Drag-over scrim: Bg.Window 85%, no blur
+    public const string BG_DRAG_SCRIM_COLOR = "BgDragScrimColor";
+    // Drag-over scrim: Bg.Window 85%, no blur
+    public const string BG_DRAG_SCRIM_BRUSH = "BgDragScrimBrush";
     // Command bar terminal tile
     public const string BG_TERMINAL_TILE_COLOR = "BgTerminalTileColor";
     // Command bar terminal tile
@@ -452,6 +456,14 @@ public static class TokenKeys
     public const string TOAST_BOTTOM_OFFSET = "ToastBottomOffset";
     // Store badge
     public const string STORE_BADGE_HEIGHT = "StoreBadgeHeight";
+    // Rail panel
+    public const string RAIL_WIDTH = "RailWidth";
+    // Docked rail column: the rail and the 8 gap
+    public const string RAIL_COLUMN = "RailColumn";
+    // Inspector panel
+    public const string INSPECTOR_WIDTH = "InspectorWidth";
+    // Docked inspector column: the gap and the inspector
+    public const string INSPECTOR_COLUMN = "InspectorColumn";
     // Toolbar icons
     public const string ICON_TOOLBAR = "IconToolbar";
     // Button icons
@@ -472,6 +484,10 @@ public static class TokenKeys
     public const string SHADOW_SELECTED_CARD = "ShadowSelectedCard";
     // Tooltips: elevation 1 at half its offset, blur and darkness
     public const string SHADOW_TOOLTIP = "ShadowTooltip";
+    // Overlay rail and inspector (DS 2.1)
+    public const string ELEVATION_OVERLAY = "ElevationOverlay";
+    // Empty-state card
+    public const string SHADOW_EMPTY_CARD = "ShadowEmptyCard";
     // 22
     public const string FONT_SIZE_DISPLAY = "FontSizeDisplay";
     // 16

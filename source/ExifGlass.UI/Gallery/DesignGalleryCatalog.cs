@@ -20,7 +20,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Media.Immutable;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
@@ -289,45 +288,10 @@ public static partial class DesignGalleryCatalog
     }
 
 
-    private static Control GroupDot(string? group, int? ring)
-    {
-        var dot = new GroupDotControl { Group = group, RingIndex = ring };
-        return dot;
-    }
+    private static Control GroupDot(string? group, int? ring) => new Controls.GroupDot { Group = group, RingIndex = ring };
 
 
-    private static Control GroupBarSegment(string group, double width) => new GroupDotControl { Group = group, Width = Math.Max(2, width), Height = 6, Radius = 0 };
+    private static Control GroupBarSegment(string group, double width) => new Controls.GroupDot { Group = group, Width = Math.Max(2, width), Height = 6, Radius = 0 };
 
     #endregion // Helpers
-
-
-    #region Nested types
-
-    /// <summary>
-    /// A group colour drawn for the current theme.
-    /// </summary>
-    private sealed class GroupDotControl : Control
-    {
-        public string? Group { get; init; }
-
-        public int? RingIndex { get; init; }
-
-        public double Radius { get; init; } = 4;
-
-        public GroupDotControl()
-        {
-            Width = 8;
-            Height = 8;
-            ActualThemeVariantChanged += (_, _) => InvalidateVisual();
-        }
-
-        public override void Render(DrawingContext context)
-        {
-            var dark = ActualThemeVariant == Avalonia.Styling.ThemeVariant.Dark;
-            var color = Group is { } g ? GroupPalette.Get(g, dark) : GroupPalette.GetRing(RingIndex ?? 0, dark);
-            context.DrawRectangle(new ImmutableSolidColorBrush(color), null, new RoundedRect(new Rect(Bounds.Size), Radius));
-        }
-    }
-
-    #endregion // Nested types
 }

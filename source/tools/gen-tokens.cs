@@ -118,6 +118,7 @@ static class Generator
         new("BgGroupHeader", "#F5FFFFFF", "#F5282E31", "Sticky group header: Bg.Panel 96%, no blur"),
         new("BgToast", "#FAFFFFFF", "#FA343A40", "Toast: Bg.Elevated 98%, no blur"),
         new("BgEmptyCard", "#F0FFFFFF", "#F0282E31", "Empty-state card: Bg.Panel 94%, no blur"),
+        new("BgDragScrim", "#D9F2F5F8", "#D9212529", "Drag-over scrim: Bg.Window 85%, no blur"),
         new("BgTerminalTile", "#0F000000", "#212529", "Command bar terminal tile"),
         new("FgTerminalTile", "#212529", "#FFBA68", "Command bar terminal glyph"),
         new("TextPrimary", "#212529", "#DEE2E6", "Body text, values"),
@@ -234,6 +235,8 @@ static class Generator
         ("AppToolbarHeight", 48, "App toolbar"), ("TableToolbarHeight", 50, "Table toolbar"), ("CommandBarHeight", 40, "Command bar collapsed"),
         ("MenuItemHeight", 34, "Simple menu item"), ("MenuItemTallHeight", 44, "Menu item with a description"),
         ("ToastHeight", 44, "Toast"), ("ToastBottomOffset", 62, "Toast above the window bottom"), ("StoreBadgeHeight", 52, "Store badge"),
+        ("RailWidth", 236, "Rail panel"), ("RailColumn", 244, "Docked rail column: the rail and the 8 gap"),
+        ("InspectorWidth", 304, "Inspector panel"), ("InspectorColumn", 312, "Docked inspector column: the gap and the inspector"),
         ("IconToolbar", 18, "Toolbar icons"), ("IconButton", 16, "Button icons"), ("IconChip", 14, "Chip icons"), ("IconSmall", 12, "Chevrons, small actions"),
     ];
 
@@ -246,6 +249,8 @@ static class Generator
         ("ShadowSegmentedThumb", "0 1 3 0 rgba(0,0,0,.16)", "Segmented thumb"),
         ("ShadowSelectedCard", "0 0 0 3 rgba(34,94,219,.08)", "Selected-tag card ring"),
         ("ShadowTooltip", "0 8 20 -6 rgba(0,0,0,.25)", "Tooltips: elevation 1 at half its offset, blur and darkness"),
+        ("ElevationOverlay", "0 24 60 -16 rgba(0,0,0,.45)", "Overlay rail and inspector (DS 2.1)"),
+        ("ShadowEmptyCard", "0 30 70 -30 rgba(0,0,0,.35)", "Empty-state card"),
     ];
 
     // DS 5.1 and 5.2; ms, easing, use
@@ -293,6 +298,9 @@ static class Generator
         ("ScrollBar", 100, "Standard", "Scroll bar expand and collapse (v2)"),
         ("TokenPop", 260, "Spring", "Token chip pop-in"),
         ("Dialog", 260, "Emphasized", "In-window dialog in"),
+        ("DragRing", 1400, "EaseOut", "Drag-over logo ring: scale 0.94 to 1.5 while it fades, looped"),
+        ("LogoFloat", 4000, "EaseInOut", "Empty-card logo: 4 px up and back, looped"),
+        ("DropScale", 380, "Spring", "Empty card grows to 1.04 while a file is over it"),
     ];
 
     static readonly (string Name, string Value, string Css)[] Easings =
@@ -304,6 +312,8 @@ static class Generator
         ("ChildWindow", "new CubicBezierEasing(0.2, 0.9, 0.3, 1.1)", "cubic-bezier(.2,.9,.3,1.1)"),
         ("QuarticOut", "new QuarticEaseOut()", "1 - (1 - t)^4"),
         ("Linear", "new LinearEasing()", "linear"),
+        ("EaseOut", "new CubicBezierEasing(0, 0, 0.58, 1)", "ease-out"),
+        ("EaseInOut", "new CubicBezierEasing(0.42, 0, 0.58, 1)", "ease-in-out"),
     ];
 
     // plan 5.2 (D17); tuned per theme below so each dot keeps 3:1 against Bg.Panel

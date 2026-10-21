@@ -1,0 +1,122 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:q="using:ExifGlass.Core.Query"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:v="using:ExifGlass.Views"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.TablePanel"
+             x:DataType="vm:MainViewModel">
+
+  <!--  DS 6.9 table panel: Bg.Panel, hairline, radius 18; the toolbar is 50 high with the 2 px load line on its bottom edge  -->
+  <ui:SquircleBorder Background="{DynamicResource BgPanelBrush}"
+                     BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                     BorderThickness="1"
+                     ClipToBounds="True"
+                     CornerRadius="{StaticResource RadiusPanel}">
+    <Grid RowDefinitions="Auto,*">
+      <Panel Height="{StaticResource TableToolbarHeight}">
+        <StackPanel Margin="16,0,8,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="8">
+          <TextBlock Name="SummaryText"
+                     Classes="subtitle"
+                     VerticalAlignment="Center"
+                     FontFeatures="+tnum"
+                     Text="{Binding Summary}"
+                     TextTrimming="CharacterEllipsis" />
+          <TextBlock Name="SummaryDetailText"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     IsVisible="{Binding ShowSummaryDetail}"
+                     Text="{Binding SummaryDetail}"
+                     TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+        <Border Height="1"
+                VerticalAlignment="Bottom"
+                Background="{DynamicResource EmphasisA07Brush}" />
+        <ui:ProgressLine Name="LoadLine"
+                         VerticalAlignment="Bottom"
+                         IsIndeterminate="True"
+                         IsVisible="{Binding IsLoading}" />
+      </Panel>
+
+      <Panel Grid.Row="1">
+        <!--  P5 replaces this list with the metadata grid  -->
+        <ScrollViewer Name="RowsViewer" IsVisible="{Binding HasDocument}">
+          <ItemsControl Name="RowsList" ItemsSource="{Binding Rows.Items}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.DataTemplates>
+              <DataTemplate x:DataType="q:GroupHeaderItem">
+                <Border Height="36"
+                        Background="{DynamicResource BgGroupHeaderBrush}"
+                        BorderBrush="{DynamicResource EmphasisA07Brush}"
+                        BorderThickness="0,0,0,1">
+                  <DockPanel Margin="12,0">
+                    <StackPanel VerticalAlignment="Center"
+                                DockPanel.Dock="Left"
+                                Orientation="Horizontal"
+                                Spacing="10">
+                      <ui:GroupDot VerticalAlignment="Center" Group="{Binding Group.Name}" />
+                      <TextBlock VerticalAlignment="Center" FontWeight="Medium" Text="{Binding Group.Name}" />
+                    </StackPanel>
+                    <TextBlock Classes="meta"
+                               Margin="12,0,0,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextTertiaryBrush}"
+                               Text="{Binding Group.Description}"
+                               TextAlignment="Right"
+                               TextTrimming="CharacterEllipsis" />
+                  </DockPanel>
+                </Border>
+              </DataTemplate>
+              <DataTemplate x:DataType="q:RowItem">
+                <Border MinHeight="36"
+                        BorderBrush="{DynamicResource EmphasisA05Brush}"
+                        BorderThickness="0,0,0,1">
+                  <Grid Margin="34,0,12,0" ColumnDefinitions="88,0.36*,0.64*">
+                    <TextBlock Classes="mono"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Text="{Binding Row.DisplayId}"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="1"
+                               Margin="12,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Text="{Binding Row.Name}"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2"
+                               Margin="12,8"
+                               VerticalAlignment="Center"
+                               FontFeatures="+tnum"
+                               MaxLines="6"
+                               Text="{Binding Row.Value}"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="Wrap" />
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.DataTemplates>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <v:EmptyState Name="Empty"
+                      Margin="20"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      IsVisible="{Binding ShowEmptyCard}" />
+
+        <!--  the pending bar's place (P8): 12 px inset at the bottom  -->
+        <Panel Name="PendingBarHost"
+               Margin="12"
+               VerticalAlignment="Bottom" />
+      </Panel>
+    </Grid>
+  </ui:SquircleBorder>
+
+</UserControl>

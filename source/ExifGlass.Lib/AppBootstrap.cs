@@ -50,6 +50,9 @@ public static class AppBootstrap
     public static bool IsGallery(string[]? args) => args?.Contains(GALLERY_ARG, StringComparer.OrdinalIgnoreCase) == true;
 
 
+    public static bool IsSoftwareRendering(string[] args) => CommandLine.Parse(args).SoftwareRendering;
+
+
     /// <summary>
     /// What every head adds to its builder: the fonts and their size rule (plan 5.3) and the Skia GPU budget (plan 5.4).
     /// </summary>

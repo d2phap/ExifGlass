@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using ExifGlass.Core.Common;
+using ExifGlass.Diagnostics;
 using ExifGlass.Core.ExifTool;
 
 namespace ExifGlass;
@@ -30,12 +31,18 @@ internal static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        StartupClock.Start();
         AppInfo.BuildInfo = new AppBuildInfo();
         BundledExifTool.EnsureExecutable();
 
         if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
 
-        return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        var builder = BuildAvaloniaApp();
+
+        // --render software: the memory reference run of plan 8, no GPU driver in the numbers
+        if (AppBootstrap.IsSoftwareRendering(args)) builder = builder.With(new X11PlatformOptions { RenderingMode = [X11RenderingMode.Software] });
+
+        return builder.StartWithClassicDesktopLifetime(args);
     }
 
     #endregion // Entry point

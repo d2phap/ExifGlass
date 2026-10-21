@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             x:Class="ExifGlass.Views.DropScrim"
+             IsHitTestVisible="False"
+             IsVisible="False">
+
+  <!--  DS 5.2 / Spec 2: with a file open, a scrim over the whole window, the logo in a pulsing ring and "Release to inspect"  -->
+  <Panel Background="{DynamicResource BgDragScrimBrush}">
+    <StackPanel Name="Message"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="14">
+      <Panel Width="96"
+             Height="96"
+             HorizontalAlignment="Center">
+        <ui:PulseRing Name="Ring"
+                      BorderBrush="{DynamicResource AccentBrush}"
+                      BorderThickness="2"
+                      CornerRadius="30"
+                      Opacity="0" />
+        <ui:ScaledImage Width="80"
+                        Height="80"
+                        Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
+      </Panel>
+      <TextBlock HorizontalAlignment="Center"
+                 FontSize="18"
+                 FontWeight="Medium"
+                 Text="{x:Static app:AppText.RELEASE_TO_INSPECT}" />
+    </StackPanel>
+  </Panel>
+
+</UserControl>

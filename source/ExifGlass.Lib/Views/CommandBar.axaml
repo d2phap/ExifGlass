@@ -1,0 +1,47 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.CommandBar"
+             x:DataType="vm:MainViewModel">
+
+  <!--  DS 6.12 command bar, collapsed 40 high: terminal tile 28, the read command on one line, Copy; P8 adds Write, expand and the choreography  -->
+  <!--  padding 4 from the outer edge, the 1 px border included, so a 32 button gives 40  -->
+  <ui:SquircleBorder MinHeight="{StaticResource CommandBarHeight}"
+                     Padding="5,3,3,3"
+                     Background="{DynamicResource BgPanelBrush}"
+                     BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                     BorderThickness="1"
+                     CornerRadius="{StaticResource RadiusPanel}">
+    <DockPanel>
+      <ui:SquircleBorder Width="28"
+                         Height="28"
+                         Margin="0,0,10,0"
+                         VerticalAlignment="Center"
+                         Background="{DynamicResource BgTerminalTileBrush}"
+                         CornerRadius="{StaticResource RadiusIconTile}"
+                         DockPanel.Dock="Left">
+        <ui:GlassIcon Width="15"
+                      Height="15"
+                      Foreground="{DynamicResource FgTerminalTileBrush}"
+                      Icon="{x:Static ui:IconId.WindowConsole}" />
+      </ui:SquircleBorder>
+      <ui:GlassButton Name="CopyButton"
+                      Classes="ghost"
+                      VerticalAlignment="Center"
+                      AutomationProperties.Name="{x:Static app:AppText.COPY_COMMAND}"
+                      Command="{Binding CopyCommandCommand}"
+                      DockPanel.Dock="Right"
+                      Foreground="{DynamicResource TextSecondaryBrush}"
+                      Icon="{x:Static ui:IconId.Copy}"
+                      IsEnabled="{Binding HasCommand}"
+                      ToolTip.Tip="{x:Static app:AppText.COPY_COMMAND}" />
+      <TextBlock Name="CommandText"
+                 Classes="mono"
+                 VerticalAlignment="Center"
+                 TextTrimming="CharacterEllipsis" />
+    </DockPanel>
+  </ui:SquircleBorder>
+
+</UserControl>

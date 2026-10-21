@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.EmptyState"
+             x:DataType="vm:MainViewModel"
+             MaxWidth="380"
+             ClipToBounds="False">
+
+  <!--  DS 6.9 / Spec 2 empty card: Bg.Panel 94% (no blur), radius 18, logo 60, title 17 Medium; it reacts to a file dragged over it  -->
+  <ui:SquircleBorder Name="Card"
+                     Padding="24,26,24,20"
+                     Background="{DynamicResource BgEmptyCardBrush}"
+                     BorderBrush="{DynamicResource EmphasisA10Brush}"
+                     BorderThickness="1.5"
+                     BoxShadow="{StaticResource ShadowEmptyCard}"
+                     CornerRadius="{StaticResource RadiusPanel}">
+    <ui:SquircleBorder.Transitions>
+      <Transitions>
+        <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
+      </Transitions>
+    </ui:SquircleBorder.Transitions>
+
+    <StackPanel Spacing="14">
+      <Panel Width="60"
+             Height="60"
+             HorizontalAlignment="Center">
+        <ui:PulseRing Name="Ring"
+                      BorderBrush="{DynamicResource AccentBrush}"
+                      BorderThickness="1.5"
+                      CornerRadius="20"
+                      Opacity="0" />
+        <ui:FloatingPanel IsFloating="{Binding ShowEmptyCard}" IsVisible="{Binding !HasExifToolProblem}">
+          <ui:ScaledImage Width="60"
+                          Height="60"
+                          Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
+        </ui:FloatingPanel>
+        <ui:SquircleBorder Background="{DynamicResource DangerA08Brush}"
+                           CornerRadius="20"
+                           IsVisible="{Binding HasExifToolProblem}">
+          <ui:GlassIcon Width="28"
+                        Height="28"
+                        Foreground="{DynamicResource DangerTextBrush}"
+                        Icon="{x:Static ui:IconId.ErrorCircle}" />
+        </ui:SquircleBorder>
+      </Panel>
+
+      <!--  the widths stand in for Proto's balanced wrap: two even lines, no word left alone  -->
+      <StackPanel Spacing="4">
+        <TextBlock Name="TitleText"
+                   MaxWidth="280"
+                   Classes="empty-title"
+                   Text="{x:Static app:AppText.EMPTY_TITLE}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+        <TextBlock Name="CaptionText"
+                   MaxWidth="250"
+                   Classes="body"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.EMPTY_CAPTION}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+      </StackPanel>
+
+      <WrapPanel HorizontalAlignment="Center"
+                 ItemSpacing="8"
+                 LineSpacing="8">
+        <ui:GlassButton Name="OpenButton"
+                        Classes="primary"
+                        Command="{Binding OpenCommand}"
+                        Content="{x:Static app:AppText.OPEN_FILE}"
+                        Icon="{x:Static ui:IconId.FolderOpen}"
+                        IsVisible="{Binding !HasExifToolProblem}" />
+        <ui:GlassButton Name="SettingsButton"
+                        Classes="primary"
+                        Command="{Binding OpenSettingsCommand}"
+                        Content="{x:Static app:AppText.OPEN_SETTINGS}"
+                        Icon="{x:Static ui:IconId.Settings}"
+                        IsVisible="{Binding HasExifToolProblem}" />
+        <ui:GlassButton Name="RetryButton"
+                        Command="{Binding RetryExifToolCommand}"
+                        Content="{x:Static app:AppText.RETRY}"
+                        Icon="{x:Static ui:IconId.ArrowSync}"
+                        IsVisible="{Binding HasExifToolProblem}" />
+      </WrapPanel>
+
+      <StackPanel HorizontalAlignment="Center"
+                  IsVisible="{Binding !HasExifToolProblem}"
+                  Orientation="Horizontal"
+                  Spacing="6">
+        <TextBlock Classes="meta"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.DROP_HINT}" />
+        <ui:Kbd Name="OpenHint" VerticalAlignment="Center" />
+      </StackPanel>
+    </StackPanel>
+  </ui:SquircleBorder>
+
+</UserControl>

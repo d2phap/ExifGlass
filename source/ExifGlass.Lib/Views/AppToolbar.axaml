@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.AppToolbar"
+             x:DataType="vm:MainViewModel"
+             Height="{StaticResource AppToolbarHeight}">
+
+  <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; search grows to 520 and centres in the space left  -->
+  <DockPanel Margin="8,0">
+    <ui:GlassToggleButton Name="RailToggle"
+                          AutomationProperties.Name="{Binding RailTooltip}"
+                          CheckedIcon="{x:Static ui:IconId.PanelLeftFilled}"
+                          Command="{Binding ToggleRailCommand}"
+                          DockPanel.Dock="Left"
+                          Icon="{x:Static ui:IconId.PanelLeft}"
+                          IsChecked="{Binding IsRailShown, Mode=OneWay}"
+                          ToolTip.Tip="{Binding RailTooltip}" />
+
+    <StackPanel Margin="4,0,0,0"
+                DockPanel.Dock="Right"
+                Orientation="Horizontal"
+                Spacing="4">
+      <ui:GlassButton Name="OpenButton"
+                      Classes="ghost toolbar"
+                      AutomationProperties.Name="{x:Static app:AppText.OPEN_FILE}"
+                      Command="{Binding OpenCommand}"
+                      Content="{Binding OpenLabel}"
+                      Icon="{x:Static ui:IconId.FolderOpen}"
+                      ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
+      <ui:GlassToggleButton Name="PinToggle"
+                            AutomationProperties.Name="{Binding PinTooltip}"
+                            CheckedIcon="{x:Static ui:IconId.PinFilled}"
+                            Command="{Binding TogglePinCommand}"
+                            Icon="{x:Static ui:IconId.Pin}"
+                            IsChecked="{Binding IsPinned, Mode=OneWay}"
+                            IsVisible="{Binding ShowSecondaryButtons}"
+                            ToolTip.Tip="{Binding PinTooltip}" />
+      <ui:GlassButton Name="ThemeButton"
+                      Classes="ghost toolbar"
+                      AutomationProperties.Name="{Binding ThemeTooltip}"
+                      Command="{Binding CycleThemeCommand}"
+                      Icon="{Binding ThemeIcon}"
+                      IsVisible="{Binding ShowSecondaryButtons}"
+                      ToolTip.Tip="{Binding ThemeTooltip}" />
+      <ui:GlassButton Name="SettingsButton"
+                      Classes="ghost toolbar"
+                      AutomationProperties.Name="{x:Static app:AppText.SETTINGS}"
+                      Command="{Binding OpenSettingsCommand}"
+                      Icon="{x:Static ui:IconId.Settings}"
+                      ToolTip.Tip="{x:Static app:AppText.SettingsTooltip}" />
+      <ui:GlassButton Name="AboutButton"
+                      Classes="ghost toolbar"
+                      AutomationProperties.Name="{x:Static app:AppText.ABOUT}"
+                      Command="{Binding OpenAboutCommand}"
+                      Icon="{x:Static ui:IconId.Info}"
+                      IsVisible="{Binding ShowSecondaryButtons}"
+                      ToolTip.Tip="{x:Static app:AppText.ABOUT}" />
+      <ui:GlassToggleButton Name="InspectorToggle"
+                            AutomationProperties.Name="{Binding InspectorTooltip}"
+                            CheckedIcon="{x:Static ui:IconId.PanelRightFilled}"
+                            Command="{Binding ToggleInspectorCommand}"
+                            Icon="{x:Static ui:IconId.PanelRight}"
+                            IsChecked="{Binding IsInspectorShown, Mode=OneWay}"
+                            ToolTip.Tip="{Binding InspectorTooltip}" />
+    </StackPanel>
+
+    <ui:SearchBox Name="Search"
+                  MinWidth="120"
+                  MaxWidth="520"
+                  Margin="4,0,0,0"
+                  VerticalAlignment="Center"
+                  AutomationProperties.Name="{x:Static app:AppText.SEARCH}"
+                  Classes.no-hint="{Binding !ShowSearchHint}"
+                  IsEnabled="{Binding HasDocument}"
+                  PlaceholderText="{Binding SearchPlaceholder}"
+                  Text="{Binding SearchText, Mode=TwoWay}" />
+  </DockPanel>
+
+</UserControl>

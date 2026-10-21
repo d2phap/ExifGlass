@@ -175,6 +175,9 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type FlyoutPresenter}" TargetType="FlyoutPresenter">
+    <!--  the shadow room is the presenter's own margin: Avalonia places a popup child inside its margin, so the room needs no offsets; the gap band inside keeps 4 px to the button above or below; the shadow paints past the bounds  -->
+    <Setter Property="Margin" Value="{x:Static ui:MenuMotion.SHADOW_ROOM}" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Padding" Value="12" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
     <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
@@ -184,7 +187,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <ui:SquircleBorder MaxWidth="360"
-                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Margin="{x:Static ui:MenuMotion.GAP_BAND}"
                            Padding="{TemplateBinding Padding}"
                            Background="{TemplateBinding Background}"
                            BorderBrush="{TemplateBinding BorderBrush}"

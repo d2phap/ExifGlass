@@ -167,9 +167,14 @@ public static class MenuMotion
     private const double GAP = 4;
 
     /// <summary>
-    /// The transparent margin around a menu surface: popups are windows, and elevation 1 reaches about this far.
+    /// The transparent margin around a menu surface and its GAP_BAND: popups are windows, and elevation 1 reaches about this far.
     /// </summary>
-    public static readonly Thickness SHADOW_ROOM = new(40, 20, 40, 60);
+    public static readonly Thickness SHADOW_ROOM = new(40, 20 - GAP, 40, 60 - GAP);
+
+    /// <summary>
+    /// The gap to the button, as a transparent band above and below the surface: Avalonia places the popup child inside its margin but doesn't mirror an offset when it flips a menu above.
+    /// </summary>
+    public static readonly Thickness GAP_BAND = new(0, GAP, 0, GAP);
 
     private static bool _registered;
 
@@ -192,13 +197,11 @@ public static class MenuMotion
 
 
     /// <summary>
-    /// Places a flyout under its button, right edges aligned, 4 px below, the shadow room cancelled; and fades it out on close.
+    /// Places a flyout under its button (above when there's no room), right edges aligned, 4 px away; and fades it out on close.
     /// </summary>
     public static void Attach(PopupFlyoutBase flyout)
     {
         flyout.Placement = PlacementMode.BottomEdgeAlignedRight;
-        flyout.HorizontalOffset = SHADOW_ROOM.Right;
-        flyout.VerticalOffset = GAP - SHADOW_ROOM.Top;
 
         var fading = false;
         flyout.Closing += (_, e) =>

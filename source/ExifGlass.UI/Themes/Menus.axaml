@@ -8,6 +8,9 @@
 
   <!--  DS 6.8 menu surface: 240-280 wide, padding 6, radius 20, Bg.Elevated, 1 px Emphasis 12%, elevation 1. The popup is a window, so a margin holds the shadow it would clip  -->
   <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">
+    <!--  the shadow room is the presenter's own margin: Avalonia places a popup child inside its margin, so the room needs no offsets; the gap band inside keeps 4 px to the button above or below; the shadow paints past the bounds  -->
+    <Setter Property="Margin" Value="{x:Static ui:MenuMotion.SHADOW_ROOM}" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Padding" Value="6" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
     <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
@@ -22,7 +25,7 @@
         <ui:SquircleBorder Name="PART_Surface"
                            MinWidth="240"
                            MaxWidth="280"
-                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Margin="{x:Static ui:MenuMotion.GAP_BAND}"
                            Background="{TemplateBinding Background}"
                            BorderBrush="{TemplateBinding BorderBrush}"
                            BorderThickness="{TemplateBinding BorderThickness}"
@@ -42,6 +45,9 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type ContextMenu}" TargetType="ContextMenu">
+    <!--  the shadow room is the presenter's own margin: Avalonia places a popup child inside its margin, so the room needs no offsets; the gap band inside keeps 4 px to the button above or below; the shadow paints past the bounds  -->
+    <Setter Property="Margin" Value="{x:Static ui:MenuMotion.SHADOW_ROOM}" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Padding" Value="6" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
     <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
@@ -54,7 +60,7 @@
         <ui:SquircleBorder Name="PART_Surface"
                            MinWidth="240"
                            MaxWidth="280"
-                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Margin="{x:Static ui:MenuMotion.GAP_BAND}"
                            Background="{TemplateBinding Background}"
                            BorderBrush="{TemplateBinding BorderBrush}"
                            BorderThickness="{TemplateBinding BorderThickness}"
@@ -72,7 +78,7 @@
     </Setter>
   </ControlTheme>
 
-  <!--  DS 6.8 item: 34 high (44 with a description), radius 14, padding 6/8, icon tile 30 (radius 12, Emphasis 6%) or a checkbox, gap 12; wide item, so pressed dims instead of scaling  -->
+  <!--  DS 6.8 item: 34 high (44 with a description), radius 14, padding 6/8, icon tile 30 (radius 12, Emphasis 6%) or a checkbox, gap 12; pressed dims and scales a little (owner, 2026-10-21; DS 4 only dims wide items)  -->
   <ControlTheme x:Key="{x:Type ui:GlassMenuItem}" TargetType="ui:GlassMenuItem">
     <Setter Property="MinHeight" Value="{StaticResource MenuItemHeight}" />
     <Setter Property="Padding" Value="8,6" />
@@ -88,11 +94,12 @@
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Background="Transparent">
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
           <ui:InteractionOverlay Name="PART_Overlay"
                                  CornerRadius="{TemplateBinding CornerRadius}"
                                  HoverBrush="{DynamicResource StateHoverBrush}"
                                  PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 PressScale="{x:Static tok:MotionTokens.PRESS_SCALE_WIDE}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
           <ui:SquircleBorder Name="PART_FocusRing"
                              BorderBrush="{DynamicResource AccentBrush}"
@@ -262,11 +269,12 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Background="Transparent">
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
           <ui:InteractionOverlay Name="PART_Overlay"
                                  CornerRadius="{TemplateBinding CornerRadius}"
                                  HoverBrush="{DynamicResource StateHoverBrush}"
                                  PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 PressScale="{x:Static tok:MotionTokens.PRESS_SCALE_WIDE}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
           <ui:SquircleBorder Name="PART_FocusRing"
                              BorderBrush="{DynamicResource AccentBrush}"

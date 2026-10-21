@@ -33,6 +33,11 @@ public static partial class MotionTokens
     public const double PRESS_SCALE = 0.96;
 
     /// <summary>
+    /// The press scale of menu and list items, which DS 4 only dims: smaller, as a 0.96 scale moves a 260 px item 5 px each side (owner, 2026-10-21).
+    /// </summary>
+    public const double PRESS_SCALE_WIDE = 0.98;
+
+    /// <summary>
     /// Disabled controls fade to this opacity (DS 4).
     /// </summary>
     public const double DISABLED_OPACITY = 0.45;

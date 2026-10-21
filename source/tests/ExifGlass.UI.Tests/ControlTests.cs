@@ -339,6 +339,59 @@ public class ControlTests
     }
 
 
+    // Avalonia doesn't mirror a popup offset when it flips a popup above, so the gap is a band inside the shadow room
+    [AvaloniaFact]
+    public void MenusAndListsKeepTheirGapBelowAndAbove()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var top = new GlassButton { Content = "Top", Margin = new Thickness(300, 20, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var bottom = new GlassButton { Content = "Bottom", Margin = new Thickness(300, 0, 0, 20), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var comboTop = new ComboBox { ItemsSource = new[] { "English", "Tiếng Việt" }, SelectedIndex = 0, Margin = new Thickness(40, 20, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var comboBottom = new ComboBox { ItemsSource = new[] { "English", "Tiếng Việt" }, SelectedIndex = 0, Margin = new Thickness(40, 0, 0, 20), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var window = Show(new Panel { Children = { top, bottom, comboTop, comboBottom } }, 600, 500);
+
+            foreach (var (button, below) in new[] { (top, true), (bottom, false) })
+            {
+                var flyout = new MenuFlyout();
+                for (var i = 0; i < 4; i++) flyout.Items.Add(new GlassMenuItem { Header = "Item", Description = "A line" });
+                MenuMotion.Attach(flyout);
+                flyout.ShowAt(button);
+                Wait(50);
+
+                var presenter = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(window).OfType<MenuFlyoutPresenter>().First();
+                var surface = Screen(Find<SquircleBorder>(presenter, "PART_Surface"));
+                var anchor = Screen(button);
+                Assert.Equal(4, below ? surface.Top - anchor.Bottom : anchor.Top - surface.Bottom, 0.5);
+                Assert.Equal(anchor.Right, surface.Right, 0.5);
+                flyout.Hide();
+                Wait(50);
+            }
+
+            foreach (var (combo, below) in new[] { (comboTop, true), (comboBottom, false) })
+            {
+                combo.IsDropDownOpen = true;
+                Wait(50);
+
+                var popup = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(combo).OfType<Avalonia.Controls.Primitives.Popup>().First();
+                var list = Screen(Find<SquircleBorder>((Control)popup.Child!, "PART_ListSurface"));
+                var box = Screen(combo);
+                Assert.Equal(2, below ? list.Top - box.Bottom : box.Top - list.Bottom, 0.5);
+                Assert.Equal(box.Left, list.Left, 0.5);
+                combo.IsDropDownOpen = false;
+                Wait(50);
+            }
+
+            window.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
     [AvaloniaFact]
     public void EveryIconHasItsGeometry()
     {
@@ -394,6 +447,9 @@ public class ControlTests
         Dispatcher.UIThread.RunJobs();
         return window;
     }
+
+
+    private static Rect Screen(Visual visual) => new(visual.PointToScreen(default).ToPoint(1), visual.Bounds.Size);
 
 
     private static void Click(Window window, Control target)

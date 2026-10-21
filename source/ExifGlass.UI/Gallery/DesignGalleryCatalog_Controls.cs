@@ -367,7 +367,7 @@ public static partial class DesignGalleryCatalog
 
         return new GallerySection("c-menu", "Menus and flyouts", "DS 6.8: 240-280 wide, padding 6, radius 20, Bg.Elevated, 1 px Emphasis 12%, elevation 1; items 34/44, radius 14, tile 30; destructive in Danger.Text; disabled 0.45; open 220 ms from the top-right, close 120 ms; pressed held 170 ms; the arrow keys' item shows the 2 px focus ring.",
         [
-            new("items", export, "keyboard focus (ring), hover, pressed (dims, no scale), destructive, disabled"),
+            new("items", export, "keyboard focus (ring), hover, pressed (dims, scales 0.98), destructive, disabled"),
             new("checklist", columns, "Columns menu; the last visible column can't be hidden; hover and keyboard focus"),
         ]);
     }

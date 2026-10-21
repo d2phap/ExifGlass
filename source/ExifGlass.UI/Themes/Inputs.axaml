@@ -472,27 +472,29 @@
                             Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
           </DockPanel>
-          <!--  Avalonia 12 lines up the popup child inside its margin with the anchor, so the shadow room needs no offset: the list opens 2 below  -->
+          <!--  Avalonia 12 places the popup child inside its margin (the shadow room) and doesn't mirror an offset when it flips the list above, so the 2 px gap is a band around the surface  -->
           <Popup Name="PART_Popup"
                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
                  InheritsTransform="True"
                  IsLightDismissEnabled="True"
                  IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                  Placement="BottomEdgeAlignedLeft"
-                 PlacementTarget="{TemplateBinding}"
-                 VerticalOffset="2">
-            <ui:SquircleBorder MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
-                               Margin="40,20,40,60"
-                               Padding="6"
-                               Background="{DynamicResource BgElevatedBrush}"
-                               BorderBrush="{DynamicResource EmphasisA12Brush}"
-                               BorderThickness="1"
-                               BoxShadow="{StaticResource Elevation1}"
-                               CornerRadius="{StaticResource RadiusMenu}">
-              <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
-              </ScrollViewer>
-            </ui:SquircleBorder>
+                 PlacementTarget="{TemplateBinding}">
+            <Panel Margin="40,18,40,58">
+              <ui:SquircleBorder Name="PART_ListSurface"
+                                 MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                                 Margin="0,2"
+                                 Padding="6"
+                                 Background="{DynamicResource BgElevatedBrush}"
+                                 BorderBrush="{DynamicResource EmphasisA12Brush}"
+                                 BorderThickness="1"
+                                 BoxShadow="{StaticResource Elevation1}"
+                                 CornerRadius="{StaticResource RadiusMenu}">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                </ScrollViewer>
+              </ui:SquircleBorder>
+            </Panel>
           </Popup>
         </Panel>
       </ControlTemplate>
@@ -523,11 +525,12 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Background="Transparent">
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
           <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
           <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
                                  HoverBrush="{DynamicResource StateHoverBrush}"
                                  PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 PressScale="{x:Static tok:MotionTokens.PRESS_SCALE_WIDE}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
           <DockPanel Margin="{TemplateBinding Padding}">
             <ui:GlassIcon Name="PART_Check"

@@ -113,9 +113,9 @@ public class GalleryTests
     }
 
 
-    // Avalonia 12 clips every templated control to its bounds, so a control whose template draws a shadow past them must turn ClipToBounds off
+    // Avalonia 12 clips every templated control to its bounds, so a control whose template paints past them (a shadow, an outset focus ring) must turn ClipToBounds off
     [AvaloniaFact]
-    public void NoShadowIsClippedByItsOwnControl()
+    public void NoShadowOrRingIsClippedByItsOwnControl()
     {
         MotionTokens.IsFrozen = true;
         try
@@ -127,15 +127,18 @@ public class GalleryTests
             {
                 foreach (var border in content.GetVisualDescendants().OfType<SquircleBorder>())
                 {
-                    if (border.TemplatedParent is not Visual owner || ShadowReach(border) is not { } reach) continue;
+                    if (border.TemplatedParent is not Visual owner) continue;
+
                     count++;
+                    var reach = PaintReach(border);
 
                     // up to the control that owns the template; the gallery's own frames may clip on purpose
                     for (var v = border.GetVisualParent(); v is not null; v = v.GetVisualParent())
                     {
-                        if (v.ClipToBounds && border.TranslatePoint(default, v) is { } at && !new Rect(v.Bounds.Size).Contains(reach.Translate(at)))
+                        // both corners through the transforms, since a pressed part is scaled
+                        if (v.ClipToBounds && border.TranslatePoint(reach.TopLeft, v) is { } from && border.TranslatePoint(reach.BottomRight, v) is { } to && !new Rect(v.Bounds.Size).Inflate(0.5).Contains(new Rect(from, to)))
                         {
-                            clipped.Add($"{owner.GetType().Name}: {v.GetType().Name} clips the shadow of {border.Name ?? "a part"}");
+                            clipped.Add($"{owner.GetType().Name}: {v.GetType().Name} clips {border.Name ?? "a part"}");
                             break;
                         }
 
@@ -144,7 +147,7 @@ public class GalleryTests
                 }
             }, settleMs: 100);
 
-            Assert.True(count >= 5, $"only {count} shadows checked");
+            Assert.True(count >= 100, $"only {count} template parts checked");
             Assert.True(clipped.Count == 0, string.Join(Environment.NewLine, clipped));
         }
         finally
@@ -182,10 +185,10 @@ public class GalleryTests
 
     #region Private methods
 
-    // where an outset shadow is still clearly visible: its spread and offset plus one blur sigma (SquircleBorder's conversion)
-    private static Rect? ShadowReach(SquircleBorder border)
+    // what a part paints: its own box (an outset focus ring) and where its outset shadows are still clearly visible, spread and offset plus one blur sigma (SquircleBorder's conversion)
+    private static Rect PaintReach(SquircleBorder border)
     {
-        Rect? reach = null;
+        var reach = new Rect(border.Bounds.Size);
         var shadows = border.BoxShadow;
         for (var i = 0; i < shadows.Count; i++)
         {
@@ -193,8 +196,7 @@ public class GalleryTests
             if (shadow.IsInset) continue;
 
             var sigma = shadow.Blur > 0 ? 0.288675 * shadow.Blur + 0.5 : 0;
-            var box = new Rect(border.Bounds.Size).Inflate(shadow.Spread + sigma).Translate(new Vector(shadow.OffsetX, shadow.OffsetY));
-            reach = reach is { } r ? r.Union(box) : box;
+            reach = reach.Union(new Rect(border.Bounds.Size).Inflate(shadow.Spread + sigma).Translate(new Vector(shadow.OffsetX, shadow.OffsetY)));
         }
 
         return reach;

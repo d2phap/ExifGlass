@@ -119,6 +119,8 @@
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <!--  Avalonia 12 clips templated controls; the focus ring lies 3 outside the track  -->
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="KnobTransitions">
       <Transitions>
         <DoubleTransition Easing="{x:Static tok:MotionTokens.SwitchKnobEasing}" Property="Canvas.Left" Duration="0:0:0.32" />

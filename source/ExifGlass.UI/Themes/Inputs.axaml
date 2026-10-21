@@ -472,7 +472,7 @@
                             Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
           </DockPanel>
-          <!--  Avalonia 12 lines up the popup child inside its margin with the anchor, so the shadow room needs no offset: the list opens 4 below  -->
+          <!--  Avalonia 12 lines up the popup child inside its margin with the anchor, so the shadow room needs no offset: the list opens 2 below  -->
           <Popup Name="PART_Popup"
                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
                  InheritsTransform="True"
@@ -480,7 +480,7 @@
                  IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                  Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{TemplateBinding}"
-                 VerticalOffset="4">
+                 VerticalOffset="2">
             <ui:SquircleBorder MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
                                Margin="40,20,40,60"
                                Padding="6"

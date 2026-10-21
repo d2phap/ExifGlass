@@ -345,7 +345,7 @@ public static partial class DesignGalleryCatalog
             Items =
             {
                 new GlassMenuHeader { Text = "EXPORTS THE 128 TAGS IN VIEW" },
-                new GlassMenuItem { Header = "CSV", Description = "Spreadsheet-ready, one row per tag", Glyph = IconId.Table },
+                new GlassMenuItem { Header = "CSV", Description = "Spreadsheet-ready, one row per tag", Glyph = IconId.Table }.FocusVisible(),
                 new GlassMenuItem { Header = "Plain text", Description = "Tab-separated, like exiftool -t", Glyph = IconId.Document }.Hover(),
                 new GlassMenuItem { Header = "JSON", Description = "Compatible with exiftool -j -G", Glyph = IconId.Braces }.Pressed(),
                 new Separator(),
@@ -360,15 +360,15 @@ public static partial class DesignGalleryCatalog
             {
                 new GlassMenuItem { Header = "#", ToggleType = MenuItemToggleType.CheckBox },
                 new GlassMenuItem { Header = "Tag ID", ToggleType = MenuItemToggleType.CheckBox, IsChecked = true }.Hover(),
-                new GlassMenuItem { Header = "Tag name", ToggleType = MenuItemToggleType.CheckBox, IsChecked = true },
+                new GlassMenuItem { Header = "Tag name", ToggleType = MenuItemToggleType.CheckBox, IsChecked = true }.FocusVisible(),
                 new GlassMenuItem { Header = "Value", ToggleType = MenuItemToggleType.CheckBox, IsChecked = true, Hint = "At least one" },
             },
         };
 
-        return new GallerySection("c-menu", "Menus and flyouts", "DS 6.8: 240-280 wide, padding 6, radius 20, Bg.Elevated, 1 px Emphasis 12%, elevation 1; items 34/44, radius 14, tile 30; destructive in Danger.Text; disabled 0.45; open 220 ms from the top-right, close 120 ms; pressed held 170 ms.",
+        return new GallerySection("c-menu", "Menus and flyouts", "DS 6.8: 240-280 wide, padding 6, radius 20, Bg.Elevated, 1 px Emphasis 12%, elevation 1; items 34/44, radius 14, tile 30; destructive in Danger.Text; disabled 0.45; open 220 ms from the top-right, close 120 ms; pressed held 170 ms; the arrow keys' item shows the 2 px focus ring.",
         [
-            new("items", export, "rest, hover, pressed (dims, no scale), destructive, disabled"),
-            new("checklist", columns, "Columns menu; the last visible column can't be hidden"),
+            new("items", export, "keyboard focus (ring), hover, pressed (dims, no scale), destructive, disabled"),
+            new("checklist", columns, "Columns menu; the last visible column can't be hidden; hover and keyboard focus"),
         ]);
     }
 

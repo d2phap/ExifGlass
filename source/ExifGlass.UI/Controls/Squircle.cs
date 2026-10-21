@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Data.Converters;
 using Avalonia.Media;
 using SkiaSharp;
 
@@ -236,6 +237,30 @@ public static class Squircle
     }
 
     #endregion // Nested types
+}
+
+
+/// <summary>
+/// Radii for a squircle nested inside another (DS 3.3: inner radius = outer radius - inset).
+/// </summary>
+public static class RadiusConverters
+{
+    #region Fields and constants
+
+    /// <summary>
+    /// The radius of a ring drawn 2 px inside its control, as the primary button's focus ring.
+    /// </summary>
+    public static readonly IValueConverter Inset2 = new FuncValueConverter<CornerRadius, CornerRadius>(r => Inset(r, 2));
+
+    #endregion // Fields and constants
+
+
+    #region Public methods
+
+    public static CornerRadius Inset(CornerRadius radius, double by) =>
+        new(Math.Max(0, radius.TopLeft - by), Math.Max(0, radius.TopRight - by), Math.Max(0, radius.BottomRight - by), Math.Max(0, radius.BottomLeft - by));
+
+    #endregion // Public methods
 }
 
 

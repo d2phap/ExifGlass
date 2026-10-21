@@ -157,6 +157,29 @@ public class ControlTests
     }
 
 
+    [AvaloniaTheory]
+    [InlineData("")]
+    [InlineData("small")]
+    [InlineData("tiny")]
+    [InlineData("card")]
+    [InlineData("ghost")]
+    [InlineData("ghost tiny")]
+    [InlineData("toolbar")]
+    [InlineData("link")]
+    public void IconOnlyButtonsCentreTheirIcon(string classes)
+    {
+        var button = new GlassButton { Icon = IconId.Dismiss, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+        foreach (var c in classes.Split(' ', StringSplitOptions.RemoveEmptyEntries)) button.Classes.Add(c);
+        var window = Show(button);
+
+        var icon = Find<GlassIcon>(button, "PART_Icon");
+        var centre = icon.TranslatePoint(new Point(icon.Bounds.Width / 2, icon.Bounds.Height / 2), button) ?? default;
+        Assert.Equal(button.Bounds.Width / 2, centre.X, 0.5);
+        Assert.Equal(button.Bounds.Height / 2, centre.Y, 0.5);
+        window.Close();
+    }
+
+
     [AvaloniaFact]
     public void TheSwitchTogglesWithOurTemplate()
     {
@@ -269,6 +292,44 @@ public class ControlTests
 
             Assert.Equal(1, clicked);
             Assert.False(menu.IsOpen);
+            window.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
+    [AvaloniaFact]
+    public void AMenuItemShowsTheFocusRingOnlyAfterAKey()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var first = new GlassMenuItem { Header = "CSV" };
+            var second = new GlassMenuItem { Header = "JSON" };
+            var menu = new ContextMenu { Items = { first, second } };
+            var target = new Border { Width = 300, Height = 200, Background = Brushes.Transparent, ContextMenu = menu };
+            var window = Show(target, 600, 400);
+
+            window.MouseMove(new Point(150, 100));
+            menu.Open(target);
+            Dispatcher.UIThread.RunJobs();
+            var opened = new[] { first, second }.FirstOrDefault(i => i.IsFocused);
+            Assert.False(opened?.Classes.Contains(FocusCue.KEYBOARD_FOCUS) ?? false, "a menu opened by the pointer shows no ring");
+
+            (TopLevel.GetTopLevel(first) as Window ?? window).KeyPressQwerty(PhysicalKey.ArrowDown, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
+            var focused = new[] { first, second }.Single(i => i.IsFocused);
+            Assert.Contains(FocusCue.KEYBOARD_FOCUS, focused.Classes);
+            Wait(200);
+            Assert.Equal(1, Find<SquircleBorder>(focused, "PART_FocusRing").Opacity);
+
+            window.MouseMove(new Point(10, 10));
+            Dispatcher.UIThread.RunJobs();
+            Assert.DoesNotContain(FocusCue.KEYBOARD_FOCUS, focused.Classes);
+            menu.Close();
             window.Close();
         }
         finally

@@ -46,6 +46,7 @@ public static class DesignSystem
 
         _initialized = true;
         MenuMotion.Register();
+        FocusCue.Register();
 
         // popups are top levels of their own, so the window's text mode doesn't reach them
         TemplatedControl.TemplateAppliedEvent.AddClassHandler<TopLevel>((top, _) => TextOptions.SetTextRenderingMode(top, TextRenderingMode.Antialias));

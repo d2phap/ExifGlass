@@ -94,6 +94,18 @@
                                  HoverBrush="{DynamicResource StateHoverBrush}"
                                  PressBrush="{DynamicResource StatePressedWideBrush}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
           <DockPanel Margin="{TemplateBinding Padding}">
             <Panel Name="PART_Lead" Width="30" Height="30" Margin="0,0,12,0" VerticalAlignment="Center" DockPanel.Dock="Left">
               <ui:SquircleBorder Name="PART_Tile" Background="{DynamicResource EmphasisA06Brush}" CornerRadius="{StaticResource RadiusIconTile}" />
@@ -225,8 +237,12 @@
     <Style Selector="^:checked /template/ ui|GlassIcon#PART_Check">
       <Setter Property="RenderTransform" Value="scale(1)" />
     </Style>
-    <Style Selector="^:selected /template/ ui|InteractionOverlay#PART_Overlay">
+    <!--  the arrow keys focus items without :focus-visible, so FocusCue marks the keyboard's item: a ring, not the held fill a pointer leaves  -->
+    <Style Selector="^:selected:not(:keyboard-focus) /template/ ui|InteractionOverlay#PART_Overlay">
       <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^:keyboard-focus /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^.danger">
       <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
@@ -252,6 +268,18 @@
                                  HoverBrush="{DynamicResource StateHoverBrush}"
                                  PressBrush="{DynamicResource StatePressedWideBrush}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
           <DockPanel Margin="{TemplateBinding Padding}">
             <ContentPresenter Name="PART_IconPresenter"
                               Width="16"
@@ -303,8 +331,12 @@
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="^:selected /template/ ui|InteractionOverlay#PART_Overlay">
+    <!--  the arrow keys focus items without :focus-visible, so FocusCue marks the keyboard's item: a ring, not the held fill a pointer leaves  -->
+    <Style Selector="^:selected:not(:keyboard-focus) /template/ ui|InteractionOverlay#PART_Overlay">
       <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^:keyboard-focus /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />

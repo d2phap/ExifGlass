@@ -53,6 +53,21 @@
               </Transitions>
             </ui:SquircleBorder.Transitions>
           </ui:SquircleBorder>
+          <!--  primary: an accent ring on an accent fill is invisible, so the ring is white and 2 inside, between the accent edge and fill  -->
+          <ui:SquircleBorder Name="PART_FocusRingInset"
+                             Margin="2"
+                             BorderBrush="{DynamicResource OnAccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius, Converter={x:Static ui:RadiusConverters.Inset2}}"
+                             IsHitTestVisible="False"
+                             IsVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
           <StackPanel Name="PART_Content"
                       Margin="{TemplateBinding Padding}"
                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -93,7 +108,6 @@
     <!--  icon-only: square, no border (DS 6.1 Icon)  -->
     <Style Selector="^:icon:not(:label)">
       <Setter Property="Width" Value="{StaticResource ControlHeight}" />
-      <Setter Property="Padding" Value="0" />
       <Setter Property="BorderThickness" Value="0" />
     </Style>
 
@@ -108,7 +122,13 @@
       <Setter Property="PressBrush" Value="{DynamicResource WhiteA14Brush}" />
     </Style>
     <Style Selector="^.primary /template/ Border#PART_FocusRing">
-      <Setter Property="BorderBrush" Value="{DynamicResource OnAccentBrush}" />
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.primary /template/ Border#PART_FocusRingInset">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.primary:focus-visible /template/ Border#PART_FocusRingInset">
+      <Setter Property="Opacity" Value="1" />
     </Style>
 
     <Style Selector="^.ghost">
@@ -175,6 +195,11 @@
     </Style>
     <Style Selector="^.toolbar">
       <Setter Property="IconSize" Value="{StaticResource IconToolbar}" />
+    </Style>
+
+    <!--  an icon-only button centres its icon: no padding, so it comes after the variants and sizes that set one  -->
+    <Style Selector="^:icon:not(:label)">
+      <Setter Property="Padding" Value="0" />
     </Style>
 
     <!--  DisclosureButton: a 12 chevron at 70% that turns from right to down while its panel is open, as the dropdown chevron turns; after the sizes so its icon size wins  -->
@@ -393,6 +418,21 @@
               </Transitions>
             </ui:SquircleBorder.Transitions>
           </ui:SquircleBorder>
+          <!--  primary: as GlassButton's, white and 2 inside  -->
+          <ui:SquircleBorder Name="PART_FocusRingInset"
+                             Margin="2"
+                             BorderBrush="{DynamicResource OnAccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius, Converter={x:Static ui:RadiusConverters.Inset2}}"
+                             IsHitTestVisible="False"
+                             IsVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
           <StackPanel Margin="{TemplateBinding Padding}"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Center"
@@ -464,7 +504,13 @@
       <Setter Property="PressBrush" Value="{DynamicResource WhiteA14Brush}" />
     </Style>
     <Style Selector="^.primary /template/ Border#PART_FocusRing">
-      <Setter Property="BorderBrush" Value="{DynamicResource OnAccentBrush}" />
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.primary /template/ Border#PART_FocusRingInset">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.primary:focus-visible /template/ Border#PART_FocusRingInset">
+      <Setter Property="Opacity" Value="1" />
     </Style>
   </ControlTheme>
 

@@ -63,6 +63,7 @@ public static class GalleryPins
         Pin(control, ":focus");
         Pin(control, ":focus-visible");
         Pin(control, ":focus-within");
+        Pin(control, FocusCue.KEYBOARD_FOCUS);
         return control;
     }
 

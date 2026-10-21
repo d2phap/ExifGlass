@@ -152,6 +152,22 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
+    public void DoubleClickingTheToolbarMaximizesAndRestores()
+    {
+        using var shell = TestShell.Open(1400);
+        var empty = new Point(120, 24);
+
+        shell.Window.MouseDown(empty, MouseButton.Left);
+        shell.Window.MouseUp(empty, MouseButton.Left);
+        shell.Window.MouseDown(empty, MouseButton.Left);
+        shell.Window.MouseUp(empty, MouseButton.Left);
+        shell.Settle();
+
+        Assert.Equal(WindowState.Maximized, shell.Window.WindowState);
+    }
+
+
+    [AvaloniaFact]
     public void WideningDocksTheRailAndClosesItsOverlay()
     {
         using var shell = TestShell.Open(760);

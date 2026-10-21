@@ -5,7 +5,8 @@
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.AppToolbar"
              x:DataType="vm:MainViewModel"
-             Height="{StaticResource AppToolbarHeight}">
+             Height="{StaticResource AppToolbarHeight}"
+             Background="Transparent">
 
   <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; search grows to 520 and centres in the space left  -->
   <DockPanel Margin="8,0">

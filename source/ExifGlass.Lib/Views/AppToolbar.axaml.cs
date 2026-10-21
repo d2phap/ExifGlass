@@ -28,6 +28,9 @@ public partial class AppToolbar : UserControl
     public AppToolbar()
     {
         InitializeComponent();
+
+        // the toolbar moves the window as the title bar does, and a double-click maximizes or restores it (FewerPhotos R184); its controls take their own presses
+        PointerPressed += Toolbar_PointerPressed;
     }
 
     #endregion // Constructors
@@ -47,4 +50,23 @@ public partial class AppToolbar : UserControl
     }
 
     #endregion // Public methods
+
+
+    #region Event handlers
+
+    private void Toolbar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.Handled || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || TopLevel.GetTopLevel(this) is not Window window) return;
+
+        e.Handled = true;
+        if (e.ClickCount == 2)
+        {
+            if (window.CanMaximize) window.WindowState = window.WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+            return;
+        }
+
+        window.BeginMoveDrag(e);
+    }
+
+    #endregion // Event handlers
 }

@@ -30,7 +30,7 @@ using ExifGlass.UI.Tokens;
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
-/// A menu item (DS 6.8): 34 high (44 with a description), radius 14, an icon tile 30 or a checkbox, label Medium 13 with a description, a trailing hint; pressed is held 170 ms before it acts.
+/// A menu item (DS 6.8): 34 high (44 with a description), radius 14, an icon tile 30 or a checkbox, label Medium 13 with a description, a trailing hint; it acts on release and stays pressed while the menu fades.
 /// </summary>
 public class GlassMenuItem : MenuItem
 {
@@ -44,8 +44,6 @@ public class GlassMenuItem : MenuItem
 
     public static readonly StyledProperty<string?> HintProperty =
         AvaloniaProperty.Register<GlassMenuItem, string?>(nameof(Hint));
-
-    private bool _acting;
 
     #endregion // Fields and constants
 
@@ -87,29 +85,22 @@ public class GlassMenuItem : MenuItem
         if (change.Property == GlyphProperty) PseudoClasses.Set(":glyph", Glyph is not null);
         else if (change.Property == DescriptionProperty) PseudoClasses.Set(":description", !string.IsNullOrEmpty(Description));
         else if (change.Property == HintProperty) PseudoClasses.Set(":hint", !string.IsNullOrEmpty(Hint));
+
+        // a checklist stays open, so several columns can be toggled in a row
+        else if (change.Property == ToggleTypeProperty) SetCurrentValue(StaysOpenOnClickProperty, ToggleType != MenuItemToggleType.None);
     }
 
 
-    // DS 4: an action that closes its host shows its pressed state for 170 ms first
+    // Avalonia acts on release, as on a ComboBox row (owner at G3 review round 4, over DS 4's 170 ms hold); the row keeps its press while the menu fades out
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (_acting || HasSubMenu || !IsEffectivelyEnabled || e.InitialPressMouseButton != MouseButton.Left || !IsPointerOver)
+        if (!HasSubMenu && !StaysOpenOnClick && IsEffectivelyEnabled && e.InitialPressMouseButton == MouseButton.Left && IsPointerOver)
         {
-            base.OnPointerReleased(e);
-            return;
+            InteractionOverlay.SetForcedState(this, InteractionState.Pressed);
+            DispatcherTimer.RunOnce(() => InteractionOverlay.SetForcedState(this, InteractionState.None), MotionTokens.IsFrozen ? TimeSpan.FromMilliseconds(1) : MotionTokens.MenuClose);
         }
 
-        e.Handled = true;
-        _acting = true;
-        InteractionOverlay.SetForcedState(this, InteractionState.Pressed);
-
-        DispatcherTimer.RunOnce(() =>
-        {
-            _acting = false;
-            InteractionOverlay.SetForcedState(this, InteractionState.None);
-            RaiseEvent(new RoutedEventArgs(ClickEvent));
-            if (ToggleType == MenuItemToggleType.None) this.FindLogicalAncestorOfType<MenuBase>()?.Close();
-        }, MotionTokens.IsFrozen ? TimeSpan.FromMilliseconds(1) : MotionTokens.PressHold);
+        base.OnPointerReleased(e);
     }
 
     #endregion // Protected methods
@@ -156,7 +147,7 @@ public class GlassMenuHeader : MenuItem
 
 
 /// <summary>
-/// Menu motion (DS 5.2): open in 220 ms (fade, -6 px, scale 0.97 from the top-right), close in a 120 ms fade; and the placement that keeps the shadow room out of the layout.
+/// Menu motion (DS 5.2): open in 220 ms (fade, 6 px, scale 0.97 from the corner nearest the anchor), close in a 120 ms fade; and the placement that keeps the shadow room out of the layout.
 /// </summary>
 public static class MenuMotion
 {
@@ -177,6 +168,7 @@ public static class MenuMotion
     public static readonly Thickness GAP_BAND = new(0, GAP, 0, GAP);
 
     private static bool _registered;
+    private static PixelPoint? _lastPress;
 
     #endregion // Fields and constants
 
@@ -193,6 +185,7 @@ public static class MenuMotion
         _registered = true;
         Control.LoadedEvent.AddClassHandler<MenuFlyoutPresenter>((presenter, _) => PlayOpen(presenter));
         Control.LoadedEvent.AddClassHandler<ContextMenu>((menu, _) => PlayOpen(menu));
+        InputElement.PointerPressedEvent.AddClassHandler<TopLevel>((top, e) => _lastPress = top.PointToScreen(e.GetPosition(top)), RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
 
@@ -230,10 +223,28 @@ public static class MenuMotion
 
         Dispatcher.UIThread.Post(() =>
         {
+            var (origin, rise) = OpenFrom(host, surface);
             CompositionMotion.Fade(surface, 0, 1, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing);
-            CompositionMotion.Move(surface, new Vector(0, OPEN_RISE), default, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing);
-            CompositionMotion.Scale(surface, OPEN_SCALE, 1, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing, new RelativePoint(1, 0, RelativeUnit.Relative));
+            CompositionMotion.Move(surface, new Vector(0, rise), default, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing);
+            CompositionMotion.Scale(surface, OPEN_SCALE, 1, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing, origin);
         }, DispatcherPriority.Render);
+    }
+
+
+    // a menu grows out of the corner nearest its anchor: below its button from the top, above it (no room below) from the bottom; a context menu's anchor is the press
+    internal static (RelativePoint Origin, double Rise) OpenFrom(Control host, Control surface)
+    {
+        PixelPoint? anchor = host.Parent switch
+        {
+            Popup { Placement: PlacementMode.Pointer } => _lastPress,
+            Popup { PlacementTarget: Visual target } => target.PointToScreen(new Point(target.Bounds.Width / 2, target.Bounds.Height / 2)),
+            _ => null,
+        };
+        if (anchor is not { } at) return (new RelativePoint(1, 0, RelativeUnit.Relative), OPEN_RISE);
+
+        var middle = surface.PointToScreen(new Point(surface.Bounds.Width / 2, surface.Bounds.Height / 2));
+        var above = middle.Y < at.Y;
+        return (new RelativePoint(middle.X < at.X ? 1 : 0, above ? 1 : 0, RelativeUnit.Relative), above ? -OPEN_RISE : OPEN_RISE);
     }
 
 

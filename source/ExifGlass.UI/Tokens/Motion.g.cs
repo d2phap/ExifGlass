@@ -63,10 +63,6 @@ public static partial class MotionTokens
     public static readonly TimeSpan Select = TimeSpan.FromMilliseconds(160);
     public static readonly Easing SelectEasing = StandardEasing;
 
-    // Menu item: pressed shown before acting: 170 ms, Standard
-    public static readonly TimeSpan PressHold = TimeSpan.FromMilliseconds(170);
-    public static readonly Easing PressHoldEasing = StandardEasing;
-
     // Checkbox fill and border: 150 ms, Standard
     public static readonly TimeSpan CheckFill = TimeSpan.FromMilliseconds(150);
     public static readonly Easing CheckFillEasing = StandardEasing;

@@ -257,7 +257,6 @@ static class Generator
         ("Focus", 120, "Standard", "Focus ring"),
         ("Disabled", 160, "Standard", "Disabled fade"),
         ("Select", 160, "Standard", "Selected cell, chip on"),
-        ("PressHold", 170, "Standard", "Menu item: pressed shown before acting"),
         ("CheckFill", 150, "Standard", "Checkbox fill and border"),
         ("CheckGlyph", 260, "Spring", "Checkbox glyph scale"),
         ("SwitchKnob", 320, "Spring", "Switch knob travel"),

@@ -273,7 +273,7 @@ public class ControlTests
 
 
     [AvaloniaFact]
-    public void AMenuItemHoldsItsPressThenActsAndCloses()
+    public void AMenuItemActsOnReleaseAndCloses()
     {
         MotionTokens.IsFrozen = true;
         try
@@ -281,17 +281,57 @@ public class ControlTests
             var clicked = 0;
             var item = new GlassMenuItem { Header = "CSV" };
             item.Click += (_, _) => clicked++;
-            var menu = new ContextMenu { Items = { item } };
+            var toggle = new GlassMenuItem { Header = "Tag ID", ToggleType = MenuItemToggleType.CheckBox };
+            var menu = new ContextMenu { Items = { toggle, item } };
             var target = new Border { Width = 300, Height = 200, Background = Brushes.Transparent, ContextMenu = menu };
             var window = Show(target, 600, 400);
 
             menu.Open(target);
             Dispatcher.UIThread.RunJobs();
-            Click(window, item);
-            Wait(30);
+            Click(window, toggle);
+            Assert.True(toggle.IsChecked);
+            Assert.True(menu.IsOpen);
 
+            // no hold before the action, as a ComboBox row
+            Click(window, item);
             Assert.Equal(1, clicked);
+            Wait(30);
             Assert.False(menu.IsOpen);
+            window.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
+    [AvaloniaFact]
+    public void AMenuOpensFromTheCornerNearestItsButton()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var top = new GlassButton { Content = "Top", Margin = new Thickness(300, 20, 0, 0), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var bottom = new GlassButton { Content = "Bottom", Margin = new Thickness(300, 0, 0, 20), VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            var window = Show(new Panel { Children = { top, bottom } }, 600, 500);
+
+            foreach (var (button, above) in new[] { (top, false), (bottom, true) })
+            {
+                var flyout = new MenuFlyout();
+                for (var i = 0; i < 4; i++) flyout.Items.Add(new GlassMenuItem { Header = "Item", Description = "A line" });
+                MenuMotion.Attach(flyout);
+                flyout.ShowAt(button);
+                Wait(50);
+
+                var presenter = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(window).OfType<MenuFlyoutPresenter>().First();
+                var (origin, rise) = MenuMotion.OpenFrom(presenter, Find<SquircleBorder>(presenter, "PART_Surface"));
+                Assert.Equal(new RelativePoint(1, above ? 1 : 0, RelativeUnit.Relative), origin);
+                Assert.True(above ? rise > 0 : rise < 0, $"{button.Content}: rise {rise}");
+                flyout.Hide();
+                Wait(50);
+            }
+
             window.Close();
         }
         finally

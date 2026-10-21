@@ -73,6 +73,8 @@ public class SquircleBorder : Decorator
     private Size _drawnSize;
     private bool _resizing;
     private DispatcherTimer? _settle;
+    private SKImage? _ringImage;
+    private RingKey? _ringKey;
 
     #endregion // Fields and constants
 
@@ -112,6 +114,12 @@ public class SquircleBorder : Decorator
 
     // S1: Border's styles and setters apply, so template parts are styled as Border#Name (never c|SquircleBorder)
     protected override Type StyleKeyOverride => GetType() == typeof(SquircleBorder) ? typeof(Border) : base.StyleKeyOverride;
+
+
+    /// <summary>
+    /// Gets the largest scale the render thread draws this box at, for a box that is always scaled; above 0 a plain ring is drawn from an image of its exact squircle made at that scale.
+    /// </summary>
+    protected virtual double RasterScale => 0;
 
 
     private bool IsRounded => CornerRadius != default;
@@ -163,6 +171,12 @@ public class SquircleBorder : Decorator
         var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
         TrackResize(size);
 
+        if (RasterScale > 0 && Background is null && BoxShadow.Count == 0 && BorderBrush is { } ringBrush && Paint(ringBrush, shapes.Box) is (var ringColor, null))
+        {
+            RenderRingImage(context, shapes, scale, ringColor);
+            return;
+        }
+
         if (BoxShadow.Count == 0)
         {
             RenderMerged(context, shapes, scale);
@@ -207,6 +221,8 @@ public class SquircleBorder : Decorator
         _settle?.Stop();
         _resizing = false;
         _drawnSize = default;
+        _ringImage = null;
+        _ringKey = null;
     }
 
     #endregion // Protected methods
@@ -278,6 +294,35 @@ public class SquircleBorder : Decorator
             _ => [],
         };
         context.Custom(new SkiaDraw(paints, scale, filled ? shapes.OuterHit : shapes.RingHit, shapes.Box, _resizing));
+    }
+
+
+    // made once per size and colour, then scaled like any image: no frame masks the path again or falls back to its holding round rects
+    private void RenderRingImage(DrawingContext context, Shapes shapes, double scale, SKColor color)
+    {
+        var key = new RingKey(shapes, scale * RasterScale, color);
+        if (_ringImage is null || _ringKey != key)
+        {
+            _ringKey = key;
+            _ringImage = RingImage(shapes, key.Scale, color);
+        }
+
+        var destination = new SKRect(0, 0, (float)(_ringImage.Width / key.Scale), (float)(_ringImage.Height / key.Scale));
+        context.Custom(new SkiaDraw([new SkiaPaint(null, _ringImage, destination, SKColors.White, 1, shapes.Box)], scale, shapes.RingHit, shapes.Box));
+    }
+
+
+    private static SKImage RingImage(Shapes shapes, double scale, SKColor color)
+    {
+        var pixels = new SKImageInfo(Math.Max(1, (int)Math.Ceiling(shapes.Box.Width * scale)), Math.Max(1, (int)Math.Ceiling(shapes.Box.Height * scale)), SKColorType.Bgra8888, SKAlphaType.Premul);
+        using var surface = SKSurface.Create(pixels);
+        surface.Canvas.Clear(SKColors.Transparent);
+        surface.Canvas.Scale((float)scale);
+
+        using var ring = Band.Path(shapes.Box, shapes.Radii, shapes.Shape, shapes.Inner, shapes.InnerRadii);
+        using var paint = new SKPaint { IsAntialias = true, Color = color };
+        surface.Canvas.DrawPath(ring, paint);
+        return surface.Snapshot();
     }
 
 
@@ -512,6 +557,9 @@ public class SquircleBorder : Decorator
             return true;
         }
     }
+
+
+    private sealed record RingKey(Shapes Shapes, double Scale, SKColor Color);
 
 
     private sealed record Shapes(Size Size, Thickness Thickness, CornerRadius Radius, CornerShape Shape, Rect Box, CornerRadii Radii, Rect Inner, CornerRadii InnerRadii, StreamGeometry Outer, StreamGeometry? Ring)

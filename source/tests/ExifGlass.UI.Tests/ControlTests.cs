@@ -22,6 +22,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Motion;
@@ -94,6 +95,36 @@ public class ControlTests
 
         Assert.Equal(GroupPalette.RingIndex("Kodak"), GroupPalette.RingIndex("KODAK"));
         Assert.Equal(GroupPalette.Get("exif", true), GroupPalette.Get("EXIF", true));
+    }
+
+
+    [AvaloniaFact]
+    public void AnAlwaysScaledRingKeepsItsExactSquircle()
+    {
+        // a 96 px ring scaled 1.25, drawn as a plain border and from its image, against a 120 px ring at rest
+        static SquircleBorder Ring(SquircleBorder ring, double size, double left, bool scaled)
+        {
+            ring.Width = ring.Height = size;
+            ring.CornerRadius = new CornerRadius(size / 3);
+            ring.BorderThickness = new Thickness(size / 24);
+            ring.BorderBrush = Brushes.Black;
+            if (scaled) ring.RenderTransform = new ScaleTransform(1.25, 1.25);
+            ring.RenderTransformOrigin = RelativePoint.TopLeft;
+            Canvas.SetLeft(ring, left);
+            Canvas.SetTop(ring, 10);
+            return ring;
+        }
+
+        var canvas = new Canvas { Background = Brushes.White };
+        canvas.Children.Add(Ring(new RasteredRing(), 96, 10, scaled: true));
+        canvas.Children.Add(Ring(new SquircleBorder(), 96, 150, scaled: true));
+        canvas.Children.Add(Ring(new SquircleBorder(), 120, 290, scaled: false));
+        var frame = Render.CaptureSettled(canvas, 420, 140, ThemeVariant.Light, settleMs: 150);
+
+        // the top-left corner, where a squircle and the round rect that holds it part
+        var exact = Render.Crop(frame, new Rect(290, 10, 40, 40));
+        Assert.True(Differing(Render.Crop(frame, new Rect(10, 10, 40, 40)), exact) <= 2);
+        Assert.True(Differing(Render.Crop(frame, new Rect(150, 10, 40, 40)), exact) > 20);
     }
 
     #endregion // Motion and shape
@@ -558,5 +589,36 @@ public class ControlTests
         return (Math.Max(la, lb) + 0.05) / (Math.Min(la, lb) + 0.05);
     }
 
+
+    // pixels apart by more than anti-aliasing: a different outline, not a softer edge
+    private static unsafe int Differing(Avalonia.Media.Imaging.WriteableBitmap a, Avalonia.Media.Imaging.WriteableBitmap b)
+    {
+        using var x = a.Lock();
+        using var y = b.Lock();
+        var count = 0;
+        for (var row = 0; row < Math.Min(a.PixelSize.Height, b.PixelSize.Height); row++)
+        {
+            var p = (byte*)x.Address + row * x.RowBytes;
+            var q = (byte*)y.Address + row * y.RowBytes;
+            for (var i = 0; i < Math.Min(a.PixelSize.Width, b.PixelSize.Width) * 4; i += 4)
+            {
+                if (Math.Abs(p[i] - q[i]) > 64 || Math.Abs(p[i + 1] - q[i + 1]) > 64 || Math.Abs(p[i + 2] - q[i + 2]) > 64) count++;
+            }
+        }
+
+        return count;
+    }
+
     #endregion // Private methods
+
+
+    #region Nested types
+
+    // a box always drawn scaled, as PulseRing is, without its pulse
+    private sealed class RasteredRing : SquircleBorder
+    {
+        protected override double RasterScale => 1.5;
+    }
+
+    #endregion // Nested types
 }

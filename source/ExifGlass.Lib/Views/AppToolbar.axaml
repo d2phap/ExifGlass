@@ -9,8 +9,10 @@
              Height="{StaticResource AppToolbarHeight}"
              Background="Transparent">
 
-  <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; the search grows to 520, centred on the window (owner at G4 review)  -->
-  <v:ToolbarRow Margin="8,0" Spacing="4">
+  <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; the search grows to 520, centred on the window, and fills its gap once the toolbar is icon-only (owner at G4 review)  -->
+  <v:ToolbarRow Margin="8,0"
+                FillsGap="{Binding SearchFillsGap}"
+                Spacing="4">
     <ui:GlassToggleButton Name="RailToggle"
                           AutomationProperties.Name="{Binding RailTooltip}"
                           CheckedIcon="{x:Static ui:IconId.PanelLeftFilled}"

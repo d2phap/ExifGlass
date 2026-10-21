@@ -155,7 +155,7 @@ public sealed partial class MainViewModel : ObservableObject
     public partial PanelMode InspectorMode { get; private set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowSecondaryButtons), nameof(OpenLabel), nameof(ShowSearchHint))]
+    [NotifyPropertyChangedFor(nameof(ShowSecondaryButtons), nameof(OpenLabel), nameof(ShowSearchHint), nameof(SearchFillsGap))]
     public partial ToolbarMode Toolbar { get; private set; }
 
     /// <summary>
@@ -231,6 +231,8 @@ public sealed partial class MainViewModel : ObservableObject
     public string? OpenLabel => Toolbar == ToolbarMode.IconOnly ? null : AppText.OPEN;
 
     public bool ShowSearchHint => Toolbar != ToolbarMode.IconOnly;
+
+    public bool SearchFillsGap => Toolbar == ToolbarMode.IconOnly;
 
     #endregion // Properties
 

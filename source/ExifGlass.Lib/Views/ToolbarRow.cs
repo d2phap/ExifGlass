@@ -22,7 +22,7 @@ using Avalonia.Controls;
 namespace ExifGlass.Views;
 
 /// <summary>
-/// The app toolbar's row: the first child at the left, the second at the right, and the third centred on the row (owner at G4 review), narrowed so it keeps Spacing from both.
+/// The app toolbar's row: the first child at the left, the second at the right, and the third centred on the row, narrowed so it keeps Spacing from both, or filling the gap with FillsGap (owner at G4 review).
 /// </summary>
 public class ToolbarRow : Panel
 {
@@ -30,6 +30,9 @@ public class ToolbarRow : Panel
 
     public static readonly StyledProperty<double> SpacingProperty =
         AvaloniaProperty.Register<ToolbarRow, double>(nameof(Spacing));
+
+    public static readonly StyledProperty<bool> FillsGapProperty =
+        AvaloniaProperty.Register<ToolbarRow, bool>(nameof(FillsGap));
 
     #endregion // Fields and constants
 
@@ -42,6 +45,15 @@ public class ToolbarRow : Panel
         set => SetValue(SpacingProperty, value);
     }
 
+    /// <summary>
+    /// Gets or sets whether the third child fills the space between the others instead of staying centred.
+    /// </summary>
+    public bool FillsGap
+    {
+        get => GetValue(FillsGapProperty);
+        set => SetValue(FillsGapProperty, value);
+    }
+
     #endregion // Properties
 
 
@@ -49,7 +61,7 @@ public class ToolbarRow : Panel
 
     static ToolbarRow()
     {
-        AffectsMeasure<ToolbarRow>(SpacingProperty);
+        AffectsMeasure<ToolbarRow>(SpacingProperty, FillsGapProperty);
     }
 
     #endregion // Constructors
@@ -101,7 +113,8 @@ public class ToolbarRow : Panel
         var from = leftWidth + Spacing;
         var to = width - rightWidth - Spacing;
         var middle = width / 2;
-        var centreWidth = Math.Clamp(2 * Math.Min(middle - from, to - middle), centre.MinWidth, Math.Max(centre.MinWidth, centre.MaxWidth));
+        var fit = FillsGap ? to - from : 2 * Math.Min(middle - from, to - middle);
+        var centreWidth = Math.Clamp(fit, centre.MinWidth, Math.Max(centre.MinWidth, centre.MaxWidth));
         var x = Math.Max(from, Math.Min(middle - centreWidth / 2, to - centreWidth));
 
         return (new Rect(0, 0, leftWidth, height), new Rect(width - rightWidth, 0, rightWidth, height), new Rect(x, 0, centreWidth, height));

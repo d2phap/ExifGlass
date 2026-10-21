@@ -270,7 +270,7 @@ public class MainWindowTests
     [AvaloniaTheory]
     [InlineData(1400)]
     [InlineData(1000)]
-    [InlineData(480)]
+    [InlineData(760)]
     public void TheSearchBoxIsCentredOnTheWindow(double width)
     {
         using var shell = TestShell.Open(width);
@@ -293,22 +293,39 @@ public class MainWindowTests
         Assert.Equal($"Open file ({primary}O)", ToolTip.GetTip(w.Toolbar.OpenButton));
         Assert.Equal($"Open file ({primary}O)", ToolTip.GetTip(w.Table.EmptyCard.OpenButton));
         Assert.Equal($"Settings ({primary},)", ToolTip.GetTip(w.Toolbar.SettingsButton));
-        Assert.Equal("About ExifGlass (F1)", ToolTip.GetTip(w.Toolbar.AboutButton));
+        Assert.Equal("About (F1)", ToolTip.GetTip(w.Toolbar.AboutButton));
         Assert.DoesNotContain("—", shell.ViewModel.ThemeTooltip, StringComparison.Ordinal);
     }
 
 
     [AvaloniaFact]
-    public void AtTheMinimumWidthTheSearchBoxKeepsClearOfTheButtons()
+    public void F1OpensTheAboutWindowTitledAbout()
     {
-        using var shell = TestShell.Open(320);
+        using var shell = TestShell.Open(1400);
+
+        shell.Window.KeyPress(Key.F1, RawInputModifiers.None, PhysicalKey.F1, null);
+        shell.Settle();
+
+        var about = Assert.Single(shell.Window.OwnedWindows.OfType<AboutWindow>());
+        Assert.Equal("About", about.Title);
+        about.Close();
+    }
+
+
+    [AvaloniaTheory]
+    [InlineData(580)]
+    [InlineData(480)]
+    [InlineData(320)]
+    public void InTheIconOnlyBandTheSearchBoxFillsItsGap(double width)
+    {
+        using var shell = TestShell.Open(width);
         var w = shell.Window;
         var search = w.Toolbar.Search;
         var left = search.TranslatePoint(default, w)!.Value.X;
 
-        Assert.Equal(120, search.Bounds.Width);
-        Assert.True(left >= w.Toolbar.RailToggle.TranslatePoint(new Point(w.Toolbar.RailToggle.Bounds.Width, 0), w)!.Value.X + 4);
-        Assert.True(left + 120 + 4 <= w.Toolbar.OpenButton.TranslatePoint(default, w)!.Value.X);
+        Assert.Null(w.Toolbar.OpenButton.Content);
+        Assert.Equal(w.Toolbar.RailToggle.TranslatePoint(new Point(w.Toolbar.RailToggle.Bounds.Width, 0), w)!.Value.X + 4, left, 0.5);
+        Assert.Equal(w.Toolbar.OpenButton.TranslatePoint(default, w)!.Value.X - 4, left + search.Bounds.Width, 0.5);
     }
 
 

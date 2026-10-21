@@ -478,6 +478,10 @@ public class PulseRing : SquircleBorder
         set => SetValue(IsPulsingProperty, value);
     }
 
+
+    // always scaled, so drawn from an image of its exact ring; the holding round rects would show at every frame
+    protected override double RasterScale => END_SCALE;
+
     #endregion // Properties
 
 

@@ -34,7 +34,7 @@ public static class AppText
     public const string OPEN_FILE = "Open file…";
     public const string OPEN_SETTINGS = "Open settings";
     public const string RETRY = "Retry";
-    public const string ABOUT = "About ExifGlass";
+    public const string ABOUT = "About";
     public const string SETTINGS = "Settings";
     public const string SEARCH = "Search tags";
 

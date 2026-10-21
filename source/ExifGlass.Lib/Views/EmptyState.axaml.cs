@@ -16,14 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Media;
-using ExifGlass.UI;
-using ExifGlass.UI.Controls;
-using ExifGlass.UI.Motion;
-using ExifGlass.UI.Tokens;
 using ExifGlass.ViewModels;
 using System.ComponentModel;
 
@@ -36,30 +29,9 @@ public partial class EmptyState : UserControl
 {
     #region Fields and constants
 
-    private const double DROP_SCALE = 1.04;
-
-    public static readonly StyledProperty<bool> IsDragOverProperty =
-        AvaloniaProperty.Register<EmptyState, bool>(nameof(IsDragOver));
-
-    private static readonly AvaloniaList<double> DASHES = [4, 3];
-
     private MainViewModel? _viewModel;
 
     #endregion // Fields and constants
-
-
-    #region Properties
-
-    /// <summary>
-    /// Gets or sets whether a file is over the window: the content grows inside an accent dashed border, and the logo's ring pulses.
-    /// </summary>
-    public bool IsDragOver
-    {
-        get => GetValue(IsDragOverProperty);
-        set => SetValue(IsDragOverProperty, value);
-    }
-
-    #endregion // Properties
 
 
     #region Constructors
@@ -67,7 +39,6 @@ public partial class EmptyState : UserControl
     public EmptyState()
     {
         InitializeComponent();
-        OpenHint.Text = UiText.Shortcut("O");
     }
 
     #endregion // Constructors
@@ -86,22 +57,6 @@ public partial class EmptyState : UserControl
         UpdateText();
     }
 
-
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        base.OnPropertyChanged(change);
-
-        if (change.Property != IsDragOverProperty) return;
-
-        var over = IsDragOver;
-        UpdateText();
-        Ring.IsPulsing = over;
-        if (over) Card[!SquircleBorder.BorderBrushProperty] = this.GetResourceObservable(TokenKeys.ACCENT_BRUSH).ToBinding();
-        else Card.BorderBrush = Brushes.Transparent;
-        SquircleBorder.SetBorderDashArray(Card, over ? DASHES : null);
-        CompositionMotion.Scale(Card, over ? 1 : DROP_SCALE, over ? DROP_SCALE : 1, MotionTokens.DropScale, MotionTokens.DropScaleEasing);
-    }
-
     #endregion // Protected methods
 
 
@@ -116,7 +71,7 @@ public partial class EmptyState : UserControl
             return;
         }
 
-        TitleText.Text = IsDragOver ? AppText.RELEASE_TO_INSPECT : AppText.EMPTY_TITLE;
+        TitleText.Text = AppText.EMPTY_TITLE;
         CaptionText.Text = AppText.EMPTY_CAPTION;
     }
 

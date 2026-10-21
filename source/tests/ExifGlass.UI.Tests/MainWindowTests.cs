@@ -22,7 +22,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -244,7 +243,7 @@ public class MainWindowTests
     {
         using var shell = TestShell.Open(1400);
         var vm = shell.ViewModel;
-        Assert.Equal(AppText.SEARCH_NO_FILE, vm.SearchPlaceholder);
+        Assert.Equal("Search", shell.Window.Toolbar.Search.PlaceholderText);
         Assert.False(shell.Window.Toolbar.Search.IsEffectivelyEnabled);
         Assert.True(shell.Window.Table.EmptyCard.IsVisible);
 
@@ -260,11 +259,56 @@ public class MainWindowTests
         await shell.WaitForAsync(() => vm.HasDocument);
 
         Assert.Equal("DSCF4127.JPG – ExifGlass", shell.Window.Title);
-        Assert.Equal("Search 128 tags", vm.SearchPlaceholder);
+        Assert.Equal("Search", shell.Window.Toolbar.Search.PlaceholderText);
         Assert.Equal("128 tags", vm.Summary);
         Assert.Equal("in 7 groups", vm.SummaryDetail);
         Assert.False(shell.Window.Table.LoadLine.IsVisible);
         Assert.True(shell.Window.Toolbar.Search.IsEffectivelyEnabled);
+    }
+
+
+    [AvaloniaTheory]
+    [InlineData(1400)]
+    [InlineData(1000)]
+    [InlineData(480)]
+    public void TheSearchBoxIsCentredOnTheWindow(double width)
+    {
+        using var shell = TestShell.Open(width);
+        var search = shell.Window.Toolbar.Search;
+        var left = search.TranslatePoint(default, shell.Window)!.Value.X;
+
+        Assert.Equal(width / 2, left + search.Bounds.Width / 2, 0.5);
+        Assert.InRange(search.Bounds.Width, 120, 520);
+        Assert.True(left + search.Bounds.Width + 4 <= shell.Window.Toolbar.OpenButton.TranslatePoint(default, shell.Window)!.Value.X);
+    }
+
+
+    [AvaloniaFact]
+    public void ButtonsWithAShortcutNameItInTheirTooltip()
+    {
+        using var shell = TestShell.Open(1400);
+        var w = shell.Window;
+        var primary = OperatingSystem.IsMacOS() ? "⌘" : "Ctrl+";
+
+        Assert.Equal($"Open file ({primary}O)", ToolTip.GetTip(w.Toolbar.OpenButton));
+        Assert.Equal($"Open file ({primary}O)", ToolTip.GetTip(w.Table.EmptyCard.OpenButton));
+        Assert.Equal($"Settings ({primary},)", ToolTip.GetTip(w.Toolbar.SettingsButton));
+        Assert.Equal("About ExifGlass (F1)", ToolTip.GetTip(w.Toolbar.AboutButton));
+        Assert.DoesNotContain("—", shell.ViewModel.ThemeTooltip, StringComparison.Ordinal);
+    }
+
+
+    [AvaloniaFact]
+    public void AtTheMinimumWidthTheSearchBoxKeepsClearOfTheButtons()
+    {
+        using var shell = TestShell.Open(320);
+        var w = shell.Window;
+        var search = w.Toolbar.Search;
+        var left = search.TranslatePoint(default, w)!.Value.X;
+
+        Assert.Equal(120, search.Bounds.Width);
+        Assert.True(left >= w.Toolbar.RailToggle.TranslatePoint(new Point(w.Toolbar.RailToggle.Bounds.Width, 0), w)!.Value.X + 4);
+        Assert.True(left + 120 + 4 <= w.Toolbar.OpenButton.TranslatePoint(default, w)!.Value.X);
     }
 
 
@@ -309,7 +353,7 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public async Task ADraggedFileLightsTheEmptyCardOrTheScrim()
+    public async Task ADraggedFileShowsTheScrimWithOrWithoutAFile()
     {
         using var shell = TestShell.Open(1400);
         var path = Path.Combine(shell.Folder, "drop.jpg");
@@ -325,17 +369,14 @@ public class MainWindowTests
 
         shell.Window.DragDrop(centre, RawDragEventType.DragEnter, data, DragDropEffects.Copy, RawInputModifiers.None);
         shell.Settle();
-        Assert.True(shell.Window.Table.EmptyCard.IsDragOver);
-        Assert.False(shell.Window.Scrim.IsVisible);
+        Assert.True(shell.Window.Scrim.IsVisible);
 
         shell.Window.DragDrop(centre, RawDragEventType.Drop, data, DragDropEffects.Copy, RawInputModifiers.None);
         await shell.WaitForAsync(() => shell.ViewModel.HasDocument);
-        Assert.False(shell.Window.Table.EmptyCard.IsDragOver);
-        shell.Settle(300);
-        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(shell.Window.Table.EmptyCard.Card.BorderBrush).Color);
+        shell.Settle(400);
+        Assert.False(shell.Window.Scrim.IsVisible);
         Assert.Equal("drop.jpg", shell.ViewModel.Document?.FileName);
 
-        // with a file open the whole window takes a scrim
         shell.Window.DragDrop(centre, RawDragEventType.DragEnter, data, DragDropEffects.Copy, RawInputModifiers.None);
         shell.Settle();
         Assert.True(shell.Window.Scrim.IsVisible);
@@ -400,7 +441,7 @@ public class MainWindowTests
             shell.ViewModel.CycleThemeCommand.Execute(null);
             Assert.Equal(ThemeVariant.Light, app.RequestedThemeVariant);
             Assert.Equal(IconId.WeatherSunny, shell.ViewModel.ThemeIcon);
-            Assert.Equal("Theme: Light — click for Dark", shell.ViewModel.ThemeTooltip);
+            Assert.Equal("Theme: Light (click for Dark)", shell.ViewModel.ThemeTooltip);
 
             shell.ViewModel.CycleThemeCommand.Execute(null);
             Assert.Equal(ThemeVariant.Dark, app.RequestedThemeVariant);

@@ -21,6 +21,8 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ExifGlass.Services;
+using ExifGlass.UI.Motion;
+using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.Windows;
 
@@ -32,6 +34,7 @@ public partial class MainWindow
     private static readonly TimeSpan DragLeaveGrace = TimeSpan.FromMilliseconds(60);
 
     private bool _dragOver;
+    private bool _emptyFaded;
     private int _dragGeneration;
 
     #endregion // Fields and constants
@@ -67,10 +70,14 @@ public partial class MainWindow
         if (_dragOver == over) return;
 
         _dragOver = over;
-        if (over && ViewModel.HasDocument) Scrim.Show();
+        if (over) Scrim.Show();
         else Scrim.Hide();
 
-        Table.EmptyCard.IsDragOver = over && !ViewModel.HasDocument;
+        // the scrim's message sits where the empty content is, so the content fades out with it rather than show through
+        if (over == _emptyFaded || (over && !ViewModel.ShowEmptyCard)) return;
+
+        _emptyFaded = over;
+        CompositionMotion.Fade(Table.EmptyCard, over ? 1 : 0, over ? 0 : 1, MotionTokens.Scrim, MotionTokens.ScrimEasing);
     }
 
 

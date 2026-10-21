@@ -38,7 +38,7 @@ public static class AppText
     public const string SETTINGS = "Settings";
     public const string SEARCH = "Search tags";
 
-    public const string SEARCH_NO_FILE = "Open a file to search";
+    public const string SEARCH_PLACEHOLDER = "Search";
     public const string SUMMARY_NO_FILE = "No file";
     public const string SUMMARY_READING = "Reading metadata…";
 
@@ -51,9 +51,8 @@ public static class AppText
     public const string COPY_COMMAND = "Copy command";
 
     public const string EMPTY_TITLE = "Drop a file here to view its metadata";
-    public const string EMPTY_CAPTION = "Or click the button below.\nAny file type works.";
+    public const string EMPTY_CAPTION = "Or click the button below";
     public const string RELEASE_TO_INSPECT = "Release to inspect";
-    public const string SHORTCUT_HINT = "or press";
     public const string EXIFTOOL_MISSING_TITLE = "ExifTool isn't available";
     public const string EXIFTOOL_MISSING_CAPTION = "ExifGlass reads metadata with ExifTool. Choose its path in Settings, or retry.";
 
@@ -81,8 +80,6 @@ public static class AppText
     /// </summary>
     public static string WindowTitle(string? fileName) => string.IsNullOrEmpty(fileName) ? AppInfo.PRODUCT_NAME : $"{fileName} – {AppInfo.PRODUCT_NAME}";
 
-    public static string SearchTags(int count) => string.Create(CultureInfo.InvariantCulture, $"Search {count:N0} tags");
-
     public static string InGroups(int count) => count == 1 ? "in 1 group" : string.Create(CultureInfo.InvariantCulture, $"in {count:N0} groups");
 
     public static string OpenedOneOf(int total) => string.Create(CultureInfo.InvariantCulture, $"Opened 1 of {total:N0} files");
@@ -90,6 +87,8 @@ public static class AppText
     public static string OpenTooltip => $"Open file ({UiText.Shortcut("O")})";
 
     public static string SettingsTooltip => $"{SETTINGS} ({UiText.Shortcut(",")})";
+
+    public static string AboutTooltip => $"{ABOUT} (F1)";
 
     public static string ThemeName(AppTheme theme) => theme switch
     {
@@ -100,9 +99,9 @@ public static class AppText
 
 
     /// <summary>
-    /// DS 1.3: "Theme: System — click for Light".
+    /// DS 1.3 without its em dash (owner at G4 review): "Theme: System (click for Light)".
     /// </summary>
-    public static string ThemeTooltip(AppTheme current, AppTheme next) => $"Theme: {ThemeName(current)} — click for {ThemeName(next)}";
+    public static string ThemeTooltip(AppTheme current, AppTheme next) => $"Theme: {ThemeName(current)} (click for {ThemeName(next)})";
 
     #endregion // Public methods
 }

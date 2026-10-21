@@ -6,7 +6,7 @@
              IsHitTestVisible="False"
              IsVisible="False">
 
-  <!--  DS 5.2 / Spec 2: with a file open, a scrim over the whole window, the logo in a pulsing ring and "Release to inspect"  -->
+  <!--  DS 5.2 / Spec 2: a scrim over the whole window, the logo in a pulsing ring and "Release to inspect"; the empty window takes it too (owner at G4 review)  -->
   <Panel Background="{DynamicResource BgDragScrimBrush}">
     <StackPanel Name="Message"
                 HorizontalAlignment="Center"

@@ -25,7 +25,7 @@ using ExifGlass.UI.Tokens;
 namespace ExifGlass.Views;
 
 /// <summary>
-/// The drag-over scrim shown while a file is over a window that already has one open.
+/// The drag-over scrim shown while a file is over the window.
 /// </summary>
 public partial class DropScrim : UserControl
 {

@@ -165,7 +165,7 @@ public class ArgumentPolicyTests
     [Fact]
     public void DescribesFlags()
     {
-        Assert.Equal("Skip scanning for trailers — faster reads", ArgumentPolicy.Describe("-fast"));
+        Assert.Equal("Skip scanning for trailers, for faster reads", ArgumentPolicy.Describe("-fast"));
         Assert.Equal("Raw numerical values, no print conversion", ArgumentPolicy.Describe("-n"));
         Assert.Equal(string.Empty, ArgumentPolicy.Describe("-zzz"));
     }

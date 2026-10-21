@@ -218,8 +218,4 @@ public static partial class MotionTokens
     // Empty-card logo: 4 px up and back, looped: 4000 ms, EaseInOut
     public static readonly TimeSpan LogoFloat = TimeSpan.FromMilliseconds(4000);
     public static readonly Easing LogoFloatEasing = EaseInOutEasing;
-
-    // Empty card grows to 1.04 while a file is over it: 380 ms, Spring
-    public static readonly TimeSpan DropScale = TimeSpan.FromMilliseconds(380);
-    public static readonly Easing DropScaleEasing = SpringEasing;
 }

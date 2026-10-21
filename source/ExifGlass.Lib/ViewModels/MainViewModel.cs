@@ -112,7 +112,7 @@ public sealed partial class MainViewModel : ObservableObject
     public partial LoadPhase Phase { get; private set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasDocument), nameof(WindowTitle), nameof(SearchPlaceholder), nameof(ShowEmptyCard), nameof(Summary), nameof(SummaryDetail), nameof(ShowSummaryDetail))]
+    [NotifyPropertyChangedFor(nameof(HasDocument), nameof(WindowTitle), nameof(ShowEmptyCard), nameof(Summary), nameof(SummaryDetail), nameof(ShowSummaryDetail))]
     [NotifyPropertyChangedFor(nameof(IsRailDocked), nameof(IsRailShown), nameof(RailTooltip), nameof(IsInspectorDocked), nameof(IsInspectorShown), nameof(InspectorTooltip))]
     [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand))]
     public partial MetadataDocument? Document { get; private set; }
@@ -121,7 +121,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// The query's result for the table: group headers and rows (S2's flat model).
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Summary), nameof(SearchPlaceholder))]
+    [NotifyPropertyChangedFor(nameof(Summary))]
     public partial ViewResult Rows { get; private set; } = ViewResult.Empty;
 
     [ObservableProperty]
@@ -192,9 +192,6 @@ public sealed partial class MainViewModel : ObservableObject
     public bool HasCommand => CommandTokens.Count > 0;
 
     public string WindowTitle => AppText.WindowTitle(Document?.FileName);
-
-    // the view's total: the CopyN duplicates stay out unless -a is on, as in the summary
-    public string SearchPlaceholder => Document is null ? AppText.SEARCH_NO_FILE : AppText.SearchTags(Rows.Total);
 
     public string Summary => Document is null ? (IsLoading ? AppText.SUMMARY_READING : AppText.SUMMARY_NO_FILE) : Rows.Summary;
 

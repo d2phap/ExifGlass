@@ -5,95 +5,68 @@
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.EmptyState"
              x:DataType="vm:MainViewModel"
-             MaxWidth="380"
-             ClipToBounds="False">
+             MaxWidth="380">
 
-  <!--  DS 6.9 / Spec 2 empty state, logo 60, title 17 Medium; part of the table's surface, no fill, border or shadow (owner at G4 review); a file dragged over draws its border  -->
-  <ui:SquircleBorder Name="Card"
-                     Padding="24,26,24,20"
-                     BorderBrush="Transparent"
-                     BorderThickness="1.5"
-                     CornerRadius="{StaticResource RadiusPanel}">
-    <ui:SquircleBorder.Transitions>
-      <Transitions>
-        <BrushTransition Property="BorderBrush" Duration="0:0:0.2" />
-      </Transitions>
-    </ui:SquircleBorder.Transitions>
+  <!--  DS 6.9 / Spec 2 empty state, logo 60, title 17 Medium; part of the table's surface, and a file dragged over gets the window's drop scrim (owner at G4 review)  -->
+  <StackPanel Margin="24,26,24,20" Spacing="14">
+    <Panel Width="60"
+           Height="60"
+           HorizontalAlignment="Center">
+      <ui:FloatingPanel IsFloating="{Binding ShowEmptyCard}" IsVisible="{Binding !HasExifToolProblem}">
+        <ui:ScaledImage Width="60"
+                        Height="60"
+                        Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
+      </ui:FloatingPanel>
+      <ui:SquircleBorder Background="{DynamicResource DangerA08Brush}"
+                         CornerRadius="20"
+                         IsVisible="{Binding HasExifToolProblem}">
+        <ui:GlassIcon Width="28"
+                      Height="28"
+                      Foreground="{DynamicResource DangerTextBrush}"
+                      Icon="{x:Static ui:IconId.ErrorCircle}" />
+      </ui:SquircleBorder>
+    </Panel>
 
-    <StackPanel Spacing="14">
-      <Panel Width="60"
-             Height="60"
-             HorizontalAlignment="Center">
-        <ui:PulseRing Name="Ring"
-                      BorderBrush="{DynamicResource AccentBrush}"
-                      BorderThickness="1.5"
-                      CornerRadius="20"
-                      Opacity="0" />
-        <ui:FloatingPanel IsFloating="{Binding ShowEmptyCard}" IsVisible="{Binding !HasExifToolProblem}">
-          <ui:ScaledImage Width="60"
-                          Height="60"
-                          Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
-        </ui:FloatingPanel>
-        <ui:SquircleBorder Background="{DynamicResource DangerA08Brush}"
-                           CornerRadius="20"
-                           IsVisible="{Binding HasExifToolProblem}">
-          <ui:GlassIcon Width="28"
-                        Height="28"
-                        Foreground="{DynamicResource DangerTextBrush}"
-                        Icon="{x:Static ui:IconId.ErrorCircle}" />
-        </ui:SquircleBorder>
-      </Panel>
-
-      <!--  the title keeps to one line and the caption breaks in its text; only the ExifTool problem wraps at these widths  -->
-      <StackPanel Spacing="4">
-        <TextBlock Name="TitleText"
-                   MaxWidth="320"
-                   Classes="empty-title"
-                   Text="{x:Static app:AppText.EMPTY_TITLE}"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap" />
-        <TextBlock Name="CaptionText"
-                   MaxWidth="250"
-                   Classes="body"
-                   Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.EMPTY_CAPTION}"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap" />
-      </StackPanel>
-
-      <WrapPanel HorizontalAlignment="Center"
-                 ItemSpacing="8"
-                 LineSpacing="8">
-        <ui:GlassButton Name="OpenButton"
-                        Classes="primary"
-                        Command="{Binding OpenCommand}"
-                        Content="{x:Static app:AppText.OPEN_FILE}"
-                        Icon="{x:Static ui:IconId.FolderOpen}"
-                        IsVisible="{Binding !HasExifToolProblem}" />
-        <ui:GlassButton Name="SettingsButton"
-                        Classes="primary"
-                        Command="{Binding OpenSettingsCommand}"
-                        Content="{x:Static app:AppText.OPEN_SETTINGS}"
-                        Icon="{x:Static ui:IconId.Settings}"
-                        IsVisible="{Binding HasExifToolProblem}" />
-        <ui:GlassButton Name="RetryButton"
-                        Command="{Binding RetryExifToolCommand}"
-                        Content="{x:Static app:AppText.RETRY}"
-                        Icon="{x:Static ui:IconId.ArrowSync}"
-                        IsVisible="{Binding HasExifToolProblem}" />
-      </WrapPanel>
-
-      <StackPanel HorizontalAlignment="Center"
-                  IsVisible="{Binding !HasExifToolProblem}"
-                  Orientation="Horizontal"
-                  Spacing="6">
-        <TextBlock Classes="meta"
-                   VerticalAlignment="Center"
-                   Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.SHORTCUT_HINT}" />
-        <ui:Kbd Name="OpenHint" VerticalAlignment="Center" />
-      </StackPanel>
+    <!--  the title keeps to one line; only the ExifTool problem wraps at these widths  -->
+    <StackPanel Spacing="4">
+      <TextBlock Name="TitleText"
+                 MaxWidth="320"
+                 Classes="empty-title"
+                 Text="{x:Static app:AppText.EMPTY_TITLE}"
+                 TextAlignment="Center"
+                 TextWrapping="Wrap" />
+      <TextBlock Name="CaptionText"
+                 MaxWidth="250"
+                 Classes="body"
+                 Foreground="{DynamicResource TextSecondaryBrush}"
+                 Text="{x:Static app:AppText.EMPTY_CAPTION}"
+                 TextAlignment="Center"
+                 TextWrapping="Wrap" />
     </StackPanel>
-  </ui:SquircleBorder>
+
+    <WrapPanel HorizontalAlignment="Center"
+               ItemSpacing="8"
+               LineSpacing="8">
+      <ui:GlassButton Name="OpenButton"
+                      Classes="primary"
+                      Command="{Binding OpenCommand}"
+                      Content="{x:Static app:AppText.OPEN_FILE}"
+                      Icon="{x:Static ui:IconId.FolderOpen}"
+                      IsVisible="{Binding !HasExifToolProblem}"
+                      ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
+      <ui:GlassButton Name="SettingsButton"
+                      Classes="primary"
+                      Command="{Binding OpenSettingsCommand}"
+                      Content="{x:Static app:AppText.OPEN_SETTINGS}"
+                      Icon="{x:Static ui:IconId.Settings}"
+                      IsVisible="{Binding HasExifToolProblem}"
+                      ToolTip.Tip="{x:Static app:AppText.SettingsTooltip}" />
+      <ui:GlassButton Name="RetryButton"
+                      Command="{Binding RetryExifToolCommand}"
+                      Content="{x:Static app:AppText.RETRY}"
+                      Icon="{x:Static ui:IconId.ArrowSync}"
+                      IsVisible="{Binding HasExifToolProblem}" />
+    </WrapPanel>
+  </StackPanel>
 
 </UserControl>

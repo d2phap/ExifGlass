@@ -119,7 +119,7 @@ public static partial class ArgumentPolicy
 
     private static readonly FrozenDictionary<string, string> FLAGS = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        ["-fast"] = "Skip scanning for trailers — faster reads",
+        ["-fast"] = "Skip scanning for trailers, for faster reads",
         ["-fast2"] = "Also skip maker notes and late chunks",
         ["-fast3"] = "Read only the file system and format tags",
         ["-m"] = "Ignore minor errors and warnings",

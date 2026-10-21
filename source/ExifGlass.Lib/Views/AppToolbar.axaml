@@ -2,26 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:ExifGlass"
              xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:v="using:ExifGlass.Views"
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.AppToolbar"
              x:DataType="vm:MainViewModel"
              Height="{StaticResource AppToolbarHeight}"
              Background="Transparent">
 
-  <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; search grows to 520 and centres in the space left  -->
-  <DockPanel Margin="8,0">
+  <!--  DS 2 / Spec 2 app toolbar: 48 high, gap 4, every control 32; the search grows to 520, centred on the window (owner at G4 review)  -->
+  <v:ToolbarRow Margin="8,0" Spacing="4">
     <ui:GlassToggleButton Name="RailToggle"
                           AutomationProperties.Name="{Binding RailTooltip}"
                           CheckedIcon="{x:Static ui:IconId.PanelLeftFilled}"
                           Command="{Binding ToggleRailCommand}"
-                          DockPanel.Dock="Left"
                           Icon="{x:Static ui:IconId.PanelLeft}"
                           IsChecked="{Binding IsRailShown, Mode=OneWay}"
                           ToolTip.Tip="{Binding RailTooltip}" />
 
-    <StackPanel Margin="4,0,0,0"
-                DockPanel.Dock="Right"
-                Orientation="Horizontal"
+    <StackPanel Orientation="Horizontal"
                 Spacing="4">
       <ui:GlassButton Name="OpenButton"
                       Classes="ghost toolbar"
@@ -56,7 +54,7 @@
                       Command="{Binding OpenAboutCommand}"
                       Icon="{x:Static ui:IconId.Info}"
                       IsVisible="{Binding ShowSecondaryButtons}"
-                      ToolTip.Tip="{x:Static app:AppText.ABOUT}" />
+                      ToolTip.Tip="{x:Static app:AppText.AboutTooltip}" />
       <ui:GlassToggleButton Name="InspectorToggle"
                             AutomationProperties.Name="{Binding InspectorTooltip}"
                             CheckedIcon="{x:Static ui:IconId.PanelRightFilled}"
@@ -69,13 +67,12 @@
     <ui:SearchBox Name="Search"
                   MinWidth="120"
                   MaxWidth="520"
-                  Margin="4,0,0,0"
                   VerticalAlignment="Center"
                   AutomationProperties.Name="{x:Static app:AppText.SEARCH}"
                   Classes.no-hint="{Binding !ShowSearchHint}"
                   IsEnabled="{Binding HasDocument}"
-                  PlaceholderText="{Binding SearchPlaceholder}"
+                  PlaceholderText="{x:Static app:AppText.SEARCH_PLACEHOLDER}"
                   Text="{Binding SearchText, Mode=TwoWay}" />
-  </DockPanel>
+  </v:ToolbarRow>
 
 </UserControl>

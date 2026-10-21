@@ -16,15 +16,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Input.Raw;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Xunit;
 
 namespace ExifGlass.UI.Tests;
 
 /// <summary>
-/// The main window in the DS 2.1 bands and its states (pushed panels, the empty card), both themes, against per-OS baselines (G4).
+/// The main window in the DS 2.1 bands and its states (pushed panels, the empty window, the drop scrim), both themes, against per-OS baselines (G4).
 /// </summary>
 public class ShellSnapshotTests
 {
@@ -68,7 +72,7 @@ public class ShellSnapshotTests
         {
             Check(empty, "shell-empty-1400", theme, failures);
 
-            empty.Window.Table.EmptyCard.IsDragOver = true;
+            await DragFileOverAsync(empty);
             Check(empty, "shell-drag-empty-1400", theme, failures);
         }
 
@@ -84,6 +88,21 @@ public class ShellSnapshotTests
 
 
     #region Private methods
+
+    // through the window's own drag handling, so the empty content fades as it does live
+    private static async Task DragFileOverAsync(TestShell shell)
+    {
+        var path = Path.Combine(shell.Folder, "drop.jpg");
+        await File.WriteAllBytesAsync(path, [0xFF, 0xD8, 0xFF, 0xD9], TestContext.Current.CancellationToken);
+        var file = await shell.Window.StorageProvider.TryGetFileFromPathAsync(path) ?? throw new InvalidOperationException("no storage file");
+
+        var item = new DataTransferItem();
+        item.SetFile(file);
+        var data = new DataTransfer();
+        data.Add(item);
+        shell.Window.DragDrop(new Point(700, 430), RawDragEventType.DragEnter, data, DragDropEffects.Copy, RawInputModifiers.None);
+    }
+
 
     private static void Check(TestShell shell, string id, string theme, List<string> failures)
     {

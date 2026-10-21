@@ -22,6 +22,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
@@ -518,30 +519,34 @@ public class DialogCard : TemplatedControl
 
 
 /// <summary>
-/// Edge panels over the content (DS 2.1): the rail slides from the left (-280) and the inspector from the right (+320) in 380 ms over a scrim (#000 18%, 200 ms); scrim click or Esc closes, opening one closes the other.
+/// Side panels that push the content aside (owner at G4 review, replacing DS 2.1's overlays): a pane slides in from its edge and the content moves with it, keeping its width, clipped at the far edge; no scrim, no shadow. Opening one closes the other; Esc closes.
 /// </summary>
-public class OverlayHost : ContentControl
+public class PushHost : ContentControl
 {
     #region Fields and constants
 
-    private const double LEFT_TRAVEL = -280;
-    private const double RIGHT_TRAVEL = 320;
-
     public static readonly StyledProperty<object?> LeftPaneProperty =
-        AvaloniaProperty.Register<OverlayHost, object?>(nameof(LeftPane));
+        AvaloniaProperty.Register<PushHost, object?>(nameof(LeftPane));
 
     public static readonly StyledProperty<object?> RightPaneProperty =
-        AvaloniaProperty.Register<OverlayHost, object?>(nameof(RightPane));
+        AvaloniaProperty.Register<PushHost, object?>(nameof(RightPane));
 
     public static readonly StyledProperty<bool> IsLeftOpenProperty =
-        AvaloniaProperty.Register<OverlayHost, bool>(nameof(IsLeftOpen), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+        AvaloniaProperty.Register<PushHost, bool>(nameof(IsLeftOpen), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
     public static readonly StyledProperty<bool> IsRightOpenProperty =
-        AvaloniaProperty.Register<OverlayHost, bool>(nameof(IsRightOpen), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+        AvaloniaProperty.Register<PushHost, bool>(nameof(IsRightOpen), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
-    private Control? _scrim;
+    public static readonly StyledProperty<double> LeftTravelProperty =
+        AvaloniaProperty.Register<PushHost, double>(nameof(LeftTravel), 244);
+
+    public static readonly StyledProperty<double> RightTravelProperty =
+        AvaloniaProperty.Register<PushHost, double>(nameof(RightTravel), 312);
+
+    private Control? _strip;
     private Control? _left;
     private Control? _right;
+    private double _offset;
     private int _generation;
 
     #endregion // Fields and constants
@@ -573,6 +578,29 @@ public class OverlayHost : ContentControl
         set => SetValue(IsRightOpenProperty, value);
     }
 
+    /// <summary>
+    /// Gets or sets how far the left pane pushes the content: its width and the gap after it (rail 244).
+    /// </summary>
+    public double LeftTravel
+    {
+        get => GetValue(LeftTravelProperty);
+        set => SetValue(LeftTravelProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets how far the right pane pushes the content: the gap before it and its width (inspector 312).
+    /// </summary>
+    public double RightTravel
+    {
+        get => GetValue(RightTravelProperty);
+        set => SetValue(RightTravelProperty, value);
+    }
+
+    /// <summary>
+    /// Gets where the content rests now: LeftTravel with the left pane open, minus RightTravel with the right one, else 0.
+    /// </summary>
+    public double Offset => _offset;
+
     #endregion // Properties
 
 
@@ -591,15 +619,11 @@ public class OverlayHost : ContentControl
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        if (_scrim is not null) _scrim.PointerPressed -= Scrim_PointerPressed;
-
         base.OnApplyTemplate(e);
 
-        _scrim = e.NameScope.Find<Control>("PART_Scrim");
+        _strip = e.NameScope.Find<Control>("PART_Strip");
         _left = e.NameScope.Find<Control>("PART_LeftPane");
         _right = e.NameScope.Find<Control>("PART_RightPane");
-        if (_scrim is not null) _scrim.PointerPressed += Scrim_PointerPressed;
-
         Update(animate: false);
     }
 
@@ -617,6 +641,10 @@ public class OverlayHost : ContentControl
         {
             if (IsRightOpen) SetCurrentValue(IsLeftOpenProperty, false);
             Update(animate: true);
+        }
+        else if (change.Property == LeftTravelProperty || change.Property == RightTravelProperty)
+        {
+            Update(animate: false);
         }
     }
 
@@ -638,54 +666,113 @@ public class OverlayHost : ContentControl
 
     #region Private methods
 
+    // the rest place is a render transform, so hit testing follows it; the render thread glides there from where the content was (FLIP)
     private void Update(bool animate)
     {
+        if (_strip is null) return;
+
         var generation = ++_generation;
-        var anyOpen = IsLeftOpen || IsRightOpen;
-        var slide = animate ? MotionTokens.Overlay : TimeSpan.Zero;
+        var previous = _offset;
+        _offset = IsLeftOpen ? LeftTravel : IsRightOpen ? -RightTravel : 0;
 
-        if (_scrim is not null)
-        {
-            _scrim.IsHitTestVisible = anyOpen;
-            if (anyOpen) _scrim.IsVisible = true;
-            CompositionMotion.Fade(_scrim, anyOpen ? 0 : 1, anyOpen ? 1 : 0, animate ? MotionTokens.Scrim : TimeSpan.Zero, MotionTokens.ScrimEasing);
-        }
+        if (_left is not null && IsLeftOpen) _left.IsVisible = true;
+        if (_right is not null && IsRightOpen) _right.IsVisible = true;
 
-        Slide(_left, IsLeftOpen, LEFT_TRAVEL, slide);
-        Slide(_right, IsRightOpen, RIGHT_TRAVEL, slide);
+        _strip.RenderTransform = _offset == 0 ? null : new TranslateTransform(_offset, 0);
+        var glide = animate && previous != _offset && !MotionTokens.IsFrozen;
+        if (glide) CompositionMotion.Move(_strip, new Vector(previous - _offset, 0), default, MotionTokens.Overlay, MotionTokens.OverlayEasing);
 
-        // hidden once closed, so closed panes stay out of the tab order and hit testing
+        // a closed pane leaves the tab order once it is out of sight
         DispatcherTimer.RunOnce(() =>
         {
             if (generation != _generation) return;
 
-            if (_scrim is not null && !anyOpen) _scrim.IsVisible = false;
             if (_left is not null) _left.IsVisible = IsLeftOpen;
             if (_right is not null) _right.IsVisible = IsRightOpen;
-        }, animate && !MotionTokens.IsFrozen ? MotionTokens.Overlay : TimeSpan.FromMilliseconds(1));
-    }
-
-
-    private static void Slide(Control? pane, bool open, double travel, TimeSpan duration)
-    {
-        if (pane is null) return;
-
-        if (open) pane.IsVisible = true;
-        var shown = new Vector(0, 0);
-        var hidden = new Vector(travel, 0);
-        CompositionMotion.Move(pane, open ? hidden : shown, open ? shown : hidden, duration, MotionTokens.OverlayEasing);
+        }, glide ? MotionTokens.Overlay : TimeSpan.FromMilliseconds(1));
     }
 
     #endregion // Private methods
+}
 
 
-    #region Event handlers
+/// <summary>
+/// The strip a PushHost slides: its first child, the content, fills it; the second waits one LeftTravel before its left edge and the third one RightTravel past its right edge.
+/// </summary>
+public class PushStrip : Panel
+{
+    #region Fields and constants
 
-    private void Scrim_PointerPressed(object? sender, PointerPressedEventArgs e)
+    public static readonly StyledProperty<double> LeftTravelProperty =
+        PushHost.LeftTravelProperty.AddOwner<PushStrip>();
+
+    public static readonly StyledProperty<double> RightTravelProperty =
+        PushHost.RightTravelProperty.AddOwner<PushStrip>();
+
+    #endregion // Fields and constants
+
+
+    #region Properties
+
+    public double LeftTravel
     {
-        CloseAll();
-        e.Handled = true;
+        get => GetValue(LeftTravelProperty);
+        set => SetValue(LeftTravelProperty, value);
     }
 
-    #endregion // Event handlers
+    public double RightTravel
+    {
+        get => GetValue(RightTravelProperty);
+        set => SetValue(RightTravelProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Constructors
+
+    static PushStrip()
+    {
+        AffectsArrange<PushStrip>(LeftTravelProperty, RightTravelProperty);
+    }
+
+    #endregion // Constructors
+
+
+    #region Protected methods
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var size = default(Size);
+        for (var i = 0; i < Children.Count; i++)
+        {
+            var child = Children[i];
+            child.Measure(i == 0 ? availableSize : availableSize.WithWidth(double.PositiveInfinity));
+            if (i == 0) size = child.DesiredSize;
+        }
+
+        return size;
+    }
+
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        for (var i = 0; i < Children.Count; i++)
+        {
+            var child = Children[i];
+            var width = child.DesiredSize.Width;
+            var x = i switch
+            {
+                0 => 0,
+                1 => -LeftTravel,
+                _ => finalSize.Width + RightTravel - width,
+            };
+
+            child.Arrange(new Rect(x, 0, i == 0 ? finalSize.Width : width, finalSize.Height));
+        }
+
+        return finalSize;
+    }
+
+    #endregion // Protected methods
 }

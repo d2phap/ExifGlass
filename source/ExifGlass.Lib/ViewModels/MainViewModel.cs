@@ -169,11 +169,11 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsRailShown), nameof(RailTooltip))]
-    public partial bool IsRailOverlayOpen { get; set; }
+    public partial bool IsRailPushed { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsInspectorShown), nameof(InspectorTooltip))]
-    public partial bool IsInspectorOverlayOpen { get; set; }
+    public partial bool IsInspectorPushed { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowSummaryDetail))]
@@ -213,13 +213,13 @@ public sealed partial class MainViewModel : ObservableObject
 
     public bool IsRailDocked => RailMode == PanelMode.Docked && RailOpen;
 
-    public bool IsRailShown => RailMode == PanelMode.Docked ? RailOpen : IsRailOverlayOpen;
+    public bool IsRailShown => RailMode == PanelMode.Docked ? RailOpen : IsRailPushed;
 
     public string RailTooltip => IsRailShown ? AppText.HIDE_RAIL : AppText.SHOW_RAIL;
 
     public bool IsInspectorDocked => InspectorMode == PanelMode.Docked && InspectorOpen;
 
-    public bool IsInspectorShown => InspectorMode == PanelMode.Docked ? InspectorOpen : IsInspectorOverlayOpen;
+    public bool IsInspectorShown => InspectorMode == PanelMode.Docked ? InspectorOpen : IsInspectorPushed;
 
     public string InspectorTooltip => IsInspectorShown ? AppText.HIDE_INSPECTOR : AppText.SHOW_INSPECTOR;
 
@@ -254,14 +254,14 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// The part of the Esc chain the window owns, after edits, menus and dialogs: overlays, then search; true when it did something.
+    /// The part of the Esc chain the window owns, after edits, menus and dialogs: a pushed panel, then search; true when it did something.
     /// </summary>
     public bool Escape()
     {
-        if (IsRailOverlayOpen || IsInspectorOverlayOpen)
+        if (IsRailPushed || IsInspectorPushed)
         {
-            IsRailOverlayOpen = false;
-            IsInspectorOverlayOpen = false;
+            IsRailPushed = false;
+            IsInspectorPushed = false;
             return true;
         }
 
@@ -276,14 +276,14 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// Places the DS 2.1 bands for the window's width; an overlay whose panel docks closes.
+    /// Places the DS 2.1 bands for the window's width; a pushed panel that docks stops being pushed.
     /// </summary>
     public void UpdateWindowWidth(double width)
     {
         if (!Layout.Update(width)) return;
 
-        if (Layout.Rail == PanelMode.Docked) IsRailOverlayOpen = false;
-        if (Layout.Inspector == PanelMode.Docked) IsInspectorOverlayOpen = false;
+        if (Layout.Rail == PanelMode.Docked) IsRailPushed = false;
+        if (Layout.Inspector == PanelMode.Docked) IsInspectorPushed = false;
         RailMode = Layout.Rail;
         InspectorMode = Layout.Inspector;
         Toolbar = Layout.Toolbar;
@@ -331,10 +331,10 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleRail()
     {
-        if (RailMode == PanelMode.Overlay)
+        if (RailMode == PanelMode.Push)
         {
-            IsRailOverlayOpen = !IsRailOverlayOpen;
-            if (IsRailOverlayOpen) IsInspectorOverlayOpen = false;
+            IsRailPushed = !IsRailPushed;
+            if (IsRailPushed) IsInspectorPushed = false;
             return;
         }
 
@@ -346,10 +346,10 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleInspector()
     {
-        if (InspectorMode == PanelMode.Overlay)
+        if (InspectorMode == PanelMode.Push)
         {
-            IsInspectorOverlayOpen = !IsInspectorOverlayOpen;
-            if (IsInspectorOverlayOpen) IsRailOverlayOpen = false;
+            IsInspectorPushed = !IsInspectorPushed;
+            if (IsInspectorPushed) IsRailPushed = false;
             return;
         }
 

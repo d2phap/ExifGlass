@@ -43,7 +43,7 @@ public static partial class DesignGalleryCatalog
     private static IEnumerable<GallerySection> BuildControls() =>
     [
         Buttons(), IconButtons(), Dropdowns(), StoreBadges(), Inputs(), TokenFields(), Checks(), Switches(), Segmented(), Combo(),
-        Chips(), Badges(), Menus(), ToolTips(), Toasts(), Dialogs(), OverlayPanels(), Scrollbars(), Cards(), Feedback(),
+        Chips(), Badges(), Menus(), ToolTips(), Toasts(), Dialogs(), PushPanels(), Scrollbars(), Cards(), Feedback(),
         TextControls(), Expanders(), Windows(), DataGridStub(),
     ];
 
@@ -429,27 +429,26 @@ public static partial class DesignGalleryCatalog
     }
 
 
-    private static GallerySection OverlayPanels()
+    private static GallerySection PushPanels()
     {
-        static Control Pane(string text, double width)
+        static Control Surface(Control child, double width = double.NaN)
         {
-            var pane = new SquircleBorder { Width = width, Margin = new Thickness(8), Padding = new Thickness(12), CornerRadius = new CornerRadius(18), BorderThickness = new Thickness(1) };
-            Bind(pane, SquircleBorder.BackgroundProperty, TokenKeys.BG_PANEL_BRUSH);
-            Bind(pane, SquircleBorder.BorderBrushProperty, TokenKeys.STROKE_HAIRLINE_BRUSH);
-            pane.Child = DesignGallery.Text(text, TypeClasses.BODY_STRONG, TokenKeys.TEXT_PRIMARY_BRUSH);
-            return pane;
+            var surface = new SquircleBorder { Width = width, Padding = new Thickness(12), CornerRadius = new CornerRadius(18), BorderThickness = new Thickness(1), Child = child };
+            Bind(surface, SquircleBorder.BackgroundProperty, TokenKeys.BG_PANEL_BRUSH);
+            Bind(surface, SquircleBorder.BorderBrushProperty, TokenKeys.STROKE_HAIRLINE_BRUSH);
+            return surface;
         }
 
-        var host = new OverlayHost { Width = 560, Height = 240, LeftPane = Pane("Rail", 180), RightPane = Pane("Inspector", 200), ClipToBounds = true };
+        static Control Pane(string text, double width) => Surface(DesignGallery.Text(text, TypeClasses.BODY_STRONG, TokenKeys.TEXT_PRIMARY_BRUSH), width);
+
+        var host = new PushHost { Width = 560, Height = 240, LeftPane = Pane("Rail", 180), RightPane = Pane("Inspector", 200), LeftTravel = 188, RightTravel = 208 };
         var left = new GlassButton { Content = "Rail", Icon = IconId.PanelLeft };
         var right = new GlassButton { Content = "Inspector", Icon = IconId.PanelRight };
         left.Click += (_, _) => host.IsLeftOpen = !host.IsLeftOpen;
         right.Click += (_, _) => host.IsRightOpen = !host.IsRightOpen;
-        var content = new SquircleBorder { CornerRadius = new CornerRadius(18), Child = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Children = { left, right } } };
-        Bind(content, SquircleBorder.BackgroundProperty, TokenKeys.BG_WINDOW_BRUSH);
-        host.Content = content;
+        host.Content = Surface(new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center, Children = { left, right } });
 
-        return new GallerySection("c-overlay", "Overlay panels", "DS 2.1: the rail slides from -280 and the inspector from +320 in 380 ms over a scrim (#000 18%, 200 ms); scrim click or Esc closes; opening one closes the other.",
+        return new GallerySection("c-push", "Push panels", "Owner at G4 (replaces DS 2.1's overlays): a pane slides in from its edge in 380 ms and pushes the content the same way, which keeps its width and is clipped; no scrim, no shadow; Esc closes; opening one closes the other.",
         [
             new("live", host),
         ]);

@@ -17,77 +17,69 @@
         <v:AppToolbar Name="Toolbar" DockPanel.Dock="Top" />
 
         <!--  DS 2 layout grid: padding 8 (none on top), gap 8; rail 236 in a 244 column, inspector 304 in a 312 column, the command bar spans all  -->
-        <ui:OverlayHost Name="Overlays"
-                        IsLeftOpen="{Binding IsRailOverlayOpen, Mode=TwoWay}"
-                        IsRightOpen="{Binding IsInspectorOverlayOpen, Mode=TwoWay}">
-          <ui:OverlayHost.LeftPane>
-            <ui:SquircleBorder Name="RailOverlayFrame"
-                               Width="{StaticResource RailWidth}"
-                               Margin="8,0,0,56"
-                               Padding="8"
-                               Background="{DynamicResource BgPanelBrush}"
-                               BorderBrush="{DynamicResource EmphasisA10Brush}"
-                               BorderThickness="1"
-                               BoxShadow="{StaticResource ElevationOverlay}"
-                               CornerRadius="{StaticResource RadiusPanel}" />
-          </ui:OverlayHost.LeftPane>
-          <ui:OverlayHost.RightPane>
-            <ui:SquircleBorder Name="InspectorOverlayFrame"
-                               Width="{StaticResource InspectorWidth}"
-                               Margin="0,0,8,56"
-                               Padding="8"
-                               Background="{DynamicResource BgWindowBrush}"
-                               BorderBrush="{DynamicResource EmphasisA10Brush}"
-                               BorderThickness="1"
-                               BoxShadow="{StaticResource ElevationOverlay}"
-                               CornerRadius="{StaticResource RadiusPanel}" />
-          </ui:OverlayHost.RightPane>
+        <Grid Name="LayoutGrid"
+              Margin="8,0,8,8"
+              RowDefinitions="*,8,Auto">
+          <!--  below the docking widths a panel pushes the table aside instead (owner at G4 review)  -->
+          <ui:PushHost Name="Pushes"
+                       IsLeftOpen="{Binding IsRailPushed, Mode=TwoWay}"
+                       IsRightOpen="{Binding IsInspectorPushed, Mode=TwoWay}"
+                       LeftTravel="{StaticResource RailColumn}"
+                       RightTravel="{StaticResource InspectorColumn}">
+            <ui:PushHost.LeftPane>
+              <ui:SquircleBorder Name="RailPushFrame"
+                                 Width="{StaticResource RailWidth}"
+                                 Padding="8"
+                                 Background="{DynamicResource BgPanelBrush}"
+                                 BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                                 BorderThickness="1"
+                                 CornerRadius="{StaticResource RadiusPanel}" />
+            </ui:PushHost.LeftPane>
+            <ui:PushHost.RightPane>
+              <ui:SquircleBorder Name="InspectorPushFrame" Width="{StaticResource InspectorWidth}" />
+            </ui:PushHost.RightPane>
 
-          <Grid Name="LayoutGrid"
-                Margin="8,0,8,8"
-                ColumnDefinitions="Auto,*,Auto"
-                RowDefinitions="*,8,Auto">
-            <ui:DockSlot Name="RailSlot"
-                         Anchor="Left"
-                         IsOpen="{Binding IsRailDocked}"
-                         OpenWidth="{StaticResource RailColumn}">
-              <Panel>
-                <ui:SquircleBorder Name="RailDockFrame"
-                                   Width="{StaticResource RailWidth}"
-                                   HorizontalAlignment="Left"
-                                   Padding="8"
-                                   Background="{DynamicResource BgPanelBrush}"
-                                   BorderBrush="{DynamicResource StrokeHairlineBrush}"
-                                   BorderThickness="1"
-                                   CornerRadius="{StaticResource RadiusPanel}">
-                  <!--  P6 fills the rail  -->
-                  <Panel Name="RailContent" />
-                </ui:SquircleBorder>
-              </Panel>
-            </ui:DockSlot>
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <ui:DockSlot Name="RailSlot"
+                           Anchor="Left"
+                           IsOpen="{Binding IsRailDocked}"
+                           OpenWidth="{StaticResource RailColumn}">
+                <Panel>
+                  <ui:SquircleBorder Name="RailDockFrame"
+                                     Width="{StaticResource RailWidth}"
+                                     HorizontalAlignment="Left"
+                                     Padding="8"
+                                     Background="{DynamicResource BgPanelBrush}"
+                                     BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                                     BorderThickness="1"
+                                     CornerRadius="{StaticResource RadiusPanel}">
+                    <!--  P6 fills the rail  -->
+                    <Panel Name="RailContent" />
+                  </ui:SquircleBorder>
+                </Panel>
+              </ui:DockSlot>
 
-            <v:TablePanel Name="Table" Grid.Column="1" />
+              <v:TablePanel Name="Table" Grid.Column="1" />
 
-            <ui:DockSlot Name="InspectorSlot"
-                         Grid.Column="2"
-                         Anchor="Right"
-                         IsOpen="{Binding IsInspectorDocked}"
-                         OpenWidth="{StaticResource InspectorColumn}">
-              <Panel>
-                <ui:SquircleBorder Name="InspectorDockFrame"
-                                   Width="{StaticResource InspectorWidth}"
-                                   HorizontalAlignment="Right">
-                  <!--  P6 fills the inspector  -->
-                  <Panel Name="InspectorContent" />
-                </ui:SquircleBorder>
-              </Panel>
-            </ui:DockSlot>
+              <ui:DockSlot Name="InspectorSlot"
+                           Grid.Column="2"
+                           Anchor="Right"
+                           IsOpen="{Binding IsInspectorDocked}"
+                           OpenWidth="{StaticResource InspectorColumn}">
+                <Panel>
+                  <ui:SquircleBorder Name="InspectorDockFrame"
+                                     Width="{StaticResource InspectorWidth}"
+                                     HorizontalAlignment="Right">
+                    <!--  P6 fills the inspector  -->
+                    <Panel Name="InspectorContent" />
+                  </ui:SquircleBorder>
+                </Panel>
+              </ui:DockSlot>
+            </Grid>
+          </ui:PushHost>
 
-            <v:CommandBar Name="CommandBarView"
-                          Grid.Row="2"
-                          Grid.ColumnSpan="3" />
-          </Grid>
-        </ui:OverlayHost>
+          <v:CommandBar Name="CommandBarView" Grid.Row="2" />
+        </Grid>
       </DockPanel>
 
       <v:DropScrim Name="Scrim" />

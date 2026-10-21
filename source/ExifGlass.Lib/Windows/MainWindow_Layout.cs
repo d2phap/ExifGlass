@@ -70,18 +70,18 @@ public partial class MainWindow
     }
 
 
-    // the rail lives in its column while docked and in the overlay pane while one is shown; it moves only when it has to
+    // the rail lives in its column while docked and in the push pane while pushed; it moves only when it has to
     private void PlaceRail()
     {
         if (ViewModel.RailMode == PanelMode.Docked) Move(RailContent, RailDockFrame);
-        else if (ViewModel.IsRailOverlayOpen || (!RailSlot.IsOpen && RailSlot.Openness <= 0)) Move(RailContent, RailOverlayFrame);
+        else if (ViewModel.IsRailPushed || (!RailSlot.IsOpen && RailSlot.Openness <= 0)) Move(RailContent, RailPushFrame);
     }
 
 
     private void PlaceInspector()
     {
         if (ViewModel.InspectorMode == PanelMode.Docked) Move(InspectorContent, InspectorDockFrame);
-        else if (ViewModel.IsInspectorOverlayOpen || (!InspectorSlot.IsOpen && InspectorSlot.Openness <= 0)) Move(InspectorContent, InspectorOverlayFrame);
+        else if (ViewModel.IsInspectorPushed || (!InspectorSlot.IsOpen && InspectorSlot.Openness <= 0)) Move(InspectorContent, InspectorPushFrame);
     }
 
 
@@ -103,12 +103,12 @@ public partial class MainWindow
         switch (e.PropertyName)
         {
             case nameof(MainViewModel.RailMode):
-            case nameof(MainViewModel.IsRailOverlayOpen):
+            case nameof(MainViewModel.IsRailPushed):
                 PlaceRail();
                 break;
 
             case nameof(MainViewModel.InspectorMode):
-            case nameof(MainViewModel.IsInspectorOverlayOpen):
+            case nameof(MainViewModel.IsInspectorPushed):
                 PlaceInspector();
                 break;
 

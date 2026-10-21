@@ -33,12 +33,12 @@ public class ShellTests
     [Theory]
     [InlineData(1400, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
     [InlineData(1200, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
-    [InlineData(1100, PanelMode.Docked, PanelMode.Overlay, ToolbarMode.Full)]
-    [InlineData(900, PanelMode.Docked, PanelMode.Overlay, ToolbarMode.Full)]
-    [InlineData(760, PanelMode.Overlay, PanelMode.Overlay, ToolbarMode.Compact)]
-    [InlineData(620, PanelMode.Overlay, PanelMode.Overlay, ToolbarMode.Compact)]
-    [InlineData(480, PanelMode.Overlay, PanelMode.Overlay, ToolbarMode.IconOnly)]
-    [InlineData(420, PanelMode.Overlay, PanelMode.Overlay, ToolbarMode.IconOnly)]
+    [InlineData(1100, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
+    [InlineData(900, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
+    [InlineData(760, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(620, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(480, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
+    [InlineData(420, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
     public void TheFourBandsFollowDs21(double width, PanelMode rail, PanelMode inspector, ToolbarMode toolbar)
     {
         var layout = new ShellLayout();
@@ -58,7 +58,7 @@ public class ShellTests
         Assert.Equal(PanelMode.Docked, layout.Inspector);
 
         Assert.True(layout.Update(1200 - ShellLayout.HYSTERESIS - 1));
-        Assert.Equal(PanelMode.Overlay, layout.Inspector);
+        Assert.Equal(PanelMode.Push, layout.Inspector);
 
         // coming back up, the threshold itself is needed again
         Assert.False(layout.Update(1199));

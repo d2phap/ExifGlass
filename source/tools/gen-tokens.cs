@@ -249,7 +249,6 @@ static class Generator
         ("ShadowSegmentedThumb", "0 1 3 0 rgba(0,0,0,.16)", "Segmented thumb"),
         ("ShadowSelectedCard", "0 0 0 3 rgba(34,94,219,.08)", "Selected-tag card ring"),
         ("ShadowTooltip", "0 8 20 -6 rgba(0,0,0,.25)", "Tooltips: elevation 1 at half its offset, blur and darkness"),
-        ("ElevationOverlay", "0 24 60 -16 rgba(0,0,0,.45)", "Overlay rail and inspector (DS 2.1)"),
         ("ShadowEmptyCard", "0 30 70 -30 rgba(0,0,0,.35)", "Empty-state card"),
     ];
 

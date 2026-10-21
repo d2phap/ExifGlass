@@ -24,7 +24,7 @@ using Xunit;
 namespace ExifGlass.UI.Tests;
 
 /// <summary>
-/// The main window in the DS 2.1 bands and its states, both themes, against per-OS baselines (G4: layout against the reference screenshots).
+/// The main window in the DS 2.1 bands and its states (pushed panels, the empty card), both themes, against per-OS baselines (G4).
 /// </summary>
 public class ShellSnapshotTests
 {
@@ -55,12 +55,12 @@ public class ShellSnapshotTests
             if (width == 1100)
             {
                 shell.ViewModel.ToggleInspectorCommand.Execute(null);
-                Check(shell, "shell-inspector-overlay-1100", theme, failures);
+                Check(shell, "shell-inspector-push-1100", theme, failures);
             }
             else if (width == 480)
             {
                 shell.ViewModel.ToggleRailCommand.Execute(null);
-                Check(shell, "shell-rail-overlay-480", theme, failures);
+                Check(shell, "shell-rail-push-480", theme, failures);
             }
         }
 

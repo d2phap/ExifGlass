@@ -484,8 +484,6 @@ public static class TokenKeys
     public const string SHADOW_SELECTED_CARD = "ShadowSelectedCard";
     // Tooltips: elevation 1 at half its offset, blur and darkness
     public const string SHADOW_TOOLTIP = "ShadowTooltip";
-    // Overlay rail and inspector (DS 2.1)
-    public const string ELEVATION_OVERLAY = "ElevationOverlay";
     // Empty-state card
     public const string SHADOW_EMPTY_CARD = "ShadowEmptyCard";
     // 22

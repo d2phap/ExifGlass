@@ -145,22 +145,16 @@
     </Style>
   </ControlTheme>
 
-  <!--  DS 2.1 overlay panels: the content, a scrim, and the rail and inspector panes at their edges  -->
-  <ControlTheme x:Key="{x:Type ui:OverlayHost}" TargetType="ui:OverlayHost">
+  <!--  push panels (owner at G4 review): the content and the panes in one strip that slides; the host clips it at its edges  -->
+  <ControlTheme x:Key="{x:Type ui:PushHost}" TargetType="ui:PushHost">
+    <Setter Property="ClipToBounds" Value="True" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel>
+        <ui:PushStrip Name="PART_Strip" LeftTravel="{TemplateBinding LeftTravel}" RightTravel="{TemplateBinding RightTravel}">
           <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-          <Border Name="PART_Scrim" Background="{DynamicResource ScrimBrush}" IsVisible="False" />
-          <ContentPresenter Name="PART_LeftPane"
-                            HorizontalAlignment="Left"
-                            Content="{TemplateBinding LeftPane}"
-                            IsVisible="False" />
-          <ContentPresenter Name="PART_RightPane"
-                            HorizontalAlignment="Right"
-                            Content="{TemplateBinding RightPane}"
-                            IsVisible="False" />
-        </Panel>
+          <ContentPresenter Name="PART_LeftPane" Content="{TemplateBinding LeftPane}" IsVisible="False" />
+          <ContentPresenter Name="PART_RightPane" Content="{TemplateBinding RightPane}" IsVisible="False" />
+        </ui:PushStrip>
       </ControlTemplate>
     </Setter>
   </ControlTheme>

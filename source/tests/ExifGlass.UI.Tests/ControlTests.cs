@@ -255,19 +255,26 @@ public class ControlTests
 
 
     [AvaloniaFact]
-    public void OneOverlayPaneAtATimeAndEscClosesIt()
+    public void OnePushPaneAtATimeAndEscClosesIt()
     {
         var inside = new Button { Content = "Open" };
-        var host = new OverlayHost { LeftPane = new Border { Width = 200 }, RightPane = new Border { Width = 200 }, Content = inside };
+        var host = new PushHost { LeftPane = new Border { Width = 200 }, RightPane = new Border { Width = 200 }, LeftTravel = 208, RightTravel = 208, Content = inside };
         var window = Show(host, 800, 400);
 
         host.IsLeftOpen = true;
+        Assert.Equal(208, host.Offset);
         host.IsRightOpen = true;
         Assert.False(host.IsLeftOpen);
+        Assert.Equal(-208, host.Offset);
+
+        // the content keeps its width and moves; the host clips it instead of scrolling
+        Assert.Equal(800, inside.Bounds.Width);
+        Assert.Equal(-208, inside.TranslatePoint(default, window)!.Value.X);
 
         inside.Focus();
         window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
         Assert.False(host.IsRightOpen);
+        Assert.Equal(0, host.Offset);
         window.Close();
     }
 

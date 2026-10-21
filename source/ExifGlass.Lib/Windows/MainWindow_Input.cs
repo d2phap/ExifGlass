@@ -104,7 +104,7 @@ public partial class MainWindow
     }
 
 
-    // DS 7.6 Esc chain after the focused control's own use: close overlays, then clear the search; Esc never closes the window
+    // DS 7.6 Esc chain after the focused control's own use: close a pushed panel, then clear the search; Esc never closes the window
     private void Window_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key != Key.Escape || e.KeyModifiers != KeyModifiers.None) return;

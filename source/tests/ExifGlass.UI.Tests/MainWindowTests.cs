@@ -128,25 +128,39 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void OverlaysOpenOneAtATimeAndEscClosesThem()
+    public void APushedPanelMovesTheTableAsideWithoutResizingIt()
     {
         using var shell = TestShell.Open(760);
         var vm = shell.ViewModel;
+        var w = shell.Window;
+        var tableWidth = w.Table.Bounds.Width;
 
         vm.ToggleRailCommand.Execute(null);
         shell.Settle();
-        Assert.True(shell.Window.Overlays.IsLeftOpen);
-        Assert.Same(shell.Window.RailOverlayFrame, shell.Window.RailContent.Parent);
+        Assert.True(w.Pushes.IsLeftOpen);
+        Assert.Same(w.RailPushFrame, w.RailContent.Parent);
+        Assert.Equal(244, w.Pushes.Offset);
+        Assert.Equal(tableWidth, w.Table.Bounds.Width);
+        Assert.Equal(8 + 244, w.Table.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(8, w.RailPushFrame.TranslatePoint(default, w)!.Value.X);
+
+        // the table's far side is clipped at the host, which never scrolls
+        Assert.True(w.Pushes.ClipToBounds);
 
         vm.ToggleInspectorCommand.Execute(null);
         shell.Settle();
-        Assert.False(shell.Window.Overlays.IsLeftOpen);
-        Assert.True(shell.Window.Overlays.IsRightOpen);
+        Assert.False(w.Pushes.IsLeftOpen);
+        Assert.True(w.Pushes.IsRightOpen);
+        Assert.Equal(-312, w.Pushes.Offset);
+        Assert.Equal(8 - 312, w.Table.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(760 - 8 - 304, w.InspectorPushFrame.TranslatePoint(default, w)!.Value.X);
         Assert.True(vm.IsInspectorShown);
 
         shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         shell.Settle();
-        Assert.False(shell.Window.Overlays.IsRightOpen);
+        Assert.False(w.Pushes.IsRightOpen);
+        Assert.Equal(0, w.Pushes.Offset);
+        Assert.Equal(8, w.Table.TranslatePoint(default, w)!.Value.X);
         Assert.False(vm.IsInspectorShown);
     }
 
@@ -168,7 +182,7 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void WideningDocksTheRailAndClosesItsOverlay()
+    public void WideningDocksAPushedRail()
     {
         using var shell = TestShell.Open(760);
         shell.ViewModel.ToggleRailCommand.Execute(null);
@@ -177,7 +191,8 @@ public class MainWindowTests
         shell.Window.Width = 1000;
         shell.Settle();
 
-        Assert.False(shell.ViewModel.IsRailOverlayOpen);
+        Assert.False(shell.ViewModel.IsRailPushed);
+        Assert.Equal(0, shell.Window.Pushes.Offset);
         Assert.Same(shell.Window.RailDockFrame, shell.Window.RailContent.Parent);
         Assert.Equal(244, shell.Window.RailSlot.Bounds.Width);
     }
@@ -374,7 +389,7 @@ public class MainWindowTests
     {
         using var shell = TestShell.Open(560);
 
-        // 560 window: rail and inspector overlay, so the table takes 544
+        // 560 window: rail and inspector are pushed panels, so the table takes 544
         Assert.True(shell.ViewModel.GroupCountFits);
 
         shell.Window.Width = 500;

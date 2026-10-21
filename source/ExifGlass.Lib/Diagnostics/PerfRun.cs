@@ -37,7 +37,7 @@ public static class PerfRun
 
     private const int REPEATED_LOADS = 50;
     private const int MOTION_ROUNDS = 3;
-    private const double OVERLAY_WIDTH = 760;
+    private const double PUSH_WIDTH = 760;
     private static readonly TimeSpan Idle = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan Motion = TimeSpan.FromMilliseconds(600);
 
@@ -99,10 +99,10 @@ public static class PerfRun
         budgetsMet &= await MeasureAsync(probe, output, "inspector column 0 <-> 312", onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
 
         var width = window.Width;
-        window.Width = OVERLAY_WIDTH;
+        window.Width = PUSH_WIDTH;
         await Task.Delay(Motion);
-        budgetsMet &= await MeasureAsync(probe, output, "rail overlay slide", onRenderThread: true, () => vm.ToggleRailCommand.Execute(null));
-        budgetsMet &= await MeasureAsync(probe, output, "inspector overlay slide", onRenderThread: true, () => vm.ToggleInspectorCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, "rail push", onRenderThread: true, () => vm.ToggleRailCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, "inspector push", onRenderThread: true, () => vm.ToggleInspectorCommand.Execute(null));
         window.Width = width;
         await Task.Delay(Motion);
 

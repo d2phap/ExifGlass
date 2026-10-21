@@ -29,9 +29,9 @@ public enum PanelMode
     Docked,
 
     /// <summary>
-    /// Over the table from its edge, above a scrim.
+    /// Off the edge until shown; then it slides in and pushes the table aside, which keeps its width (owner at G4 review).
     /// </summary>
-    Overlay,
+    Push,
 }
 
 
@@ -97,8 +97,8 @@ public sealed class ShellLayout
     /// </summary>
     public bool Update(double windowWidth)
     {
-        var rail = Reached(windowWidth, Rail == PanelMode.Docked, RAIL_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Overlay;
-        var inspector = Reached(windowWidth, Inspector == PanelMode.Docked, INSPECTOR_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Overlay;
+        var rail = Reached(windowWidth, Rail == PanelMode.Docked, RAIL_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Push;
+        var inspector = Reached(windowWidth, Inspector == PanelMode.Docked, INSPECTOR_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Push;
         var toolbar = Reached(windowWidth, Toolbar == ToolbarMode.Full, TOOLBAR_FULL_WIDTH) ? ToolbarMode.Full
             : Reached(windowWidth, Toolbar != ToolbarMode.IconOnly, TOOLBAR_LABEL_WIDTH) ? ToolbarMode.Compact
             : ToolbarMode.IconOnly;

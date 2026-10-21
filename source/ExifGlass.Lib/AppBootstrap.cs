@@ -16,7 +16,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia;
 using Avalonia.Styling;
+using ExifGlass.UI.Tokens;
 using ExifGlass.Core.Common;
 using ExifGlass.Core.Diagnostics;
 using ExifGlass.Diagnostics;
@@ -32,6 +34,10 @@ public static class AppBootstrap
 
     public const string SELFTEST_ARG = "--selftest";
     public const string THEME_ARG = "--theme";
+    public const string GALLERY_ARG = "--gallery";
+
+    // S1: Avalonia's 28 MB default evicts squircle masks in motion; 96 MB covers the 72 MB stress peak and stays bounded
+    public const long SKIA_GPU_BUDGET = 96L * 1024 * 1024;
 
     #endregion // Constants
 
@@ -39,6 +45,18 @@ public static class AppBootstrap
     #region Public methods
 
     public static bool IsSelfTest(string[] args) => args.Contains(SELFTEST_ARG, StringComparer.OrdinalIgnoreCase);
+
+
+    public static bool IsGallery(string[]? args) => args?.Contains(GALLERY_ARG, StringComparer.OrdinalIgnoreCase) == true;
+
+
+    /// <summary>
+    /// What every head adds to its builder: the fonts and their size rule (plan 5.3) and the Skia GPU budget (plan 5.4).
+    /// </summary>
+    public static AppBuilder WithExifGlassDefaults(this AppBuilder builder) => builder
+        .With(new SkiaOptions { MaxGpuResourceSizeBytes = SKIA_GPU_BUDGET })
+        .WithAppFonts()
+        .WithPlatformFontSizes();
 
 
     /// <summary>

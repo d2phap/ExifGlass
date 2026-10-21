@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using ExifGlass.UI;
 using ExifGlass.Windows;
 
 namespace ExifGlass;
@@ -27,7 +28,11 @@ public partial class App : Application
 {
     #region Public methods
 
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+        DesignSystem.Initialize(this);
+    }
 
 
     public override void OnFrameworkInitializationCompleted()
@@ -38,6 +43,15 @@ public partial class App : Application
             {
                 RequestedThemeVariant = theme;
             }
+
+#if DEBUG
+            if (AppBootstrap.IsGallery(desktop.Args))
+            {
+                desktop.MainWindow = new UI.Gallery.GalleryWindow();
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
+#endif
 
             desktop.MainWindow = new MainWindow();
         }

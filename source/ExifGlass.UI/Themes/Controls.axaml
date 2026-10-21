@@ -1,0 +1,16 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--  every ExifGlass ControlTheme (O14); App.Resources is searched before SimpleTheme, so these win  -->
+  <ResourceDictionary.MergedDictionaries>
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Icons.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Buttons.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Inputs.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Selection.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Menus.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Overlays.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Scrolling.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Surfaces.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

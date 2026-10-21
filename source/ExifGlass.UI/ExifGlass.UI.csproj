@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExifGlass.UI.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Skia" />
+    <PackageReference Include="ProDataGrid" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExifGlass.Core\ExifGlass.Core.csproj" />
   </ItemGroup>
 </Project>

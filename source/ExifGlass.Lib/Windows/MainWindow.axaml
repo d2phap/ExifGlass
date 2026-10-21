@@ -7,7 +7,6 @@
         MinWidth="420"
         MinHeight="480"
         WindowStartupLocation="CenterScreen"
-        Icon="avares://ExifGlass.Lib/Assets/ExifGlass.ico"
         FontFamily="{StaticResource FontUi}"
         FontSize="13"
         Foreground="{DynamicResource TextPrimaryBrush}">

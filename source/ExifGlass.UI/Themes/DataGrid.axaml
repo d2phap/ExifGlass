@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--  stubs over ProDataGrid's Simple.v2 templates until P5 builds the table's own themes (S2); only Avalonia-core properties, which trim safely  -->
+  <Style Selector="DataGrid">
+    <Setter Property="Background" Value="{DynamicResource BgPanelBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeHairlineBrush}" />
+  </Style>
+  <Style Selector="DataGridColumnHeader">
+    <Setter Property="Background" Value="{DynamicResource BgHeaderBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeOverline}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="MinHeight" Value="32" />
+  </Style>
+  <Style Selector="DataGridRow">
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </Style>
+  <Style Selector="DataGridCell">
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  </Style>
+
+</Styles>

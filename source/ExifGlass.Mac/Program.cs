@@ -54,7 +54,8 @@ internal static class Program
 #endif
         .UseSkia()
         .UseHarfBuzz()
-        .WithInterFont();
+        .WithInterFont()
+        .WithExifGlassDefaults();
 
     #endregion // Avalonia
 }

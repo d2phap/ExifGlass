@@ -23,6 +23,13 @@ namespace ExifGlass.Win32.Common;
 
 internal sealed class Win32ShellProvider : IShellProvider
 {
+    #region Properties
+
+    public bool AnimatesOwnedWindows => !User32.SystemParametersInfoW(User32.SPI_GETCLIENTAREAANIMATION, 0, out var on, 0) || on != 0;
+
+    #endregion // Properties
+
+
     #region Public methods
 
     public bool TrySetMicaBackdrop(nint windowHandle)

@@ -4,18 +4,21 @@
              Name="ExifGlass"
              RequestedThemeVariant="Default">
 
-  <Application.Styles>
-    <!--  Safety net only: every control the app shows gets its own ExifGlass ControlTheme  -->
-    <SimpleTheme />
-    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml" />
-  </Application.Styles>
-
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://ExifGlass.UI/Tokens/Tokens.axaml" />
+        <ResourceInclude Source="avares://ExifGlass.UI/Themes/Controls.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>
+
+  <Application.Styles>
+    <!--  Safety net only (O14): every control the app shows gets an ExifGlass ControlTheme from Themes/Controls.axaml  -->
+    <SimpleTheme />
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml" />
+    <StyleInclude Source="avares://ExifGlass.UI/Themes/DataGrid.axaml" />
+    <StyleInclude Source="avares://ExifGlass.UI/Tokens/Typography.axaml" />
+  </Application.Styles>
 
 </Application>

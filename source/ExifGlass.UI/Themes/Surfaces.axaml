@@ -1,0 +1,274 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  windows, popups and plain containers: ExifGlass themes so nothing on screen keeps a SimpleTheme template (O14)  -->
+  <ControlTheme x:Key="{x:Type Window}" TargetType="Window">
+    <Setter Property="Background" Value="{DynamicResource BgWindowBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontUi}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+          <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+          <Panel Margin="{TemplateBinding WindowDecorationMargin}" Background="Transparent" />
+          <VisualLayerManager Name="PART_VisualLayerManager">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Margin="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </VisualLayerManager>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type PopupRoot}" TargetType="PopupRoot">
+    <Setter Property="Background" Value="{x:Null}" />
+    <Setter Property="TransparencyLevelHint" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontUi}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="FontStyle" Value="Normal" />
+    <Setter Property="Inline.TextDecorations" Value="" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <LayoutTransformControl LayoutTransform="{TemplateBinding Transform}">
+          <Panel>
+            <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+            <VisualLayerManager Name="PART_VisualLayerManager">
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </VisualLayerManager>
+          </Panel>
+        </LayoutTransformControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type OverlayPopupHost}" TargetType="OverlayPopupHost">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontUi}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="FontStyle" Value="Normal" />
+    <Setter Property="Inline.TextDecorations" Value="" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <LayoutTransformControl LayoutTransform="{TemplateBinding Transform}">
+          <VisualLayerManager Name="PART_VisualLayerManager">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Padding="{TemplateBinding Padding}"
+                              Background="{TemplateBinding Background}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </VisualLayerManager>
+        </LayoutTransformControl>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ContentControl}" TargetType="ContentControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter Name="PART_ContentPresenter"
+                          Padding="{TemplateBinding Padding}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          CornerRadius="{TemplateBinding CornerRadius}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type UserControl}" TargetType="UserControl" BasedOn="{StaticResource {x:Type ContentControl}}" />
+
+  <ControlTheme x:Key="{x:Type ThemeVariantScope}" TargetType="ThemeVariantScope">
+    <Setter Property="TextElement.Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ItemsControl}" TargetType="ItemsControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ItemsPresenter Name="PART_ItemsPresenter" Margin="{TemplateBinding Padding}" ItemsPanel="{TemplateBinding ItemsPanel}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ListBox}" TargetType="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ScrollViewer Name="PART_ScrollViewer"
+                      Background="{TemplateBinding Background}"
+                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+          <ItemsPresenter Name="PART_ItemsPresenter" Margin="{TemplateBinding Padding}" ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </ScrollViewer>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  a list row: 32 high, radius 14, one state layer; selected Accent 10%  -->
+  <ControlTheme x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
+    <Setter Property="MinHeight" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="Background" Value="{DynamicResource AccentA00Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.SelectEasing}" Property="Background" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0" />
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{DynamicResource AccentA10Brush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type FlyoutPresenter}" TargetType="FlyoutPresenter">
+    <Setter Property="Padding" Value="12" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
+    <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA12Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder MaxWidth="360"
+                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Padding="{TemplateBinding Padding}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           BoxShadow="{StaticResource Elevation1}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  selectable text: accent selection, I-beam, a Copy menu  -->
+  <MenuFlyout x:Key="GlassTextContextFlyout">
+    <ui:GlassMenuItem Command="{Binding $parent[SelectableTextBlock].Copy}"
+                      Glyph="{x:Static ui:IconId.Copy}"
+                      Header="{x:Static eg:UiText.COPY}"
+                      InputGesture="{x:Static TextBox.CopyGesture}"
+                      IsEnabled="{Binding $parent[SelectableTextBlock].CanCopy}" />
+  </MenuFlyout>
+
+  <ControlTheme x:Key="{x:Type SelectableTextBlock}" TargetType="SelectableTextBlock">
+    <Setter Property="SelectionBrush" Value="{DynamicResource AccentA30Brush}" />
+    <Style Selector="^[IsEnabled=True]">
+      <Setter Property="Cursor" Value="IBeam" />
+      <Setter Property="ContextFlyout" Value="{StaticResource GlassTextContextFlyout}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 3.2, 6.11 card: Bg.Panel, radius 18, hairline, padding 12; .accent (selected tag) and .ai  -->
+  <ControlTheme x:Key="{x:Type ui:Card}" TargetType="ui:Card">
+    <Setter Property="Padding" Value="12" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusPanel}" />
+    <Setter Property="Background" Value="{DynamicResource BgPanelBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeHairlineBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Name="PART_Surface"
+                           Padding="{TemplateBinding Padding}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.accent">
+      <Setter Property="Padding" Value="14" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentA35Brush}" />
+    </Style>
+    <Style Selector="^.accent /template/ Border#PART_Surface">
+      <Setter Property="BoxShadow" Value="{StaticResource ShadowSelectedCard}" />
+    </Style>
+    <Style Selector="^.ai">
+      <Setter Property="BorderBrush" Value="{DynamicResource Accent2A30Brush}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 6.9 skeleton bar: Emphasis 8%, radius 4  -->
+  <ControlTheme x:Key="{x:Type ui:Skeleton}" TargetType="ui:Skeleton">
+    <Setter Property="Height" Value="8" />
+    <Setter Property="Background" Value="{DynamicResource EmphasisA08Brush}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusSkeleton}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  DS 6.9 progress: a 2 px accent line  -->
+  <ControlTheme x:Key="{x:Type ui:ProgressLine}" TargetType="ui:ProgressLine">
+    <Setter Property="Height" Value="2" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Name="PART_Bar" HorizontalAlignment="Left" Background="{DynamicResource AccentBrush}" CornerRadius="1" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,145 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="using:ExifGlass.UI.Motion"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  DS 6.16: overlay scroll bars, no track, no arrows; the bars lie over the content's edge, so content keeps its width; wheel notches ease  -->
+  <ControlTheme x:Key="{x:Type ScrollViewer}" TargetType="ScrollViewer">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="AllowAutoHide" Value="False" />
+    <Setter Property="motion:SmoothScroll.IsEnabled" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+          <ScrollContentPresenter Name="PART_ContentPresenter"
+                                  Grid.RowSpan="2"
+                                  Grid.ColumnSpan="2"
+                                  Padding="{TemplateBinding Padding}"
+                                  Background="{TemplateBinding Background}"
+                                  HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                  HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                  ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}"
+                                  VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                  VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}">
+            <ScrollContentPresenter.GestureRecognizers>
+              <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                       CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                       Extent="{Binding Extent, ElementName=PART_ContentPresenter}"
+                                       IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}"
+                                       Offset="{Binding Offset, ElementName=PART_ContentPresenter}"
+                                       Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}" />
+            </ScrollContentPresenter.GestureRecognizers>
+          </ScrollContentPresenter>
+          <ScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Orientation="Horizontal" />
+          <ScrollBar Name="PART_VerticalScrollBar" Grid.Column="1" Orientation="Vertical" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  rest: a 1 px hairline at Emphasis 35%; over the bar: 6 px at 50% (160 ms); dragging: 62%; radius 12 (round), at least 40 long  -->
+  <ControlTheme x:Key="GlassScrollThumb" TargetType="Thumb">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA35Brush}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Width" Duration="0:0:0.16" />
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Height" Duration="0:0:0.16" />
+        <ThicknessTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Margin" Duration="0:0:0.16" />
+        <BrushTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Background" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusScrollThumb}" ui:SquircleBorder.CornerShape="Round" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="{DynamicResource EmphasisA62Brush}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the bar's page areas: transparent, and out of the tab order  -->
+  <ControlTheme x:Key="GlassScrollTrackButton" TargetType="RepeatButton">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="AutomationProperties.AccessibilityView" Value="Raw" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="Transparent" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+    <Setter Property="Cursor" Value="Arrow" />
+
+    <Style Selector="^:vertical">
+      <Setter Property="Width" Value="12" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Track DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                 IsDirectionReversed="True"
+                 Maximum="{TemplateBinding Maximum}"
+                 Minimum="{TemplateBinding Minimum}"
+                 Orientation="{TemplateBinding Orientation}"
+                 ViewportSize="{TemplateBinding ViewportSize}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}">
+            <Track.DecreaseButton>
+              <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
+            </Track.IncreaseButton>
+            <Thumb Name="thumb"
+                   Width="1"
+                   MinHeight="40"
+                   Margin="0,2,5,2"
+                   HorizontalAlignment="Right"
+                   Theme="{StaticResource GlassScrollThumb}" />
+          </Track>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:vertical:pointerover /template/ Thumb#thumb">
+      <Setter Property="Width" Value="6" />
+      <Setter Property="Margin" Value="0,2,3,2" />
+      <Setter Property="Background" Value="{DynamicResource EmphasisA50Brush}" />
+    </Style>
+
+    <Style Selector="^:horizontal">
+      <Setter Property="Height" Value="12" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Track DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                 Maximum="{TemplateBinding Maximum}"
+                 Minimum="{TemplateBinding Minimum}"
+                 Orientation="{TemplateBinding Orientation}"
+                 ViewportSize="{TemplateBinding ViewportSize}"
+                 Value="{TemplateBinding Value, Mode=TwoWay}">
+            <Track.DecreaseButton>
+              <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
+            </Track.DecreaseButton>
+            <Track.IncreaseButton>
+              <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
+            </Track.IncreaseButton>
+            <Thumb Name="thumb"
+                   Height="1"
+                   MinWidth="40"
+                   Margin="2,0,2,5"
+                   VerticalAlignment="Bottom"
+                   Theme="{StaticResource GlassScrollThumb}" />
+          </Track>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:horizontal:pointerover /template/ Thumb#thumb">
+      <Setter Property="Height" Value="6" />
+      <Setter Property="Margin" Value="2,0,2,3" />
+      <Setter Property="Background" Value="{DynamicResource EmphasisA50Brush}" />
+    </Style>
+    <Style Selector="^ /template/ Thumb#thumb:pressed">
+      <Setter Property="Background" Value="{DynamicResource EmphasisA62Brush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

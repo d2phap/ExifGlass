@@ -23,6 +23,16 @@ namespace ExifGlass.Core.Platform;
 /// </summary>
 public interface IShellProvider
 {
+    #region Properties
+
+    /// <summary>
+    /// Gets whether the OS animates owned windows itself as they open and close (S4: DWM does unless Animation effects are off).
+    /// </summary>
+    bool AnimatesOwnedWindows => false;
+
+    #endregion // Properties
+
+
     #region Methods
 
     /// <summary>

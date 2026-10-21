@@ -1,0 +1,351 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:conv="using:Avalonia.Controls.Converters"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <conv:PlatformKeyGestureConverter x:Key="KeyGestureConverter" />
+
+  <!--  DS 6.8 menu surface: 240-280 wide, padding 6, radius 20, Bg.Elevated, 1 px Emphasis 12%, elevation 1. The popup is a window, so a margin holds the shadow it would clip  -->
+  <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
+    <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA12Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Name="PART_Surface"
+                           MinWidth="240"
+                           MaxWidth="280"
+                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           BoxShadow="{StaticResource Elevation1}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                        VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+            <ItemsPresenter Name="PART_ItemsPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            Grid.IsSharedSizeScope="True"
+                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                            KeyboardNavigation.TabNavigation="Continue" />
+          </ScrollViewer>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ContextMenu}" TargetType="ContextMenu">
+    <Setter Property="Padding" Value="6" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
+    <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA12Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Name="PART_Surface"
+                           MinWidth="240"
+                           MaxWidth="280"
+                           Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           BoxShadow="{StaticResource Elevation1}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsPresenter Name="PART_ItemsPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            Grid.IsSharedSizeScope="True"
+                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                            KeyboardNavigation.TabNavigation="Continue" />
+          </ScrollViewer>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  DS 6.8 item: 34 high (44 with a description), radius 14, padding 6/8, icon tile 30 (radius 12, Emphasis 6%) or a checkbox, gap 12; wide item, so pressed dims instead of scaling  -->
+  <ControlTheme x:Key="{x:Type ui:GlassMenuItem}" TargetType="ui:GlassMenuItem">
+    <Setter Property="MinHeight" Value="{StaticResource MenuItemHeight}" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenuItem}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <Panel Name="PART_Lead" Width="30" Height="30" Margin="0,0,12,0" VerticalAlignment="Center" DockPanel.Dock="Left">
+              <ui:SquircleBorder Name="PART_Tile" Background="{DynamicResource EmphasisA06Brush}" CornerRadius="{StaticResource RadiusIconTile}" />
+              <ui:GlassIcon Name="PART_Glyph" Width="16" Height="16" Icon="{TemplateBinding Glyph}" />
+              <Panel Name="PART_ToggleBox" Width="16" Height="16" IsVisible="False">
+                <ui:SquircleBorder Name="PART_BoxFill"
+                                   Background="{DynamicResource AccentA00Brush}"
+                                   BorderBrush="{DynamicResource EmphasisA40Brush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusCheckBox}">
+                  <ui:SquircleBorder.Transitions>
+                    <Transitions>
+                      <BrushTransition Property="Background" Duration="0:0:0.15" />
+                      <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                    </Transitions>
+                  </ui:SquircleBorder.Transitions>
+                </ui:SquircleBorder>
+                <ui:GlassIcon Name="PART_Check"
+                              Width="12"
+                              Height="12"
+                              Foreground="{DynamicResource OnAccentBrush}"
+                              Icon="{x:Static ui:IconId.CheckmarkFilled}"
+                              RenderTransform="scale(0)"
+                              RenderTransformOrigin="50%,50%">
+                  <ui:GlassIcon.Transitions>
+                    <Transitions>
+                      <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.CheckGlyphEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                    </Transitions>
+                  </ui:GlassIcon.Transitions>
+                </ui:GlassIcon>
+              </Panel>
+            </Panel>
+            <ui:GlassIcon Name="PART_SubArrow"
+                          Width="12"
+                          Height="12"
+                          Margin="8,0,0,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Right"
+                          Icon="{x:Static ui:IconId.ChevronRight}"
+                          Opacity="0.7" />
+            <TextBlock Name="PART_Hint"
+                       Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Right"
+                       FontSize="{StaticResource FontSizeOverline}"
+                       Foreground="{DynamicResource TextTertiaryBrush}"
+                       Text="{TemplateBinding Hint}" />
+            <TextBlock Name="PART_InputGestureText"
+                       Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Right"
+                       FontSize="{StaticResource FontSizeOverline}"
+                       Foreground="{DynamicResource TextTertiaryBrush}"
+                       Text="{TemplateBinding InputGesture, Converter={StaticResource KeyGestureConverter}}" />
+            <StackPanel VerticalAlignment="Center" Spacing="1">
+              <ContentPresenter Name="PART_HeaderPresenter"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                FontWeight="Medium"
+                                RecognizesAccessKey="True" />
+              <TextBlock Name="PART_Description"
+                         FontSize="{StaticResource FontSizeMeta}"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{TemplateBinding Description}"
+                         TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+          </DockPanel>
+          <Popup Name="PART_Popup"
+                 IsLightDismissEnabled="False"
+                 IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
+                 Placement="RightEdgeAlignedTop">
+            <ui:SquircleBorder MinWidth="240"
+                               Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                               Padding="6"
+                               Background="{DynamicResource BgElevatedBrush}"
+                               BorderBrush="{DynamicResource EmphasisA12Brush}"
+                               BorderThickness="1"
+                               BoxShadow="{StaticResource Elevation1}"
+                               CornerRadius="{StaticResource RadiusMenu}">
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter Name="PART_ItemsPresenter" Grid.IsSharedSizeScope="True" ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+            </ui:SquircleBorder>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:separator">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Separator />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:description">
+      <Setter Property="MinHeight" Value="{StaticResource MenuItemTallHeight}" />
+    </Style>
+    <Style Selector="^:not(:description) /template/ TextBlock#PART_Description">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:hint) /template/ TextBlock#PART_Hint">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:empty /template/ ui|GlassIcon#PART_SubArrow">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:glyph):not(:toggle) /template/ Panel#PART_Lead">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:toggle /template/ Border#PART_Tile">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:toggle /template/ ui|GlassIcon#PART_Glyph">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:toggle /template/ Panel#PART_Lead">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Height" Value="16" />
+      <Setter Property="Margin" Value="7,0,19,0" />
+    </Style>
+    <Style Selector="^:toggle /template/ Panel#PART_ToggleBox">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:checked /template/ Border#PART_BoxFill">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="^:checked /template/ ui|GlassIcon#PART_Check">
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="^:selected /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^.danger">
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type MenuItem}" TargetType="MenuItem">
+    <Setter Property="MinHeight" Value="{StaticResource MenuItemHeight}" />
+    <Setter Property="Padding" Value="8,6" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenuItem}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ContentPresenter Name="PART_IconPresenter"
+                              Width="16"
+                              Height="16"
+                              Margin="0,0,12,0"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Icon}"
+                              DockPanel.Dock="Left"
+                              IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Name="PART_InputGestureText"
+                       Margin="8,0,0,0"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Right"
+                       FontSize="{StaticResource FontSizeOverline}"
+                       Foreground="{DynamicResource TextTertiaryBrush}"
+                       Text="{TemplateBinding InputGesture, Converter={StaticResource KeyGestureConverter}}" />
+            <ContentPresenter Name="PART_HeaderPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Header}"
+                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                              FontWeight="Medium"
+                              RecognizesAccessKey="True" />
+          </DockPanel>
+          <Popup Name="PART_Popup"
+                 IsLightDismissEnabled="False"
+                 IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
+                 Placement="RightEdgeAlignedTop">
+            <ui:SquircleBorder MinWidth="240"
+                               Margin="{x:Static ui:MenuMotion.SHADOW_ROOM}"
+                               Padding="6"
+                               Background="{DynamicResource BgElevatedBrush}"
+                               BorderBrush="{DynamicResource EmphasisA12Brush}"
+                               BorderThickness="1"
+                               BoxShadow="{StaticResource Elevation1}"
+                               CornerRadius="{StaticResource RadiusMenu}">
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter Name="PART_ItemsPresenter" Grid.IsSharedSizeScope="True" ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+            </ui:SquircleBorder>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:separator">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Separator />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:selected /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 6.8 header label: Overline, not interactive  -->
+  <ControlTheme x:Key="{x:Type ui:GlassMenuHeader}" TargetType="ui:GlassMenuHeader">
+    <Setter Property="Height" Value="28" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <TextBlock Margin="{TemplateBinding Padding}"
+                   VerticalAlignment="Center"
+                   Classes="overline"
+                   Text="{TemplateBinding Text}"
+                   TextTrimming="CharacterEllipsis" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  DS 6.8 divider: 1 px hairline with 6 px margin  -->
+  <ControlTheme x:Key="{x:Type Separator}" TargetType="Separator">
+    <Setter Property="Height" Value="1" />
+    <Setter Property="Margin" Value="6" />
+    <Setter Property="Background" Value="{DynamicResource StrokeHairlineBrush}" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Menu}" TargetType="Menu">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" KeyboardNavigation.TabNavigation="Continue" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

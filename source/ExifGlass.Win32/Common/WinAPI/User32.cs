@@ -16,19 +16,25 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-namespace ExifGlass.UI.Tokens;
+using System.Runtime.InteropServices;
 
-/// <summary>
-/// Resource keys of Tokens.axaml that code looks up.
-/// </summary>
-public static class TokenKeys
+namespace ExifGlass.Win32.Common.WinAPI;
+
+internal static partial class User32
 {
     #region Constants
 
-    public const string BG_WINDOW_BRUSH = "BgWindowBrush";
-    public const string BG_PANEL_BRUSH = "BgPanelBrush";
-    public const string TEXT_PRIMARY_BRUSH = "TextPrimaryBrush";
-    public const string FONT_UI = "FontUi";
+    // "Animation effects" in Settings; off also turns off DWM's window transitions
+    public const uint SPI_GETCLIENTAREAANIMATION = 0x1042;
 
     #endregion // Constants
+
+
+    #region Native methods
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool SystemParametersInfoW(uint action, uint param, out int value, uint winIni);
+
+    #endregion // Native methods
 }

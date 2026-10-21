@@ -1,0 +1,558 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  DS 6.2: 32 high, radius 14, padding 10, Bg.Input, border Stroke.Control; hover Emphasis 24%; focus = Accent border + inset 1 px Accent (a crisp 2 px ring, no glow)  -->
+  <ControlTheme x:Key="{x:Type TextBox}" TargetType="TextBox">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Background" Value="{DynamicResource BgInputBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CaretBrush" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="PlaceholderForeground" Value="{DynamicResource TextTertiaryBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource AccentA30Brush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ui:SquircleBorder Name="PART_Field"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding InnerLeftContent}" DockPanel.Dock="Left" />
+            <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding InnerRightContent}" DockPanel.Dock="Right" />
+            <ScrollViewer Name="PART_ScrollViewer"
+                          HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                          VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+              <Panel VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <TextBlock Name="PART_Placeholder"
+                           Foreground="{TemplateBinding PlaceholderForeground}"
+                           Text="{TemplateBinding PlaceholderText}"
+                           TextTrimming="CharacterEllipsis"
+                           TextWrapping="{TemplateBinding TextWrapping}">
+                  <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}" ElementName="PART_TextPresenter" Path="PreeditText" />
+                      <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}" Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </MultiBinding>
+                  </TextBlock.IsVisible>
+                </TextBlock>
+                <TextPresenter Name="PART_TextPresenter"
+                               CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                               CaretBrush="{TemplateBinding CaretBrush}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               LetterSpacing="{TemplateBinding LetterSpacing}"
+                               LineHeight="{TemplateBinding LineHeight}"
+                               PasswordChar="{TemplateBinding PasswordChar}"
+                               RevealPassword="{TemplateBinding RevealPassword}"
+                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               TextAlignment="{TemplateBinding TextAlignment}"
+                               TextWrapping="{TemplateBinding TextWrapping}" />
+              </Panel>
+            </ScrollViewer>
+          </DockPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Field">
+      <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlHoverBrush}" />
+    </Style>
+    <Style Selector="^:focus /template/ Border#PART_Field">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="^:focus /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.6" />
+    </Style>
+
+    <!--  DS 6.2 multiline value editor: mono, min 64, starts focused with the text selected  -->
+    <Style Selector="^.mono-editor">
+      <Setter Property="Height" Value="NaN" />
+      <Setter Property="MinHeight" Value="64" />
+      <Setter Property="Padding" Value="11,9" />
+      <Setter Property="FontFamily" Value="{DynamicResource FontMono}" />
+      <Setter Property="FontSize" Value="{StaticResource FontSizeMonoValue}" />
+      <Setter Property="AcceptsReturn" Value="True" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="VerticalContentAlignment" Value="Top" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the clear button inside the search box: 22, radius 10  -->
+  <ControlTheme x:Key="ClearButton" TargetType="Button">
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl22}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:GlassIcon Width="14" Height="14" Icon="{x:Static ui:IconId.Dismiss}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  DS 6.2 search: leading search icon 16, Ctrl+K hint while empty, clear button while not  -->
+  <ControlTheme x:Key="{x:Type ui:SearchBox}" TargetType="ui:SearchBox" BasedOn="{StaticResource {x:Type TextBox}}">
+    <Setter Property="Padding" Value="10,0,5,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ui:SquircleBorder Name="PART_Field"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ui:GlassIcon Width="16"
+                          Height="16"
+                          Margin="0,0,8,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Left"
+                          Foreground="{DynamicResource TextSecondaryBrush}"
+                          Icon="{x:Static ui:IconId.Search}" />
+            <Button Name="PART_ClearButton"
+                    Margin="6,0,0,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{x:Static ui:SearchBox.CLEAR_LABEL}"
+                    DockPanel.Dock="Right"
+                    Theme="{StaticResource ClearButton}"
+                    ToolTip.Tip="{x:Static ui:SearchBox.CLEAR_LABEL}" />
+            <ui:Kbd Name="PART_Hint"
+                    Margin="6,0,1,0"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Right"
+                    Text="{TemplateBinding ShortcutHint}" />
+            <ScrollViewer Name="PART_ScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+              <Panel VerticalAlignment="Center">
+                <TextBlock Name="PART_Placeholder"
+                           Foreground="{TemplateBinding PlaceholderForeground}"
+                           Text="{TemplateBinding PlaceholderText}"
+                           TextTrimming="CharacterEllipsis">
+                  <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}" ElementName="PART_TextPresenter" Path="PreeditText" />
+                      <Binding Converter="{x:Static StringConverters.IsNullOrEmpty}" Path="Text" RelativeSource="{RelativeSource TemplatedParent}" />
+                    </MultiBinding>
+                  </TextBlock.IsVisible>
+                </TextBlock>
+                <TextPresenter Name="PART_TextPresenter"
+                               CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                               CaretBrush="{TemplateBinding CaretBrush}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               TextWrapping="NoWrap" />
+              </Panel>
+            </ScrollViewer>
+          </DockPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:empty /template/ Button#PART_ClearButton">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:empty) /template/ ui|Kbd#PART_Hint">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:focus /template/ ui|Kbd#PART_Hint">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.no-hint /template/ ui|Kbd#PART_Hint">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 6.15 token field: chips per argument in a field radius 14 (Emphasis 16%), dashed suggestions below  -->
+  <ControlTheme x:Key="{x:Type ui:TokenField}" TargetType="ui:TokenField">
+    <Setter Property="Padding" Value="5,5" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="Background" Value="{DynamicResource BgInputBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA16Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Cursor" Value="IBeam" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Spacing="8">
+          <Panel>
+            <ui:SquircleBorder Name="PART_Field"
+                               MinHeight="{StaticResource ControlHeight}"
+                               Background="{TemplateBinding Background}"
+                               BorderBrush="{TemplateBinding BorderBrush}"
+                               BorderThickness="{TemplateBinding BorderThickness}"
+                               CornerRadius="{TemplateBinding CornerRadius}">
+              <ui:SquircleBorder.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                </Transitions>
+              </ui:SquircleBorder.Transitions>
+            </ui:SquircleBorder>
+            <ui:SquircleBorder Name="PART_FocusRing"
+                               BorderBrush="{DynamicResource AccentBrush}"
+                               BorderThickness="2"
+                               CornerRadius="{TemplateBinding CornerRadius}"
+                               IsHitTestVisible="False"
+                               Opacity="0">
+              <ui:SquircleBorder.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                </Transitions>
+              </ui:SquircleBorder.Transitions>
+            </ui:SquircleBorder>
+            <WrapPanel Name="PART_Panel" Margin="{TemplateBinding Padding}" ItemSpacing="6" LineSpacing="6" Orientation="Horizontal">
+              <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" PlaceholderText="{TemplateBinding Placeholder}" />
+            </WrapPanel>
+          </Panel>
+          <WrapPanel Name="PART_Suggestions" ItemSpacing="6" LineSpacing="6" Orientation="Horizontal" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Field">
+      <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlHoverBrush}" />
+    </Style>
+    <Style Selector="^:focus-within /template/ Border#PART_Field">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="^:focus-within /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the borderless input at the end of a token field  -->
+  <ControlTheme x:Key="TokenInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+    <Setter Property="Height" Value="26" />
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="Padding" Value="4,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontMono}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeMono}" />
+    <Style Selector="^:focus /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#PART_Field">
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+  </ControlTheme>
+
+  <!--  a token chip: 26 high, radius 12, mono 11.5; flags Accent 10% in AccentText, values Accent2 10%; locked shows a lock, invalid turns red  -->
+  <ControlTheme x:Key="{x:Type ui:TokenChip}" TargetType="ui:TokenChip">
+    <Setter Property="Height" Value="26" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl26}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FontMono}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeMono}" />
+    <Setter Property="Background" Value="{DynamicResource AccentA10Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent">
+          <ui:SquircleBorder Name="PART_Background"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <StackPanel Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
+            <ui:GlassIcon Name="PART_Lock" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.LockClosed}" IsVisible="False" />
+            <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Text}" />
+            <Button Name="PART_Remove"
+                    Width="16"
+                    Height="16"
+                    Margin="2,0,-4,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="{x:Static ui:TokenChip.REMOVE_LABEL}"
+                    CornerRadius="{StaticResource RadiusControl18}"
+                    Focusable="False"
+                    Opacity="0.55">
+              <Button.Template>
+                <ControlTemplate>
+                  <Panel Background="Transparent">
+                    <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
+                                           HoverBrush="{DynamicResource StateHoverBrush}"
+                                           PressBrush="{DynamicResource StatePressedBrush}"
+                                           RestBrush="{DynamicResource StateRestBrush}" />
+                    <ui:GlassIcon Width="10" Height="10" Icon="{x:Static ui:IconId.Dismiss}" />
+                  </Panel>
+                </ControlTemplate>
+              </Button.Template>
+              <Button.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.14" />
+                </Transitions>
+              </Button.Transitions>
+            </Button>
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.value">
+      <Setter Property="Background" Value="{DynamicResource Accent2A10Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Accent2TextBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Button#PART_Remove">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:locked /template/ ui|GlassIcon#PART_Lock">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:locked /template/ Button#PART_Remove">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:invalid">
+      <Setter Property="Background" Value="{DynamicResource DangerA12Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+    </Style>
+    <Style Selector="^.suggestion">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA24Brush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^.suggestion /template/ Border#PART_Background">
+      <Setter Property="(ui:SquircleBorder.BorderDashArray)" Value="3,2" />
+    </Style>
+    <Style Selector="^.suggestion /template/ Button#PART_Remove">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!--  ComboBox: a secondary button with a chevron; the list is a menu surface (DS 6.8)  -->
+  <ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="160" />
+    <Setter Property="Padding" Value="12,0,10,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Background" Value="{DynamicResource BgInputBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="MaxDropDownHeight" Value="320" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ui:GlassIcon Name="PART_Chevron"
+                          Width="12"
+                          Height="12"
+                          Margin="8,0,0,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Right"
+                          Icon="{x:Static ui:IconId.ChevronDown}"
+                          Opacity="0.7"
+                          RenderTransformOrigin="50%,50%">
+              <ui:GlassIcon.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.ChevronEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                </Transitions>
+              </ui:GlassIcon.Transitions>
+            </ui:GlassIcon>
+            <ContentControl VerticalAlignment="Center"
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+          </DockPanel>
+          <Popup Name="PART_Popup"
+                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                 InheritsTransform="True"
+                 IsLightDismissEnabled="True"
+                 IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                 Placement="Bottom"
+                 PlacementTarget="{TemplateBinding}"
+                 VerticalOffset="-16">
+            <ui:SquircleBorder MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                               Margin="40,20,40,60"
+                               Padding="6"
+                               Background="{DynamicResource BgElevatedBrush}"
+                               BorderBrush="{DynamicResource EmphasisA12Brush}"
+                               BorderThickness="1"
+                               BoxShadow="{StaticResource Elevation1}"
+                               CornerRadius="{StaticResource RadiusMenu}">
+              <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+              </ScrollViewer>
+            </ui:SquircleBorder>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:dropdownopen /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^:dropdownopen /template/ ui|GlassIcon#PART_Chevron">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  a ComboBox row: a menu item 34 high, radius 14, a check on the selected one  -->
+  <ControlTheme x:Key="{x:Type ComboBoxItem}" TargetType="ComboBoxItem">
+    <Setter Property="Height" Value="{StaticResource MenuItemHeight}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenuItem}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ui:GlassIcon Name="PART_Check"
+                          Width="14"
+                          Height="14"
+                          Margin="8,0,0,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Right"
+                          Foreground="{DynamicResource AccentTextBrush}"
+                          Icon="{x:Static ui:IconId.Checkmark}"
+                          IsVisible="False" />
+            <ContentPresenter Name="PART_ContentPresenter"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </DockPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:selected /template/ ui|GlassIcon#PART_Check">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:focus-visible">
+      <Setter Property="Background" Value="{DynamicResource StateHoverBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

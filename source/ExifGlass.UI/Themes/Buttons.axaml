@@ -1,0 +1,515 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  Template layers (plan 5.5, S1): root panel (press-scale target) > fill and hairline in one squircle > state layer > inset focus ring > content  -->
+
+  <!--  DS 6.1: classes primary, ghost, danger, link; sizes card 30, small 28, tiny 24; an icon with no label is a square icon button  -->
+  <ControlTheme x:Key="{x:Type ui:GlassButton}" TargetType="ui:GlassButton">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeControl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <StackPanel Name="PART_Content"
+                      Margin="{TemplateBinding Padding}"
+                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                      Orientation="Horizontal"
+                      Spacing="6">
+            <ui:GlassIcon Name="PART_Icon"
+                          Width="{TemplateBinding IconSize}"
+                          Height="{TemplateBinding IconSize}"
+                          VerticalAlignment="Center"
+                          Icon="{TemplateBinding Icon}" />
+            <ContentPresenter Name="PART_ContentPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              RecognizesAccessKey="True" />
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:icon) /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:label) /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:icon:label">
+      <Setter Property="Padding" Value="10,0,12,0" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+
+    <!--  icon-only: square, no border (DS 6.1 Icon)  -->
+    <Style Selector="^:icon:not(:label)">
+      <Setter Property="Width" Value="{StaticResource ControlHeight}" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style Selector="^.primary">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+    </Style>
+    <Style Selector="^.primary /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="RestBrush" Value="{DynamicResource WhiteA00Brush}" />
+      <Setter Property="HoverBrush" Value="{DynamicResource WhiteA08Brush}" />
+      <Setter Property="PressBrush" Value="{DynamicResource WhiteA14Brush}" />
+    </Style>
+    <Style Selector="^.primary /template/ Border#PART_FocusRing">
+      <Setter Property="BorderBrush" Value="{DynamicResource OnAccentBrush}" />
+    </Style>
+
+    <Style Selector="^.ghost">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="10,0" />
+    </Style>
+    <Style Selector="^.ghost:icon:label">
+      <Setter Property="Padding" Value="8,0,10,0" />
+    </Style>
+
+    <Style Selector="^.danger">
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+    </Style>
+    <Style Selector="^.danger /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="RestBrush" Value="{DynamicResource DangerA00Brush}" />
+      <Setter Property="HoverBrush" Value="{DynamicResource DangerA08Brush}" />
+      <Setter Property="PressBrush" Value="{DynamicResource DangerA12Brush}" />
+    </Style>
+
+    <!--  text links: Show more, Clear all, Open in OpenStreetMap  -->
+    <Style Selector="^.link">
+      <Setter Property="Height" Value="{StaticResource ControlHeightTiny}" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="Padding" Value="6,0" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl24}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+      <Setter Property="IconSize" Value="14" />
+    </Style>
+    <Style Selector="^.link:icon:label">
+      <Setter Property="Padding" Value="5,0,6,0" />
+    </Style>
+
+    <Style Selector="^.card">
+      <Setter Property="Height" Value="{StaticResource ControlHeightCard}" />
+      <Setter Property="MinWidth" Value="{StaticResource ControlHeightCard}" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl30}" />
+    </Style>
+    <Style Selector="^.card:icon:not(:label)">
+      <Setter Property="Width" Value="{StaticResource ControlHeightCard}" />
+    </Style>
+    <Style Selector="^.small">
+      <Setter Property="Height" Value="{StaticResource ControlHeightSmall}" />
+      <Setter Property="MinWidth" Value="{StaticResource ControlHeightSmall}" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl28}" />
+      <Setter Property="IconSize" Value="14" />
+    </Style>
+    <Style Selector="^.small:icon:not(:label)">
+      <Setter Property="Width" Value="{StaticResource ControlHeightSmall}" />
+    </Style>
+    <Style Selector="^.tiny">
+      <Setter Property="Height" Value="{StaticResource ControlHeightTiny}" />
+      <Setter Property="MinWidth" Value="{StaticResource ControlHeightTiny}" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl24}" />
+      <Setter Property="Padding" Value="8,0" />
+      <Setter Property="FontSize" Value="{StaticResource FontSizeMeta}" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="IconSize" Value="13" />
+    </Style>
+    <Style Selector="^.tiny:icon:not(:label)">
+      <Setter Property="Width" Value="{StaticResource ControlHeightTiny}" />
+    </Style>
+    <Style Selector="^.toolbar">
+      <Setter Property="IconSize" Value="{StaticResource IconToolbar}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  any plain Button looks like the secondary one  -->
+  <ControlTheme x:Key="{x:Type Button}" TargetType="Button">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeControl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            RecognizesAccessKey="True" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 6.1 toggle: off = Regular icon, on = Filled icon + Accent 10% + AccentText  -->
+  <ControlTheme x:Key="{x:Type ui:GlassToggleButton}" TargetType="ui:GlassToggleButton">
+    <Setter Property="Width" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeControl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="{DynamicResource AccentA00Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.SelectEasing}" Property="Foreground" Duration="0:0:0.16" />
+        <BrushTransition Easing="{x:Static tok:MotionTokens.SelectEasing}" Property="Background" Duration="0:0:0.16" />
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <StackPanel Margin="{TemplateBinding Padding}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Orientation="Horizontal"
+                      Spacing="6">
+            <ui:GlassIcon Name="PART_Icon"
+                          Width="{TemplateBinding IconSize}"
+                          Height="{TemplateBinding IconSize}"
+                          VerticalAlignment="Center"
+                          Icon="{TemplateBinding ShownIcon}" />
+            <ContentPresenter Name="PART_ContentPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:checked">
+      <Setter Property="Background" Value="{DynamicResource AccentA10Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+    <Style Selector="^.small">
+      <Setter Property="Width" Value="{StaticResource ControlHeightSmall}" />
+      <Setter Property="Height" Value="{StaticResource ControlHeightSmall}" />
+      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl28}" />
+      <Setter Property="IconSize" Value="16" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ToggleButton}" TargetType="ToggleButton" BasedOn="{StaticResource {x:Type Button}}">
+    <Setter Property="Background" Value="{DynamicResource AccentA00Brush}" />
+    <Style Selector="^:checked">
+      <Setter Property="Background" Value="{DynamicResource AccentA10Brush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type RepeatButton}" TargetType="RepeatButton" BasedOn="{StaticResource {x:Type Button}}" />
+
+  <!--  DS 6.1 dropdown: icon 16 + label + chevron 12 at 70%, chevron turns 180 degrees and the hover fill holds while open  -->
+  <ControlTheme x:Key="{x:Type ui:GlassDropDownButton}" TargetType="ui:GlassDropDownButton">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="12,0,10,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeControl}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource StrokeControlBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background"
+                             Background="{TemplateBinding Background}"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="{TemplateBinding BorderThickness}"
+                             CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <StackPanel Margin="{TemplateBinding Padding}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Orientation="Horizontal"
+                      Spacing="6">
+            <ui:GlassIcon Name="PART_Icon"
+                          Width="{TemplateBinding IconSize}"
+                          Height="{TemplateBinding IconSize}"
+                          VerticalAlignment="Center"
+                          Icon="{TemplateBinding Icon}" />
+            <ContentPresenter Name="PART_ContentPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              RecognizesAccessKey="True" />
+            <ui:GlassIcon Name="PART_Chevron"
+                          Width="12"
+                          Height="12"
+                          VerticalAlignment="Center"
+                          Icon="ChevronDown"
+                          Opacity="0.7"
+                          RenderTransformOrigin="50%,50%">
+              <ui:GlassIcon.Transitions>
+                <Transitions>
+                  <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.ChevronEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                </Transitions>
+              </ui:GlassIcon.Transitions>
+            </ui:GlassIcon>
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:icon) /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:label) /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:icon">
+      <Setter Property="Padding" Value="10,0,10,0" />
+    </Style>
+    <Style Selector="^:icon:not(:label)">
+      <Setter Property="Padding" Value="8,0" />
+    </Style>
+    <Style Selector="^:flyout-open /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
+    </Style>
+    <Style Selector="^:flyout-open /template/ ui|GlassIcon#PART_Chevron">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+
+    <Style Selector="^.secondary">
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="^.primary">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+    </Style>
+    <Style Selector="^.primary /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="RestBrush" Value="{DynamicResource WhiteA00Brush}" />
+      <Setter Property="HoverBrush" Value="{DynamicResource WhiteA08Brush}" />
+      <Setter Property="PressBrush" Value="{DynamicResource WhiteA14Brush}" />
+    </Style>
+    <Style Selector="^.primary /template/ Border#PART_FocusRing">
+      <Setter Property="BorderBrush" Value="{DynamicResource OnAccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type DropDownButton}" TargetType="DropDownButton" BasedOn="{StaticResource {x:Type Button}}" />
+
+  <!--  DS 6.15 Store badge: inverse fill, no shadow, radius 16, 52 high; hover brightness 1.15, pressed 0.9 and scale 0.97  -->
+  <ControlTheme x:Key="{x:Type ui:StoreBadge}" TargetType="ui:StoreBadge">
+    <Setter Property="Height" Value="{StaticResource StoreBadgeHeight}" />
+    <Setter Property="Padding" Value="16,0,20,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusStoreBadge}" />
+    <Setter Property="Background" Value="{DynamicResource InverseBgBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource InverseFgBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:SquircleBorder Name="PART_Background" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}" />
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource InverseHoverLayerBrush}"
+                                 PressBrush="{DynamicResource InversePressedLayerBrush}"
+                                 PressScale="0.97"
+                                 RestBrush="{DynamicResource InverseRestLayerBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <StackPanel Margin="{TemplateBinding Padding}"
+                      VerticalAlignment="Center"
+                      Orientation="Horizontal"
+                      Spacing="12">
+            <ui:GlassIcon Width="24" Height="24" VerticalAlignment="Center" Icon="{TemplateBinding Glyph}" />
+            <StackPanel VerticalAlignment="Center" Spacing="1">
+              <TextBlock FontSize="{StaticResource FontSizeBadge}" Opacity="0.75" Text="{TemplateBinding Caption}" />
+              <TextBlock FontSize="{StaticResource FontSizeStoreTitle}" FontWeight="SemiBold" Text="{TemplateBinding Target}" />
+            </StackPanel>
+          </StackPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

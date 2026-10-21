@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
 using ExifGlass.Core.Common;
+using ExifGlass.UI.Windows;
 
 namespace ExifGlass.Windows;
 
@@ -28,7 +29,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        WindowBackdrop.Use(this);
+        AppWindow.Prepare(this);
 
         VersionText.Text = AppInfo.BuildInfo is { } info ? $"Version {info.Version}" : string.Empty;
     }

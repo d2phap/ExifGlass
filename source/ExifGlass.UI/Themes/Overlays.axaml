@@ -1,0 +1,165 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  tooltips carry names and shortcuts (DS 8): Bg.Elevated, 1 px Emphasis 12%, radius 12, caption text; a margin holds the shadow the popup would clip  -->
+  <ControlTheme x:Key="{x:Type ToolTip}" TargetType="ToolTip">
+    <Setter Property="Padding" Value="9,5" />
+    <Setter Property="MaxWidth" Value="320" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl26}" />
+    <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA12Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Margin="16,4,16,20"
+                           Padding="{TemplateBinding Padding}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           BoxShadow="{StaticResource ShadowTooltip}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            TextWrapping="Wrap" />
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  DS 6.14 toast: bottom centre, 62 above the bottom, 44 high, radius 16, Bg.Elevated 98% (no blur), status icon 18 Filled, title Medium + sub 11.5  -->
+  <ControlTheme x:Key="{x:Type ui:ToastHost}" TargetType="ui:ToastHost">
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ui:SquircleBorder Name="PART_Toast"
+                             MinHeight="{StaticResource ToastHeight}"
+                             Margin="16,0,16,62"
+                             Padding="12,6,16,6"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Bottom"
+                             Background="{DynamicResource BgToastBrush}"
+                             BorderBrush="{DynamicResource EmphasisA10Brush}"
+                             BorderThickness="1"
+                             BoxShadow="{StaticResource ElevationToast}"
+                             CornerRadius="{StaticResource RadiusToast}"
+                             IsVisible="False">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <ui:GlassIcon Name="PART_Status"
+                            Width="18"
+                            Height="18"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource SuccessBrush}"
+                            Icon="{TemplateBinding StatusIcon}" />
+              <StackPanel VerticalAlignment="Center" Spacing="1">
+                <TextBlock FontWeight="Medium" Text="{TemplateBinding Title}" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="{StaticResource FontSizeMeta}"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           IsVisible="{TemplateBinding Subtitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Text="{TemplateBinding Subtitle}"
+                           TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </StackPanel>
+          </ui:SquircleBorder>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:danger /template/ ui|GlassIcon#PART_Status">
+      <Setter Property="Foreground" Value="{DynamicResource DangerBrush}" />
+    </Style>
+    <Style Selector="^:info /template/ ui|GlassIcon#PART_Status">
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  D8 dialog: the content, a scrim (#000 18%) and a menu-style card at elevation 2  -->
+  <ControlTheme x:Key="{x:Type ui:DialogHost}" TargetType="ui:DialogHost">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Panel Name="PART_DialogLayer" IsVisible="False">
+            <Border Name="PART_Scrim" Background="{DynamicResource ScrimBrush}" />
+            <ui:DialogCard Name="PART_Card" HorizontalAlignment="Center" VerticalAlignment="Center" KeyboardNavigation.TabNavigation="Cycle" />
+          </Panel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ui:DialogCard}" TargetType="ui:DialogCard">
+    <Setter Property="Width" Value="400" />
+    <Setter Property="Margin" Value="24" />
+    <Setter Property="Padding" Value="20,18,16,16" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenu}" />
+    <Setter Property="Background" Value="{DynamicResource BgElevatedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA12Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="{TemplateBinding Padding}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           BoxShadow="{StaticResource Elevation2}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <StackPanel Spacing="16">
+            <DockPanel>
+              <Panel Name="PART_IconTile" Width="30" Height="30" Margin="0,0,12,0" VerticalAlignment="Top" DockPanel.Dock="Left">
+                <ui:SquircleBorder Background="{DynamicResource EmphasisA06Brush}" CornerRadius="{StaticResource RadiusIconTile}" />
+                <ui:GlassIcon Width="16" Height="16" Icon="{TemplateBinding Icon}" />
+              </Panel>
+              <StackPanel Spacing="6">
+                <TextBlock Classes="title" Text="{TemplateBinding Title}" TextWrapping="Wrap" />
+                <TextBlock Classes="body"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           IsVisible="{TemplateBinding Body, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           Text="{TemplateBinding Body}"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </DockPanel>
+            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+              <ui:GlassButton Name="PART_Secondary" Classes="danger" Content="{TemplateBinding SecondaryText}" />
+              <ui:GlassButton Name="PART_Cancel" Content="{TemplateBinding CancelText}" />
+              <ui:GlassButton Name="PART_Primary" Classes="primary" Content="{TemplateBinding PrimaryText}" />
+            </StackPanel>
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:icon) /template/ Panel#PART_IconTile">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:secondary) /template/ ui|GlassButton#PART_Secondary">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 2.1 overlay panels: the content, a scrim, and the rail and inspector panes at their edges  -->
+  <ControlTheme x:Key="{x:Type ui:OverlayHost}" TargetType="ui:OverlayHost">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ContentPresenter Name="PART_ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Border Name="PART_Scrim" Background="{DynamicResource ScrimBrush}" IsVisible="False" />
+          <ContentPresenter Name="PART_LeftPane"
+                            HorizontalAlignment="Left"
+                            Content="{TemplateBinding LeftPane}"
+                            IsVisible="False" />
+          <ContentPresenter Name="PART_RightPane"
+                            HorizontalAlignment="Right"
+                            Content="{TemplateBinding RightPane}"
+                            IsVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

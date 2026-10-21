@@ -20,29 +20,30 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using ExifGlass.Core.Platform;
 using ExifGlass.UI.Tokens;
 
-namespace ExifGlass.Windows;
+namespace ExifGlass.UI.Windows;
 
 /// <summary>
-/// Gives a window its fill: native Mica on Windows 11 22H2 and later, the solid window colour everywhere else.
+/// Gives a window its fill (O4): native Mica on Windows 11 22H2 and later, the solid window colour everywhere else.
 /// </summary>
 public static class WindowBackdrop
 {
-    #region Constants
+    #region Fields and constants
 
     public const string MICA_CLASS = "mica";
 
-    #endregion // Constants
+    #endregion // Fields and constants
 
 
     #region Public methods
 
     public static void Use(Window window)
     {
-        // A style, not a local value: a theme change re-reads the brush without undoing Mica.
+        // a style, not a local value: a theme change re-reads the brush without undoing Mica
         window.Styles.Add(new Style(x => x.Is<Window>())
         {
             Setters = { new Setter(TemplatedControl.BackgroundProperty, window.GetResourceObservable(TokenKeys.BG_WINDOW_BRUSH).ToBinding()) },
@@ -71,4 +72,35 @@ public static class WindowBackdrop
     }
 
     #endregion // Event handlers
+}
+
+
+/// <summary>
+/// What every ExifGlass window gets: the app icon, grayscale text (S3), the backdrop and the theme's text colour.
+/// </summary>
+public static class AppWindow
+{
+    #region Public methods
+
+    public static void Prepare(Window window)
+    {
+        window.Icon = CreateIcon();
+        window[!TemplatedControl.ForegroundProperty] = window.GetResourceObservable(TokenKeys.TEXT_PRIMARY_BRUSH).ToBinding();
+        window[!TemplatedControl.FontFamilyProperty] = window.GetResourceObservable(TokenKeys.FONT_UI).ToBinding();
+        TextOptions.SetTextRenderingMode(window, TextRenderingMode.Antialias);
+        WindowBackdrop.Use(window);
+    }
+
+
+    /// <summary>
+    /// The caption and taskbar icon: the exe's own .ico on Windows, the 256 px logo on Linux; macOS shows the bundle's.
+    /// </summary>
+    public static WindowIcon CreateIcon()
+    {
+        var path = OperatingSystem.IsLinux() ? "Assets/Logo/logo-256.png" : "Assets/ExifGlass.ico";
+        using var stream = AssetLoader.Open(new Uri($"avares://ExifGlass.UI/{path}"));
+        return new WindowIcon(stream);
+    }
+
+    #endregion // Public methods
 }

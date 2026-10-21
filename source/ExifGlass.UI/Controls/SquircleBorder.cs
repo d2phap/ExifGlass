@@ -25,6 +25,8 @@ using Avalonia.Media.Immutable;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
+using Avalonia.Threading;
+using ExifGlass.UI.Tokens;
 using SkiaSharp;
 
 namespace ExifGlass.UI.Controls;
@@ -37,6 +39,9 @@ public class SquircleBorder : Decorator
     #region Fields and constants
 
     private static readonly ShadowPart[] NO_SHADOWS = [];
+
+    // a box holds its round rects until its size has stood still this long
+    private static readonly TimeSpan RESIZE_SETTLE = TimeSpan.FromMilliseconds(150);
 
     /// <summary>
     /// Squircle everywhere; inherited, so a panel set to Round rounds everything inside it.
@@ -65,6 +70,9 @@ public class SquircleBorder : Decorator
     private ShadowKey? _shadowKey;
     private IPen? _pen;
     private bool _ownsClip;
+    private Size _drawnSize;
+    private bool _resizing;
+    private DispatcherTimer? _settle;
 
     #endregion // Fields and constants
 
@@ -153,6 +161,7 @@ public class SquircleBorder : Decorator
 
         var shapes = ShapesFor(size);
         var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
+        TrackResize(size);
 
         if (BoxShadow.Count == 0)
         {
@@ -194,12 +203,37 @@ public class SquircleBorder : Decorator
         // never disposed here: the render thread may still draw the last frame's, and the GC frees them
         _shadows = NO_SHADOWS;
         _shadowKey = null;
+
+        _settle?.Stop();
+        _resizing = false;
+        _drawnSize = default;
     }
 
     #endregion // Protected methods
 
 
     #region Private methods
+
+    // plan 5.4: a box being resized (a docked column's glide, a window resize) is moving; an exact path at each new size is a new GPU mask
+    private void TrackResize(Size size)
+    {
+        if (_drawnSize == size) return;
+
+        var first = _drawnSize == default;
+        _drawnSize = size;
+        if (first || MotionTokens.IsFrozen) return;
+
+        _resizing = true;
+        if (_settle is null)
+        {
+            _settle = new DispatcherTimer { Interval = RESIZE_SETTLE };
+            _settle.Tick += Settle_Tick;
+        }
+
+        _settle.Stop();
+        _settle.Start();
+    }
+
 
     // S1: one draw op for fill and border, none for a transparent overlay at rest; hit testing keeps Border's rules
     private void RenderMerged(DrawingContext context, Shapes shapes, double scale)
@@ -243,7 +277,7 @@ public class SquircleBorder : Decorator
             (false, true) => [edge],
             _ => [],
         };
-        context.Custom(new SkiaDraw(paints, scale, filled ? shapes.OuterHit : shapes.RingHit, shapes.Box));
+        context.Custom(new SkiaDraw(paints, scale, filled ? shapes.OuterHit : shapes.RingHit, shapes.Box, _resizing));
     }
 
 
@@ -253,20 +287,20 @@ public class SquircleBorder : Decorator
         var shadows = ShadowsFor(shapes, out var alphas);
 
         var outset = CollectShadows(shadows, alphas, inset: false);
-        if (outset.Length > 0) context.Custom(new SkiaDraw(outset, scale, null));
+        if (outset.Length > 0) context.Custom(new SkiaDraw(outset, scale, null, resizing: _resizing));
 
         if (Background is { } background)
         {
-            if (Paint(background, shapes.Box) is var (color, shader)) context.Custom(new SkiaDraw([new SkiaPaint(shapes.Body, null, default, color, 1, shapes.Box, shader)], scale, shapes.OuterHit));
+            if (Paint(background, shapes.Box) is var (color, shader)) context.Custom(new SkiaDraw([new SkiaPaint(shapes.Body, null, default, color, 1, shapes.Box, shader)], scale, shapes.OuterHit, resizing: _resizing));
             else context.DrawGeometry(background, null, shapes.Outer);
         }
 
         var inset = CollectShadows(shadows, alphas, inset: true);
-        if (inset.Length > 0) context.Custom(new SkiaDraw(inset, scale, null));
+        if (inset.Length > 0) context.Custom(new SkiaDraw(inset, scale, null, resizing: _resizing));
 
         if (BorderBrush is not { } brush || shapes.Ring is not { } ring) return;
 
-        if (Paint(brush, shapes.Box) is var (border, borderShader)) context.Custom(new SkiaDraw([new SkiaPaint(shapes.BorderRing, null, default, border, 1, shapes.Box, borderShader)], scale, shapes.RingHit));
+        if (Paint(brush, shapes.Box) is var (border, borderShader)) context.Custom(new SkiaDraw([new SkiaPaint(shapes.BorderRing, null, default, border, 1, shapes.Box, borderShader)], scale, shapes.RingHit, resizing: _resizing));
         else context.DrawGeometry(brush, null, ring);
     }
 
@@ -449,6 +483,18 @@ public class SquircleBorder : Decorator
     #endregion // Private methods
 
 
+    #region Event handlers
+
+    private void Settle_Tick(object? sender, EventArgs e)
+    {
+        _settle?.Stop();
+        _resizing = false;
+        InvalidateVisual();
+    }
+
+    #endregion // Event handlers
+
+
     #region Nested types
 
     private sealed record ShadowKey(Size Size, CornerRadius Radius, CornerShape Shape, Thickness Thickness, double Scale, BoxShadow[] Shadows)
@@ -596,7 +642,7 @@ public class SquircleBorder : Decorator
 
 
     // drawn by Skia on the render thread, where the frame's transform is known; shadows are never hit, as Border's
-    private sealed class SkiaDraw(SkiaPaint[] paints, double scale, Func<Point, bool>? hit, Rect? bounds = null) : ICustomDrawOperation
+    private sealed class SkiaDraw(SkiaPaint[] paints, double scale, Func<Point, bool>? hit, Rect? bounds = null, bool resizing = false) : ICustomDrawOperation
     {
         [ThreadStatic]
         private static SKPaint? t_paint;
@@ -627,7 +673,7 @@ public class SquircleBorder : Decorator
             // Skia masks a path afresh at each new scale, turn and part-pixel place, so only a box at rest on whole pixels takes its exact outline (FewerPhotos F13)
             var m = canvas.TotalMatrix;
             static bool Whole(float v) => Math.Abs(v - MathF.Round(v)) < 1e-3;
-            var moving = Math.Abs(m.ScaleX - scale) > 1e-3 || Math.Abs(m.ScaleY - scale) > 1e-3 || m.SkewX != 0 || m.SkewY != 0 || !Whole(m.TransX) || !Whole(m.TransY);
+            var moving = resizing || Math.Abs(m.ScaleX - scale) > 1e-3 || Math.Abs(m.ScaleY - scale) > 1e-3 || m.SkewX != 0 || m.SkewY != 0 || !Whole(m.TransX) || !Whole(m.TransY);
             var paint = t_paint ??= new SKPaint { IsAntialias = true };
 
             foreach (var p in paints)
@@ -663,6 +709,10 @@ public class SquircleBorder : Decorator
     // a crisp shadow is a ring; a blurred one an image drawn once per size, since a blurred path is a new GPU mask at each new position or scale
     private sealed class ShadowPart
     {
+        // a blur is rastered at a size where its sigma still spans this many pixels, at most this many times smaller
+        private const double MIN_BLUR_PIXELS = 6;
+        private const int MAX_DOWNSCALE = 8;
+
         private readonly SKColor _color;
         private readonly Band? _band;
         private readonly SKImage? _image;
@@ -743,7 +793,7 @@ public class SquircleBorder : Decorator
                 if (cast)
                 {
                     using var shape = SkiaPath(box, radii, shapes.Shape);
-                    canvas.DrawPath(shape, paint);
+                    DrawBlurred(canvas, shape, paint, pixels, scale, sigma, extent);
                 }
 
                 using var outer = SkiaPath(shapes.Box, shapes.Radii, shapes.Shape);
@@ -753,6 +803,29 @@ public class SquircleBorder : Decorator
 
             var destination = new SKRect((float)-extent, (float)-extent, (float)(-extent + pixels.Width / scale), (float)(-extent + pixels.Height / scale));
             return new ShadowPart(shadow.IsInset, color, null, surface.Snapshot(), destination, new Rect(destination.Left, destination.Top, destination.Width, destination.Height));
+        }
+
+
+        // a wide blur keeps no detail a smaller raster loses: blurred there, then scaled up (an elevation 2 card's took about 80 ms at full size)
+        private static void DrawBlurred(SKCanvas canvas, SKPath shape, SKPaint paint, SKImageInfo pixels, double scale, double sigma, double extent)
+        {
+            var step = Math.Clamp((int)(sigma * scale / MIN_BLUR_PIXELS), 1, MAX_DOWNSCALE);
+            if (step == 1)
+            {
+                canvas.DrawPath(shape, paint);
+                return;
+            }
+
+            var small = new SKImageInfo(Math.Max(1, pixels.Width / step), Math.Max(1, pixels.Height / step), pixels.ColorType, pixels.AlphaType);
+            using var surface = SKSurface.Create(small);
+            surface.Canvas.Clear(SKColors.Transparent);
+            surface.Canvas.Scale((float)(scale / step));
+            surface.Canvas.Translate((float)extent, (float)extent);
+            surface.Canvas.DrawPath(shape, paint);
+
+            using var image = surface.Snapshot();
+            var area = new SKRect((float)-extent, (float)-extent, (float)(-extent + small.Width * step / scale), (float)(-extent + small.Height * step / scale));
+            canvas.DrawImage(image, area, new SKSamplingOptions(SKFilterMode.Linear));
         }
 
 

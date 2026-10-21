@@ -50,10 +50,10 @@ public static class AppText
     public const string UNPIN = "Unpin window";
     public const string COPY_COMMAND = "Copy command";
 
-    public const string EMPTY_TITLE = "Open an AI image or photo to inspect its metadata";
-    public const string EMPTY_CAPTION = "JPEG, PNG, HEIC, TIFF, RAW and more — read locally with ExifTool.";
+    public const string EMPTY_TITLE = "Drop a file here to view its metadata";
+    public const string EMPTY_CAPTION = "Or click the button below.\nAny file type works.";
     public const string RELEASE_TO_INSPECT = "Release to inspect";
-    public const string DROP_HINT = "or drop a file anywhere";
+    public const string SHORTCUT_HINT = "or press";
     public const string EXIFTOOL_MISSING_TITLE = "ExifTool isn't available";
     public const string EXIFTOOL_MISSING_CAPTION = "ExifGlass reads metadata with ExifTool. Choose its path in Settings, or retry.";
 

@@ -14,7 +14,10 @@
                      ClipToBounds="True"
                      CornerRadius="{StaticResource RadiusPanel}">
     <Grid RowDefinitions="Auto,*">
-      <Panel Height="{StaticResource TableToolbarHeight}">
+      <!--  with no file the surface is one plain section (owner at G4 review)  -->
+      <Panel Name="SummaryBar"
+             Height="{StaticResource TableToolbarHeight}"
+             IsVisible="{Binding !ShowEmptyCard}">
         <StackPanel Margin="16,0,8,0"
                     VerticalAlignment="Center"
                     Orientation="Horizontal"
@@ -105,11 +108,10 @@
           </ItemsControl>
         </ScrollViewer>
 
-        <v:EmptyState Name="Empty"
-                      Margin="20"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      IsVisible="{Binding ShowEmptyCard}" />
+        <!--  a window near its minimum size scales the content down rather than cut it  -->
+        <Viewbox Margin="20" StretchDirection="DownOnly">
+          <v:EmptyState Name="Empty" IsVisible="{Binding ShowEmptyCard}" />
+        </Viewbox>
 
         <!--  the pending bar's place (P8): 12 px inset at the bottom  -->
         <Panel Name="PendingBarHost"

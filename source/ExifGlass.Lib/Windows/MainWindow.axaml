@@ -6,8 +6,8 @@
         x:Class="ExifGlass.Windows.MainWindow"
         x:DataType="vm:MainViewModel"
         Title="{Binding WindowTitle}"
-        MinWidth="420"
-        MinHeight="480"
+        MinWidth="320"
+        MinHeight="240"
         DragDrop.AllowDrop="True"
         Topmost="{Binding IsPinned}">
 
@@ -41,7 +41,7 @@
 
             <Grid ColumnDefinitions="Auto,*,Auto">
               <ui:DockSlot Name="RailSlot"
-                           Anchor="Left"
+                           Anchor="Right"
                            IsOpen="{Binding IsRailDocked}"
                            OpenWidth="{StaticResource RailColumn}">
                 <Panel>
@@ -63,7 +63,7 @@
 
               <ui:DockSlot Name="InspectorSlot"
                            Grid.Column="2"
-                           Anchor="Right"
+                           Anchor="Left"
                            IsOpen="{Binding IsInspectorDocked}"
                            OpenWidth="{StaticResource InspectorColumn}">
                 <Panel>

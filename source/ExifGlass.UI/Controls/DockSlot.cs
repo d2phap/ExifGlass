@@ -25,7 +25,7 @@ using ExifGlass.UI.Tokens;
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
-/// A docked panel's column (DS 2.1): its width glides between 0 and OpenWidth in 420 ms while the panel keeps its own width, clipped at the moving edge.
+/// A docked panel's column (DS 2.1): its width glides between 0 and OpenWidth in 420 ms; the panel keeps its own width and rides the moving edge, so it slides in as the table narrows.
 /// </summary>
 public class DockSlot : Decorator
 {
@@ -72,7 +72,7 @@ public class DockSlot : Decorator
     }
 
     /// <summary>
-    /// Gets or sets the edge the panel keeps while the column narrows: Left for the rail, Right for the inspector.
+    /// Gets or sets the column edge the panel stays on, the table's side: Right for the rail, Left for the inspector.
     /// </summary>
     public HorizontalAlignment Anchor
     {
@@ -177,7 +177,7 @@ public class DockSlot : Decorator
     }
 
 
-    // the panel keeps its full width at its anchored edge; the clip shows the part the column has reached
+    // the panel keeps its full width at its anchored edge; the clip hides the part still outside the column
     protected override Size ArrangeOverride(Size finalSize)
     {
         if (Child is { } child)

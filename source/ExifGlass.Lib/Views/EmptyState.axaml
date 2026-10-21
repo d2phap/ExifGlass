@@ -8,13 +8,11 @@
              MaxWidth="380"
              ClipToBounds="False">
 
-  <!--  DS 6.9 / Spec 2 empty card: Bg.Panel 94% (no blur), radius 18, logo 60, title 17 Medium; it reacts to a file dragged over it  -->
+  <!--  DS 6.9 / Spec 2 empty state, logo 60, title 17 Medium; part of the table's surface, no fill, border or shadow (owner at G4 review); a file dragged over draws its border  -->
   <ui:SquircleBorder Name="Card"
                      Padding="24,26,24,20"
-                     Background="{DynamicResource BgEmptyCardBrush}"
-                     BorderBrush="{DynamicResource EmphasisA10Brush}"
+                     BorderBrush="Transparent"
                      BorderThickness="1.5"
-                     BoxShadow="{StaticResource ShadowEmptyCard}"
                      CornerRadius="{StaticResource RadiusPanel}">
     <ui:SquircleBorder.Transitions>
       <Transitions>
@@ -46,10 +44,10 @@
         </ui:SquircleBorder>
       </Panel>
 
-      <!--  the widths stand in for Proto's balanced wrap: two even lines, no word left alone  -->
+      <!--  the title keeps to one line and the caption breaks in its text; only the ExifTool problem wraps at these widths  -->
       <StackPanel Spacing="4">
         <TextBlock Name="TitleText"
-                   MaxWidth="280"
+                   MaxWidth="320"
                    Classes="empty-title"
                    Text="{x:Static app:AppText.EMPTY_TITLE}"
                    TextAlignment="Center"
@@ -92,7 +90,7 @@
         <TextBlock Classes="meta"
                    VerticalAlignment="Center"
                    Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.DROP_HINT}" />
+                   Text="{x:Static app:AppText.SHORTCUT_HINT}" />
         <ui:Kbd Name="OpenHint" VerticalAlignment="Center" />
       </StackPanel>
     </StackPanel>

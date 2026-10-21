@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Media;
 using ExifGlass.UI;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Motion;
@@ -29,7 +30,7 @@ using System.ComponentModel;
 namespace ExifGlass.Views;
 
 /// <summary>
-/// The empty table's card (DS 6.9): open a file, or drop one on the window; with no ExifTool it says so and offers Settings and Retry.
+/// The empty table's content (DS 6.9): drop a file or open one; with no ExifTool it says so and offers Settings and Retry.
 /// </summary>
 public partial class EmptyState : UserControl
 {
@@ -50,7 +51,7 @@ public partial class EmptyState : UserControl
     #region Properties
 
     /// <summary>
-    /// Gets or sets whether a file is over the window: the card grows, its border turns accent and dashed, and the logo's ring pulses.
+    /// Gets or sets whether a file is over the window: the content grows inside an accent dashed border, and the logo's ring pulses.
     /// </summary>
     public bool IsDragOver
     {
@@ -95,7 +96,8 @@ public partial class EmptyState : UserControl
         var over = IsDragOver;
         UpdateText();
         Ring.IsPulsing = over;
-        Card[!SquircleBorder.BorderBrushProperty] = this.GetResourceObservable(over ? TokenKeys.ACCENT_BRUSH : TokenKeys.EMPHASIS_A10_BRUSH).ToBinding();
+        if (over) Card[!SquircleBorder.BorderBrushProperty] = this.GetResourceObservable(TokenKeys.ACCENT_BRUSH).ToBinding();
+        else Card.BorderBrush = Brushes.Transparent;
         SquircleBorder.SetBorderDashArray(Card, over ? DASHES : null);
         CompositionMotion.Scale(Card, over ? 1 : DROP_SCALE, over ? DROP_SCALE : 1, MotionTokens.DropScale, MotionTokens.DropScaleEasing);
     }

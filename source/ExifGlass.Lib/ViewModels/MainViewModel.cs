@@ -37,7 +37,7 @@ public interface IShellView
     #region Methods
 
     /// <summary>
-    /// Shows the open picker (images, then All files); null when cancelled.
+    /// Shows the open picker (All files, then images); null when cancelled.
     /// </summary>
     Task<string?> PickFileAsync();
 
@@ -113,6 +113,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasDocument), nameof(WindowTitle), nameof(SearchPlaceholder), nameof(ShowEmptyCard), nameof(Summary), nameof(SummaryDetail), nameof(ShowSummaryDetail))]
+    [NotifyPropertyChangedFor(nameof(IsRailDocked), nameof(IsRailShown), nameof(RailTooltip), nameof(IsInspectorDocked), nameof(IsInspectorShown), nameof(InspectorTooltip))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand))]
     public partial MetadataDocument? Document { get; private set; }
 
     /// <summary>
@@ -211,15 +213,16 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string PinTooltip => IsPinned ? AppText.UNPIN : AppText.PIN;
 
-    public bool IsRailDocked => RailMode == PanelMode.Docked && RailOpen;
+    // with no file the panels stay closed and their toggles off, whatever the settings say (owner at G4 review)
+    public bool IsRailDocked => HasDocument && RailMode == PanelMode.Docked && RailOpen;
 
-    public bool IsRailShown => RailMode == PanelMode.Docked ? RailOpen : IsRailPushed;
+    public bool IsRailShown => HasDocument && (RailMode == PanelMode.Docked ? RailOpen : IsRailPushed);
 
     public string RailTooltip => IsRailShown ? AppText.HIDE_RAIL : AppText.SHOW_RAIL;
 
-    public bool IsInspectorDocked => InspectorMode == PanelMode.Docked && InspectorOpen;
+    public bool IsInspectorDocked => HasDocument && InspectorMode == PanelMode.Docked && InspectorOpen;
 
-    public bool IsInspectorShown => InspectorMode == PanelMode.Docked ? InspectorOpen : IsInspectorPushed;
+    public bool IsInspectorShown => HasDocument && (InspectorMode == PanelMode.Docked ? InspectorOpen : IsInspectorPushed);
 
     public string InspectorTooltip => IsInspectorShown ? AppText.HIDE_INSPECTOR : AppText.SHOW_INSPECTOR;
 
@@ -328,7 +331,7 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDocument))]
     private void ToggleRail()
     {
         if (RailMode == PanelMode.Push)
@@ -343,7 +346,7 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(HasDocument))]
     private void ToggleInspector()
     {
         if (InspectorMode == PanelMode.Push)
@@ -398,7 +401,16 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnSearchTextChanged(string value) => _ = RunQueryAsync(Loader.Document, Loader.Phase);
 
 
-    partial void OnDocumentChanged(MetadataDocument? value) => UpdateCommandTokens();
+    partial void OnDocumentChanged(MetadataDocument? value)
+    {
+        if (value is null)
+        {
+            IsRailPushed = false;
+            IsInspectorPushed = false;
+        }
+
+        UpdateCommandTokens();
+    }
 
 
     // the query runs off the UI thread; only the newest result is applied, as one reset (plan 4.2), with its document and phase

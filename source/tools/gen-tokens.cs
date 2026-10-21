@@ -117,7 +117,6 @@ static class Generator
         new("BgInput", "#FFFFFF", "#0DFFFFFF", "Text inputs (DS 6.2)"),
         new("BgGroupHeader", "#F5FFFFFF", "#F5282E31", "Sticky group header: Bg.Panel 96%, no blur"),
         new("BgToast", "#FAFFFFFF", "#FA343A40", "Toast: Bg.Elevated 98%, no blur"),
-        new("BgEmptyCard", "#F0FFFFFF", "#F0282E31", "Empty-state card: Bg.Panel 94%, no blur"),
         new("BgDragScrim", "#D9F2F5F8", "#D9212529", "Drag-over scrim: Bg.Window 85%, no blur"),
         new("BgTerminalTile", "#0F000000", "#212529", "Command bar terminal tile"),
         new("FgTerminalTile", "#212529", "#FFBA68", "Command bar terminal glyph"),
@@ -249,7 +248,6 @@ static class Generator
         ("ShadowSegmentedThumb", "0 1 3 0 rgba(0,0,0,.16)", "Segmented thumb"),
         ("ShadowSelectedCard", "0 0 0 3 rgba(34,94,219,.08)", "Selected-tag card ring"),
         ("ShadowTooltip", "0 8 20 -6 rgba(0,0,0,.25)", "Tooltips: elevation 1 at half its offset, blur and darkness"),
-        ("ShadowEmptyCard", "0 30 70 -30 rgba(0,0,0,.35)", "Empty-state card"),
     ];
 
     // DS 5.1 and 5.2; ms, easing, use

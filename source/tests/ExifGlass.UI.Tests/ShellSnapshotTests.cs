@@ -72,6 +72,11 @@ public class ShellSnapshotTests
             Check(empty, "shell-drag-empty-1400", theme, failures);
         }
 
+        using (var empty = TestShell.Open(480, theme: variant))
+        {
+            Check(empty, "shell-empty-480", theme, failures);
+        }
+
         Assert.True(failures.Count == 0, string.Join("\n", failures));
     }
 

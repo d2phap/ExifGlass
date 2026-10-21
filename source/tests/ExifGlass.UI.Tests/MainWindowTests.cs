@@ -22,6 +22,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
+using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -44,15 +45,15 @@ public class MainWindowTests
     #region Tests
 
     [AvaloniaFact]
-    public void OpensAtTheSpecMinimumSizeAndRenders()
+    public void OpensWithALowMinimumSizeAndRenders()
     {
         AppInfo.BuildInfo = new TestBuildInfo();
         var window = new MainWindow();
         window.Show();
 
         Assert.Equal("ExifGlass", window.Title);
-        Assert.Equal(420, window.MinWidth);
-        Assert.Equal(480, window.MinHeight);
+        Assert.Equal(320, window.MinWidth);
+        Assert.Equal(240, window.MinHeight);
         Assert.NotNull(window.CaptureRenderedFrame());
 
         window.Close();
@@ -75,14 +76,14 @@ public class MainWindowTests
     [InlineData(1100, true, false, true, true)]
     [InlineData(760, false, false, false, true)]
     [InlineData(480, false, false, false, false)]
-    public void EachBandDocksAndShowsWhatDs21Says(double width, bool railDocked, bool inspectorDocked, bool secondaryButtons, bool openLabel)
+    public async Task EachBandDocksAndShowsWhatDs21Says(double width, bool railDocked, bool inspectorDocked, bool secondaryButtons, bool openLabel)
     {
-        using var shell = TestShell.Open(width);
+        using var shell = await TestShell.OpenWithFileAsync(width);
         var w = shell.Window;
 
         Assert.Equal(railDocked, w.RailSlot.Openness > 0);
         Assert.Equal(inspectorDocked, w.InspectorSlot.Openness > 0);
-        Assert.Equal(secondaryButtons, w.Toolbar.PinToggle.IsVisible);
+        Assert.True(w.Toolbar.PinToggle.IsVisible);
         Assert.Equal(secondaryButtons, w.Toolbar.ThemeButton.IsVisible);
         Assert.Equal(secondaryButtons, w.Toolbar.AboutButton.IsVisible);
         Assert.True(w.Toolbar.SettingsButton.IsVisible);
@@ -92,9 +93,49 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void TheLayoutGridMatchesDs2()
+    public async Task WithNoFileThePanelsStayClosedAndTheSurfaceIsPlain()
     {
         using var shell = TestShell.Open(1400);
+        var w = shell.Window;
+
+        Assert.False(w.Toolbar.RailToggle.IsEffectivelyEnabled);
+        Assert.False(w.Toolbar.InspectorToggle.IsEffectivelyEnabled);
+        Assert.False(w.Toolbar.RailToggle.IsChecked);
+        Assert.Equal((0, 0), (w.RailSlot.Openness, w.InspectorSlot.Openness));
+        Assert.False(w.Table.SummaryBar.IsVisible);
+        Assert.True(w.Table.EmptyCard.IsVisible);
+
+        // the settings' open panels come in with the first file
+        await shell.ViewModel.OpenFileAsync("a.jpg");
+        await shell.WaitForAsync(() => shell.ViewModel.HasDocument);
+        shell.Settle();
+        Assert.True(w.Toolbar.RailToggle.IsEffectivelyEnabled);
+        Assert.True(w.Toolbar.InspectorToggle.IsChecked);
+        Assert.Equal((1, 1), (w.RailSlot.Openness, w.InspectorSlot.Openness));
+        Assert.True(w.Table.SummaryBar.IsVisible);
+    }
+
+
+    [AvaloniaFact]
+    public void AtTheMinimumSizeTheEmptyContentScalesToFit()
+    {
+        using var shell = TestShell.Open(320);
+        var w = shell.Window;
+        w.Height = 240;
+        shell.Settle();
+
+        var card = w.Table.EmptyCard;
+        var topLeft = card.TranslatePoint(default, w.Table)!.Value;
+        var bottomRight = card.TranslatePoint(new Point(card.Bounds.Width, card.Bounds.Height), w.Table)!.Value;
+        Assert.True(topLeft.X >= 0 && topLeft.Y >= 0, $"{topLeft}");
+        Assert.True(bottomRight.X <= w.Table.Bounds.Width && bottomRight.Y <= w.Table.Bounds.Height, $"{bottomRight} in {w.Table.Bounds.Size}");
+    }
+
+
+    [AvaloniaFact]
+    public async Task TheLayoutGridMatchesDs2()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
         var w = shell.Window;
 
         Assert.Equal(48, w.Toolbar.Bounds.Height);
@@ -113,9 +154,9 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void TheDockedToggleClosesTheColumnAndRemembersIt()
+    public async Task TheDockedToggleClosesTheColumnAndRemembersIt()
     {
-        using var shell = TestShell.Open(1400);
+        using var shell = await TestShell.OpenWithFileAsync(1400);
 
         shell.Window.Toolbar.RailToggle.Command!.Execute(null);
         shell.Settle();
@@ -128,9 +169,9 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void APushedPanelMovesTheTableAsideWithoutResizingIt()
+    public async Task APushedPanelMovesTheTableAsideWithoutResizingIt()
     {
-        using var shell = TestShell.Open(760);
+        using var shell = await TestShell.OpenWithFileAsync(760);
         var vm = shell.ViewModel;
         var w = shell.Window;
         var tableWidth = w.Table.Bounds.Width;
@@ -182,9 +223,9 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
-    public void WideningDocksAPushedRail()
+    public async Task WideningDocksAPushedRail()
     {
-        using var shell = TestShell.Open(760);
+        using var shell = await TestShell.OpenWithFileAsync(760);
         shell.ViewModel.ToggleRailCommand.Execute(null);
         shell.Settle();
 
@@ -290,6 +331,8 @@ public class MainWindowTests
         shell.Window.DragDrop(centre, RawDragEventType.Drop, data, DragDropEffects.Copy, RawInputModifiers.None);
         await shell.WaitForAsync(() => shell.ViewModel.HasDocument);
         Assert.False(shell.Window.Table.EmptyCard.IsDragOver);
+        shell.Settle(300);
+        Assert.Equal(Colors.Transparent, Assert.IsAssignableFrom<ISolidColorBrush>(shell.Window.Table.EmptyCard.Card.BorderBrush).Color);
         Assert.Equal("drop.jpg", shell.ViewModel.Document?.FileName);
 
         // with a file open the whole window takes a scrim

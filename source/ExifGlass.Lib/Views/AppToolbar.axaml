@@ -36,7 +36,6 @@
                             Command="{Binding TogglePinCommand}"
                             Icon="{x:Static ui:IconId.Pin}"
                             IsChecked="{Binding IsPinned, Mode=OneWay}"
-                            IsVisible="{Binding ShowSecondaryButtons}"
                             ToolTip.Tip="{Binding PinTooltip}" />
       <ui:GlassButton Name="ThemeButton"
                       Classes="ghost toolbar"

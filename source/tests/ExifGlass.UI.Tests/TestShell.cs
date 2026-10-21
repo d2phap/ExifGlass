@@ -80,6 +80,20 @@ public sealed class TestShell : IDisposable
 
 
     /// <summary>
+    /// Opens a shell with a file loaded: the panels and their toggles wait for one.
+    /// </summary>
+    public static async Task<TestShell> OpenWithFileAsync(double width, ThemeVariant? theme = null, string file = "a.jpg")
+    {
+        var shell = Open(width, theme: theme);
+        await shell.ViewModel.OpenFileAsync(file);
+        await shell.WaitForAsync(() => shell.ViewModel.HasDocument);
+        shell.Settle();
+
+        return shell;
+    }
+
+
+    /// <summary>
     /// Runs the dispatcher for a while: a pushed frame runs its timers too (drag grace, scrim fade), which RunJobs alone doesn't.
     /// </summary>
     public void Settle(int ms = 120)

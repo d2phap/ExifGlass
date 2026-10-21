@@ -280,6 +280,25 @@ public class ControlTests
 
 
     [AvaloniaFact]
+    public void ADockedPanelSlidesWithTheColumnEdgeOnTheTableSide()
+    {
+        var rail = new Border { Width = 236, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+        var inspector = new Border { Width = 304, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right };
+
+        // two columns caught 100 px open, as on one frame of the glide
+        var left = new DockSlot { Anchor = Avalonia.Layout.HorizontalAlignment.Right, OpenWidth = 244, Width = 100, IsOpen = true, Child = new Panel { Children = { rail } } };
+        var right = new DockSlot { Anchor = Avalonia.Layout.HorizontalAlignment.Left, OpenWidth = 312, Width = 100, IsOpen = true, Child = new Panel { Children = { inspector } } };
+        Grid.SetColumn(right, 2);
+        var window = Show(new Grid { ColumnDefinitions = new("Auto,*,Auto"), Children = { left, right } }, 800, 400);
+
+        // each panel keeps its 8 px gap to the table; the rest is still past the column's outer edge
+        Assert.Equal(100 - 8, rail.TranslatePoint(new Point(236, 0), left)!.Value.X);
+        Assert.Equal(8, inspector.TranslatePoint(default, right)!.Value.X);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
     public void AMenuItemActsOnReleaseAndCloses()
     {
         MotionTokens.IsFrozen = true;

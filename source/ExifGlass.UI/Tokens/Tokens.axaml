@@ -23,8 +23,6 @@
       <SolidColorBrush x:Key="BgGroupHeaderBrush" Color="#F5FFFFFF" />
       <Color x:Key="BgToastColor">#FAFFFFFF</Color>
       <SolidColorBrush x:Key="BgToastBrush" Color="#FAFFFFFF" />
-      <Color x:Key="BgEmptyCardColor">#F0FFFFFF</Color>
-      <SolidColorBrush x:Key="BgEmptyCardBrush" Color="#F0FFFFFF" />
       <Color x:Key="BgDragScrimColor">#D9F2F5F8</Color>
       <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9F2F5F8" />
       <Color x:Key="BgTerminalTileColor">#0F000000</Color>
@@ -145,8 +143,6 @@
       <SolidColorBrush x:Key="BgGroupHeaderBrush" Color="#F5282E31" />
       <Color x:Key="BgToastColor">#FA343A40</Color>
       <SolidColorBrush x:Key="BgToastBrush" Color="#FA343A40" />
-      <Color x:Key="BgEmptyCardColor">#F0282E31</Color>
-      <SolidColorBrush x:Key="BgEmptyCardBrush" Color="#F0282E31" />
       <Color x:Key="BgDragScrimColor">#D9212529</Color>
       <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9212529" />
       <Color x:Key="BgTerminalTileColor">#212529</Color>
@@ -382,7 +378,6 @@
   <BoxShadows x:Key="ShadowSegmentedThumb">0 1 3.46 0 #29000000</BoxShadows>
   <BoxShadows x:Key="ShadowSelectedCard">0 0 0 3 #14225EDB</BoxShadows>
   <BoxShadows x:Key="ShadowTooltip">0 8 32.91 -6 #40000000</BoxShadows>
-  <BoxShadows x:Key="ShadowEmptyCard">0 30 119.51 -30 #59000000</BoxShadows>
 
   <!--  Font sizes (DS 1.1); mono +1 off Windows cancels the -1 pt coercion (S3)  -->
   <x:Double x:Key="FontSizeDisplay">22</x:Double>

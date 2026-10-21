@@ -102,7 +102,7 @@ public partial class MainWindow : Window, IShellView
         {
             Title = AppText.PICKER_TITLE,
             AllowMultiple = false,
-            FileTypeFilter = [ImageFiles, AllFiles],
+            FileTypeFilter = [AllFiles, ImageFiles],
         });
 
         return files.Count > 0 ? files[0].TryGetLocalPath() : null;

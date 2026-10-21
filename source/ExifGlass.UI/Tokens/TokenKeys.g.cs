@@ -60,10 +60,6 @@ public static class TokenKeys
     public const string BG_TOAST_COLOR = "BgToastColor";
     // Toast: Bg.Elevated 98%, no blur
     public const string BG_TOAST_BRUSH = "BgToastBrush";
-    // Empty-state card: Bg.Panel 94%, no blur
-    public const string BG_EMPTY_CARD_COLOR = "BgEmptyCardColor";
-    // Empty-state card: Bg.Panel 94%, no blur
-    public const string BG_EMPTY_CARD_BRUSH = "BgEmptyCardBrush";
     // Drag-over scrim: Bg.Window 85%, no blur
     public const string BG_DRAG_SCRIM_COLOR = "BgDragScrimColor";
     // Drag-over scrim: Bg.Window 85%, no blur
@@ -484,8 +480,6 @@ public static class TokenKeys
     public const string SHADOW_SELECTED_CARD = "ShadowSelectedCard";
     // Tooltips: elevation 1 at half its offset, blur and darkness
     public const string SHADOW_TOOLTIP = "ShadowTooltip";
-    // Empty-state card
-    public const string SHADOW_EMPTY_CARD = "ShadowEmptyCard";
     // 22
     public const string FONT_SIZE_DISPLAY = "FontSizeDisplay";
     // 16

@@ -46,7 +46,7 @@ public enum ToolbarMode
     Full,
 
     /// <summary>
-    /// Pin, Theme and About hidden (reachable from Settings, Appendix B item 4).
+    /// Theme and About hidden (reachable from Settings, Appendix B item 4); Pin stays (owner at G4 review).
     /// </summary>
     Compact,
 

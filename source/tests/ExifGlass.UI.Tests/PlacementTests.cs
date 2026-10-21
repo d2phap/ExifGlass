@@ -17,6 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI.Windows;
 using Xunit;
@@ -128,10 +131,42 @@ public class PlacementTests
         Assert.Null(store.Get("About"));
     }
 
+
+    [AvaloniaFact]
+    public void ARestoreFromMaximizedIsKeptWhenTheWindowClosesMinimized()
+    {
+        // G4 finding 9: the restore's size events come while the state still reads Maximized
+        var store = new MemoryPlacementStore();
+        var saved = Saved(100, 100, 800, 600, Laptop);
+        saved.Maximized = true;
+        store.Set("Test", saved);
+
+        var window = new Window();
+        WindowPlacement.Attach(window, "Test", new Size(800, 600), store);
+        window.Show();
+        Pump();
+
+        window.WindowState = WindowState.Normal;
+        Pump();
+        window.WindowState = WindowState.Minimized;
+        Pump();
+        window.Close();
+
+        Assert.False(store.Get("Test")!.Maximized);
+    }
+
     #endregion // Tests
 
 
     #region Private methods
+
+    private static void Pump()
+    {
+        var frame = new DispatcherFrame();
+        DispatcherTimer.RunOnce(() => frame.Continue = false, TimeSpan.FromMilliseconds(50));
+        Dispatcher.UIThread.PushFrame(frame);
+    }
+
 
     private static WindowPlacementState Saved(int x, int y, double width, double height, ScreenInfo screen, Size frame = default) => new()
     {

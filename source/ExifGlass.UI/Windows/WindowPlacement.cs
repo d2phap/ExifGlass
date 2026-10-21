@@ -170,7 +170,13 @@ public static class WindowPlacement
             window.Closing += (_, _) => Commit();
             window.PropertyChanged += (_, e) =>
             {
-                if (e.Property == Window.WindowStateProperty && e.GetNewValue<WindowState>() == WindowState.Minimized) _beforeMinimized = e.GetOldValue<WindowState>();
+                if (e.Property != Window.WindowStateProperty) return;
+
+                var state = e.GetNewValue<WindowState>();
+                if (state == WindowState.Minimized) _beforeMinimized = e.GetOldValue<WindowState>();
+
+                // a restore from maximized resizes before the state reads Normal, so its size events alone capture nothing
+                if (state == WindowState.Normal) Queue();
             };
         }
 

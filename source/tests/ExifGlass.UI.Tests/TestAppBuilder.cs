@@ -36,6 +36,7 @@ public static class TestAppBuilder
         .UseSkia()
         .UseHarfBuzz()
         .WithInterFont()
+        .WithExifGlassDefaults()
         .UseHeadless(new AvaloniaHeadlessPlatformOptions
         {
             // Real Skia, so captured frames hold actual glyphs and antialiasing.

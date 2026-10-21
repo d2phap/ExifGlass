@@ -1,0 +1,379 @@
+/*
+ExifGlass - AI & EXIF metadata viewer
+Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Project homepage: https://github.com/d2phap/ExifGlass
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Threading;
+using ExifGlass.UI.Controls;
+using ExifGlass.UI.Motion;
+using ExifGlass.UI.Tokens;
+using ExifGlass.UI.Windows;
+using Xunit;
+
+namespace ExifGlass.UI.Tests;
+
+public class ControlTests
+{
+    #region Motion and shape
+
+    [Fact]
+    public void CubicBezierMatchesCss()
+    {
+        var linear = new CubicBezierEasing(0, 0, 1, 1);
+        Assert.Equal(0.5, linear.Ease(0.5), 4);
+
+        // CSS ease at half time (WebKit UnitBezier)
+        Assert.Equal(0.8024, new CubicBezierEasing(0.25, 0.1, 0.25, 1).Ease(0.5), 3);
+
+        // the spring overshoots past 1 before it settles
+        var spring = (CubicBezierEasing)MotionTokens.SpringEasing;
+        Assert.True(Enumerable.Range(1, 99).Max(i => spring.Ease(i / 100.0)) > 1.05);
+    }
+
+
+    [Fact]
+    public void ChoreoSeeksEveryTrack()
+    {
+        double a = -1, b = -1;
+        var choreo = new Choreo()
+            .Add(TimeSpan.FromMilliseconds(100), new CubicBezierEasing(0, 0, 1, 1), p => a = p)
+            .Add(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(100), new CubicBezierEasing(0, 0, 1, 1), p => b = p);
+
+        choreo.Seek(TimeSpan.FromMilliseconds(50));
+        Assert.Equal(0.5, a, 3);
+        Assert.Equal(0, b);
+
+        choreo.Seek(TimeSpan.FromMilliseconds(200));
+        Assert.Equal(1, a);
+        Assert.Equal(1, b);
+        Assert.Equal(TimeSpan.FromMilliseconds(200), choreo.Duration);
+    }
+
+
+    [Fact]
+    public void SquircleRadiiFitTheBoxAsCssDoes()
+    {
+        var radii = Squircle.Radii(new Rect(0, 0, 40, 20), new CornerRadius(16));
+        Assert.Equal(10, radii.TopLeft.Width, 6);
+
+        // the holding round rect touches the squircle at its apex, so it is smaller than the radius
+        var holding = Squircle.RoundHolding(14, CornerShape.Squircle);
+        Assert.InRange(holding, 14 * 0.5, 14 * 0.9);
+        Assert.Equal(14, Squircle.RoundHolding(14, CornerShape.Round));
+    }
+
+
+    [Fact]
+    public void GroupColoursKeepThreeToOneAndAreStable()
+    {
+        foreach (var dark in new[] { false, true })
+        {
+            var panel = dark ? Color.Parse("#282E31") : Color.Parse("#FFFFFF");
+            foreach (var group in GroupPalette.NamedGroups) Assert.True(Contrast(GroupPalette.Get(group, dark), panel) >= 2.995, $"{group} {(dark ? "dark" : "light")}");
+            for (var i = 0; i < GroupPalette.RingSize; i++) Assert.True(Contrast(GroupPalette.GetRing(i, dark), panel) >= 2.995, $"ring {i}");
+        }
+
+        Assert.Equal(GroupPalette.RingIndex("Kodak"), GroupPalette.RingIndex("KODAK"));
+        Assert.Equal(GroupPalette.Get("exif", true), GroupPalette.Get("EXIF", true));
+    }
+
+    #endregion // Motion and shape
+
+
+    #region Controls
+
+    [Fact]
+    public void ReadoutsFormatAsTheInspectorShowsThem()
+    {
+        Assert.Equal("1/250", CountUpText.FormatValue(250, CountUpFormat.Shutter));
+        Assert.Equal("1/1", CountUpText.FormatValue(0, CountUpFormat.Shutter));
+        Assert.Equal("2.0", CountUpText.FormatValue(2, CountUpFormat.OneDecimal));
+        Assert.Equal("12,800", CountUpText.FormatValue(12800, CountUpFormat.Integer));
+    }
+
+
+    [Fact]
+    public void HighlightFindsEveryMatchIgnoringCase()
+    {
+        Assert.Equal([0, 4, 22, 4], HighlightTextBlock.FindRanges("FUJIFILM Corporation, Fujinon", "fuji")!);
+        Assert.Null(HighlightTextBlock.FindRanges("Canon", "fuji"));
+        Assert.Null(HighlightTextBlock.FindRanges("Canon", ""));
+    }
+
+
+    [AvaloniaFact]
+    public void TokenFieldAddsAndRemovesWithTheKeyboard()
+    {
+        var field = new TokenField { Width = 400, LockedTokens = ["-G"] };
+        field.Tokens.Add("-G");
+        var window = Show(field);
+
+        var input = Find<TextBox>(field, "PART_Input");
+        input.Focus();
+        window.KeyTextInput("-fast");
+        window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+        Assert.Equal(["-G", "-fast"], field.Tokens);
+
+        window.KeyPressQwerty(PhysicalKey.Backspace, RawInputModifiers.None);
+        window.KeyPressQwerty(PhysicalKey.Backspace, RawInputModifiers.None);
+        Assert.Equal(["-G"], field.Tokens);
+
+        field.Add("-charset UTF8");
+        Assert.Equal(["-G", "-charset", "UTF8"], field.Tokens);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void ToggleButtonsSwapToTheirFilledIcon()
+    {
+        var pin = new GlassToggleButton { Icon = IconId.Pin, CheckedIcon = IconId.PinFilled };
+        var window = Show(pin);
+
+        Assert.Equal(IconId.Pin, pin.ShownIcon);
+        Click(window, pin);
+        Assert.True(pin.IsChecked);
+        Assert.Equal(IconId.PinFilled, pin.ShownIcon);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void TheSwitchTogglesWithOurTemplate()
+    {
+        var toggle = new ToggleSwitch();
+        var window = Show(toggle);
+
+        Click(window, toggle);
+        Assert.True(toggle.IsChecked);
+        Assert.NotNull(Find<Panel>(toggle, "PART_MovingKnobs"));
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void SearchBoxEscClearsThenLetsGo()
+    {
+        var search = new SearchBox { Width = 300, Text = "fuji" };
+        var window = Show(search);
+        search.Focus();
+
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Assert.Equal(string.Empty, search.Text);
+        Assert.True(search.IsFocused);
+
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Assert.False(search.IsFocused);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void TheStateLayerFollowsAForcedState()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var button = new GlassButton { Content = "Save" };
+            var window = Show(button);
+            var overlay = Find<InteractionOverlay>(button, "PART_Overlay");
+
+            Assert.Same(overlay.RestBrush, overlay.Background);
+            InteractionOverlay.SetForcedState(button, InteractionState.Hover);
+            Assert.Same(overlay.HoverBrush, overlay.Background);
+            InteractionOverlay.SetForcedState(button, InteractionState.Pressed);
+            Assert.Same(overlay.PressBrush, overlay.Background);
+            window.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
+    [AvaloniaFact]
+    public async Task TheDialogAnswersAndEscCancels()
+    {
+        var host = new DialogHost { Content = new Border() };
+        var window = Show(host, 600, 400);
+
+        var first = host.ShowAsync(new DialogRequest("Save changes?", null, "Save", "Discard"));
+        Dispatcher.UIThread.RunJobs();
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Assert.Equal(DialogAnswer.Cancel, await first);
+
+        var second = host.ShowAsync(new DialogRequest("Save changes?", null, "Save", "Discard"));
+        Dispatcher.UIThread.RunJobs();
+        Click(window, Find<Button>(Find<DialogCard>(host, "PART_Card"), "PART_Primary"));
+        Assert.Equal(DialogAnswer.Primary, await second);
+        Assert.False(host.IsOpen);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void OneOverlayPaneAtATimeAndEscClosesIt()
+    {
+        var inside = new Button { Content = "Open" };
+        var host = new OverlayHost { LeftPane = new Border { Width = 200 }, RightPane = new Border { Width = 200 }, Content = inside };
+        var window = Show(host, 800, 400);
+
+        host.IsLeftOpen = true;
+        host.IsRightOpen = true;
+        Assert.False(host.IsLeftOpen);
+
+        inside.Focus();
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        Assert.False(host.IsRightOpen);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void AMenuItemHoldsItsPressThenActsAndCloses()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var clicked = 0;
+            var item = new GlassMenuItem { Header = "CSV" };
+            item.Click += (_, _) => clicked++;
+            var menu = new ContextMenu { Items = { item } };
+            var target = new Border { Width = 300, Height = 200, Background = Brushes.Transparent, ContextMenu = menu };
+            var window = Show(target, 600, 400);
+
+            menu.Open(target);
+            Dispatcher.UIThread.RunJobs();
+            Click(window, item);
+            Wait(30);
+
+            Assert.Equal(1, clicked);
+            Assert.False(menu.IsOpen);
+            window.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
+    [AvaloniaFact]
+    public void EveryIconHasItsGeometry()
+    {
+        var host = new Border();
+        var window = Show(host);
+        foreach (var id in Enum.GetValues<IconId>())
+        {
+            var hasStroke = host.TryFindResource($"Icon.{id}.Stroke", out var stroke) && stroke is Geometry;
+            var hasFill = host.TryFindResource($"Icon.{id}.Fill", out var fill) && fill is Geometry;
+            Assert.True(hasStroke || hasFill, id.ToString());
+        }
+
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void OwnedWindowsCloseOnEscAndRememberTheirPlace()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var owner = Show(new Border(), 1240, 820);
+            var store = new MemoryPlacementStore();
+            var child = new OwnedWindow { Content = new Border() };
+            child.UsePlacement("Settings", new Size(560, 420), store, owner);
+            child.Show(owner);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(560, child.MinWidth);
+            child.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Wait(30);
+
+            Assert.False(child.IsVisible);
+            Assert.Equal(560, store.Get("Settings")!.Width);
+            owner.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+    #endregion // Controls
+
+
+    #region Private methods
+
+    private static Window Show(Control content, double width = 500, double height = 300)
+    {
+        var window = new Window { Width = width, Height = height, Content = content };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        return window;
+    }
+
+
+    private static void Click(Window window, Control target)
+    {
+        var centre = target.TranslatePoint(new Point(target.Bounds.Width / 2, target.Bounds.Height / 2), window) ?? default;
+        var root = TopLevel.GetTopLevel(target) as Window ?? window;
+        if (!ReferenceEquals(root, window)) centre = target.TranslatePoint(new Point(target.Bounds.Width / 2, target.Bounds.Height / 2), root) ?? default;
+
+        root.MouseMove(centre);
+        root.MouseDown(centre, MouseButton.Left);
+        root.MouseUp(centre, MouseButton.Left);
+        Dispatcher.UIThread.RunJobs();
+    }
+
+
+    private static void Wait(int milliseconds)
+    {
+        var frame = new DispatcherFrame();
+        DispatcherTimer.RunOnce(() => frame.Continue = false, TimeSpan.FromMilliseconds(milliseconds));
+        Dispatcher.UIThread.PushFrame(frame);
+    }
+
+
+    private static T Find<T>(Control templated, string name) where T : Control
+    {
+        foreach (var visual in Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(templated))
+        {
+            if (visual is T match && match.Name == name) return match;
+        }
+
+        throw new InvalidOperationException($"{name} not found");
+    }
+
+
+    private static double Contrast(Color a, Color b)
+    {
+        static double Lin(double v) => v <= 0.04045 ? v / 12.92 : Math.Pow((v + 0.055) / 1.055, 2.4);
+        static double Lum(Color c) => 0.2126 * Lin(c.R / 255.0) + 0.7152 * Lin(c.G / 255.0) + 0.0722 * Lin(c.B / 255.0);
+        var (la, lb) = (Lum(a), Lum(b));
+        return (Math.Max(la, lb) + 0.05) / (Math.Min(la, lb) + 0.05);
+    }
+
+    #endregion // Private methods
+}

@@ -71,6 +71,20 @@
       <SolidColorBrush x:Key="InverseHoverLayerBrush" Color="#14FFFFFF" />
       <Color x:Key="InversePressedLayerColor">#1A000000</Color>
       <SolidColorBrush x:Key="InversePressedLayerBrush" Color="#1A000000" />
+      <Color x:Key="ScrollThumbColor">#999999</Color>
+      <SolidColorBrush x:Key="ScrollThumbBrush" Color="#999999" />
+      <Color x:Key="ScrollThumbHoverColor">#888888</Color>
+      <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#888888" />
+      <Color x:Key="ScrollThumbPressedColor">#666666</Color>
+      <SolidColorBrush x:Key="ScrollThumbPressedBrush" Color="#666666" />
+      <Color x:Key="ScrollThumbDisabledColor">#30808080</Color>
+      <SolidColorBrush x:Key="ScrollThumbDisabledBrush" Color="#30808080" />
+      <Color x:Key="ScrollBarExpandedColor">#AAFFFFFF</Color>
+      <SolidColorBrush x:Key="ScrollBarExpandedBrush" Color="#AAFFFFFF" />
+      <Color x:Key="ScrollTrackExpandedColor">#08000000</Color>
+      <SolidColorBrush x:Key="ScrollTrackExpandedBrush" Color="#08000000" />
+      <Color x:Key="ScrollArrowPressedColor">#10000000</Color>
+      <SolidColorBrush x:Key="ScrollArrowPressedBrush" Color="#10000000" />
       <!--  Emphasis alphas: Overlays in both themes  -->
       <Color x:Key="EmphasisA00Color">#00000000</Color>
       <SolidColorBrush x:Key="EmphasisA00Brush" Color="#00000000" />
@@ -177,6 +191,20 @@
       <SolidColorBrush x:Key="InverseHoverLayerBrush" Color="#0D000000" />
       <Color x:Key="InversePressedLayerColor">#1A000000</Color>
       <SolidColorBrush x:Key="InversePressedLayerBrush" Color="#1A000000" />
+      <Color x:Key="ScrollThumbColor">#BBBBBB</Color>
+      <SolidColorBrush x:Key="ScrollThumbBrush" Color="#BBBBBB" />
+      <Color x:Key="ScrollThumbHoverColor">#CCCCCC</Color>
+      <SolidColorBrush x:Key="ScrollThumbHoverBrush" Color="#CCCCCC" />
+      <Color x:Key="ScrollThumbPressedColor">#DDDDDD</Color>
+      <SolidColorBrush x:Key="ScrollThumbPressedBrush" Color="#DDDDDD" />
+      <Color x:Key="ScrollThumbDisabledColor">#30808080</Color>
+      <SolidColorBrush x:Key="ScrollThumbDisabledBrush" Color="#30808080" />
+      <Color x:Key="ScrollBarExpandedColor">#33FFFFFF</Color>
+      <SolidColorBrush x:Key="ScrollBarExpandedBrush" Color="#33FFFFFF" />
+      <Color x:Key="ScrollTrackExpandedColor">#0CFFFFFF</Color>
+      <SolidColorBrush x:Key="ScrollTrackExpandedBrush" Color="#0CFFFFFF" />
+      <Color x:Key="ScrollArrowPressedColor">#15FFFFFF</Color>
+      <SolidColorBrush x:Key="ScrollArrowPressedBrush" Color="#15FFFFFF" />
       <!--  Emphasis alphas: Overlays in both themes  -->
       <Color x:Key="EmphasisA00Color">#00FFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA00Brush" Color="#00FFFFFF" />
@@ -306,7 +334,6 @@
   <CornerRadius x:Key="RadiusCell">10</CornerRadius>
   <CornerRadius x:Key="RadiusHighlight">3</CornerRadius>
   <CornerRadius x:Key="RadiusSkeleton">4</CornerRadius>
-  <CornerRadius x:Key="RadiusScrollThumb">12</CornerRadius>
   <CornerRadius x:Key="RadiusToast">16</CornerRadius>
   <CornerRadius x:Key="RadiusStoreBadge">16</CornerRadius>
 

@@ -40,6 +40,10 @@ public static class UiText
     public const string RELEASES_CAPTION = "Download from";
     public const string RELEASES_TARGET = "GitHub Releases";
     public const string DIALOG_CANCEL = "Cancel";
+    public const string SCROLL_UP = "Scroll up";
+    public const string SCROLL_DOWN = "Scroll down";
+    public const string SCROLL_LEFT = "Scroll left";
+    public const string SCROLL_RIGHT = "Scroll right";
 
     #endregion // Constants
 

@@ -156,6 +156,34 @@ public static class TokenKeys
     public const string INVERSE_PRESSED_LAYER_COLOR = "InversePressedLayerColor";
     // Inverse fills pressed (DS brightness 0.9)
     public const string INVERSE_PRESSED_LAYER_BRUSH = "InversePressedLayerBrush";
+    // Scroll bar thumb and arrows
+    public const string SCROLL_THUMB_COLOR = "ScrollThumbColor";
+    // Scroll bar thumb and arrows
+    public const string SCROLL_THUMB_BRUSH = "ScrollThumbBrush";
+    // Scroll bar thumb and arrows on hover
+    public const string SCROLL_THUMB_HOVER_COLOR = "ScrollThumbHoverColor";
+    // Scroll bar thumb and arrows on hover
+    public const string SCROLL_THUMB_HOVER_BRUSH = "ScrollThumbHoverBrush";
+    // Scroll bar thumb and arrows pressed
+    public const string SCROLL_THUMB_PRESSED_COLOR = "ScrollThumbPressedColor";
+    // Scroll bar thumb and arrows pressed
+    public const string SCROLL_THUMB_PRESSED_BRUSH = "ScrollThumbPressedBrush";
+    // Scroll bar thumb and arrows disabled
+    public const string SCROLL_THUMB_DISABLED_COLOR = "ScrollThumbDisabledColor";
+    // Scroll bar thumb and arrows disabled
+    public const string SCROLL_THUMB_DISABLED_BRUSH = "ScrollThumbDisabledBrush";
+    // Scroll bar fill while expanded
+    public const string SCROLL_BAR_EXPANDED_COLOR = "ScrollBarExpandedColor";
+    // Scroll bar fill while expanded
+    public const string SCROLL_BAR_EXPANDED_BRUSH = "ScrollBarExpandedBrush";
+    // Scroll track tint while expanded; arrow button hover
+    public const string SCROLL_TRACK_EXPANDED_COLOR = "ScrollTrackExpandedColor";
+    // Scroll track tint while expanded; arrow button hover
+    public const string SCROLL_TRACK_EXPANDED_BRUSH = "ScrollTrackExpandedBrush";
+    // Scroll arrow button pressed
+    public const string SCROLL_ARROW_PRESSED_COLOR = "ScrollArrowPressedColor";
+    // Scroll arrow button pressed
+    public const string SCROLL_ARROW_PRESSED_BRUSH = "ScrollArrowPressedBrush";
     // Fills, focus ring, switches, checkboxes
     public const string ACCENT_COLOR = "AccentColor";
     // Fills, focus ring, switches, checkboxes
@@ -376,8 +404,6 @@ public static class TokenKeys
     public const string RADIUS_HIGHLIGHT = "RadiusHighlight";
     // Skeleton bars
     public const string RADIUS_SKELETON = "RadiusSkeleton";
-    // Scroll bar thumb
-    public const string RADIUS_SCROLL_THUMB = "RadiusScrollThumb";
     // Toast
     public const string RADIUS_TOAST = "RadiusToast";
     // Store badge

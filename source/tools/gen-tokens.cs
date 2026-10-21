@@ -141,6 +141,15 @@ static class Generator
         new("InverseRestLayer", "#00FFFFFF", "#00000000", "Inverse fills at rest: the hover colour at 0%"),
         new("InverseHoverLayer", "#14FFFFFF", "#0D000000", "Inverse fills hovered (DS brightness 1.15)"),
         new("InversePressedLayer", "#1A000000", "#1A000000", "Inverse fills pressed (DS brightness 0.9)"),
+
+        // the Fluent 2 scroll bar of v2, which replaces DS 6.16 (owner, 2026-10-21)
+        new("ScrollThumb", "#999999", "#BBBBBB", "Scroll bar thumb and arrows"),
+        new("ScrollThumbHover", "#888888", "#CCCCCC", "Scroll bar thumb and arrows on hover"),
+        new("ScrollThumbPressed", "#666666", "#DDDDDD", "Scroll bar thumb and arrows pressed"),
+        new("ScrollThumbDisabled", "#30808080", "#30808080", "Scroll bar thumb and arrows disabled"),
+        new("ScrollBarExpanded", "#AAFFFFFF", "#33FFFFFF", "Scroll bar fill while expanded"),
+        new("ScrollTrackExpanded", "#08000000", "#0CFFFFFF", "Scroll track tint while expanded; arrow button hover"),
+        new("ScrollArrowPressed", "#10000000", "#15FFFFFF", "Scroll arrow button pressed"),
     ];
 
     // the same in both themes
@@ -210,7 +219,7 @@ static class Generator
         ("RadiusWell", 12, "Value wells, frame preview, file card, drop target"), ("RadiusSegmentedThumb", 11, "Segmented thumb (14 - 3)"),
         ("RadiusCheckBox", 5, "Checkbox box"), ("RadiusKbd", 8, "Kbd hint (plan Appendix A item 13)"),
         ("RadiusThumbnail", 10, "Rail thumbnail"), ("RadiusCell", 10, "Selected cell ring"), ("RadiusHighlight", 3, "Search match"),
-        ("RadiusSkeleton", 4, "Skeleton bars"), ("RadiusScrollThumb", 12, "Scroll bar thumb"), ("RadiusToast", 16, "Toast"),
+        ("RadiusSkeleton", 4, "Skeleton bars"), ("RadiusToast", 16, "Toast"),
         ("RadiusStoreBadge", 16, "Store badge"),
     ];
 
@@ -282,7 +291,7 @@ static class Generator
         ("SkeletonPulse", 1200, "Standard", "Skeleton pulse 0.45 to 1"),
         ("SkeletonStagger", 70, "Standard", "Skeleton stagger"),
         ("Spin", 800, "Linear", "Spinner turn"),
-        ("ScrollBar", 160, "Standard", "Scroll bar thumb width"),
+        ("ScrollBar", 100, "Standard", "Scroll bar expand and collapse (v2)"),
         ("TokenPop", 260, "Spring", "Token chip pop-in"),
         ("Dialog", 260, "Emphasized", "In-window dialog in"),
     ];

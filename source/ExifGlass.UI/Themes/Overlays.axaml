@@ -34,6 +34,7 @@
   <!--  DS 6.14 toast: bottom centre, 62 above the bottom, 44 high, radius 16, Bg.Elevated 98% (no blur), status icon 18 Filled, title Medium + sub 11.5  -->
   <ControlTheme x:Key="{x:Type ui:ToastHost}" TargetType="ui:ToastHost">
     <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
@@ -94,6 +95,8 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type ui:DialogCard}" TargetType="ui:DialogCard">
+    <!--  Avalonia 12 clips templated controls; elevation 2 falls well outside the card  -->
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Width" Value="400" />
     <Setter Property="Margin" Value="24" />
     <Setter Property="Padding" Value="20,18,16,16" />

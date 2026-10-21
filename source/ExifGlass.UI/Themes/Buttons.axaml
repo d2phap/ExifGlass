@@ -63,7 +63,8 @@
                           Width="{TemplateBinding IconSize}"
                           Height="{TemplateBinding IconSize}"
                           VerticalAlignment="Center"
-                          Icon="{TemplateBinding Icon}" />
+                          Icon="{TemplateBinding Icon}"
+                          RenderTransformOrigin="50%,50%" />
             <ContentPresenter Name="PART_ContentPresenter"
                               VerticalAlignment="Center"
                               Content="{TemplateBinding Content}"
@@ -76,8 +77,7 @@
 
     <Style Selector="^:not(:icon) /template/ ui|GlassIcon#PART_Icon">
       <Setter Property="IsVisible" Value="False" />
-    </Style>
-    <Style Selector="^:not(:label) /template/ ContentPresenter#PART_ContentPresenter">
+    </Style>    <Style Selector="^:not(:label) /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="^:icon:label">
@@ -175,6 +175,22 @@
     </Style>
     <Style Selector="^.toolbar">
       <Setter Property="IconSize" Value="{StaticResource IconToolbar}" />
+    </Style>
+
+    <!--  DisclosureButton: a 12 chevron at 70% that turns from right to down while its panel is open, as the dropdown chevron turns; after the sizes so its icon size wins  -->
+    <Style Selector="^.disclosure">
+      <Setter Property="IconSize" Value="12" />
+    </Style>
+    <Style Selector="^.disclosure /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="Opacity" Value="0.7" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.ChevronEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="^.disclosure:expanded /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="RenderTransform" Value="rotate(90deg)" />
     </Style>
   </ControlTheme>
 

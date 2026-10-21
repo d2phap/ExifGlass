@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 
 namespace ExifGlass.UI.Controls;
 
@@ -89,6 +90,63 @@ public class GlassButton : Button
     }
 
     #endregion // Private methods
+}
+
+
+/// <summary>
+/// A button that shows and hides an ExpandPanel: its chevron points right while closed and turns down while open.
+/// </summary>
+public class DisclosureButton : GlassButton
+{
+    #region Fields and constants
+
+    public const string CLASS = "disclosure";
+
+    public static readonly StyledProperty<bool> IsExpandedProperty =
+        AvaloniaProperty.Register<DisclosureButton, bool>(nameof(IsExpanded), defaultBindingMode: BindingMode.TwoWay);
+
+    #endregion // Fields and constants
+
+
+    #region Properties
+
+    public bool IsExpanded
+    {
+        get => GetValue(IsExpandedProperty);
+        set => SetValue(IsExpandedProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Constructors
+
+    public DisclosureButton()
+    {
+        Icon = IconId.ChevronRight;
+        Classes.Add(CLASS);
+    }
+
+    #endregion // Constructors
+
+
+    #region Protected methods
+
+    protected override void OnClick()
+    {
+        IsExpanded = !IsExpanded;
+        base.OnClick();
+    }
+
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == IsExpandedProperty) PseudoClasses.Set(":expanded", IsExpanded);
+    }
+
+    #endregion // Protected methods
 }
 
 

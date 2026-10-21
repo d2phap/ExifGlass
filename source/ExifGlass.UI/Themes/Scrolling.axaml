@@ -1,13 +1,13 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
                     xmlns:motion="using:ExifGlass.UI.Motion"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
 
-  <!--  DS 6.16: overlay scroll bars, no track, no arrows; the bars lie over the content's edge, so content keeps its width; wheel notches ease  -->
+  <!--  the Fluent 2 scroll bars of v2 (owner, 2026-10-21; replaces DS 6.16): they lie over the content's edge, so content keeps its width; wheel notches ease  -->
   <ControlTheme x:Key="{x:Type ScrollViewer}" TargetType="ScrollViewer">
     <Setter Property="Background" Value="Transparent" />
-    <Setter Property="AllowAutoHide" Value="False" />
     <Setter Property="motion:SmoothScroll.IsEnabled" Value="True" />
     <Setter Property="Template">
       <ControlTemplate>
@@ -31,31 +31,41 @@
                                        Viewport="{Binding Viewport, ElementName=PART_ContentPresenter}" />
             </ScrollContentPresenter.GestureRecognizers>
           </ScrollContentPresenter>
-          <ScrollBar Name="PART_HorizontalScrollBar" Grid.Row="1" Orientation="Horizontal" />
-          <ScrollBar Name="PART_VerticalScrollBar" Grid.Column="1" Orientation="Vertical" />
+          <ScrollBar Name="PART_HorizontalScrollBar"
+                     Grid.Row="1"
+                     AllowAutoHide="{TemplateBinding AllowAutoHide}"
+                     Orientation="Horizontal" />
+          <ScrollBar Name="PART_VerticalScrollBar"
+                     Grid.Column="1"
+                     AllowAutoHide="{TemplateBinding AllowAutoHide}"
+                     Orientation="Vertical" />
         </Grid>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
 
-  <!--  rest: a 1 px hairline at Emphasis 35%; over the bar: 6 px at 50% (160 ms); dragging: 62%; radius 12 (round), at least 40 long  -->
+  <!--  an 8 px pill; the bar scales it to a third at rest  -->
   <ControlTheme x:Key="GlassScrollThumb" TargetType="Thumb">
-    <Setter Property="Background" Value="{DynamicResource EmphasisA35Brush}" />
+    <Setter Property="Background" Value="{DynamicResource ScrollThumbBrush}" />
     <Setter Property="Transitions">
       <Transitions>
-        <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Width" Duration="0:0:0.16" />
-        <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Height" Duration="0:0:0.16" />
-        <ThicknessTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Margin" Duration="0:0:0.16" />
-        <BrushTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Background" Duration="0:0:0.16" />
+        <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="RenderTransform" Duration="0:0:0.1" />
+        <BrushTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Background" Duration="0:0:0.1" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>
-        <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusScrollThumb}" ui:SquircleBorder.CornerShape="Round" />
+        <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="4" ui:SquircleBorder.CornerShape="Round" />
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ScrollThumbHoverBrush}" />
+    </Style>
     <Style Selector="^:pressed">
-      <Setter Property="Background" Value="{DynamicResource EmphasisA62Brush}" />
+      <Setter Property="Background" Value="{DynamicResource ScrollThumbPressedBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Background" Value="{DynamicResource ScrollThumbDisabledBrush}" />
     </Style>
   </ControlTheme>
 
@@ -70,75 +80,199 @@
     </Setter>
   </ControlTheme>
 
+  <!--  the arrows: hidden at rest, shown while the bar is expanded  -->
+  <ControlTheme x:Key="GlassScrollLineButton" TargetType="RepeatButton">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource ScrollThumbBrush}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Opacity" Duration="0:0:0.1" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="3">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Content="{TemplateBinding Content}" />
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{DynamicResource ScrollTrackExpandedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ScrollThumbHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Background" Value="{DynamicResource ScrollArrowPressedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource ScrollThumbPressedBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource ScrollThumbDisabledBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  14 px; at rest the thumb shows a third of its 8 px, over the bar (after ShowDelay) the bar fills, the track tints, the arrows show and the thumb is whole  -->
   <ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
     <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="MinWidth" Value="14" />
+    <Setter Property="MinHeight" Value="14" />
+    <Setter Property="Background" Value="Transparent" />
 
     <Style Selector="^:vertical">
-      <Setter Property="Width" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
-          <Track DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
-                 IsDirectionReversed="True"
-                 Maximum="{TemplateBinding Maximum}"
-                 Minimum="{TemplateBinding Minimum}"
-                 Orientation="{TemplateBinding Orientation}"
-                 ViewportSize="{TemplateBinding ViewportSize}"
-                 Value="{TemplateBinding Value, Mode=TwoWay}">
-            <Track.DecreaseButton>
-              <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
-            </Track.DecreaseButton>
-            <Track.IncreaseButton>
-              <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
-            </Track.IncreaseButton>
-            <Thumb Name="thumb"
-                   Width="1"
-                   MinHeight="40"
-                   Margin="0,2,5,2"
-                   HorizontalAlignment="Right"
-                   Theme="{StaticResource GlassScrollThumb}" />
-          </Track>
+          <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="6" ui:SquircleBorder.CornerShape="Round">
+            <Grid RowDefinitions="Auto,*,Auto">
+              <ui:SquircleBorder Name="PART_TrackTint"
+                                 Grid.RowSpan="3"
+                                 Background="{DynamicResource ScrollTrackExpandedBrush}"
+                                 CornerRadius="6"
+                                 Opacity="0"
+                                 ui:SquircleBorder.CornerShape="Round">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Opacity" Duration="0:0:0.1" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
+              </ui:SquircleBorder>
+              <RepeatButton Name="PART_LineUpButton"
+                            Grid.Row="0"
+                            Height="14"
+                            MinWidth="14"
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_UP}"
+                            Theme="{StaticResource GlassScrollLineButton}">
+                <Path Width="10"
+                      Height="7.5"
+                      Data="M 3,9.5 L 7,2.8 Q 8,1 9,2.8 L 13,9.5 Q 14,11.5 12,11.5 L 4,11.5 Q 2,11.5 3,9.5 Z"
+                      Fill="{Binding $parent[RepeatButton].Foreground}"
+                      Stretch="Uniform" />
+              </RepeatButton>
+              <Track Grid.Row="1"
+                     DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                     IsDirectionReversed="True"
+                     Maximum="{TemplateBinding Maximum}"
+                     Minimum="{TemplateBinding Minimum}"
+                     Orientation="{TemplateBinding Orientation}"
+                     ViewportSize="{TemplateBinding ViewportSize}"
+                     Value="{TemplateBinding Value, Mode=TwoWay}">
+                <Track.DecreaseButton>
+                  <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
+                </Track.DecreaseButton>
+                <Track.IncreaseButton>
+                  <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
+                </Track.IncreaseButton>
+                <Thumb Name="thumb"
+                       Width="8"
+                       MinHeight="14"
+                       RenderTransformOrigin="100%,50%"
+                       Theme="{StaticResource GlassScrollThumb}" />
+              </Track>
+              <RepeatButton Name="PART_LineDownButton"
+                            Grid.Row="2"
+                            Height="14"
+                            MinWidth="14"
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_DOWN}"
+                            Theme="{StaticResource GlassScrollLineButton}">
+                <Path Width="10"
+                      Height="7.5"
+                      Data="M 13,2.5 L 9,9.2 Q 8,11 7,9.2 L 3,2.5 Q 2,0.5 4,0.5 L 12,0.5 Q 14,0.5 13,2.5 Z"
+                      Fill="{Binding $parent[RepeatButton].Foreground}"
+                      Stretch="Uniform" />
+              </RepeatButton>
+            </Grid>
+          </ui:SquircleBorder>
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="^:vertical:pointerover /template/ Thumb#thumb">
-      <Setter Property="Width" Value="6" />
-      <Setter Property="Margin" Value="0,2,3,2" />
-      <Setter Property="Background" Value="{DynamicResource EmphasisA50Brush}" />
+    <Style Selector="^:vertical /template/ Thumb#thumb">
+      <Setter Property="RenderTransform" Value="scaleX(0.33)" />
     </Style>
 
     <Style Selector="^:horizontal">
-      <Setter Property="Height" Value="12" />
       <Setter Property="Template">
         <ControlTemplate>
-          <Track DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
-                 Maximum="{TemplateBinding Maximum}"
-                 Minimum="{TemplateBinding Minimum}"
-                 Orientation="{TemplateBinding Orientation}"
-                 ViewportSize="{TemplateBinding ViewportSize}"
-                 Value="{TemplateBinding Value, Mode=TwoWay}">
-            <Track.DecreaseButton>
-              <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
-            </Track.DecreaseButton>
-            <Track.IncreaseButton>
-              <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
-            </Track.IncreaseButton>
-            <Thumb Name="thumb"
-                   Height="1"
-                   MinWidth="40"
-                   Margin="2,0,2,5"
-                   VerticalAlignment="Bottom"
-                   Theme="{StaticResource GlassScrollThumb}" />
-          </Track>
+          <ui:SquircleBorder Background="{TemplateBinding Background}" CornerRadius="6" ui:SquircleBorder.CornerShape="Round">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <ui:SquircleBorder Name="PART_TrackTint"
+                                 Grid.ColumnSpan="3"
+                                 Background="{DynamicResource ScrollTrackExpandedBrush}"
+                                 CornerRadius="6"
+                                 Opacity="0"
+                                 ui:SquircleBorder.CornerShape="Round">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <DoubleTransition Easing="{x:Static tok:MotionTokens.ScrollBarEasing}" Property="Opacity" Duration="0:0:0.1" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
+              </ui:SquircleBorder>
+              <RepeatButton Name="PART_LineUpButton"
+                            Grid.Column="0"
+                            Width="14"
+                            MinHeight="14"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_LEFT}"
+                            Theme="{StaticResource GlassScrollLineButton}">
+                <Path Width="7.5"
+                      Height="10"
+                      Data="M 9.5,3 L 2.8,7 Q 1,8 2.8,9 L 9.5,13 Q 11.5,14 11.5,12 L 11.5,4 Q 11.5,2 9.5,3 Z"
+                      Fill="{Binding $parent[RepeatButton].Foreground}"
+                      Stretch="Uniform" />
+              </RepeatButton>
+              <Track Grid.Column="1"
+                     DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                     Maximum="{TemplateBinding Maximum}"
+                     Minimum="{TemplateBinding Minimum}"
+                     Orientation="{TemplateBinding Orientation}"
+                     ViewportSize="{TemplateBinding ViewportSize}"
+                     Value="{TemplateBinding Value, Mode=TwoWay}">
+                <Track.DecreaseButton>
+                  <RepeatButton Name="PART_PageUpButton" Theme="{StaticResource GlassScrollTrackButton}" />
+                </Track.DecreaseButton>
+                <Track.IncreaseButton>
+                  <RepeatButton Name="PART_PageDownButton" Theme="{StaticResource GlassScrollTrackButton}" />
+                </Track.IncreaseButton>
+                <Thumb Name="thumb"
+                       Height="8"
+                       MinWidth="14"
+                       RenderTransformOrigin="50%,100%"
+                       Theme="{StaticResource GlassScrollThumb}" />
+              </Track>
+              <RepeatButton Name="PART_LineDownButton"
+                            Grid.Column="2"
+                            Width="14"
+                            MinHeight="14"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_RIGHT}"
+                            Theme="{StaticResource GlassScrollLineButton}">
+                <Path Width="7.5"
+                      Height="10"
+                      Data="M 2.5,3 L 9.2,7 Q 11,8 9.2,9 L 2.5,13 Q 0.5,14 0.5,12 L 0.5,4 Q 0.5,2 2.5,3 Z"
+                      Fill="{Binding $parent[RepeatButton].Foreground}"
+                      Stretch="Uniform" />
+              </RepeatButton>
+            </Grid>
+          </ui:SquircleBorder>
         </ControlTemplate>
       </Setter>
     </Style>
-    <Style Selector="^:horizontal:pointerover /template/ Thumb#thumb">
-      <Setter Property="Height" Value="6" />
-      <Setter Property="Margin" Value="2,0,2,3" />
-      <Setter Property="Background" Value="{DynamicResource EmphasisA50Brush}" />
+    <Style Selector="^:horizontal /template/ Thumb#thumb">
+      <Setter Property="RenderTransform" Value="scaleY(0.33)" />
     </Style>
-    <Style Selector="^ /template/ Thumb#thumb:pressed">
-      <Setter Property="Background" Value="{DynamicResource EmphasisA62Brush}" />
+
+    <!--  after the rest styles, so the whole thumb wins; the fill is set on the bar since a template binding outranks a style  -->
+    <Style Selector="^[IsExpanded=true]">
+      <Setter Property="Background" Value="{DynamicResource ScrollBarExpandedBrush}" />
+    </Style>
+    <Style Selector="^[IsExpanded=true] /template/ Border#PART_TrackTint">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^[IsExpanded=true] /template/ Thumb#thumb">
+      <Setter Property="RenderTransform" Value="none" />
+    </Style>
+    <Style Selector="^[IsExpanded=true] /template/ RepeatButton">
+      <Setter Property="Opacity" Value="1" />
     </Style>
   </ControlTheme>
 

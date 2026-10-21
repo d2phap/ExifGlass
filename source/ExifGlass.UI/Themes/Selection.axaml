@@ -254,6 +254,8 @@
     <Setter Property="SelectionMode" Value="Single,AlwaysSelected" />
     <!--  a selection mustn't scroll the page that holds the control  -->
     <Setter Property="AutoScrollToSelectedItem" Value="False" />
+    <!--  Avalonia 12 clips templated controls; the thumb's shadow falls past the padding  -->
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="ItemsPanel">
@@ -336,8 +338,9 @@
       <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
       <Setter Property="FontWeight" Value="Medium" />
     </Style>
+    <!--  items draw over the sliding thumb: the selected one drops its hover and press layer at once, or it tints the thumb as it arrives  -->
     <Style Selector="^:selected /template/ ui|InteractionOverlay#PART_Overlay">
-      <Setter Property="HoverBrush" Value="{DynamicResource StateRestBrush}" />
+      <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
       <Setter Property="Opacity" Value="1" />
@@ -447,6 +450,8 @@
             <Button Name="PART_Remove"
                     Width="18"
                     Height="18"
+                    MinWidth="0"
+                    MinHeight="0"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="{x:Static ui:TokenChip.REMOVE_LABEL}"
                     CornerRadius="{StaticResource RadiusControl18}"

@@ -458,29 +458,24 @@ public static partial class DesignGalleryCatalog
 
     private static GallerySection Scrollbars()
     {
-        static Control Viewer(Func<ScrollBar, ScrollBar>? state = null)
+        // a viewer that never auto-hides keeps its bars expanded, which pins that state
+        static Control Viewer(bool expanded = false)
         {
             var lines = new StackPanel { Spacing = 6, Margin = new Thickness(12) };
             for (var i = 0; i < 30; i++) lines.Children.Add(new Skeleton { Width = 120 - i % 4 * 18 });
 
-            var viewer = new ScrollViewer { Width = 180, Height = 120, Content = lines, VerticalScrollBarVisibility = ScrollBarVisibility.Visible };
+            var viewer = new ScrollViewer { Width = 180, Height = 120, Content = lines, VerticalScrollBarVisibility = ScrollBarVisibility.Visible, AllowAutoHide = !expanded };
             var frame = new SquircleBorder { CornerRadius = new CornerRadius(12), BorderThickness = new Thickness(1), ClipToBounds = true, Child = viewer };
             Bind(frame, SquircleBorder.BackgroundProperty, TokenKeys.BG_PANEL_BRUSH);
             Bind(frame, SquircleBorder.BorderBrushProperty, TokenKeys.STROKE_HAIRLINE_BRUSH);
-
-            if (state is not null) viewer.TemplateApplied += (_, e) =>
-            {
-                if (e.NameScope.Find<ScrollBar>("PART_VerticalScrollBar") is { } bar) state(bar);
-            };
-
             return frame;
         }
 
-        return new GallerySection("c-scroll", "Scroll bars", "DS 6.16: overlay, no track or arrows; 1 px hairline at Emphasis 35%, 6 px at 50% over the bar (160 ms), 62% while dragging; radius 12, at least 40 long; wheel notches ease.",
+        return new GallerySection("c-scroll", "Scroll bars", "Fluent 2, as in v2 (owner 2026-10-21; replaces DS 6.16): 14 px over the content's edge; at rest a third of the 8 px thumb; over the bar it expands: the whole pill, a tinted track and arrows (100 ms); thumb darker on hover and press; wheel notches ease.",
         [
             new("rest", Viewer()),
-            new(":pointerover", Viewer(b => b.Hover())),
-            new("live", Viewer(), "wheel, drag the thumb"),
+            new("[IsExpanded]", Viewer(expanded: true), "pointer over the bar"),
+            new("live", Viewer(), "hover, wheel, drag the thumb, the arrows"),
         ]);
     }
 
@@ -563,11 +558,13 @@ public static partial class DesignGalleryCatalog
         foreach (var line in new[] { "Hires upscale: 1.5", "Hires steps: 12", "Denoising strength: 0.45", "Clip skip: 2" }) content.Children.Add(DesignGallery.Text(line, TypeClasses.CAPTION, TokenKeys.TEXT_SECONDARY_BRUSH));
 
         var panel = new ExpandPanel { Child = content, Width = 260 };
-        var toggle = new GlassButton { Content = "All parameters", Icon = IconId.ChevronDown, Classes = { "ghost", "small" } };
-        toggle.Click += (_, _) => panel.IsExpanded = !panel.IsExpanded;
+        var toggle = new DisclosureButton { Content = "All parameters", Classes = { "ghost", "small" } };
+        toggle.Click += (_, _) => panel.IsExpanded = toggle.IsExpanded;
 
-        return new GallerySection("c-expand", "Expand panel", "Height 0 to content in 420 ms Emphasized, clipped while moving; fade 220 ms; closed content leaves the tab order.",
+        return new GallerySection("c-expand", "Expand panel", "Height 0 to content in 420 ms Emphasized, clipped while moving; fade 220 ms; closed content leaves the tab order. The disclosure chevron points right while closed and turns down (260 ms).",
         [
+            new("closed", new DisclosureButton { Content = "All parameters", Classes = { "ghost", "small" } }),
+            new(":expanded", new DisclosureButton { Content = "All parameters", IsExpanded = true, Classes = { "ghost", "small" } }),
             new("live", new StackPanel { Spacing = 4, Children = { toggle.Left(), panel } }),
         ]);
     }

@@ -199,8 +199,8 @@ public static partial class MotionTokens
     public static readonly TimeSpan Spin = TimeSpan.FromMilliseconds(800);
     public static readonly Easing SpinEasing = LinearEasing;
 
-    // Scroll bar thumb width: 160 ms, Standard
-    public static readonly TimeSpan ScrollBar = TimeSpan.FromMilliseconds(160);
+    // Scroll bar expand and collapse (v2): 100 ms, Standard
+    public static readonly TimeSpan ScrollBar = TimeSpan.FromMilliseconds(100);
     public static readonly Easing ScrollBarEasing = StandardEasing;
 
     // Token chip pop-in: 260 ms, Spring

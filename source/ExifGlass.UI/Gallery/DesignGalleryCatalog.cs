@@ -87,12 +87,18 @@ public static partial class DesignGalleryCatalog
         foreach (var group in GroupPalette.NamedGroups) states.Add(new GalleryState(group, GroupDot(group, null), ""));
         for (var i = 0; i < GroupPalette.RingSize; i++) states.Add(new GalleryState("ring " + i.ToString(CultureInfo.InvariantCulture), GroupDot(null, i), "other groups"));
 
-        var bar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, Width = 300 };
+        // Proto: square segments in a track that clips them to radius 2, so only the bar's ends are rounded
+        const double BAR_WIDTH = 300;
+        var segments = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2 };
         double[] counts = [17, 55, 23, 31, 9, 12, 6];
         string[] groups = ["File", "EXIF", "MakerNotes", "XMP", "ICC_Profile", "Composite", "PNG"];
         var total = counts.Sum();
-        for (var i = 0; i < counts.Length; i++) bar.Children.Add(GroupBarSegment(groups[i], 300 * counts[i] / total - 2));
-        states.Add(new GalleryState("composition bar", bar, "6 px, 2 px gaps, segments by tag count"));
+        var room = BAR_WIDTH - segments.Spacing * (counts.Length - 1);
+        for (var i = 0; i < counts.Length; i++) segments.Children.Add(GroupBarSegment(groups[i], room * counts[i] / total));
+
+        var bar = new SquircleBorder { Width = BAR_WIDTH, Height = 6, CornerRadius = new CornerRadius(2), ClipToBounds = true, Child = segments };
+        Bind(bar, SquircleBorder.BackgroundProperty, TokenKeys.EMPHASIS_A06_BRUSH);
+        states.Add(new GalleryState("composition bar", bar, "6 px, 2 px gaps, segments by tag count; radius 2 at the ends only"));
 
         return new GallerySection("groups", "Group palette (D17)", "plan 5.2: the DS eight plus extended groups and a 12-colour ring; each dot keeps 3:1 against Bg.Panel in its theme (tuned by gen-tokens). Danger red is never a group colour.", states);
     }
@@ -290,7 +296,7 @@ public static partial class DesignGalleryCatalog
     }
 
 
-    private static Control GroupBarSegment(string group, double width) => new GroupDotControl { Group = group, Width = Math.Max(2, width), Height = 6, Radius = 3 };
+    private static Control GroupBarSegment(string group, double width) => new GroupDotControl { Group = group, Width = Math.Max(2, width), Height = 6, Radius = 0 };
 
     #endregion // Helpers
 

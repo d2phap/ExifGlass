@@ -22,6 +22,8 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.VisualTree;
+using ExifGlass.UI.Controls;
 using ExifGlass.UI.Gallery;
 using ExifGlass.UI.Tokens;
 using Xunit;
@@ -111,6 +113,47 @@ public class GalleryTests
     }
 
 
+    // Avalonia 12 clips every templated control to its bounds, so a control whose template draws a shadow past them must turn ClipToBounds off
+    [AvaloniaFact]
+    public void NoShadowIsClippedByItsOwnControl()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var content = DesignGallery.BuildThemed(DesignGalleryCatalog.Build(), ThemeVariant.Light);
+            var clipped = new SortedSet<string>(StringComparer.Ordinal);
+            var count = 0;
+            Render.CaptureSettled(content, WIDTH, HEIGHT, ThemeVariant.Light, _ =>
+            {
+                foreach (var border in content.GetVisualDescendants().OfType<SquircleBorder>())
+                {
+                    if (border.TemplatedParent is not Visual owner || ShadowReach(border) is not { } reach) continue;
+                    count++;
+
+                    // up to the control that owns the template; the gallery's own frames may clip on purpose
+                    for (var v = border.GetVisualParent(); v is not null; v = v.GetVisualParent())
+                    {
+                        if (v.ClipToBounds && border.TranslatePoint(default, v) is { } at && !new Rect(v.Bounds.Size).Contains(reach.Translate(at)))
+                        {
+                            clipped.Add($"{owner.GetType().Name}: {v.GetType().Name} clips the shadow of {border.Name ?? "a part"}");
+                            break;
+                        }
+
+                        if (v == owner) break;
+                    }
+                }
+            }, settleMs: 100);
+
+            Assert.True(count >= 5, $"only {count} shadows checked");
+            Assert.True(clipped.Count == 0, string.Join(Environment.NewLine, clipped));
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
+
     [AvaloniaFact]
     public void TheGalleryWindowOpensAndAudits()
     {
@@ -138,6 +181,25 @@ public class GalleryTests
 
 
     #region Private methods
+
+    // where an outset shadow is still clearly visible: its spread and offset plus one blur sigma (SquircleBorder's conversion)
+    private static Rect? ShadowReach(SquircleBorder border)
+    {
+        Rect? reach = null;
+        var shadows = border.BoxShadow;
+        for (var i = 0; i < shadows.Count; i++)
+        {
+            var shadow = shadows[i];
+            if (shadow.IsInset) continue;
+
+            var sigma = shadow.Blur > 0 ? 0.288675 * shadow.Blur + 0.5 : 0;
+            var box = new Rect(border.Bounds.Size).Inflate(shadow.Spread + sigma).Translate(new Vector(shadow.OffsetX, shadow.OffsetY));
+            reach = reach is { } r ? r.Union(box) : box;
+        }
+
+        return reach;
+    }
+
 
     // Windows keeps the baselines; other OSes render for review (fonts differ) unless they record their own with EG_UPDATE_SNAPSHOTS=1
     private static unsafe string? Compare(WriteableBitmap actual, string id, string theme)

@@ -339,13 +339,16 @@
           <StackPanel Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
             <ui:GlassIcon Name="PART_Lock" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.LockClosed}" IsVisible="False" />
             <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Text}" />
+            <!--  Proto: 20 square, radius 9, 3 from the chip's end; MinWidth 0 or the Button theme's 32 widens it  -->
             <Button Name="PART_Remove"
-                    Width="16"
-                    Height="16"
-                    Margin="2,0,-4,0"
+                    Width="20"
+                    Height="20"
+                    MinWidth="0"
+                    MinHeight="0"
+                    Margin="-2,0,-5,0"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="{x:Static ui:TokenChip.REMOVE_LABEL}"
-                    CornerRadius="{StaticResource RadiusControl18}"
+                    CornerRadius="{StaticResource RadiusControl20}"
                     Focusable="False"
                     Opacity="0.55">
               <Button.Template>
@@ -469,14 +472,15 @@
                             Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
           </DockPanel>
+          <!--  Avalonia 12 lines up the popup child inside its margin with the anchor, so the shadow room needs no offset: the list opens 4 below  -->
           <Popup Name="PART_Popup"
                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
                  InheritsTransform="True"
                  IsLightDismissEnabled="True"
                  IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
-                 Placement="Bottom"
+                 Placement="BottomEdgeAlignedLeft"
                  PlacementTarget="{TemplateBinding}"
-                 VerticalOffset="-16">
+                 VerticalOffset="4">
             <ui:SquircleBorder MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
                                Margin="40,20,40,60"
                                Padding="6"

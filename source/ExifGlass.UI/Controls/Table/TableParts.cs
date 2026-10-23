@@ -52,6 +52,8 @@ public sealed class GroupHeaderView : Grid
     private readonly TextBlock _name;
     private readonly Badge _count;
     private readonly TextBlock _description;
+    private StackPanel? _from;
+    private SourceLink? _link;
 
     #endregion // Fields and constants
 
@@ -136,6 +138,7 @@ public sealed class GroupHeaderView : Grid
         _dot.Group = ai ? null : group.Name;
         _dot.IsVisible = !ai;
         _sparkle.IsVisible = ai;
+        ShowSource(ai ? group.SourceKey : null);
 
         // a recycled header takes its new group's chevron at once: only a toggle turns it
         if (!animate) _chevron.Transitions = null;
@@ -168,13 +171,33 @@ public sealed class GroupHeaderView : Grid
         base.OnPropertyChanged(change);
 
         if (change.Property == IsCollapsedProperty) _chevron.RenderTransform = IsCollapsed ? CLOSED : OPEN;
-        else if (change.Property == ShowsDescriptionProperty) _description.IsVisible = ShowsDescription;
+        else if (change.Property == ShowsDescriptionProperty) ShowSource(Group is { Name: GroupInfo.AI_GROUP } group ? group.SourceKey : null);
     }
 
     #endregion // Protected methods
 
 
     #region Private methods
+
+    // the AI group names the one tag most of its fields came from, in the description's place (AI addendum question 1)
+    private void ShowSource(string? key)
+    {
+        if (key is not null && _from is null)
+        {
+            var from = new TextBlock { Text = UiText.FROM, VerticalAlignment = VerticalAlignment.Center };
+            Typography.SetRole(from, TextRole.Meta);
+            from[!TextBlock.ForegroundProperty] = from.GetResourceObservable(TokenKeys.TEXT_TERTIARY_BRUSH).ToBinding();
+            _link = new SourceLink { Focusable = false };
+            _from = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 2, HorizontalAlignment = HorizontalAlignment.Right, Children = { from, _link } };
+            SetColumn(_from, 4);
+            Children.Add(_from);
+        }
+
+        if (_link is not null) _link.SourceKey = key;
+        if (_from is not null) _from.IsVisible = key is not null && ShowsDescription;
+        _description.IsVisible = key is null && ShowsDescription;
+    }
+
 
     private static Transitions ChevronTransitions() =>
     [

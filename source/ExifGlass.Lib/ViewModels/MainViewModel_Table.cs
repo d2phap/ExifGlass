@@ -27,9 +27,16 @@ using ExifGlass.UI.Controls;
 namespace ExifGlass.ViewModels;
 
 /// <summary>
-/// A removable filter chip in the table toolbar (DS 7.2): hidden groups or a quick filter.
+/// A removable filter chip in the table toolbar (DS 7.2): hidden groups or a quick filter; an AI one in Accent2.
 /// </summary>
-public sealed record FilterChipItem(string Label, QuickFilter? Filter);
+public sealed record FilterChipItem(string Label, QuickFilter? Filter)
+{
+    #region Properties
+
+    public bool IsAi => Filter is QuickFilter.Ai or QuickFilter.AiPrompts or QuickFilter.AiModels or QuickFilter.AiProvenance;
+
+    #endregion // Properties
+}
 
 
 /// <summary>
@@ -153,7 +160,7 @@ public sealed partial class MainViewModel
 
     public string? ExportContent => ShowTableLabels ? AppText.EXPORT : null;
 
-    public string ExportHeader => AppText.ExportsInView(Rows.RowsInView.Count);
+    public string ExportHeader => AppText.ExportsInView(Rows.TagsInView, Rows.AiInView);
 
     public string GpsDescription => Rows.FilterCounts.GetValueOrDefault(QuickFilter.Gps) is var gps and > 0 ? AppText.GpsTags(gps) : AppText.EDIT_GPS_NONE;
 
@@ -316,7 +323,7 @@ public sealed partial class MainViewModel
     {
         if (Shell is null || Document is not { } document) return;
 
-        var rows = Rows.RowsInView;
+        var (rows, tags, ai) = (Rows.RowsInView, Rows.TagsInView, Rows.AiInView);
         var name = Path.GetFileNameWithoutExtension(document.FileName) + "." + Exporter.Extension(format);
         try
         {
@@ -325,7 +332,7 @@ public sealed partial class MainViewModel
 
             var content = await Task.Run(() => Exporter.Export(format, rows, Columns, document.SourcePath));
             await Exporter.WriteAsync(target.Stream, format, content);
-            Shell.ShowToast(AppText.Exported(target.Name), AppText.ExportedSub(rows.Count, target.Stream.CanSeek ? target.Stream.Length : content.Length));
+            Shell.ShowToast(AppText.Exported(target.Name), AppText.ExportedSub(tags, ai, target.Stream.CanSeek ? target.Stream.Length : content.Length));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
@@ -339,9 +346,9 @@ public sealed partial class MainViewModel
     {
         if (Document is not { } document) return;
 
-        var rows = Rows.RowsInView;
+        var (rows, tags, ai) = (Rows.RowsInView, Rows.TagsInView, Rows.AiInView);
         var json = await Task.Run(() => Exporter.ToExifToolJson(rows, document.SourcePath));
-        await CopyAndToastAsync(json, AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(rows.Count));
+        await CopyAndToastAsync(json, AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(tags, ai));
     }
 
 
@@ -433,6 +440,9 @@ public sealed partial class MainViewModel
         QuickFilter.Gps => AppText.FILTER_GPS,
         QuickFilter.Converted => AppText.FILTER_CONVERTED,
         QuickFilter.HasTagId => AppText.FILTER_TAG_ID,
+        QuickFilter.AiPrompts => AppText.FILTER_PROMPTS,
+        QuickFilter.AiModels => AppText.FILTER_MODELS,
+        QuickFilter.AiProvenance => AppText.FILTER_PROVENANCE,
         _ => AppText.FILTER_AI,
     };
 
@@ -494,6 +504,8 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(CollapseAllContent));
         OnPropertyChanged(nameof(ExportHeader));
         OnPropertyChanged(nameof(GpsDescription));
+        OnPropertyChanged(nameof(AiSummary));
+        OnPropertyChanged(nameof(HasAiSummary));
         UpdateChips();
         UpdateRail();
         UpdateFocus();

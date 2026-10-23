@@ -42,6 +42,14 @@
                        IsVisible="{Binding ShowSummaryDetail}"
                        Text="{Binding SummaryDetail}"
                        TextTrimming="CharacterEllipsis" />
+            <!--  AI fields are counted apart from tags, in Accent2 (AI addendum question 2)  -->
+            <TextBlock Name="AiSummaryText"
+                       Margin="-4,0,0,0"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource Accent2TextBrush}"
+                       IsVisible="{Binding HasAiSummary}"
+                       Text="{Binding AiSummary}"
+                       TextTrimming="CharacterEllipsis" />
             <ItemsControl Name="Chips"
                           VerticalAlignment="Center"
                           IsVisible="{Binding HasFilterChips}"
@@ -53,7 +61,7 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:FilterChipItem">
-                  <ui:FilterChip Text="{Binding Label}" ToolTip.Tip="{x:Static app:AppText.REMOVE_FILTER}" />
+                  <ui:FilterChip Classes.ai="{Binding IsAi}" Text="{Binding Label}" ToolTip.Tip="{x:Static app:AppText.REMOVE_FILTER}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -217,6 +225,27 @@
                                     Description="{x:Static app:AppText.EXPORT_COPY_DESC}"
                                     Glyph="{x:Static ui:IconId.Copy}"
                                     Header="{x:Static app:AppText.EXPORT_COPY}" />
+                  <!--  the AI data (P7 Exports): A1111 text, normalized JSON, the workflow as embedded  -->
+                  <Separator IsVisible="{Binding HasAi}" />
+                  <ui:GlassMenuHeader IsVisible="{Binding HasAi}" Text="{x:Static app:AppText.EXPORT_AI_HEADER}" />
+                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                    CommandParameter="{x:Static vm:AiExportKind.Parameters}"
+                                    Description="{x:Static app:AppText.EXPORT_AI_PARAMETERS_DESC}"
+                                    Glyph="{x:Static ui:IconId.Sparkle}"
+                                    Header="{x:Static app:AppText.EXPORT_AI_PARAMETERS}"
+                                    IsVisible="{Binding HasGenerationParameters}" />
+                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                    CommandParameter="{x:Static vm:AiExportKind.Json}"
+                                    Description="{x:Static app:AppText.EXPORT_AI_JSON_DESC}"
+                                    Glyph="{x:Static ui:IconId.Braces}"
+                                    Header="{x:Static app:AppText.EXPORT_AI_JSON}"
+                                    IsVisible="{Binding HasAi}" />
+                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                    CommandParameter="{x:Static vm:AiExportKind.Workflow}"
+                                    Description="{x:Static app:AppText.EXPORT_AI_WORKFLOW_DESC}"
+                                    Glyph="{x:Static ui:IconId.AiWorkflow}"
+                                    Header="{x:Static app:AppText.EXPORT_AI_WORKFLOW}"
+                                    IsVisible="{Binding HasWorkflow}" />
                 </MenuFlyout>
               </ui:GlassDropDownButton.Flyout>
             </ui:GlassDropDownButton>

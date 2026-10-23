@@ -24,8 +24,10 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.Styling;
+using ExifGlass.Core.Ai;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
+using System.Windows.Input;
 
 namespace ExifGlass.UI.Controls;
 
@@ -251,6 +253,29 @@ public class FileCard : TemplatedControl
     public static readonly StyledProperty<IReadOnlyList<GroupSegment>?> SegmentsProperty =
         AvaloniaProperty.Register<FileCard, IReadOnlyList<GroupSegment>?>(nameof(Segments));
 
+    /// <summary>
+    /// The AI badge under the meta: the generator, or "Character card"; null hides it.
+    /// </summary>
+    public static readonly StyledProperty<string?> AiBadgeProperty =
+        AvaloniaProperty.Register<FileCard, string?>(nameof(AiBadge));
+
+    public static readonly StyledProperty<AiKind> AiKindProperty =
+        AvaloniaProperty.Register<FileCard, AiKind>(nameof(AiKind));
+
+    public static readonly StyledProperty<string?> AiBadgeTipProperty =
+        AvaloniaProperty.Register<FileCard, string?>(nameof(AiBadgeTip));
+
+    /// <summary>
+    /// The badge's click: jump to the AI group.
+    /// </summary>
+    public static readonly StyledProperty<ICommand?> AiBadgeCommandProperty =
+        AvaloniaProperty.Register<FileCard, ICommand?>(nameof(AiBadgeCommand));
+
+    public static readonly DirectProperty<FileCard, IconId> AiIconProperty =
+        AvaloniaProperty.RegisterDirect<FileCard, IconId>(nameof(AiIcon), c => c.AiIcon);
+
+    private IconId _aiIcon = IconId.Sparkle;
+
     private CompositionBar? _bar;
     private Control? _image;
 
@@ -287,6 +312,39 @@ public class FileCard : TemplatedControl
     {
         get => GetValue(SegmentsProperty);
         set => SetValue(SegmentsProperty, value);
+    }
+
+    public string? AiBadge
+    {
+        get => GetValue(AiBadgeProperty);
+        set => SetValue(AiBadgeProperty, value);
+    }
+
+    public AiKind AiKind
+    {
+        get => GetValue(AiKindProperty);
+        set => SetValue(AiKindProperty, value);
+    }
+
+    public string? AiBadgeTip
+    {
+        get => GetValue(AiBadgeTipProperty);
+        set => SetValue(AiBadgeTipProperty, value);
+    }
+
+    public ICommand? AiBadgeCommand
+    {
+        get => GetValue(AiBadgeCommandProperty);
+        set => SetValue(AiBadgeCommandProperty, value);
+    }
+
+    /// <summary>
+    /// Gets the badge's icon: the sparkle, the question for Unknown AI, the character for a character card.
+    /// </summary>
+    public IconId AiIcon
+    {
+        get => _aiIcon;
+        private set => SetAndRaise(AiIconProperty, ref _aiIcon, value);
     }
 
     #endregion // Properties
@@ -327,7 +385,12 @@ public class FileCard : TemplatedControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == PreviewProperty || change.Property == ExtensionProperty) UpdatePseudoClasses();
+        if (change.Property == PreviewProperty || change.Property == ExtensionProperty || change.Property == AiBadgeProperty) UpdatePseudoClasses();
+        if (change.Property == AiKindProperty)
+        {
+            AiIcon = AiCard.KindIconOf(AiKind);
+            PseudoClasses.Set(":ai-neutral", AiCard.KindBadgeOf(AiKind) == BadgeKind.Neutral);
+        }
 
         // a preview arrives after the table: it fades in rather than pop over the label
         if (change.Property == PreviewProperty && change.NewValue is not null && _image is not null)
@@ -345,6 +408,7 @@ public class FileCard : TemplatedControl
     {
         PseudoClasses.Set(":preview", Preview is not null);
         PseudoClasses.Set(":empty", Preview is null && string.IsNullOrEmpty(Extension));
+        PseudoClasses.Set(":ai", AiBadge is not null);
     }
 
     #endregion // Private methods

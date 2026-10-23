@@ -479,6 +479,11 @@
     <Style Selector="^:not(:icon) /template/ ui|GlassIcon#PART_Icon">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+      <!--  an AI filter (AI addendum): Accent2  -->
+    <Style Selector="^.ai">
+      <Setter Property="Background" Value="{DynamicResource Accent2A10Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource Accent2TextBrush}" />
+    </Style>
   </ControlTheme>
 
   <!--  DS 6.7: count badges 18 high, mono, Emphasis 6%; status badges 20, Medium 10.5 (Edited, Delete, New, AI)  -->
@@ -542,6 +547,10 @@
       <Setter Property="Padding" Value="8,0" />
       <Setter Property="CornerRadius" Value="{StaticResource RadiusControl22}" />
       <Setter Property="FontSize" Value="{StaticResource FontSizeMeta}" />
+    </Style>
+    <!--  a kind chip (AI addendum): the icon sits closer to the edge  -->
+    <Style Selector="^:ai:icon, ^:neutral:icon">
+      <Setter Property="Padding" Value="6,0,8,0" />
     </Style>
   </ControlTheme>
 

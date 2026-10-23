@@ -288,11 +288,11 @@ public class TableShellTests
             var csv = System.Text.Encoding.UTF8.GetString(shell.Saved.ToArray());
             Assert.StartsWith("\uFEFF\"Group\",\"Tag ID\",\"Tag name\",\"Value\"", csv);
             Assert.Equal(vm.Rows.RowsInView.Count + 1, csv.Split("\r\n", StringSplitOptions.RemoveEmptyEntries).Length);
-            Assert.Equal(("Exported a.csv", AppText.ExportedSub(vm.Rows.RowsInView.Count, shell.Saved.Length)), shell.Toasts[^1]);
+            Assert.Equal(("Exported a.csv", AppText.ExportedSub(vm.Rows.TagsInView, vm.Rows.AiInView, shell.Saved.Length)), shell.Toasts[^1]);
 
             await vm.CopyAsJsonCommand.ExecuteAsync(null);
             Assert.StartsWith("[", shell.Copied[^1]);
-            Assert.Equal((AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(vm.Rows.RowsInView.Count)), shell.Toasts[^1]);
+            Assert.Equal((AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(vm.Rows.TagsInView, vm.Rows.AiInView)), shell.Toasts[^1]);
         }
         finally
         {
@@ -323,59 +323,4 @@ public class TableShellTests
     }
 
     #endregion // Private methods
-
-
-    #region Nested types
-
-    /// <summary>
-    /// A shell with no window: it records toasts and copies and saves to memory.
-    /// </summary>
-    private sealed class RecordingShell : IShellView
-    {
-        public List<(string Title, string? Subtitle)> Toasts { get; } = [];
-
-        public List<string> Copied { get; } = [];
-
-        public MemoryStream Saved { get; private set; } = new();
-
-        public Task<string?> PickFileAsync() => Task.FromResult<string?>(null);
-
-        public void ShowToast(string title, string? subtitle = null, ToastKind kind = ToastKind.Success) => Toasts.Add((title, subtitle));
-
-        public void FocusSearch()
-        {
-        }
-
-        public void ShowSettings()
-        {
-        }
-
-        public void ShowAbout()
-        {
-        }
-
-        public Task CopyTextAsync(string text)
-        {
-            Copied.Add(text);
-            return Task.CompletedTask;
-        }
-
-        public Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format)
-        {
-            Saved = new KeptStream();
-            return Task.FromResult<SaveTarget?>(new SaveTarget(Saved, suggestedName));
-        }
-
-        // the export disposes its stream; the test still reads it
-        private sealed class KeptStream : MemoryStream
-        {
-            protected override void Dispose(bool disposing)
-            {
-            }
-
-            public override ValueTask DisposeAsync() => ValueTask.CompletedTask;
-        }
-    }
-
-    #endregion // Nested types
 }

@@ -58,7 +58,52 @@ public static class TestDocuments
         return MetadataDocument.Create(path, read);
     }
 
+
+    /// <summary>
+    /// An A1111 PNG as the table read gives it: PNG:Parameters with the infotext, an IPTC source type beside it, and the size tags.
+    /// </summary>
+    public static MetadataDocument MakeAi(string path)
+    {
+        var json = new StringBuilder("[{\"SourceFile\": \"").Append(path.Replace('\\', '/')).Append('"');
+        json.Append(", \"ExifTool:ExifTool:ExifToolVersion\": {\"id\": \"ExifToolVersion\", \"desc\": \"ExifTool Version Number\", \"val\": 13.59}");
+        json.Append(", \"PNG:ImageWidth\": {\"id\": \"0x0000\", \"desc\": \"Image Width\", \"val\": 832}");
+        json.Append(", \"PNG:Parameters\": {\"id\": \"parameters\", \"desc\": \"Parameters\", \"val\": ").Append(JsonString(A1111)).Append('}');
+        json.Append(", \"XMP:XMP-iptcExt:DigitalSourceType\": {\"id\": \"DigitalSourceType\", \"desc\": \"Digital Source Type\", \"val\": \"").Append(SOURCE_TYPE).Append("\"}");
+        json.Append("}]");
+        var read = TableReader.Read(new ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(json.ToString())), new StringPool());
+        return MetadataDocument.Create(path, read);
+    }
+
+
+    /// <summary>
+    /// What the AI read finds in MakeAi's file.
+    /// </summary>
+    public static AiGenerationInfo Ai()
+    {
+        using var tags = AiTagSet.FromPairs([("PNG:Main:Parameters", A1111), ("XMP:XMP-iptcExt:Main:DigitalSourceType", SOURCE_TYPE)]);
+        return AiEngine.Parse(tags)!;
+    }
+
     #endregion // Public methods
+
+
+    #region Private methods
+
+    private static string JsonString(string text) => "\"" + text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n") + "\"";
+
+    #endregion // Private methods
+
+
+    #region Constants
+
+    public const string SOURCE_TYPE = "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia";
+
+    public const string A1111 = "a lighthouse on a basalt cliff, (volumetric fog:1.2), <lora:add_detail:0.8>\nNegative prompt: lowres, easynegative\n"
+        + "Steps: 30, Sampler: DPM++ 2M, Schedule type: Karras, CFG scale: 6.5, Seed: 2841937305, Size: 1024x1536, Model hash: 31e35c80fc, "
+        + "Model: sd_xl_base_1.0, VAE hash: 235745af8d, VAE: sdxl_vae, Denoising strength: 0.35, Clip skip: 2, Hires upscale: 1.5, Hires steps: 15, "
+        + "Hires upscaler: 4x-UltraSharp, Lora hashes: \"add_detail: 7c6bad76eb54\", TI hashes: \"easynegative: c74b4e810b03\", Version: v1.10.1";
+
+    #endregion // Constants
 }
 
 
@@ -95,6 +140,16 @@ public sealed class FakeReader : IMetadataReader
     /// </summary>
     public AiGenerationInfo? Ai { get; set; }
 
+    /// <summary>
+    /// Gets or sets how the documents of paths that aren't held are made; TestDocuments.Make by default.
+    /// </summary>
+    public Func<string, MetadataDocument>? Maker { get; set; }
+
+    /// <summary>
+    /// Gets or sets an AI read that ends when the test completes it, for a slow one.
+    /// </summary>
+    public TaskCompletionSource<AiGenerationInfo?>? AiHold { get; set; }
+
     #endregion // Properties
 
 
@@ -109,7 +164,7 @@ public sealed class FakeReader : IMetadataReader
     {
         Reads++;
         if (Failure is { } failure) return Task.FromException<MetadataDocument>(failure);
-        if (!_held.TryGetValue(path, out var held)) return Task.FromResult(TestDocuments.Make(path, Tags));
+        if (!_held.TryGetValue(path, out var held)) return Task.FromResult(Maker?.Invoke(path) ?? TestDocuments.Make(path, Tags));
 
         return held.Task.WaitAsync(cancellationToken);
     }
@@ -118,7 +173,7 @@ public sealed class FakeReader : IMetadataReader
     public Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken)
     {
         AiReads++;
-        return Task.FromResult(Ai);
+        return AiHold is { } hold ? hold.Task.WaitAsync(cancellationToken) : Task.FromResult(Ai);
     }
 
     #endregion // Public methods

@@ -59,6 +59,8 @@
       <SolidColorBrush x:Key="SuccessTextBrush" Color="#198754" />
       <Color x:Key="DangerTextColor">#DC3545</Color>
       <SolidColorBrush x:Key="DangerTextBrush" Color="#DC3545" />
+      <Color x:Key="WarningIconColor">#E8590C</Color>
+      <SolidColorBrush x:Key="WarningIconBrush" Color="#E8590C" />
       <Color x:Key="SegmentedThumbColor">#FFFFFF</Color>
       <SolidColorBrush x:Key="SegmentedThumbBrush" Color="#FFFFFF" />
       <Color x:Key="InverseBgColor">#212529</Color>
@@ -185,6 +187,8 @@
       <SolidColorBrush x:Key="SuccessTextBrush" Color="#75B798" />
       <Color x:Key="DangerTextColor">#EA868F</Color>
       <SolidColorBrush x:Key="DangerTextBrush" Color="#EA868F" />
+      <Color x:Key="WarningIconColor">#FFA94D</Color>
+      <SolidColorBrush x:Key="WarningIconBrush" Color="#FFA94D" />
       <Color x:Key="SegmentedThumbColor">#495057</Color>
       <SolidColorBrush x:Key="SegmentedThumbBrush" Color="#495057" />
       <Color x:Key="InverseBgColor">#FFFFFF</Color>
@@ -268,6 +272,8 @@
   <SolidColorBrush x:Key="SuccessBrush" Color="#198754" />
   <Color x:Key="DangerColor">#DC3545</Color>
   <SolidColorBrush x:Key="DangerBrush" Color="#DC3545" />
+  <Color x:Key="WarningColor">#FD7E14</Color>
+  <SolidColorBrush x:Key="WarningBrush" Color="#FD7E14" />
   <Color x:Key="HighlightColor">#99FFBA68</Color>
   <SolidColorBrush x:Key="HighlightBrush" Color="#99FFBA68" />
   <Color x:Key="ScrimColor">#2E000000</Color>
@@ -289,13 +295,17 @@
   <Color x:Key="AccentA35Color">#59225EDB</Color>
   <SolidColorBrush x:Key="AccentA35Brush" Color="#59225EDB" />
 
-  <!--  Accent2 alphas: AI badges and the AI card  -->
+  <!--  Accent2 alphas: AI badges, the AI cards, weight chips  -->
+  <Color x:Key="Accent2A08Color">#14BF3298</Color>
+  <SolidColorBrush x:Key="Accent2A08Brush" Color="#14BF3298" />
   <Color x:Key="Accent2A10Color">#1ABF3298</Color>
   <SolidColorBrush x:Key="Accent2A10Brush" Color="#1ABF3298" />
   <Color x:Key="Accent2A12Color">#1FBF3298</Color>
   <SolidColorBrush x:Key="Accent2A12Brush" Color="#1FBF3298" />
   <Color x:Key="Accent2A30Color">#4CBF3298</Color>
   <SolidColorBrush x:Key="Accent2A30Brush" Color="#4CBF3298" />
+  <Color x:Key="Accent2A40Color">#66BF3298</Color>
+  <SolidColorBrush x:Key="Accent2A40Brush" Color="#66BF3298" />
 
   <!--  Success alphas: New badge  -->
   <Color x:Key="SuccessA14Color">#24198754</Color>
@@ -308,6 +318,10 @@
   <SolidColorBrush x:Key="DangerA08Brush" Color="#14DC3545" />
   <Color x:Key="DangerA12Color">#1FDC3545</Color>
   <SolidColorBrush x:Key="DangerA12Brush" Color="#1FDC3545" />
+
+  <!--  Warning alphas: Warning notes  -->
+  <Color x:Key="WarningA10Color">#1AFD7E14</Color>
+  <SolidColorBrush x:Key="WarningA10Brush" Color="#1AFD7E14" />
 
   <!--  White alphas: Layers over accent fills  -->
   <Color x:Key="WhiteA00Color">#00FFFFFF</Color>
@@ -391,6 +405,7 @@
   <BoxShadows x:Key="ElevationToast">0 18 74.48 -14 #66000000</BoxShadows>
   <BoxShadows x:Key="ShadowSegmentedThumb">0 1 3.46 0 #29000000</BoxShadows>
   <BoxShadows x:Key="ShadowSelectedCard">0 0 0 3 #14225EDB</BoxShadows>
+  <BoxShadows x:Key="ShadowSelectedAiCard">0 0 0 3 #14BF3298</BoxShadows>
   <BoxShadows x:Key="ShadowFocusPoint">0 0 0 4 #1F225EDB</BoxShadows>
   <BoxShadows x:Key="ShadowTooltip">0 8 32.91 -6 #40000000</BoxShadows>
 

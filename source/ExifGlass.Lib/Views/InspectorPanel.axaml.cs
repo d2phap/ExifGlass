@@ -32,7 +32,9 @@ public partial class InspectorPanel : UserControl
 
     private MainViewModel? _viewModel;
     private string? _focusedKey;
+    private string? _focusedAiKey;
     private bool _hadAi;
+    private bool _hadCharacter;
     private bool _appeared;
 
     #endregion // Fields and constants
@@ -55,6 +57,13 @@ public partial class InspectorPanel : UserControl
     /// </summary>
     public void FocusSelectedTag() => Dispatcher.UIThread.Post(() =>
     {
+        if (_viewModel?.HasFocusedAiField == true)
+        {
+            AiFieldCard.BringIntoView();
+            AiFieldCard.FocusFirst();
+            return;
+        }
+
         TagCard.BringIntoView();
         TagCard.FocusFirst();
     }, DispatcherPriority.Loaded);
@@ -98,9 +107,23 @@ public partial class InspectorPanel : UserControl
 
         switch (e.PropertyName)
         {
-            case nameof(MainViewModel.HasAi):
-                if (_viewModel.HasAi && !_hadAi) AiCard.Appear();
-                _hadAi = _viewModel.HasAi;
+            // the skeleton becomes the card in place; a card that wasn't there rises in
+            case nameof(MainViewModel.ShowAiCard):
+                if (_viewModel.ShowAiCard && !_hadAi) AiCard.Appear();
+                _hadAi = _viewModel.ShowAiCard;
+                break;
+
+            case nameof(MainViewModel.HasCharacterCard):
+                if (_viewModel.HasCharacterCard && !_hadCharacter) CharacterCard.Appear();
+                _hadCharacter = _viewModel.HasCharacterCard;
+                break;
+
+            // under the AI card (question 4): the inspector scrolls to it
+            case nameof(MainViewModel.FocusedAiField):
+                var aiKey = _viewModel.FocusedAiField?.Key;
+                if (aiKey is not null && _focusedAiKey is null) AiFieldCard.Appear();
+                if (aiKey is not null && aiKey != _focusedAiKey) Dispatcher.UIThread.Post(() => AiFieldCard.BringIntoView(), DispatcherPriority.Loaded);
+                _focusedAiKey = aiKey;
                 break;
 
             // a card that appears rises in; another tag in the card that's already there only scrolls it into view

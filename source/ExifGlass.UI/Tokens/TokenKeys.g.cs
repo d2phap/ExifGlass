@@ -132,6 +132,10 @@ public static class TokenKeys
     public const string DANGER_TEXT_COLOR = "DangerTextColor";
     // Delete, strip, errors
     public const string DANGER_TEXT_BRUSH = "DangerTextBrush";
+    // Warning note icon (AI addendum)
+    public const string WARNING_ICON_COLOR = "WarningIconColor";
+    // Warning note icon (AI addendum)
+    public const string WARNING_ICON_BRUSH = "WarningIconBrush";
     // Segmented control thumb
     public const string SEGMENTED_THUMB_COLOR = "SegmentedThumbColor";
     // Segmented control thumb
@@ -204,6 +208,10 @@ public static class TokenKeys
     public const string DANGER_COLOR = "DangerColor";
     // Danger fills
     public const string DANGER_BRUSH = "DangerBrush";
+    // Warning notes (AI addendum)
+    public const string WARNING_COLOR = "WarningColor";
+    // Warning notes (AI addendum)
+    public const string WARNING_BRUSH = "WarningBrush";
     // Search match
     public const string HIGHLIGHT_COLOR = "HighlightColor";
     // Search match
@@ -324,6 +332,10 @@ public static class TokenKeys
     public const string ACCENT_A35_COLOR = "AccentA35Color";
     // Accent at 35%
     public const string ACCENT_A35_BRUSH = "AccentA35Brush";
+    // Accent2 at 8%
+    public const string ACCENT2_A08_COLOR = "Accent2A08Color";
+    // Accent2 at 8%
+    public const string ACCENT2_A08_BRUSH = "Accent2A08Brush";
     // Accent2 at 10%
     public const string ACCENT2_A10_COLOR = "Accent2A10Color";
     // Accent2 at 10%
@@ -336,6 +348,10 @@ public static class TokenKeys
     public const string ACCENT2_A30_COLOR = "Accent2A30Color";
     // Accent2 at 30%
     public const string ACCENT2_A30_BRUSH = "Accent2A30Brush";
+    // Accent2 at 40%
+    public const string ACCENT2_A40_COLOR = "Accent2A40Color";
+    // Accent2 at 40%
+    public const string ACCENT2_A40_BRUSH = "Accent2A40Brush";
     // Success at 14%
     public const string SUCCESS_A14_COLOR = "SuccessA14Color";
     // Success at 14%
@@ -352,6 +368,10 @@ public static class TokenKeys
     public const string DANGER_A12_COLOR = "DangerA12Color";
     // Danger at 12%
     public const string DANGER_A12_BRUSH = "DangerA12Brush";
+    // Warning at 10%
+    public const string WARNING_A10_COLOR = "WarningA10Color";
+    // Warning at 10%
+    public const string WARNING_A10_BRUSH = "WarningA10Brush";
     // White at 0%
     public const string WHITE_A00_COLOR = "WhiteA00Color";
     // White at 0%
@@ -494,6 +514,8 @@ public static class TokenKeys
     public const string SHADOW_SEGMENTED_THUMB = "ShadowSegmentedThumb";
     // Selected-tag card ring
     public const string SHADOW_SELECTED_CARD = "ShadowSelectedCard";
+    // Selected AI field card ring (AI addendum)
+    public const string SHADOW_SELECTED_AI_CARD = "ShadowSelectedAiCard";
     // Frame card autofocus point halo
     public const string SHADOW_FOCUS_POINT = "ShadowFocusPoint";
     // Tooltips: elevation 1 at half its offset, blur and darkness

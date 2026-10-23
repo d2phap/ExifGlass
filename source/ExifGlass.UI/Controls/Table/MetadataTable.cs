@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -141,6 +142,7 @@ public partial class MetadataTable : Panel
         _placeholder = new ContentControl { IsVisible = false, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Top };
         _sticky = new StickyGroupHeader { IsVisible = false, VerticalAlignment = VerticalAlignment.Top, Height = GROUP_HEADER_HEIGHT };
         _sticky.Click += Sticky_Click;
+        AddHandler(Button.ClickEvent, Ai_Click);
 
         // the rows area only: a sticky header pushed up never covers the column header, and the ghost stays under the sticky one
         _rowsArea = new Panel { ClipToBounds = true };
@@ -293,6 +295,12 @@ public partial class MetadataTable : Panel
     /// Enter on a row: the inspector takes it (Appendix B item 10).
     /// </summary>
     public event EventHandler<ViewRow>? RowActivated;
+
+
+    /// <summary>
+    /// Occurs when a source link or a source tag's sparkle is clicked: show that tag, or jump to the AI group.
+    /// </summary>
+    public event EventHandler<AiActionRequest>? AiActionRequested;
 
     #endregion // Events
 
@@ -628,6 +636,15 @@ public partial class MetadataTable : Panel
 
 
     private void Selection_Changed(object? sender, EventArgs e) => RefreshRows();
+
+    // a link's request rides on its tag (SourceLink, the source tag's sparkle)
+    private void Ai_Click(object? sender, RoutedEventArgs e)
+    {
+        if ((e.Source as Control)?.Tag is not AiActionRequest request) return;
+
+        AiActionRequested?.Invoke(this, request);
+        e.Handled = true;
+    }
 
     #endregion // Event handlers
 

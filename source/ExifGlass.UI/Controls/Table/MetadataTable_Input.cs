@@ -313,6 +313,9 @@ public partial class MetadataTable
 
     private void Sticky_Click(object? sender, RoutedEventArgs e)
     {
+        // the AI group's source link inside the copy is a button of its own
+        if (!ReferenceEquals(e.Source, _sticky)) return;
+
         if (_sticky.View.Group is { } group && Find(TableItem.HeaderKey(group.Name)) is { } header) ToggleGroup(header);
         else if (_sticky.View.Group is { } shown) GroupToggleRequested?.Invoke(this, shown.Name);
     }

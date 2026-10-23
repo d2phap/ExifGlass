@@ -157,10 +157,15 @@ public class ShellTests
         var phases = new List<LoadPhase>();
         loader.Changed += (_, _) => phases.Add(loader.Phase);
 
+        var readingAi = new List<bool>();
+        loader.Changed += (_, _) => readingAi.Add(loader.IsReadingAi);
+
         await loader.OpenAsync("a.png");
 
+        // the end of the AI read is a change too: the AI card's skeleton waits on it
         Assert.Equal((1, 1), (reader.Reads, reader.AiReads));
-        Assert.Equal([LoadPhase.Loading, LoadPhase.Ready], phases);
+        Assert.Equal([LoadPhase.Loading, LoadPhase.Ready, LoadPhase.Ready], phases);
+        Assert.Equal([false, true, false], readingAi);
     }
 
 

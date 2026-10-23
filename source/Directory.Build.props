@@ -19,6 +19,7 @@
   <PropertyGroup>
     <Authors>Duong Dieu Phap</Authors>
     <Product>ExifGlass</Product>
+    <Description>AI &amp; EXIF metadata viewer</Description>
     <Company>Duong Dieu Phap</Company>
     <Copyright>Copyright © 2023 - 2026 Duong Dieu Phap</Copyright>
 

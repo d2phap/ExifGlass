@@ -87,6 +87,37 @@ public partial class MetadataTable
         }
     }
 
+    /// <summary>
+    /// Glides a row to a third of the way down the rows and selects its value cell: Show source tag (AI addendum state-source-jump).
+    /// </summary>
+    public async Task RevealRowAsync(string key)
+    {
+        if (_scroller is null || Find(key) is not { IsHeader: false } item) return;
+
+        _jump?.Stop(jumpToEnd: false);
+        var from = _scroller.Offset.Y;
+        _grid.ScrollIntoView(item, null);
+        _grid.UpdateLayout();
+        var to = from;
+        foreach (var row in RealizedRows())
+        {
+            if (ReferenceEquals(row.DataContext, item)) to = Math.Max(0, _scroller.Offset.Y + row.Bounds.Y - _scroller.Viewport.Height / 3);
+        }
+
+        to = Math.Min(to, Math.Max(0, _scroller.Extent.Height - _scroller.Viewport.Height));
+        Selection?.SelectCell(key, ExifGlass.Core.Export.TableColumns.Value);
+        if (MotionTokens.IsFrozen || Math.Abs(to - from) < 1)
+        {
+            _scroller.Offset = _scroller.Offset.WithY(to);
+            return;
+        }
+
+        _scroller.Offset = _scroller.Offset.WithY(from);
+        var scroller = _scroller;
+        var jump = _jump = new Choreo().Add(JUMP, MotionTokens.EmphasizedEasing, t => scroller.Offset = scroller.Offset.WithY(from + (to - from) * t));
+        await jump.PlayAsync(this);
+    }
+
     #endregion // Public methods
 
 

@@ -270,12 +270,16 @@ public class PanelTests
         }]);
         var window = Show(card);
         Assert.Equal("ChatGPT", card.Generator);
-        Assert.False(Part<Button>(card, "PART_CopyParameters").IsVisible);
+        Assert.Equal(UiText.COPY_AI_JSON, card.MainActionText);
+        Assert.Equal(AiAction.CopyJson, Part<Button>(card, "PART_MainAction").Tag);
         Assert.False(Part<Control>(card, "PART_PromptSection").IsVisible);
+        Assert.True(Part<Control>(card, "PART_ProvenanceNote").IsVisible);
 
         card.Info = Info(new ExifGlass.Core.Ai.AiPrompt("a lighthouse", ExifGlass.Core.Ai.AiPromptRole.Positive));
-        Assert.True(Part<Button>(card, "PART_CopyParameters").IsVisible);
+        Assert.Equal(UiText.COPY_PARAMETERS, card.MainActionText);
+        Assert.Equal(AiAction.CopyGenerationParameters, Part<Button>(card, "PART_MainAction").Tag);
         Assert.True(Part<Control>(card, "PART_PromptSection").IsVisible);
+        Assert.False(Part<Control>(card, "PART_ProvenanceNote").IsVisible);
         window.Close();
     }
 

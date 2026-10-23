@@ -459,6 +459,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         UpdateCommandTokens();
         NotifyInspector();
+        NotifyAi();
     }
 
 
@@ -502,6 +503,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void Loader_Changed(object? sender, EventArgs e)
     {
+        UpdateAiLoading();
         if (ReferenceEquals(Loader.Document, Document))
         {
             Phase = Loader.Phase;

@@ -136,6 +136,7 @@ static class Generator
         new("Accent2Text", "#BF3298", "#D77BBE", "AI labels"),
         new("SuccessText", "#198754", "#75B798", "Saved, up to date"),
         new("DangerText", "#DC3545", "#EA868F", "Delete, strip, errors"),
+        new("WarningIcon", "#E8590C", "#FFA94D", "Warning note icon (AI addendum)"),
         new("SegmentedThumb", "#FFFFFF", "#495057", "Segmented control thumb"),
         new("InverseBg", "#212529", "#FFFFFF", "Pending bar, Store badge"),
         new("InverseFg", "#FFFFFF", "#212529", "Text on Inverse.Bg"),
@@ -161,6 +162,7 @@ static class Generator
         ("Accent2", "#BF3298", "AI generation"),
         ("Success", "#198754", "Success fills"),
         ("Danger", "#DC3545", "Danger fills"),
+        ("Warning", "#FD7E14", "Warning notes (AI addendum)"),
         ("Highlight", "#99FFBA68", "Search match"),
         ("Scrim", "#2E000000", "Behind overlay panels (DS 2.1: #000 18%)"),
         ("Transparent", "#00000000", "Nothing"),
@@ -170,9 +172,10 @@ static class Generator
     [
         new("Emphasis", "#000000", "#FFFFFF", [0, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 24, 25, 35, 40, 50, 55, 62, 70], "Overlays in both themes"),
         new("Accent", "#225EDB", "#225EDB", [0, 8, 10, 12, 30, 35], "Selection, chips, edited badges"),
-        new("Accent2", "#BF3298", "#BF3298", [10, 12, 30], "AI badges and the AI card"),
+        new("Accent2", "#BF3298", "#BF3298", [8, 10, 12, 30, 40], "AI badges, the AI cards, weight chips"),
         new("Success", "#198754", "#198754", [14], "New badge"),
         new("Danger", "#DC3545", "#DC3545", [0, 8, 12], "Danger ghost hover, Delete badge"),
+        new("Warning", "#FD7E14", "#FD7E14", [10], "Warning notes"),
         new("White", "#FFFFFF", "#FFFFFF", [0, 8, 14], "Layers over accent fills"),
         new("Black", "#000000", "#000000", [0, 8, 16], "Layers and shadows"),
     ];
@@ -248,6 +251,7 @@ static class Generator
         ("ElevationToast", "0 18 44 -14 rgba(0,0,0,.4)", "Toast"),
         ("ShadowSegmentedThumb", "0 1 3 0 rgba(0,0,0,.16)", "Segmented thumb"),
         ("ShadowSelectedCard", "0 0 0 3 rgba(34,94,219,.08)", "Selected-tag card ring"),
+        ("ShadowSelectedAiCard", "0 0 0 3 rgba(191,50,152,.08)", "Selected AI field card ring (AI addendum)"),
         ("ShadowFocusPoint", "0 0 0 4 rgba(34,94,219,.12)", "Frame card autofocus point halo"),
         ("ShadowTooltip", "0 8 20 -6 rgba(0,0,0,.25)", "Tooltips: elevation 1 at half its offset, blur and darkness"),
     ];

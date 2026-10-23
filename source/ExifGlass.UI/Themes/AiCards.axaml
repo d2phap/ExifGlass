@@ -1,0 +1,967 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  the AI surfaces of the inspector (AI addendum, D28): notes, the AI card, the selected AI field, the character card; values from the addendum's proto.css where DS leaves them open  -->
+
+  <!--  a note: icon 14 and Meta text; info Emphasis 3.5%, warning orange 10%, danger 8%, padding 8 10, radius 12  -->
+  <ControlTheme x:Key="{x:Type ui:InlineNote}" TargetType="ui:InlineNote">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Name="PART_Box" Background="Transparent" CornerRadius="{StaticResource RadiusWell}">
+          <Grid ColumnDefinitions="14,*" ColumnSpacing="8">
+            <ui:GlassIcon Name="PART_Icon"
+                          Width="14"
+                          Height="14"
+                          Margin="0,1,0,0"
+                          VerticalAlignment="Top"
+                          Foreground="{DynamicResource TextSecondaryBrush}"
+                          Icon="{TemplateBinding Icon}" />
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Name="PART_Text"
+                         tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{TemplateBinding Text}"
+                         TextWrapping="Wrap" />
+              <ContentPresenter Name="PART_Actions" Content="{TemplateBinding Content}" IsVisible="False" />
+            </StackPanel>
+          </Grid>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:actions /template/ ContentPresenter#PART_Actions">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:info /template/ Border#PART_Box">
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Background" Value="{DynamicResource EmphasisA035Brush}" />
+    </Style>
+    <Style Selector="^:warning /template/ Border#PART_Box">
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Background" Value="{DynamicResource WarningA10Brush}" />
+    </Style>
+    <Style Selector="^:warning /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="Foreground" Value="{DynamicResource WarningIconBrush}" />
+    </Style>
+    <Style Selector="^:danger /template/ Border#PART_Box">
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Background" Value="{DynamicResource DangerA08Brush}" />
+    </Style>
+    <Style Selector="^:danger /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+    </Style>
+    <Style Selector="^:warning /template/ TextBlock#PART_Text, ^:danger /template/ TextBlock#PART_Text">
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  AI card (AI addendum section 2): Accent2 30% border, padding 12, sections 12 apart, each with a 24-high overline row  -->
+  <ControlTheme x:Key="{x:Type ui:AiCard}" TargetType="ui:AiCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="12"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource Accent2A30Brush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <Panel>
+            <!--  the AI read is still running (state-ai-loading): a pulsing skeleton and what it waits for  -->
+            <StackPanel Name="PART_Loading" IsVisible="False" Spacing="12">
+              <DockPanel Height="24">
+                <ui:SquircleBorder Width="24"
+                                   Height="24"
+                                   Margin="0,0,8,0"
+                                   Background="{DynamicResource Accent2A12Brush}"
+                                   CornerRadius="{StaticResource RadiusControl24}"
+                                   DockPanel.Dock="Left">
+                  <ui:GlassIcon Width="14" Height="14" Foreground="{DynamicResource Accent2TextBrush}" Icon="{x:Static ui:IconId.Sparkle}" />
+                </ui:SquircleBorder>
+                <ui:Skeleton Width="96" Height="22" DockPanel.Dock="Right" IsPulsing="True" />
+                <TextBlock VerticalAlignment="Center"
+                           tok:Typography.Role="Overline"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
+              </DockPanel>
+              <StackPanel Spacing="10">
+                <ui:Skeleton Width="256" HorizontalAlignment="Left" Index="0" IsPulsing="True" />
+                <ui:Skeleton Width="278" HorizontalAlignment="Left" Index="1" IsPulsing="True" />
+                <ui:Skeleton Width="232" HorizontalAlignment="Left" Index="2" IsPulsing="True" />
+                <ui:Skeleton Width="166" HorizontalAlignment="Left" Index="3" IsPulsing="True" />
+              </StackPanel>
+              <ui:InlineNote Icon="{x:Static ui:IconId.ArrowSync}" Text="{x:Static eg:UiText.AI_LOADING}" />
+            </StackPanel>
+
+            <StackPanel Name="PART_Content" Spacing="12">
+              <DockPanel Height="24">
+                <ui:SquircleBorder Name="PART_Tile"
+                                   Width="24"
+                                   Height="24"
+                                   Margin="0,0,8,0"
+                                   Background="{DynamicResource Accent2A12Brush}"
+                                   CornerRadius="{StaticResource RadiusControl24}"
+                                   DockPanel.Dock="Left">
+                  <ui:GlassIcon Name="PART_TileIcon"
+                                Width="14"
+                                Height="14"
+                                Foreground="{DynamicResource Accent2TextBrush}"
+                                Icon="{x:Static ui:IconId.Sparkle}" />
+                </ui:SquircleBorder>
+                <ui:Badge Name="PART_Generator"
+                          MaxWidth="150"
+                          Margin="8,0,0,0"
+                          DockPanel.Dock="Right"
+                          Kind="Ai"
+                          Text="{TemplateBinding Generator}"
+                          ToolTip.Tip="{TemplateBinding Generator}" />
+                <TextBlock VerticalAlignment="Center"
+                           tok:Typography.Role="Overline"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
+              </DockPanel>
+
+              <!--  kind chip and the tag the card leads with  -->
+              <DockPanel Margin="0,-4,0,0">
+                <ui:Badge DockPanel.Dock="Left"
+                          Icon="{TemplateBinding KindIcon}"
+                          Kind="{TemplateBinding KindBadge}"
+                          Text="{TemplateBinding KindText}" />
+                <TextBlock Margin="6,0,0,0"
+                           VerticalAlignment="Center"
+                           DockPanel.Dock="Left"
+                           tok:Typography.Role="Meta"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static eg:UiText.FROM}" />
+                <ui:SourceLink Margin="2,0,0,0" OtherSources="{TemplateBinding OtherSources}" SourceKey="{TemplateBinding SourceKey}" />
+              </DockPanel>
+
+              <!--  R19: a custom ExifTool too old for every AI field. This note, the warning, the raw text, the sampler switch and the sections below the models are made only when they have content: a hidden template part still costs its heap (R24)  -->
+              <ContentPresenter Content="{TemplateBinding ExifToolNote}" IsVisible="{TemplateBinding ExifToolNote, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <ui:InlineNote Icon="{x:Static ui:IconId.AiWarning}" Kind="Warning" Text="{Binding}">
+                      <WrapPanel ItemSpacing="6" LineSpacing="4">
+                        <ui:GlassButton Classes="small" Content="{x:Static eg:UiText.USE_BUNDLED_EXIFTOOL}" Tag="{x:Static ui:AiAction.UseBundledExifTool}" />
+                        <ui:GlassButton Classes="link" Content="{x:Static eg:UiText.OPEN_SETTINGS}" Tag="{x:Static ui:AiAction.OpenSettings}" />
+                      </WrapPanel>
+                    </ui:InlineNote>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ContentPresenter Content="{TemplateBinding Warning}" IsVisible="{TemplateBinding Warning, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <ui:InlineNote Icon="{x:Static ui:IconId.AiWarning}" Kind="Warning" Text="{Binding}" />
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ui:InlineNote Name="PART_UnknownNote"
+                             IsVisible="False"
+                             Kind="Info"
+                             Text="{x:Static eg:UiText.UNKNOWN_AI_NOTE}" />
+
+              <!--  Unknown AI: the raw text as it is  -->
+              <ContentPresenter Content="{TemplateBinding Raw}" IsVisible="{TemplateBinding Raw, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiRawView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2">
+                          <ui:SourceLink SourceKey="{Binding SourceKey}" />
+                          <ui:GlassButton Classes="ghost tiny"
+                                          Foreground="{DynamicResource TextSecondaryBrush}"
+                                          Icon="{x:Static ui:IconId.Copy}"
+                                          Tag="{x:Static ui:AiAction.CopyText}"
+                                          ToolTip.Tip="{x:Static eg:UiText.COPY_RAW}" />
+                        </StackPanel>
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.RAW_TEXT_OVERLINE}" />
+                      </DockPanel>
+                      <ui:SquircleBorder Background="{DynamicResource EmphasisA05Brush}" ClipToBounds="True" CornerRadius="{StaticResource RadiusWell}">
+                        <ScrollViewer MaxHeight="160" Margin="12,10" HorizontalScrollBarVisibility="Disabled">
+                          <SelectableTextBlock tok:Typography.Role="Mono" Text="{Binding Text}" TextWrapping="Wrap" />
+                        </ScrollViewer>
+                      </ui:SquircleBorder>
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <!--  prompt: 4 lines with Show more, Copy on its overline  -->
+              <StackPanel Name="PART_PromptSection" Spacing="4">
+                <DockPanel Height="24">
+                  <ui:GlassButton Margin="0,0,-6,0"
+                                  Classes="link"
+                                  Content="{x:Static eg:UiText.COPY}"
+                                  DockPanel.Dock="Right"
+                                  Icon="{x:Static ui:IconId.Copy}"
+                                  IconSize="13"
+                                  Tag="{x:Static ui:AiAction.CopyPrompt}"
+                                  ToolTip.Tip="{x:Static eg:UiText.COPY_PROMPT}" />
+                  <TextBlock VerticalAlignment="Center"
+                             tok:Typography.Role="Overline"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
+                             Text="{TemplateBinding PromptTitle}" />
+                </DockPanel>
+                <ui:PromptText Name="PART_Prompt"
+                               ClampLines="4"
+                               Embeddings="{TemplateBinding Embeddings}"
+                               FontSize="12.5"
+                               IsExpanded="{TemplateBinding IsExpanded}"
+                               LineHeight="19"
+                               Prompt="{TemplateBinding Prompt}" />
+                <ui:GlassButton Name="PART_More"
+                                Margin="-6,0,0,0"
+                                HorizontalAlignment="Left"
+                                Classes="link"
+                                Content="{x:Static eg:UiText.SHOW_MORE}"
+                                IsVisible="False" />
+              </StackPanel>
+
+              <StackPanel Name="PART_NegativeSection" Spacing="4">
+                <DockPanel Height="24">
+                  <ui:GlassButton Name="PART_CopyNegative"
+                                  Margin="0,0,-6,0"
+                                  Classes="link"
+                                  Content="{x:Static eg:UiText.COPY}"
+                                  DockPanel.Dock="Right"
+                                  Icon="{x:Static ui:IconId.Copy}"
+                                  IconSize="13"
+                                  Tag="{x:Static ui:AiAction.CopyNegativePrompt}"
+                                  ToolTip.Tip="{x:Static eg:UiText.COPY_NEGATIVE}" />
+                  <TextBlock VerticalAlignment="Center"
+                             tok:Typography.Role="Overline"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
+                             Text="{x:Static eg:UiText.NEGATIVE_PROMPT_OVERLINE}" />
+                </DockPanel>
+                <ui:PromptText Name="PART_Negative"
+                               ClampLines="2"
+                               Embeddings="{TemplateBinding Embeddings}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               IsExpanded="{TemplateBinding IsExpanded}"
+                               LineHeight="18"
+                               Prompt="{TemplateBinding NegativePrompt}" />
+                <TextBlock Name="PART_NegativeNote"
+                           tok:Typography.Role="Caption"
+                           Foreground="{DynamicResource TextTertiaryBrush}"
+                           IsVisible="False"
+                           Text="{TemplateBinding NegativeNote}"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+
+              <!--  NovelAI regional prompts: number tile, caption, centre, copy  -->
+              <StackPanel Name="PART_CharactersSection" IsVisible="False" Spacing="4">
+                <DockPanel Height="24">
+                  <TextBlock VerticalAlignment="Center"
+                             DockPanel.Dock="Right"
+                             tok:Typography.Role="Meta"
+                             Foreground="{DynamicResource TextTertiaryBrush}"
+                             Text="{x:Static eg:UiText.REGIONAL_PROMPTS}" />
+                  <TextBlock VerticalAlignment="Center"
+                             tok:Typography.Role="Overline"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
+                             Text="{TemplateBinding CharactersTitle}" />
+                </DockPanel>
+                <ui:SquircleBorder BorderBrush="{DynamicResource EmphasisA08Brush}" BorderThickness="1" CornerRadius="{StaticResource RadiusWell}">
+                  <ItemsControl ItemsSource="{TemplateBinding Characters}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="ui:AiCharacterView">
+                        <Border BorderBrush="{DynamicResource EmphasisA07Brush}" BorderThickness="{Binding Line}">
+                          <Grid Margin="8,8,6,8" ColumnDefinitions="30,*,Auto" ColumnSpacing="10">
+                            <ui:SquircleBorder Width="30"
+                                               Height="30"
+                                               VerticalAlignment="Top"
+                                               Background="{DynamicResource Accent2A10Brush}"
+                                               CornerRadius="{StaticResource RadiusWell}">
+                              <TextBlock HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         tok:Typography.Role="MonoSmall"
+                                         FontWeight="SemiBold"
+                                         Foreground="{DynamicResource Accent2TextBrush}"
+                                         Text="{Binding Number}" />
+                            </ui:SquircleBorder>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                              <ui:PromptText ClampLines="0" FontSize="12" LineHeight="17" Prompt="{Binding Caption}" />
+                              <TextBlock tok:Typography.Role="Badge"
+                                         FontWeight="Normal"
+                                         Foreground="{DynamicResource TextSecondaryBrush}"
+                                         Text="{Binding Centre}" />
+                            </StackPanel>
+                            <ui:GlassButton Grid.Column="2"
+                                            VerticalAlignment="Top"
+                                            Classes="ghost tiny"
+                                            Foreground="{DynamicResource TextSecondaryBrush}"
+                                            Icon="{x:Static ui:IconId.Copy}"
+                                            Tag="{Binding Copy}"
+                                            ToolTip.Tip="{x:Static eg:UiText.COPY_CHARACTER}" />
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ui:SquircleBorder>
+              </StackPanel>
+
+              <!--  Fooocus styles as neutral badges  -->
+              <StackPanel Name="PART_StylesSection" IsVisible="False" Spacing="4">
+                <TextBlock Height="24"
+                           Padding="0,5,0,0"
+                           tok:Typography.Role="Overline"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static eg:UiText.STYLES_OVERLINE}" />
+                <ItemsControl ItemsSource="{TemplateBinding StyleNames}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <WrapPanel ItemSpacing="4" LineSpacing="4" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                      <ui:Badge Height="20"
+                                FontSize="{StaticResource FontSizeBadge}"
+                                Kind="Neutral"
+                                Text="{Binding}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+
+              <!--  parameters: a sampler switch when there are several, the first 8 in a 2 x N grid, then All parameters  -->
+              <StackPanel Name="PART_ParametersSection" Spacing="4">
+                <!--  the samplers share the width equally (AI addendum)  -->
+                <ContentPresenter Content="{TemplateBinding PassesView}" IsVisible="{TemplateBinding PassesView, Converter={x:Static ObjectConverters.IsNotNull}}">
+                  <ContentPresenter.ContentTemplate>
+                    <DataTemplate x:DataType="ui:AiPassesView">
+                      <StackPanel Spacing="4">
+                        <DockPanel Height="24">
+                          <TextBlock VerticalAlignment="Center"
+                                     DockPanel.Dock="Right"
+                                     tok:Typography.Role="Meta"
+                                     Foreground="{DynamicResource TextTertiaryBrush}"
+                                     Text="{Binding Label}" />
+                          <TextBlock VerticalAlignment="Center"
+                                     tok:Typography.Role="Overline"
+                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                     Text="{x:Static eg:UiText.PARAMETERS_OVERLINE}" />
+                        </DockPanel>
+                        <ui:SegmentedControl Height="28"
+                                             Margin="0,0,0,4"
+                                             HorizontalAlignment="Stretch"
+                                             ItemsSource="{Binding Titles}"
+                                             SelectedIndex="{Binding $parent[ui:AiCard].SelectedPass, Mode=TwoWay}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ContentPresenter.ContentTemplate>
+                </ContentPresenter>
+                <!--  1 px lines of Emphasis 8% between Bg.Panel tiles, radius 12; the tiles are clipped to the ring's inner edge (11, concentric)  -->
+                <ui:SquircleBorder Name="PART_Parameters"
+                                   BorderBrush="{DynamicResource EmphasisA08Brush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusWell}">
+                  <ui:SquircleBorder Background="{DynamicResource EmphasisA08Brush}" ClipToBounds="True" CornerRadius="11">
+                    <ItemsControl ItemsSource="{TemplateBinding Parameters}">
+                      <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                          <ui:TileGrid />
+                        </ItemsPanelTemplate>
+                      </ItemsControl.ItemsPanel>
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="ui:AiParameterView">
+                          <ui:ParameterTile View="{Binding}" />
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ui:SquircleBorder>
+                </ui:SquircleBorder>
+                <!--  the count sits over the button's right end: a button's content is a stack and can't stretch  -->
+                <Panel Name="PART_AllParameters" Margin="0,0,0,-4" IsVisible="False">
+                  <ui:DisclosureButton Height="32"
+                                       Padding="10,0"
+                                       HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Left"
+                                       BorderThickness="0"
+                                       Content="{x:Static eg:UiText.ALL_PARAMETERS}"
+                                       CornerRadius="{StaticResource RadiusMenuItem}"
+                                       FontSize="{StaticResource FontSizeCaption}"
+                                       FontWeight="Normal"
+                                       IsExpanded="{TemplateBinding AllParametersOpen, Mode=TwoWay}" />
+                  <ui:Badge Margin="0,0,10,0"
+                            HorizontalAlignment="Right"
+                            IsHitTestVisible="False"
+                            Kind="Count"
+                            Text="{TemplateBinding ParameterCount}" />
+                </Panel>
+                <ui:ExpandPanel IsExpanded="{TemplateBinding AllParametersOpen}">
+                  <ui:KeyValueList Margin="2,4,2,2" Items="{TemplateBinding MoreParameters}" />
+                </ui:ExpandPanel>
+              </StackPanel>
+
+              <!--  models: three, then "n more"  -->
+              <StackPanel Name="PART_ModelsSection" IsVisible="False" Spacing="4">
+                <TextBlock Height="24"
+                           Padding="0,5,0,0"
+                           tok:Typography.Role="Overline"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{TemplateBinding ModelsTitle}" />
+                <ui:SquircleBorder BorderBrush="{DynamicResource EmphasisA08Brush}" BorderThickness="1" CornerRadius="{StaticResource RadiusWell}">
+                  <ui:SquircleBorder ClipToBounds="True" CornerRadius="11">
+                    <StackPanel>
+                      <ItemsControl ItemsSource="{TemplateBinding Models}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="ui:AiModelView">
+                            <ui:ModelRow View="{Binding}" />
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <ui:ExpandPanel IsExpanded="{TemplateBinding AllModelsOpen}">
+                        <ItemsControl ItemsSource="{TemplateBinding MoreModels}">
+                          <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="ui:AiModelView">
+                              <ui:ModelRow View="{Binding}" />
+                            </DataTemplate>
+                          </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                      </ui:ExpandPanel>
+                      <Border Name="PART_MoreModels"
+                              BorderBrush="{DynamicResource EmphasisA07Brush}"
+                              BorderThickness="0,1,0,0"
+                              IsVisible="False">
+                        <ui:DisclosureButton Height="36"
+                                             Padding="12,0"
+                                             HorizontalAlignment="Stretch"
+                                             HorizontalContentAlignment="Left"
+                                             BorderThickness="0"
+                                             Content="{TemplateBinding MoreModelsLabel}"
+                                             CornerRadius="0"
+                                             FontSize="{StaticResource FontSizeCaption}"
+                                             FontWeight="Normal"
+                                             IsExpanded="{TemplateBinding AllModelsOpen, Mode=TwoWay}" />
+                      </Border>
+                    </StackPanel>
+                  </ui:SquircleBorder>
+                </ui:SquircleBorder>
+              </StackPanel>
+
+              <!--  the workflow summary (D25): counts, size and formats; Save workflow... and Copy JSON  -->
+              <ContentPresenter Content="{TemplateBinding Workflow}" IsVisible="{TemplateBinding Workflow, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiWorkflowView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <ui:SourceLink DockPanel.Dock="Right" SourceKey="{Binding SourceKey}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.WORKFLOW_OVERLINE}" />
+                      </DockPanel>
+                      <ui:SquircleBorder Padding="10" Background="{DynamicResource EmphasisA035Brush}" CornerRadius="{StaticResource RadiusWell}">
+                        <StackPanel Spacing="8">
+                          <StackPanel Orientation="Horizontal" Spacing="10">
+                            <StackPanel>
+                              <TextBlock tok:Typography.Role="Subtitle" FontFeatures="+tnum" Text="{Binding Nodes}" />
+                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding NodesLabel}" />
+                            </StackPanel>
+                            <Border Width="1" Background="{DynamicResource EmphasisA08Brush}" />
+                            <StackPanel>
+                              <TextBlock tok:Typography.Role="Subtitle" FontFeatures="+tnum" Text="{Binding Samplers}" />
+                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding SamplersLabel}" />
+                            </StackPanel>
+                            <Border Width="1" Background="{DynamicResource EmphasisA08Brush}" />
+                            <StackPanel>
+                              <TextBlock tok:Typography.Role="Subtitle" FontFeatures="+tnum" Text="{Binding Models}" />
+                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{Binding ModelsLabel}" />
+                            </StackPanel>
+                            <Border Width="1" Background="{DynamicResource EmphasisA08Brush}" />
+                            <StackPanel>
+                              <TextBlock tok:Typography.Role="Subtitle" FontFeatures="+tnum" Text="{Binding Size}" />
+                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.JSON}" />
+                            </StackPanel>
+                          </StackPanel>
+                          <TextBlock tok:Typography.Role="Meta"
+                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                     Text="{Binding Summary}"
+                                     TextWrapping="Wrap" />
+                          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                            <ui:GlassButton HorizontalAlignment="Stretch"
+                                            Classes="card"
+                                            Content="{x:Static eg:UiText.SAVE_WORKFLOW}"
+                                            Icon="{x:Static ui:IconId.Save}"
+                                            IconSize="15"
+                                            Tag="{x:Static ui:AiAction.SaveWorkflow}"
+                                            ToolTip.Tip="{Binding SaveTip}" />
+                            <ui:GlassButton Grid.Column="1"
+                                            Classes="card"
+                                            Content="{x:Static eg:UiText.COPY_JSON}"
+                                            Icon="{x:Static ui:IconId.Copy}"
+                                            IconSize="15"
+                                            Tag="{x:Static ui:AiAction.CopyWorkflowJson}"
+                                            ToolTip.Tip="{Binding CopyTip}" />
+                          </Grid>
+                        </StackPanel>
+                      </ui:SquircleBorder>
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <!--  C2PA Content Credentials (D21): what the file claims, marked Not verified in a neutral badge (question 6), no signer  -->
+              <ContentPresenter Content="{TemplateBinding Credentials}" IsVisible="{TemplateBinding Credentials, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiSectionView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <ui:Badge Height="20"
+                                  Padding="5,0,7,0"
+                                  DockPanel.Dock="Right"
+                                  FontSize="{StaticResource FontSizeBadge}"
+                                  Icon="{x:Static ui:IconId.AiShieldQuestion}"
+                                  Kind="Neutral"
+                                  Text="{x:Static eg:UiText.NOT_VERIFIED}"
+                                  ToolTip.Tip="{x:Static eg:UiText.NOT_VERIFIED_TIP}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.CREDENTIALS_OVERLINE}" />
+                      </DockPanel>
+                      <ui:SquircleBorder Padding="10"
+                                         BorderBrush="{DynamicResource EmphasisA08Brush}"
+                                         BorderThickness="1"
+                                         CornerRadius="{StaticResource RadiusWell}">
+                        <StackPanel Spacing="8">
+                          <ui:KeyValueList Items="{Binding Rows}" />
+                          <ItemsControl IsVisible="{Binding HasIngredients}" ItemsSource="{Binding Ingredients}">
+                            <ItemsControl.ItemsPanel>
+                              <ItemsPanelTemplate>
+                                <StackPanel Spacing="8" />
+                              </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="ui:AiIngredientView">
+                                <Border Padding="0,8,0,0" BorderBrush="{DynamicResource EmphasisA07Brush}" BorderThickness="0,1,0,0">
+                                  <Grid ColumnDefinitions="16,*" ColumnSpacing="8">
+                                    <ui:GlassIcon Width="14"
+                                                  Height="14"
+                                                  Margin="0,2,0,0"
+                                                  VerticalAlignment="Top"
+                                                  Foreground="{DynamicResource TextSecondaryBrush}"
+                                                  Icon="{x:Static ui:IconId.Image}" />
+                                    <StackPanel Grid.Column="1" Spacing="1">
+                                      <TextBlock tok:Typography.Role="Caption" TextWrapping="Wrap">
+                                        <Run FontWeight="Medium" Text="{Binding Title}" />
+                                        <Run Foreground="{DynamicResource TextTertiaryBrush}" Text="{x:Static eg:UiText.INGREDIENT_SUFFIX}" />
+                                      </TextBlock>
+                                      <TextBlock tok:Typography.Role="Meta"
+                                                 Foreground="{DynamicResource TextSecondaryBrush}"
+                                                 Text="{Binding Detail}"
+                                                 TextWrapping="Wrap" />
+                                    </StackPanel>
+                                  </Grid>
+                                </Border>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </ui:SquircleBorder>
+                      <DockPanel>
+                        <TextBlock VerticalAlignment="Center"
+                                   DockPanel.Dock="Right"
+                                   tok:Typography.Role="Badge"
+                                   FontWeight="Normal"
+                                   Foreground="{DynamicResource TextTertiaryBrush}"
+                                   Text="{x:Static eg:UiText.SIGNER_NOT_SHOWN}" />
+                        <ui:SourceLink OtherSources="{Binding OtherSources}" SourceKey="{Binding SourceKey}" />
+                      </DockPanel>
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ContentPresenter Content="{TemplateBinding Iptc}" IsVisible="{TemplateBinding Iptc, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiSectionView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <ui:SourceLink DockPanel.Dock="Right" OtherSources="{Binding OtherSources}" SourceKey="{Binding SourceKey}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.IPTC_OVERLINE}" />
+                      </DockPanel>
+                      <ui:KeyValueList Margin="2,0" Items="{Binding Rows}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ContentPresenter Content="{TemplateBinding Aigc}" IsVisible="{TemplateBinding Aigc, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiSectionView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <ui:SourceLink DockPanel.Dock="Right" OtherSources="{Binding OtherSources}" SourceKey="{Binding SourceKey}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.AIGC_OVERLINE}" />
+                      </DockPanel>
+                      <ui:KeyValueList Margin="2,0" Items="{Binding Rows}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ContentPresenter Content="{TemplateBinding Training}" IsVisible="{TemplateBinding Training, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ContentPresenter.ContentTemplate>
+                  <DataTemplate x:DataType="ui:AiSectionView">
+                    <StackPanel Spacing="4">
+                      <DockPanel Height="24">
+                        <ui:SourceLink DockPanel.Dock="Right" OtherSources="{Binding OtherSources}" SourceKey="{Binding SourceKey}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{x:Static eg:UiText.TRAINING_OVERLINE}" />
+                      </DockPanel>
+                      <ui:KeyValueList Margin="2,0" Items="{Binding Rows}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ContentPresenter.ContentTemplate>
+              </ContentPresenter>
+
+              <ui:InlineNote Name="PART_ProvenanceNote" IsVisible="False" Text="{x:Static eg:UiText.PROVENANCE_ONLY}" />
+
+              <!--  Copy generation parameters (A1111 text), or Copy AI data as JSON for provenance alone; More opens the rest  -->
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                <ui:GlassButton Name="PART_MainAction"
+                                HorizontalAlignment="Stretch"
+                                Content="{TemplateBinding MainActionText}"
+                                Icon="{TemplateBinding MainActionIcon}"
+                                IconSize="14"
+                                Tag="{x:Static ui:AiAction.CopyJson}" />
+                <ui:GlassDropDownButton Name="PART_Menu"
+                                        Grid.Column="1"
+                                        Icon="{x:Static ui:IconId.AiMore}"
+                                        ToolTip.Tip="{x:Static eg:UiText.AI_MENU_TIP}" />
+              </Grid>
+            </StackPanel>
+          </Panel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:loading /template/ StackPanel#PART_Loading">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:loading /template/ StackPanel#PART_Content">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:unknown /template/ Border#PART_Tile">
+      <Setter Property="Background" Value="{DynamicResource EmphasisA06Brush}" />
+    </Style>
+    <Style Selector="^:unknown /template/ ui|GlassIcon#PART_TileIcon">
+      <Setter Property="Icon" Value="{x:Static ui:IconId.AiQuestion}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    </Style>
+    <Style Selector="^:unknown /template/ ui|Badge#PART_Generator">
+      <Setter Property="Kind" Value="Neutral" />
+    </Style>
+    <Style Selector="^:unknown /template/ ui|InlineNote#PART_UnknownNote">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:not(:prompt) /template/ StackPanel#PART_PromptSection">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:negative):not(:negative-note) /template/ StackPanel#PART_NegativeSection">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:negative) /template/ ui|GlassButton#PART_CopyNegative">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:negative) /template/ SelectableTextBlock#PART_Negative">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:negative-note /template/ TextBlock#PART_NegativeNote">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:characters /template/ StackPanel#PART_CharactersSection">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:styles /template/ StackPanel#PART_StylesSection">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:not(:parameters) /template/ StackPanel#PART_ParametersSection">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:more-parameters /template/ Panel#PART_AllParameters">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:models /template/ StackPanel#PART_ModelsSection">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:more-models /template/ Border#PART_MoreModels">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:provenance-only /template/ ui|InlineNote#PART_ProvenanceNote">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:copyable /template/ ui|GlassButton#PART_MainAction">
+      <Setter Property="Tag" Value="{x:Static ui:AiAction.CopyGenerationParameters}" />
+    </Style>
+    <Style Selector="^:clamped /template/ ui|GlassButton#PART_More">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:expanded /template/ ui|GlassButton#PART_More">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Content" Value="{x:Static eg:UiText.SHOW_LESS}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  selected AI field (AI addendum question 4): the selected-tag card in Accent2, 40% border and a 3 px ring; Show source tag in Edit's place  -->
+  <ControlTheme x:Key="{x:Type ui:AiFieldCard}" TargetType="ui:AiFieldCard">
+    <!--  Avalonia 12 clips templated controls; the ring lies outside the card  -->
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="14"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource Accent2A40Brush}"
+                           BorderThickness="1"
+                           BoxShadow="{StaticResource ShadowSelectedAiCard}"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel x:DataType="ui:AiFieldView"
+                      DataContext="{TemplateBinding View}"
+                      Spacing="12">
+            <DockPanel Height="24">
+              <ui:GlassButton Name="PART_Close"
+                              Classes="ghost tiny"
+                              Command="{TemplateBinding CloseCommand}"
+                              DockPanel.Dock="Right"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Dismiss}"
+                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+              <ui:SquircleBorder Height="22"
+                                 Padding="9,0"
+                                 HorizontalAlignment="Left"
+                                 Background="{DynamicResource EmphasisA06Brush}"
+                                 CornerRadius="{StaticResource RadiusControl22}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <ui:GlassIcon Width="11"
+                                Height="11"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource Accent2TextBrush}"
+                                Icon="{x:Static ui:IconId.Sparkle}" />
+                  <TextBlock VerticalAlignment="Center"
+                             FontSize="{StaticResource FontSizeMeta}"
+                             FontWeight="Medium"
+                             Text="{x:Static eg:UiText.AI_GROUP}" />
+                </StackPanel>
+              </ui:SquircleBorder>
+            </DockPanel>
+
+            <TextBlock tok:Typography.Role="Title" Text="{Binding Name}" TextWrapping="Wrap" />
+
+            <!--  the value: a prompt in the UI font with its tints (question 14), anything else in mono; up to 220 high, then it scrolls  -->
+            <Panel>
+              <ui:SquircleBorder MinHeight="40"
+                                 Background="{DynamicResource BgSubtleBrush}"
+                                 ClipToBounds="True"
+                                 CornerRadius="{StaticResource RadiusWell}">
+                <ScrollViewer MaxHeight="220" Margin="12,10,40,10" HorizontalScrollBarVisibility="Disabled">
+                  <Panel>
+                    <ui:PromptText Name="PART_Prompt"
+                                   ClampLines="0"
+                                   Embeddings="{Binding Embeddings}"
+                                   FontSize="13"
+                                   IsVisible="False"
+                                   LineHeight="19"
+                                   Prompt="{Binding ShownValue}" />
+                    <SelectableTextBlock Name="PART_Value"
+                                         tok:Typography.Role="MonoValue"
+                                         Text="{Binding ShownValue}"
+                                         TextWrapping="Wrap" />
+                  </Panel>
+                </ScrollViewer>
+              </ui:SquircleBorder>
+              <ui:GlassButton Margin="0,6,6,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Classes="small"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Copy}"
+                              Tag="{x:Static ui:AiAction.CopyText}"
+                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
+            </Panel>
+
+            <!--  Source tag, Parsed as, Length: label 70, gap 12, rows 6 apart  -->
+            <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,6,Auto,6,Auto">
+              <TextBlock Name="PART_SourceLabel"
+                         VerticalAlignment="Center"
+                         tok:Typography.Role="Caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.SOURCE_TAG}" />
+              <DockPanel Name="PART_SourceRow"
+                         Grid.Column="1"
+                         Height="20"
+                         Margin="12,0,0,0">
+                <ui:GlassButton Margin="4,-4,0,-4"
+                                Classes="small"
+                                DockPanel.Dock="Right"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Icon="{x:Static ui:IconId.Copy}"
+                                Tag="{x:Static ui:AiAction.CopyTagKey}"
+                                ToolTip.Tip="{x:Static eg:UiText.COPY_TAG_KEY}" />
+                <TextBlock VerticalAlignment="Center"
+                           tok:Typography.Role="Mono"
+                           Text="{Binding SourceArgument}"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding SourceArgument}" />
+              </DockPanel>
+              <TextBlock Grid.Row="2"
+                         tok:Typography.Role="Caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.PARSED_AS}" />
+              <TextBlock Grid.Row="2"
+                         Grid.Column="1"
+                         Margin="12,0,0,0"
+                         tok:Typography.Role="Caption"
+                         Text="{Binding ParsedAs}"
+                         TextWrapping="Wrap" />
+              <TextBlock Grid.Row="4"
+                         tok:Typography.Role="Caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.LENGTH}" />
+              <TextBlock Grid.Row="4"
+                         Grid.Column="1"
+                         Margin="12,0,0,0"
+                         tok:Typography.Role="Caption"
+                         FontFeatures="+tnum"
+                         Text="{Binding Length}" />
+            </Grid>
+
+            <ui:GlassButton Name="PART_ShowSource"
+                            HorizontalAlignment="Right"
+                            Classes="primary"
+                            Content="{x:Static eg:UiText.SHOW_SOURCE_TAG}"
+                            Icon="{x:Static ui:IconId.AiSource}"
+                            IconSize="15"
+                            Tag="{x:Static ui:AiAction.ShowSourceTag}" />
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:prompt /template/ SelectableTextBlock#PART_Prompt">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:prompt /template/ SelectableTextBlock#PART_Value">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:source) /template/ ui|GlassButton#PART_ShowSource">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:source) /template/ DockPanel#PART_SourceRow">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:source) /template/ TextBlock#PART_SourceLabel">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!--  character card (AI addendum question 9): a neutral card of its own, hairline border, not counted as AI generation  -->
+  <ControlTheme x:Key="{x:Type ui:CharacterCard}" TargetType="ui:CharacterCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="12"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel Spacing="12">
+            <DockPanel Height="24">
+              <ui:SquircleBorder Width="24"
+                                 Height="24"
+                                 Margin="0,0,8,0"
+                                 Background="{DynamicResource EmphasisA06Brush}"
+                                 CornerRadius="{StaticResource RadiusControl24}"
+                                 DockPanel.Dock="Left">
+                <ui:GlassIcon Width="14"
+                              Height="14"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.AiCharacter}" />
+              </ui:SquircleBorder>
+              <ui:Badge MaxWidth="150"
+                        Margin="8,0,0,0"
+                        DockPanel.Dock="Right"
+                        Kind="Neutral"
+                        Text="{TemplateBinding Spec}" />
+              <TextBlock VerticalAlignment="Center"
+                         tok:Typography.Role="Overline"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.CHARACTER_CARD_OVERLINE}" />
+            </DockPanel>
+            <ui:InlineNote Kind="Info" Text="{x:Static eg:UiText.CHARACTER_NOTE}" />
+            <StackPanel Spacing="4">
+              <TextBlock tok:Typography.Role="Title" Text="{TemplateBinding CharacterName}" TextWrapping="Wrap" />
+              <TextBlock Name="PART_Description"
+                         IsVisible="False"
+                         MaxLines="3"
+                         tok:Typography.Role="Caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{TemplateBinding Description}"
+                         TextTrimming="CharacterEllipsis"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ui:KeyValueList Name="PART_Rows" IsVisible="False" Items="{TemplateBinding Rows}" />
+            <ItemsControl Name="PART_Tags" IsVisible="False" ItemsSource="{TemplateBinding Tags}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel ItemSpacing="4" LineSpacing="4" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                  <ui:Badge Height="20"
+                            FontSize="{StaticResource FontSizeBadge}"
+                            Kind="Neutral"
+                            Text="{Binding}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ui:SourceLink OtherSources="{TemplateBinding OtherSources}" SourceKey="{TemplateBinding SourceKey}" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+              <ui:GlassButton HorizontalAlignment="Stretch"
+                              Content="{x:Static eg:UiText.COPY_CARD_JSON}"
+                              Icon="{x:Static ui:IconId.Braces}"
+                              IconSize="14"
+                              Tag="{x:Static ui:AiAction.CopyCharacterJson}" />
+              <ui:GlassButton Grid.Column="1"
+                              Icon="{x:Static ui:IconId.Save}"
+                              IconSize="15"
+                              Tag="{x:Static ui:AiAction.SaveCharacterJson}"
+                              ToolTip.Tip="{x:Static eg:UiText.SAVE_CARD_JSON}" />
+            </Grid>
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:description /template/ TextBlock#PART_Description">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:rows /template/ ui|KeyValueList#PART_Rows">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:tags /template/ ItemsControl#PART_Tags">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

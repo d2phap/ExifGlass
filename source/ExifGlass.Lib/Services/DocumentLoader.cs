@@ -85,6 +85,11 @@ public sealed class DocumentLoader(IMetadataReader reader)
     public string? PendingPath { get; private set; }
 
     /// <summary>
+    /// The AI read runs after the table (plan 2.2 Fast); true from the table shown until it ends.
+    /// </summary>
+    public bool IsReadingAi { get; private set; }
+
+    /// <summary>
     /// From the request to the document applied, for the last load that finished (plan 8: open a JPEG).
     /// </summary>
     public TimeSpan LastLoadTime { get; private set; }
@@ -132,6 +137,7 @@ public sealed class DocumentLoader(IMetadataReader reader)
 
         PendingPath = path;
         Phase = LoadPhase.Loading;
+        IsReadingAi = false;
         Changed?.Invoke(this, EventArgs.Empty);
 
         MetadataDocument document;
@@ -159,6 +165,7 @@ public sealed class DocumentLoader(IMetadataReader reader)
         Document = document;
         PendingPath = null;
         Phase = LoadPhase.Ready;
+        IsReadingAi = true;
         LastLoadTime = watch.Elapsed;
         SetPreview(null);
         Changed?.Invoke(this, EventArgs.Empty);
@@ -186,11 +193,10 @@ public sealed class DocumentLoader(IMetadataReader reader)
             Abandon(preview);
             return;
         }
-        if (ai is not null)
-        {
-            Document = document.WithAi(ai);
-            Changed?.Invoke(this, EventArgs.Empty);
-        }
+
+        IsReadingAi = false;
+        if (ai is not null) Document = document.WithAi(ai);
+        Changed?.Invoke(this, EventArgs.Empty);
 
         await ApplyPreviewAsync(preview ?? PreviewService.LoadAsync(document, reader, PreviewScaling, token), generation, token);
     }

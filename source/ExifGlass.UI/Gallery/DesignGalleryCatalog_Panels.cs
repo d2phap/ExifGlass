@@ -37,7 +37,6 @@ public static partial class DesignGalleryCatalog
 
     // Proto's AI sample: A1111 infotext from SD WebUI 1.10.1
     private const string SAMPLE_PROMPT = "a lighthouse on a basalt cliff at blue hour, volumetric fog drifting over the sea, long exposure, 35mm film grain, highly detailed, cinematic lighting, (dramatic sky:1.2), <lora:film_grain_v2:0.6>";
-    private const string SAMPLE_NEGATIVE = "lowres, blurry, oversaturated, watermark, text, jpeg artifacts";
 
     private static readonly GroupSegment[] SEGMENTS =
     [
@@ -138,9 +137,7 @@ public static partial class DesignGalleryCatalog
             EditText = editing ? "FUJIFILM Corporation" : null,
         };
 
-        var ai = new SelectedTagView("AI:Prompt", UiText.AI_GROUP, "—", "Prompt", SAMPLE_PROMPT, SAMPLE_PROMPT, "—", string.Empty, true, IsAi: true);
-        var expanded = new AiCard { Width = CARD_WIDTH, Info = SampleAi() };
-        expanded.IsExpanded = true;
+        var source = new SelectedTagView("PNG:Parameters", "PNG", "parameters", "Parameters", SAMPLE_PROMPT, UiText.SAME_AS_VALUE, "string", "-PNG:Parameters", true, AiFields: 23);
 
         var frame = new FrameInfo(7728, 5152, "3:2", 39.8, 52, 46);
         DetailItem[] details =
@@ -155,16 +152,14 @@ public static partial class DesignGalleryCatalog
             new("ISO", 160, 0, "", "", "EV -1/3"), new("Focal", 33, 0, "", " mm", "50 mm full-frame eq."),
         ];
 
-        return new GallerySection("c-inspector", "Inspector cards", "DS 6.11 / S4: cards 304 wide, 8 apart, each rising 12 px as it appears (400 ms). Selected tag: Accent 35% border + 3 px ring; chip, Tag ID, Delete or Undo, Close; name Title; mono value well radius 12 with Copy; Raw (-n), Format, Tag key; Edit primary; edit mode Cancel / Apply; no edit UI for read-only groups. AI card: Accent2 30%, prompt 4 lines with Show more, negative 2, parameters 2 x N. Frame, Exposure (22 Medium, counting up 1100 ms), Details.",
+        return new GallerySection("c-inspector", "Inspector cards", "DS 6.11 / S4: cards 304 wide, 8 apart, each rising 12 px as it appears (400 ms). Selected tag: Accent 35% border + 3 px ring; chip, Tag ID, Delete or Undo, Close; name Title; mono value well radius 12 with Copy; Raw (-n), Format, Tag key; Edit primary; edit mode Cancel / Apply; no edit UI for read-only groups; a tag the AI group was read from says how many fields it fed (the AI card is in c-ai). Frame, Exposure (22 Medium, counting up 1100 ms), Details.",
         [
             new("selected tag", Card(Tag()), "an editable EXIF tag"),
             new("edited", Card(Tag(EditState.Edited)), "Was: and Revert"),
             new("deleted", Card(Tag(EditState.Deleted)), "struck through; Delete turns into Undo"),
             new("read-only group", Card(Tag(readOnly: true)), "File, Composite, ExifTool, ICC_Profile, PNG: no Delete, no Edit, no badge"),
             new("edit mode", Card(Tag(), editing: true), "mono editor; Cancel (Esc), Apply (Ctrl+Enter)"),
-            new("AI row", Card(ai), "a field of the AI group; P7 gives it its own card"),
-            new("AI card", new AiCard { Width = CARD_WIDTH, Info = SampleAi() }, "prompt clamped to 4 lines"),
-            new("AI card, Show more", expanded),
+            new("AI source tag", Card(source), "Parsed into 23 AI fields, Go to AI generation; Raw says same as value (AI addendum)"),
             new("frame", new FrameCard { Width = CARD_WIDTH, Frame = frame }, "rule of thirds, AF point, ratio and MP chips"),
             new("frame :preview", new FrameCard { Width = CARD_WIDTH, Frame = frame, Preview = PreviewSample() }, "the preview as cover; its own shape"),
             new("frame, unknown size", new FrameCard { Width = CARD_WIDTH, Frame = new FrameInfo(0, 0, "—", 0, null, null) }),
@@ -182,31 +177,6 @@ public static partial class DesignGalleryCatalog
     #region Helpers
 
     private static Bitmap PreviewSample() => _previewSample ??= new Bitmap(AssetLoader.Open(new Uri(string.Format(System.Globalization.CultureInfo.InvariantCulture, LOGO, 312))));
-
-
-    private static AiGenerationInfo SampleAi()
-    {
-        AiField Param(string id, string label, string value) => new(id, label, value, label);
-
-        var source = new AiSourceInfo
-        {
-            Source = AiSourceKind.A1111,
-            Generator = "SD WebUI",
-            GeneratorVersion = "v1.10.1",
-            Kind = AiKind.Generated,
-            Prompts = [new AiPrompt(SAMPLE_PROMPT, AiPromptRole.Positive), new AiPrompt(SAMPLE_NEGATIVE, AiPromptRole.Negative)],
-            Parameters =
-            [
-                Param(AiParameterNames.MODEL, "Model", "sd_xl_base_1.0"), Param(AiParameterNames.SAMPLER, "Sampler", "DPM++ 2M"),
-                Param(AiParameterNames.SCHEDULER, "Scheduler", "Karras"), Param(AiParameterNames.STEPS, "Steps", "30"),
-                Param(AiParameterNames.CFG, "CFG", "6.5"), Param(AiParameterNames.SEED, "Seed", "2841937305"),
-                Param(AiParameterNames.SIZE, "Size", "1024x1536"), Param(AiParameterNames.DENOISE, "Denoise", "0.35"),
-                Param("hiresUpscale", "Hires upscale", "1.5"),
-            ],
-        };
-
-        return new AiGenerationInfo([source]);
-    }
 
     #endregion // Helpers
 }

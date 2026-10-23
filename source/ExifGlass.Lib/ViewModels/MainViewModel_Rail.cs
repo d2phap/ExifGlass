@@ -72,7 +72,7 @@ public sealed partial class RailGroupItem : ObservableObject
 /// <summary>
 /// One rail quick filter (DS 6.6): its chip, live count and state.
 /// </summary>
-public sealed partial class QuickFilterItem(QuickFilter filter, string label, IconId icon) : ObservableObject
+public sealed partial class QuickFilterItem(QuickFilter filter, string label, IconId icon, string? tip = null) : ObservableObject
 {
     #region Properties
 
@@ -82,16 +82,29 @@ public sealed partial class QuickFilterItem(QuickFilter filter, string label, Ic
 
     public IconId Icon { get; } = icon;
 
+    public string? Tip { get; } = tip;
+
     /// <summary>
-    /// The AI chip takes Accent2 when on (AI addendum).
+    /// The AI chips take Accent2 when on (AI addendum).
     /// </summary>
-    public bool IsAi => Filter == QuickFilter.Ai;
+    public bool IsAi => Filter is QuickFilter.Ai or QuickFilter.AiPrompts or QuickFilter.AiModels or QuickFilter.AiProvenance;
+
+    /// <summary>
+    /// Prompts, Models and Provenance show only for a file with AI data (question 3).
+    /// </summary>
+    public bool IsOnlyForAi => Filter is QuickFilter.AiPrompts or QuickFilter.AiModels or QuickFilter.AiProvenance;
 
     [ObservableProperty]
     public partial string? Count { get; set; }
 
     [ObservableProperty]
     public partial bool IsOn { get; set; }
+
+    /// <summary>
+    /// Off without a file, and for an AI chip with nothing to show.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsAvailable { get; set; }
 
     #endregion // Properties
 }
@@ -122,13 +135,29 @@ public sealed partial class MainViewModel
     [ObservableProperty]
     public partial IReadOnlyList<GroupSegment> Segments { get; private set; } = [];
 
+    /// <summary>
+    /// The AI chips, first and on a line of their own (AI addendum question 3).
+    /// </summary>
+    public IReadOnlyList<QuickFilterItem> AiQuickFilters { get; } =
+    [
+        new(QuickFilter.Ai, AppText.FILTER_AI, IconId.Sparkle, AppText.FILTER_AI_TIP),
+        new(QuickFilter.AiPrompts, AppText.FILTER_PROMPTS, IconId.AiPrompt, AppText.FILTER_PROMPTS_TIP),
+        new(QuickFilter.AiModels, AppText.FILTER_MODELS, IconId.AiModel, AppText.FILTER_MODELS_TIP),
+        new(QuickFilter.AiProvenance, AppText.FILTER_PROVENANCE, IconId.AiShieldCheck, AppText.FILTER_PROVENANCE_TIP),
+    ];
+
+    /// <summary>
+    /// The AI chips the rail shows: Prompts, Models and Provenance only for a file with AI data; a hidden chip would still cost its heap (R24).
+    /// </summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<QuickFilterItem> ShownAiFilters { get; private set; } = [];
+
     public IReadOnlyList<QuickFilterItem> QuickFilters { get; } =
     [
         new(QuickFilter.DateTime, AppText.FILTER_DATES, IconId.Clock),
         new(QuickFilter.Gps, AppText.FILTER_GPS, IconId.Location),
         new(QuickFilter.Converted, AppText.FILTER_CONVERTED, IconId.ArrowSync),
         new(QuickFilter.HasTagId, AppText.FILTER_TAG_ID, IconId.Key),
-        new(QuickFilter.Ai, AppText.FILTER_AI, IconId.Sparkle),
     ];
 
     public string FileTitle => Document?.FileName ?? (IsLoading ? AppText.FILE_READING : AppText.FILE_NONE);
@@ -244,11 +273,17 @@ public sealed partial class MainViewModel
         if (!segments.SequenceEqual(Segments)) Segments = segments;
 
         var filters = Rows.Query.Filters;
-        foreach (var chip in QuickFilters)
+        var hasAi = Rows.AiTotal > 0;
+        foreach (var chip in AiQuickFilters.Concat(QuickFilters))
         {
+            var count = Rows.FilterCounts.GetValueOrDefault(chip.Filter);
             chip.IsOn = filters.Contains(chip.Filter);
-            chip.Count = Document is null ? null : Rows.FilterCounts.GetValueOrDefault(chip.Filter).ToString(CultureInfo.InvariantCulture);
+            chip.Count = Document is null ? null : count.ToString(CultureInfo.InvariantCulture);
+            chip.IsAvailable = Document is not null && (!chip.IsOnlyForAi || count > 0 || chip.IsOn);
         }
+
+        var aiChips = hasAi ? AiQuickFilters.Count : 1;
+        if (ShownAiFilters.Count != aiChips) ShownAiFilters = [.. AiQuickFilters.Take(aiChips)];
     }
 
     #endregion // Private methods

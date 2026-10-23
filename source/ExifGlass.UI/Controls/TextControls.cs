@@ -28,6 +28,55 @@ using System.Text.RegularExpressions;
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
+/// How much of a long value the UI lays out; copy and search still use all of it.
+/// </summary>
+public static class ShownText
+{
+    #region Fields and constants
+
+    // a 2 MB ComfyUI workflow laid out whole blocked the UI thread for 330 ms per cell (G7)
+    public const int CELL = 2_048;
+    public const int WELL = 10_000;
+
+    #endregion // Fields and constants
+
+
+    #region Public methods
+
+    /// <summary>
+    /// The text's first characters and an ellipsis, or the text when it is short.
+    /// </summary>
+    public static string Cut(string text, int max) => text.Length <= max ? text : text[..End(text, max)] + "…";
+
+
+    /// <summary>
+    /// The text's first characters for a value well, with how many more there are.
+    /// </summary>
+    public static string Well(string text) => text.Length <= WELL ? text : text[..End(text, WELL)] + "…\n\n" + UiText.MoreCharacters(text.Length - End(text, WELL));
+
+
+    /// <summary>
+    /// The match ranges that fall inside a cut text.
+    /// </summary>
+    public static IReadOnlyList<TextRange>? Matches(IReadOnlyList<TextRange>? matches, int length)
+    {
+        if (matches is null || matches.Count == 0 || matches[^1].Start + matches[^1].Length <= length) return matches;
+
+        return [.. matches.Where(m => m.Start + m.Length <= length)];
+    }
+
+    #endregion // Public methods
+
+
+    #region Private methods
+
+    private static int End(string text, int max) => char.IsHighSurrogate(text[max - 1]) ? max - 1 : max;
+
+    #endregion // Private methods
+}
+
+
+/// <summary>
 /// Text with every search match on a rounded Highlight background (DS 6.9, plan Appendix A item 18), drawn from TextLayout hit-test rectangles.
 /// </summary>
 public class HighlightTextBlock : TextBlock
@@ -87,6 +136,12 @@ public class HighlightTextBlock : TextBlock
     /// </summary>
     public void SetText(string text, IReadOnlyList<TextRange>? matches)
     {
+        if (text.Length > ShownText.CELL)
+        {
+            text = ShownText.Cut(text, ShownText.CELL);
+            matches = ShownText.Matches(matches, ShownText.CELL);
+        }
+
         var redraw = !ReferenceEquals(_matches, matches);
         _matches = matches is { Count: > 0 } ? matches : null;
         if (Text != text) Text = text;
@@ -117,6 +172,17 @@ public class HighlightTextBlock : TextBlock
 
 
     #region Protected methods
+
+    /// <summary>
+    /// Sets the match ranges alone, for text built from inlines.
+    /// </summary>
+    protected void SetMatches(IReadOnlyList<TextRange>? matches)
+    {
+        var redraw = !ReferenceEquals(_matches, matches);
+        _matches = matches is { Count: > 0 } ? matches : null;
+        if (redraw) InvalidateVisual();
+    }
+
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {

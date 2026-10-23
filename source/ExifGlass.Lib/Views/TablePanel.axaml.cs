@@ -53,6 +53,7 @@ public partial class TablePanel : UserControl
         Grid.GroupToggleRequested += Grid_GroupToggleRequested;
         Grid.ValueCopyRequested += Grid_ValueCopyRequested;
         Grid.CopyRequested += Grid_CopyRequested;
+        Grid.AiActionRequested += Grid_AiActionRequested;
         Grid.PropertyChanged += Grid_PropertyChanged;
         Chips.AddHandler(FilterChip.RemovedEvent, Chip_Removed);
         ToolbarGrid.LayoutUpdated += ToolbarGrid_LayoutUpdated;
@@ -81,12 +82,18 @@ public partial class TablePanel : UserControl
     {
         base.OnDataContextChanged(e);
 
-        if (_viewModel is not null) _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        if (_viewModel is not null)
+        {
+            _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            _viewModel.RowRevealRequested -= ViewModel_RowRevealRequested;
+        }
+
         _viewModel = DataContext as MainViewModel;
         Grid.Selection = _viewModel?.Selection;
         if (_viewModel is null) return;
 
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        _viewModel.RowRevealRequested += ViewModel_RowRevealRequested;
         SyncColumnItems();
     }
 
@@ -167,6 +174,14 @@ public partial class TablePanel : UserControl
 
 
     private void Grid_CopyRequested(object? sender, EventArgs e) => _viewModel?.CopySelection();
+
+
+    private void Grid_AiActionRequested(object? sender, AiActionRequest e) => _viewModel?.AiActionCommand.Execute(e);
+
+
+    // the row is in this view once it is applied
+    private void ViewModel_RowRevealRequested(object? sender, string key) =>
+        Avalonia.Threading.Dispatcher.UIThread.Post(() => _ = Grid.RevealRowAsync(key), Avalonia.Threading.DispatcherPriority.Loaded);
 
 
     private void Grid_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

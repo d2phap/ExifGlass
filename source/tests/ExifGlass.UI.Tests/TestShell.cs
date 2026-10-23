@@ -19,7 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia.Headless;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using ExifGlass.Core.Export;
 using ExifGlass.Core.Settings;
+using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
 using ExifGlass.UI.Windows;
 using ExifGlass.ViewModels;
@@ -135,4 +137,55 @@ public sealed class TestShell : IDisposable
     }
 
     #endregion // Public methods
+}
+
+
+/// <summary>
+/// A shell with no window: it records toasts and copies and saves to memory.
+/// </summary>
+internal sealed class RecordingShell : IShellView
+{
+    public List<(string Title, string? Subtitle)> Toasts { get; } = [];
+
+    public List<string> Copied { get; } = [];
+
+    public MemoryStream Saved { get; private set; } = new();
+
+    public Task<string?> PickFileAsync() => Task.FromResult<string?>(null);
+
+    public void ShowToast(string title, string? subtitle = null, ToastKind kind = ToastKind.Success) => Toasts.Add((title, subtitle));
+
+    public void FocusSearch()
+    {
+    }
+
+    public void ShowSettings()
+    {
+    }
+
+    public void ShowAbout()
+    {
+    }
+
+    public Task CopyTextAsync(string text)
+    {
+        Copied.Add(text);
+        return Task.CompletedTask;
+    }
+
+    public Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format)
+    {
+        Saved = new KeptStream();
+        return Task.FromResult<SaveTarget?>(new SaveTarget(Saved, suggestedName));
+    }
+
+    // the export disposes its stream; the test still reads it
+    private sealed class KeptStream : MemoryStream
+    {
+        protected override void Dispose(bool disposing)
+        {
+        }
+
+        public override ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
 }

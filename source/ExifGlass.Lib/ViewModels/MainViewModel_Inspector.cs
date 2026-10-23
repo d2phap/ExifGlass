@@ -70,7 +70,23 @@ public sealed partial class MainViewModel
 
     public IReadOnlyList<ExposureItem>? Exposure => Document?.Derived.Exposure;
 
-    public IReadOnlyList<DetailItem>? Details => Document?.Derived.Details;
+    /// <summary>
+    /// The Details card's rows; an AI-training signal on a file not made with AI is a row of its own (AI addendum question 10).
+    /// </summary>
+    public IReadOnlyList<DetailItem>? Details
+    {
+        get
+        {
+            if (Document?.Derived.Details is not { } details) return null;
+            if (Document.Ai is not { IsAi: false, Training: { } training }) return details;
+
+            var signals = new List<string>(2);
+            if (training.DataMining is not null) signals.Add(AppText.PLUS_DATA_MINING);
+            if (training.LearningOptOutIn is not null) signals.Add(AppText.EXIF_OPT_OUT);
+            var value = training.IsOptOut ? AppText.NOT_ALLOWED : training.DataMining ?? training.LearningOptOutIn ?? string.Empty;
+            return [.. details, new DetailItem(AppText.AI_TRAINING, value, string.Join(" · ", signals))];
+        }
+    }
 
     /// <summary>
     /// Staged changes, for the table's badges until P8's pending bar shows them.
@@ -158,18 +174,12 @@ public sealed partial class MainViewModel
     }
 
 
-    [RelayCommand]
-    private Task CopyPromptAsync() => AiInfo?.Prompt is { } prompt
-        ? CopyAndToastAsync(prompt.Text, AppText.TOAST_COPIED_PROMPT, AppText.Characters(prompt.Text.Length))
-        : Task.CompletedTask;
-
-
     /// <summary>
-    /// Copy generation parameters: A1111 infotext, as A1111 and Forge read it back (P7 checks the round trip).
+    /// Copy generation parameters: A1111 infotext, as A1111 and Forge read it back (G7 checks the round trip).
     /// </summary>
     [RelayCommand]
-    private Task CopyGenerationParametersAsync() => AiInfo is { Primary: { } source } info
-        ? CopyAndToastAsync(AiExport.ToA1111(source), AppText.TOAST_COPIED_PARAMETERS, AiCard.GeneratorLabel(info))
+    private Task CopyGenerationParametersAsync() => AiInfo is { Primary: { IsGeneration: true } source } info
+        ? CopyAndToastAsync(AiExport.ToA1111(source), AppText.TOAST_COPIED_PARAMETERS, AppText.A1111Text(AiCard.GeneratorLabel(info)))
         : Task.CompletedTask;
 
 
@@ -184,11 +194,12 @@ public sealed partial class MainViewModel
     private bool CanEditFocus() => FocusedTag is { IsReadOnly: false };
 
 
-    // the card follows the selection and the rows it is made from (an edit restyles it)
+    // the card follows the selection and the rows it is made from (an edit restyles it); an AI row has a card of its own
     private void UpdateFocus()
     {
         var row = Selection.FocusedKey is { } key ? FindRow(key) : null;
-        if (row is null || row.EditState == EditState.Added)
+        UpdateAiFocus(row);
+        if (row is null || row.IsAi || row.EditState == EditState.Added)
         {
             IsEditing = false;
             FocusedTag = null;
@@ -204,15 +215,29 @@ public sealed partial class MainViewModel
             row.DisplayId,
             row.Name,
             row.Value,
-            tag?.RawOrValue ?? row.Value,
+            tag?.Raw is { } raw && raw != row.Value ? raw : UI.UiText.SAME_AS_VALUE,
             tag is not null && Document is { } doc ? doc.FormatOf(tag) : TagIdRule.NONE,
             tag?.ArgumentKey ?? string.Empty,
             row.IsAi || tag is null || tag.IsReadOnly || TagWriteRules.IsReadOnly(tag, null),
             row.EditState,
             row.OriginalValue,
-            row.IsAi);
+            row.IsAi,
+            tag?.IsAiSource == true ? AiFieldsFrom(tag) : 0);
 
         if (view != FocusedTag) FocusedTag = view;
+    }
+
+
+    // the AI fields read from this tag: "Parsed into 23 AI fields" on its card
+    private int AiFieldsFrom(TagRecord tag)
+    {
+        var count = 0;
+        foreach (var row in Rows.RowsInView)
+        {
+            if (row is { IsAi: true, SourceKey: { } key } && (key == tag.Key || new AiSourceMatcher([key]).Matches(tag))) count++;
+        }
+
+        return count;
     }
 
 

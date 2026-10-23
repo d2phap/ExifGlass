@@ -48,13 +48,28 @@ public sealed record SelectedTagView(
     bool IsReadOnly,
     EditState State = EditState.None,
     string? OriginalValue = null,
-    bool IsAi = false)
+    bool IsAi = false,
+    int AiFields = 0)
 {
     #region Properties
 
+    /// <summary>
+    /// Gets "Parsed into 23 AI fields" for a tag the AI group was read from (AI addendum state-source-jump).
+    /// </summary>
+    public string AiFieldsText => UiText.ParsedInto(AiFields);
+
     public bool IsDeleted => State == EditState.Deleted;
 
+    public string ShownValue => ShownText.Well(Value);
+
+    public string ShownRaw => ShownText.Cut(Raw, ShownText.CELL);
+
     public bool IsEdited => State == EditState.Edited;
+
+    /// <summary>
+    /// Gets whether the raw value says "same as value" (AI addendum): ExifTool's print conversion left it alone.
+    /// </summary>
+    public bool IsRawSame => Raw == UiText.SAME_AS_VALUE;
 
     /// <summary>
     /// Gets "Was: ..." for an edited value.
@@ -104,6 +119,9 @@ public class SelectedTagCard : TemplatedControl
 
     public static readonly StyledProperty<ICommand?> RevertCommandProperty =
         AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(RevertCommand));
+
+    public static readonly StyledProperty<ICommand?> GoToAiCommandProperty =
+        AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(GoToAiCommand));
 
     private TextBox? _editor;
     private Button? _edit;
@@ -193,6 +211,15 @@ public class SelectedTagCard : TemplatedControl
         set => SetValue(RevertCommandProperty, value);
     }
 
+    /// <summary>
+    /// Go to AI generation, from a tag the AI group was read from.
+    /// </summary>
+    public ICommand? GoToAiCommand
+    {
+        get => GetValue(GoToAiCommandProperty);
+        set => SetValue(GoToAiCommandProperty, value);
+    }
+
     #endregion // Properties
 
 
@@ -263,6 +290,8 @@ public class SelectedTagCard : TemplatedControl
         PseudoClasses.Set(":deleted", tag?.IsDeleted ?? false);
         PseudoClasses.Set(":edited", tag?.IsEdited ?? false);
         PseudoClasses.Set(":ai", tag?.IsAi ?? false);
+        PseudoClasses.Set(":ai-source", tag?.AiFields > 0);
+        PseudoClasses.Set(":raw-same", tag?.IsRawSame == true);
         PseudoClasses.Set(":editing", IsEditing);
     }
 
@@ -284,208 +313,6 @@ public class SelectedTagCard : TemplatedControl
 
         if (command.CanExecute(null)) command.Execute(null);
         e.Handled = true;
-    }
-
-    #endregion // Event handlers
-}
-
-
-/// <summary>
-/// One parameter tile of the AI card: a label and a mono value.
-/// </summary>
-public sealed record AiParameterView(string Label, string Value);
-
-
-/// <summary>
-/// The AI generation card as the spec draws it (DS 6.11, S4): sparkle tile, generator badge, the prompt clamped to 4 lines with Show more and Copy, the negative prompt in 2, a 2 x N parameter grid and Copy generation parameters. P7 extends it.
-/// </summary>
-public class AiCard : TemplatedControl
-{
-    #region Fields and constants
-
-    // DS 6.11: the first eight parameters
-    private const int SHOWN_PARAMETERS = 8;
-
-    public static readonly StyledProperty<AiGenerationInfo?> InfoProperty =
-        AvaloniaProperty.Register<AiCard, AiGenerationInfo?>(nameof(Info));
-
-    public static readonly StyledProperty<bool> IsExpandedProperty =
-        AvaloniaProperty.Register<AiCard, bool>(nameof(IsExpanded));
-
-    public static readonly StyledProperty<ICommand?> CopyPromptCommandProperty =
-        AvaloniaProperty.Register<AiCard, ICommand?>(nameof(CopyPromptCommand));
-
-    public static readonly StyledProperty<ICommand?> CopyParametersCommandProperty =
-        AvaloniaProperty.Register<AiCard, ICommand?>(nameof(CopyParametersCommand));
-
-    public static readonly DirectProperty<AiCard, string?> GeneratorProperty =
-        AvaloniaProperty.RegisterDirect<AiCard, string?>(nameof(Generator), c => c.Generator);
-
-    public static readonly DirectProperty<AiCard, string?> PromptProperty =
-        AvaloniaProperty.RegisterDirect<AiCard, string?>(nameof(Prompt), c => c.Prompt);
-
-    public static readonly DirectProperty<AiCard, string?> NegativePromptProperty =
-        AvaloniaProperty.RegisterDirect<AiCard, string?>(nameof(NegativePrompt), c => c.NegativePrompt);
-
-    public static readonly DirectProperty<AiCard, IReadOnlyList<AiParameterView>> ParametersProperty =
-        AvaloniaProperty.RegisterDirect<AiCard, IReadOnlyList<AiParameterView>>(nameof(Parameters), c => c.Parameters);
-
-    private string? _generator;
-    private string? _prompt;
-    private string? _negative;
-    private IReadOnlyList<AiParameterView> _parameters = [];
-    private Button? _more;
-    private PromptText? _promptText;
-
-    #endregion // Fields and constants
-
-
-    #region Constructors
-
-    public AiCard()
-    {
-        UpdatePseudoClasses();
-    }
-
-    #endregion // Constructors
-
-
-    #region Properties
-
-    public AiGenerationInfo? Info
-    {
-        get => GetValue(InfoProperty);
-        set => SetValue(InfoProperty, value);
-    }
-
-    /// <summary>
-    /// Shows the whole prompt (Show more).
-    /// </summary>
-    public bool IsExpanded
-    {
-        get => GetValue(IsExpandedProperty);
-        set => SetValue(IsExpandedProperty, value);
-    }
-
-    public ICommand? CopyPromptCommand
-    {
-        get => GetValue(CopyPromptCommandProperty);
-        set => SetValue(CopyPromptCommandProperty, value);
-    }
-
-    public ICommand? CopyParametersCommand
-    {
-        get => GetValue(CopyParametersCommandProperty);
-        set => SetValue(CopyParametersCommandProperty, value);
-    }
-
-    /// <summary>
-    /// Gets the badge: "SD WebUI v1.10.1".
-    /// </summary>
-    public string? Generator
-    {
-        get => _generator;
-        private set => SetAndRaise(GeneratorProperty, ref _generator, value);
-    }
-
-    public string? Prompt
-    {
-        get => _prompt;
-        private set => SetAndRaise(PromptProperty, ref _prompt, value);
-    }
-
-    public string? NegativePrompt
-    {
-        get => _negative;
-        private set => SetAndRaise(NegativePromptProperty, ref _negative, value);
-    }
-
-    public IReadOnlyList<AiParameterView> Parameters
-    {
-        get => _parameters;
-        private set => SetAndRaise(ParametersProperty, ref _parameters, value);
-    }
-
-    #endregion // Properties
-
-
-    #region Public methods
-
-    public void Appear() => Card.PlayAppear(this);
-
-
-    /// <summary>
-    /// The generator badge's text: the name and its version.
-    /// </summary>
-    public static string GeneratorLabel(AiGenerationInfo info)
-    {
-        var name = info.Generator.Length > 0 ? info.Generator : AiGenerationInfo.KindLabel(info.Kind);
-        return info.GeneratorVersion is { Length: > 0 } version ? $"{name} {version}" : name;
-    }
-
-    #endregion // Public methods
-
-
-    #region Protected methods
-
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        if (_more is not null) _more.Click -= More_Click;
-        if (_promptText is not null) _promptText.PropertyChanged -= Prompt_PropertyChanged;
-
-        base.OnApplyTemplate(e);
-
-        _more = e.NameScope.Find<Button>("PART_More");
-        _promptText = e.NameScope.Find<PromptText>("PART_Prompt");
-        if (_more is not null) _more.Click += More_Click;
-        if (_promptText is not null) _promptText.PropertyChanged += Prompt_PropertyChanged;
-    }
-
-
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        base.OnPropertyChanged(change);
-
-        if (change.Property == IsExpandedProperty) PseudoClasses.Set(":expanded", IsExpanded);
-        else if (change.Property == InfoProperty)
-        {
-            var info = Info;
-            Generator = info is null ? null : GeneratorLabel(info);
-            Prompt = info?.Prompt?.Text;
-            NegativePrompt = info?.NegativePrompt?.Text;
-            Parameters = info is null ? [] : [.. info.Parameters.Take(SHOWN_PARAMETERS).Select(p => new AiParameterView(p.Label, p.Value))];
-            IsExpanded = false;
-            UpdatePseudoClasses();
-        }
-    }
-
-    #endregion // Protected methods
-
-
-    #region Private methods
-
-    private void UpdatePseudoClasses()
-    {
-        PseudoClasses.Set(":prompt", !string.IsNullOrEmpty(Prompt));
-        PseudoClasses.Set(":negative", !string.IsNullOrEmpty(NegativePrompt));
-        PseudoClasses.Set(":parameters", Parameters.Count > 0);
-
-        // provenance alone (a C2PA manifest's fields) has no generation parameters to copy; P7 shows it
-        PseudoClasses.Set(":copyable", Info?.Primary is { IsGeneration: true });
-    }
-
-    #endregion // Private methods
-
-
-    #region Event handlers
-
-    private void More_Click(object? sender, RoutedEventArgs e) => IsExpanded = !IsExpanded;
-
-
-    // Show more only when the clamp hides text (PromptText measures it)
-    private void Prompt_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == PromptText.IsClampedProperty) PseudoClasses.Set(":clamped", _promptText?.IsClamped == true);
     }
 
     #endregion // Event handlers
@@ -983,6 +810,7 @@ public class DetailsCard : TemplatedControl
     private static readonly (string Label, IconId Icon)[] ROWS =
     [
         ("Camera", IconId.Camera), ("Lens", IconId.Aperture), ("Captured", IconId.Clock), ("Location", IconId.Location), ("Software", IconId.WindowConsole),
+        ("AI training", IconId.AiNoTraining),
     ];
 
     public static readonly StyledProperty<IReadOnlyList<DetailItem>?> ItemsProperty =

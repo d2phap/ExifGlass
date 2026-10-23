@@ -13,6 +13,10 @@
           Margin="8"
           RowDefinitions="Auto,Auto,Auto,*,Auto">
       <ui:FileCard Name="File"
+                   AiBadge="{Binding AiBadge}"
+                   AiBadgeCommand="{Binding JumpToAiCommand}"
+                   AiBadgeTip="{Binding AiBadgeTip}"
+                   AiKind="{Binding AiBadgeKind}"
                    Extension="{Binding FileExtension}"
                    Meta="{Binding FileMeta}"
                    Preview="{Binding Preview}"
@@ -76,24 +80,43 @@
                    tok:Typography.Role="Overline"
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    Text="{x:Static app:AppText.QUICK_FILTERS}" />
-        <ItemsControl Name="FilterList"
-                      Margin="6,0"
-                      ItemsSource="{Binding QuickFilters}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <WrapPanel ItemSpacing="6" LineSpacing="6" />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-          <ItemsControl.ItemTemplate>
-            <DataTemplate x:DataType="vm:QuickFilterItem">
-              <ui:Chip Classes.ai="{Binding IsAi}"
-                       Content="{Binding Label}"
-                       Count="{Binding Count}"
-                       Icon="{Binding Icon}"
-                       IsChecked="{Binding IsOn, Mode=OneWay}" />
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!--  AI chips first, on a line of their own (AI addendum question 3)  -->
+        <StackPanel Name="FilterList" Margin="6,0" Spacing="6">
+          <ItemsControl ItemsSource="{Binding ShownAiFilters}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel ItemSpacing="6" LineSpacing="6" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:QuickFilterItem">
+                <ui:Chip Classes.ai="{Binding IsAi}"
+                         Content="{Binding Label}"
+                         Count="{Binding Count}"
+                         Icon="{Binding Icon}"
+                         IsChecked="{Binding IsOn, Mode=OneWay}"
+                         IsEnabled="{Binding IsAvailable}"
+                         ToolTip.Tip="{Binding Tip}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+          <ItemsControl ItemsSource="{Binding QuickFilters}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel ItemSpacing="6" LineSpacing="6" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:QuickFilterItem">
+                <ui:Chip Content="{Binding Label}"
+                         Count="{Binding Count}"
+                         Icon="{Binding Icon}"
+                         IsChecked="{Binding IsOn, Mode=OneWay}"
+                         IsEnabled="{Binding IsAvailable}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
       </StackPanel>
 
       <ui:DropTarget Name="Drop"

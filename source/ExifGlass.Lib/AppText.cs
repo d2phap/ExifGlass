@@ -124,6 +124,13 @@ public static class AppText
     public const string FILTER_CONVERTED = "Converted";
     public const string FILTER_TAG_ID = "Has tag ID";
     public const string FILTER_AI = "AI generation";
+    public const string FILTER_PROMPTS = "Prompts";
+    public const string FILTER_MODELS = "Models";
+    public const string FILTER_PROVENANCE = "Provenance";
+    public const string FILTER_AI_TIP = "Show AI fields and the tags they were read from";
+    public const string FILTER_PROMPTS_TIP = "Show the prompts";
+    public const string FILTER_MODELS_TIP = "Show the models, LoRAs and embeddings";
+    public const string FILTER_PROVENANCE_TIP = "Show Content Credentials, IPTC, the AI label and AI-training signals";
 
     public const string TOAST_COPIED_VALUE = "Copied value";
     public const string TOAST_COPIED_CELL = "Copied cell";
@@ -146,7 +153,30 @@ public static class AppText
     public const string TOAST_EDIT_STAGED = "Edit staged";
     public const string TOAST_NO_CHANGE = "No change";
     public const string TOAST_COPIED_PROMPT = "Copied prompt";
+    public const string TOAST_COPIED_NEGATIVE = "Copied negative prompt";
     public const string TOAST_COPIED_PARAMETERS = "Copied generation parameters";
+    public const string TOAST_COPIED_AI_JSON = "Copied AI data as JSON";
+    public const string TOAST_COPIED_WORKFLOW = "Copied workflow JSON";
+    public const string TOAST_COPIED_CHARACTER = "Copied character card";
+    public const string TOAST_SAVED_WORKFLOW = "Saved workflow";
+    public const string TOAST_SAVED_PARAMETERS = "Saved generation parameters";
+    public const string TOAST_SAVED_AI_JSON = "Saved AI data";
+    public const string TOAST_SAVED_CHARACTER = "Saved character card";
+
+    // the Export menu's AI items (P7)
+    public const string EXPORT_AI_HEADER = "AI GENERATION";
+    public const string EXPORT_AI_PARAMETERS = "Generation parameters";
+    public const string EXPORT_AI_PARAMETERS_DESC = "A1111 text, as .txt";
+    public const string EXPORT_AI_JSON = "AI data as JSON";
+    public const string EXPORT_AI_JSON_DESC = "Every parsed field with its source tag";
+    public const string EXPORT_AI_WORKFLOW = "Workflow";
+    public const string EXPORT_AI_WORKFLOW_DESC = "Exactly as embedded, as .json";
+
+    // the Details card's AI-training row (AI addendum question 10)
+    public const string AI_TRAINING = "AI training";
+    public const string NOT_ALLOWED = "Not allowed";
+    public const string PLUS_DATA_MINING = "PLUS DataMining";
+    public const string EXIF_OPT_OUT = "Exif 3.1 LearningOptOutIn";
 
     #endregion // Constants
 
@@ -170,16 +200,21 @@ public static class AppText
 
     public static string CopiedAsJson(int count) => string.Create(CultureInfo.InvariantCulture, $"Copied {count:N0} as JSON");
 
-    public static string TagsInView(int count) => $"{Tags(count)} in view";
+    public static string TagsInView(int tags, int ai) => $"{TagsAndAi(tags, ai)} in view";
 
     /// <summary>
     /// The Export menu's header (DS 8: be concrete), uppercase as a menu header (DS 6.8).
     /// </summary>
-    public static string ExportsInView(int count) => string.Create(CultureInfo.InvariantCulture, $"EXPORTS THE {count:N0} {(count == 1 ? "TAG" : "TAGS")} IN VIEW");
+    public static string ExportsInView(int tags, int ai) => $"EXPORTS THE {TagsAndAi(tags, ai).ToUpperInvariant()} IN VIEW";
+
+    /// <summary>
+    /// "22 tags and 15 AI fields": AI fields are counted apart from tags (AI addendum question 2).
+    /// </summary>
+    public static string TagsAndAi(int tags, int ai) => ai == 0 ? Tags(tags) : $"{Tags(tags)} and {AiFields(ai)}";
 
     public static string Exported(string file) => $"Exported {file}";
 
-    public static string ExportedSub(int count, long bytes) => string.Create(CultureInfo.InvariantCulture, $"{Tags(count)} · {bytes / 1024.0:0.0} kB");
+    public static string ExportedSub(int tags, int ai, long bytes) => string.Create(CultureInfo.InvariantCulture, $"{TagsAndAi(tags, ai)} · {bytes / 1024.0:0.0} kB");
 
     public static string GpsTags(int count) => string.Create(CultureInfo.InvariantCulture, $"{count:N0} location {(count == 1 ? "tag" : "tags")} · -gps:all=");
 
@@ -206,6 +241,21 @@ public static class AppText
     public static string Characters(int count) => count == 1 ? "1 character" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} characters");
 
     public static string AboutTooltip => $"{ABOUT} (F1)";
+
+    public static string AiFields(int count) => count == 1 ? "1 AI field" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} AI fields");
+
+    public static string A1111Text(string generator) => $"{generator} · A1111 text";
+
+    /// <summary>
+    /// A copied AI value's toast: "Copied seed", "Copied character 1"; "Copied value" without a label.
+    /// </summary>
+    public static string CopiedField(string? label) => string.IsNullOrEmpty(label) ? TOAST_COPIED_VALUE : "Copied " + char.ToLowerInvariant(label[0]) + label[1..];
+
+    /// <summary>
+    /// R19 in the AI card: "Your ExifTool 12.40 can't read every AI field. C2PA Content Credentials in every container need 12.75."
+    /// </summary>
+    public static string OldExifTool(string version, IReadOnlyList<Core.ExifTool.ExifToolFeature> missing) =>
+        $"Your ExifTool {version} can't read every AI field. " + string.Join(" ", missing.Select(f => string.Create(CultureInfo.InvariantCulture, $"{f.Name} need {f.MinVersion:0.00}.")));
 
     public static string ThemeName(AppTheme theme) => theme switch
     {

@@ -23,18 +23,22 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using ExifGlass.Core.Platform;
+using Avalonia.Threading;
 using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Windows;
 
 /// <summary>
-/// Gives a window its fill (O4): native Mica on Windows 11 22H2 and later, the solid window colour everywhere else.
+/// Gives a window its fill (O4): native Mica on Windows 11 22H2 and later with transparency effects on, the solid window colour (Bg.Window) everywhere else.
 /// </summary>
 public static class WindowBackdrop
 {
     #region Fields and constants
 
     public const string MICA_CLASS = "mica";
+
+    // the OS-wide settings outlive a window; each open window's handler comes off when it closes
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Window, EventHandler<PlatformColorValues>> SETTINGS_HANDLERS = [];
 
     #endregion // Fields and constants
 
@@ -54,6 +58,7 @@ public static class WindowBackdrop
         });
 
         window.Opened += Window_Opened;
+        window.Closed += Window_Closed;
     }
 
     #endregion // Public methods
@@ -63,12 +68,37 @@ public static class WindowBackdrop
 
     private static void Window_Opened(object? sender, EventArgs e)
     {
-        if (sender is not Window window || window.Classes.Contains(MICA_CLASS)) return;
+        if (sender is not Window window) return;
 
-        if (window.TryGetPlatformHandle()?.Handle is { } handle && PlatformServices.Shell?.TrySetMicaBackdrop(handle) == true)
-        {
-            window.Classes.Add(MICA_CLASS);
-        }
+        Update(window);
+        if (Application.Current?.PlatformSettings is not { } settings || SETTINGS_HANDLERS.TryGetValue(window, out _)) return;
+
+        EventHandler<PlatformColorValues> handler = (_, _) => Dispatcher.UIThread.Post(() => Update(window));
+        SETTINGS_HANDLERS.Add(window, handler);
+        settings.ColorValuesChanged += handler;
+    }
+
+
+    private static void Window_Closed(object? sender, EventArgs e)
+    {
+        if (sender is not Window window) return;
+
+        window.Classes.Remove(MICA_CLASS);
+        if (!SETTINGS_HANDLERS.TryGetValue(window, out var handler)) return;
+
+        SETTINGS_HANDLERS.Remove(window);
+        if (Application.Current?.PlatformSettings is { } settings) settings.ColorValuesChanged -= handler;
+    }
+
+
+    // Windows sends the colour-settings change when transparency effects are switched, so the window follows without a restart
+    private static void Update(Window window)
+    {
+        if (!window.IsVisible || window.TryGetPlatformHandle()?.Handle is not { } handle || PlatformServices.Shell is not { } shell) return;
+
+        var mica = shell.TrySetMicaBackdrop(handle);
+        if (!mica && window.Classes.Contains(MICA_CLASS)) shell.ClearMicaBackdrop(handle);
+        window.Classes.Set(MICA_CLASS, mica);
     }
 
     #endregion // Event handlers

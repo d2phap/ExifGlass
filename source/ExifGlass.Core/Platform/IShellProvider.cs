@@ -40,12 +40,5 @@ public interface IShellProvider
     /// </summary>
     bool TrySetMicaBackdrop(nint windowHandle);
 
-    /// <summary>
-    /// Takes Mica away again, so the window's own fill shows (transparency effects turned off while it is open).
-    /// </summary>
-    void ClearMicaBackdrop(nint windowHandle)
-    {
-    }
-
     #endregion // Methods
 }

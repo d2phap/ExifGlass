@@ -31,7 +31,7 @@ public class TokensTests
     #region Tests
 
     [AvaloniaTheory]
-    [InlineData("Light", "#F2F5F8", "#FFFFFF")]
+    [InlineData("Light", "#F3F3F3", "#FFFFFF")]
     [InlineData("Dark", "#212529", "#282E31")]
     public void SurfacesFollowTheThemeVariant(string variant, string window, string panel)
     {

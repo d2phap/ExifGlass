@@ -25,7 +25,6 @@ internal static partial class DwmApi
     #region Constants
 
     public const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
-    public const int DWMSBT_NONE = 1;
     public const int DWMSBT_MAINWINDOW = 2;
 
     // DWMWA_SYSTEMBACKDROP_TYPE came with Windows 11 22H2.

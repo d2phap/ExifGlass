@@ -7,8 +7,8 @@
     <ResourceDictionary x:Key="Light">
       <Color x:Key="BgBackdropColor">#DEE2E6</Color>
       <SolidColorBrush x:Key="BgBackdropBrush" Color="#DEE2E6" />
-      <Color x:Key="BgWindowColor">#F2F5F8</Color>
-      <SolidColorBrush x:Key="BgWindowBrush" Color="#F2F5F8" />
+      <Color x:Key="BgWindowColor">#F3F3F3</Color>
+      <SolidColorBrush x:Key="BgWindowBrush" Color="#F3F3F3" />
       <Color x:Key="BgPanelColor">#FFFFFF</Color>
       <SolidColorBrush x:Key="BgPanelBrush" Color="#FFFFFF" />
       <Color x:Key="BgElevatedColor">#FFFFFF</Color>
@@ -23,8 +23,8 @@
       <SolidColorBrush x:Key="BgGroupHeaderBrush" Color="#F5FFFFFF" />
       <Color x:Key="BgToastColor">#FAFFFFFF</Color>
       <SolidColorBrush x:Key="BgToastBrush" Color="#FAFFFFFF" />
-      <Color x:Key="BgDragScrimColor">#D9F2F5F8</Color>
-      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9F2F5F8" />
+      <Color x:Key="BgDragScrimColor">#D9F3F3F3</Color>
+      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9F3F3F3" />
       <Color x:Key="BgTerminalTileColor">#0F000000</Color>
       <SolidColorBrush x:Key="BgTerminalTileBrush" Color="#0F000000" />
       <Color x:Key="FgTerminalTileColor">#212529</Color>

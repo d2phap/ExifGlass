@@ -100,6 +100,11 @@ public sealed class MetadataDocument
     /// </summary>
     public AiGenerationInfo? Ai { get; init; }
 
+    /// <summary>
+    /// The tag table the read used, shared by every document; null when none was loaded.
+    /// </summary>
+    public TagDb? TagDb { get; init; }
+
     #endregion // Properties
 
 
@@ -138,6 +143,7 @@ public sealed class MetadataDocument
             Warnings = read.Warnings,
             Error = read.Error,
             ParseTime = parseTime,
+            TagDb = tagDb,
         };
 
         return doc.With(derived: DerivedInfo.From(doc));
@@ -164,11 +170,18 @@ public sealed class MetadataDocument
             ParseTime = ParseTime,
             Derived = Derived,
             Ai = ai,
+            TagDb = TagDb,
         };
     }
 
 
     public TagRecord? GetByKey(string key) => _byKey.GetValueOrDefault(key);
+
+
+    /// <summary>
+    /// The Format row (D18): the tag table's type, "—" when the table doesn't list the tag.
+    /// </summary>
+    public string FormatOf(TagRecord tag) => TagDb is not null && TagDb.TryFind(tag.Group0, tag.Name, tag.Group1, out var def) ? def.Format : TagIdRule.NONE;
 
 
     /// <summary>
@@ -224,6 +237,7 @@ public sealed class MetadataDocument
         ParseTime = ParseTime,
         Derived = derived ?? Derived,
         Ai = ai ?? Ai,
+        TagDb = TagDb,
     };
 
 

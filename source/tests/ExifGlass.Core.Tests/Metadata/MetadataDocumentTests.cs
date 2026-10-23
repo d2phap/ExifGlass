@@ -212,6 +212,17 @@ public class MetadataDocumentTests
 
 
     [Fact]
+    public void GivesTheFormatRowFromTheTagDbAndKeepsItThroughTheAiRead()
+    {
+        var doc = Doc(CAMERA_JSON, TagDb.LoadEmbedded()!);
+
+        Assert.Equal("rational64u", doc.FormatOf(doc.Find("EXIF", "FNumber")!));
+        Assert.Equal("rational64u", doc.WithAi(null).FormatOf(doc.Find("EXIF", "FNumber")!));
+        Assert.Equal(TagIdRule.NONE, Doc(CAMERA_JSON).FormatOf(doc.Find("EXIF", "FNumber")!));
+    }
+
+
+    [Fact]
     public void ReadsFileSizeAndTimeFromDiskWhenTheFileExists()
     {
         var path = Path.Combine(Path.GetTempPath(), "exifglass-doc-" + Guid.NewGuid().ToString("N") + ".bin");

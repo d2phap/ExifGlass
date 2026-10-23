@@ -20,6 +20,7 @@ using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Metadata;
 using System.Buffers;
+using System.Buffers.Text;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -196,33 +197,36 @@ public sealed class ExifToolService : IAsyncDisposable
     }
 
 
-    // -b values come as "base64:..." inside -j output; the largest is the best preview
+    // -b values come as "base64:..." in -j output, the largest the best; JsonDocument would copy the reply into a pooled array each thread keeps (plan 8)
     private static byte[]? LargestBinary(in ReadOnlySequence<byte> json)
     {
         if (json.IsEmpty) return null;
 
-        using var doc = JsonDocument.Parse(json);
-        if (doc.RootElement.ValueKind != JsonValueKind.Array || doc.RootElement.GetArrayLength() == 0) return null;
-
-        string? best = null;
-        foreach (var p in doc.RootElement[0].EnumerateObject())
-        {
-            if (p.Value.ValueKind != JsonValueKind.String) continue;
-
-            var s = p.Value.GetString()!;
-            if (s.StartsWith(BASE64_PREFIX, StringComparison.Ordinal) && (best is null || s.Length > best.Length)) best = s;
-        }
-
-        if (best is null) return null;
-
+        var reader = new Utf8JsonReader(json);
+        byte[]? best = null;
         try
         {
-            return Convert.FromBase64String(best[BASE64_PREFIX.Length..]);
+            while (reader.Read())
+            {
+                if (reader.TokenType != JsonTokenType.String) continue;
+
+                var length = reader.HasValueSequence ? reader.ValueSequence.Length : reader.ValueSpan.Length;
+                if (length <= BASE64_PREFIX.Length || (best is not null && (length - BASE64_PREFIX.Length) * 3 / 4 <= best.Length)) continue;
+
+                var text = new byte[length];
+                var written = reader.CopyString(text);
+                if (!text.AsSpan(0, written).StartsWith("base64:"u8)) continue;
+
+                var payload = text.AsSpan(BASE64_PREFIX.Length, written - BASE64_PREFIX.Length);
+                if (Base64.DecodeFromUtf8InPlace(payload, out var decoded) == OperationStatus.Done) best = payload[..decoded].ToArray();
+            }
         }
-        catch (FormatException)
+        catch (JsonException)
         {
-            return null;
+            // a cut reply: keep what was found before it
         }
+
+        return best;
     }
 
     #endregion // Private methods

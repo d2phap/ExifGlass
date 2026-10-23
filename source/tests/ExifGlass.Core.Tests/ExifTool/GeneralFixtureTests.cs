@@ -78,6 +78,20 @@ public class GeneralFixtureTests(ExifToolFixture exifTool)
     }
 
 
+    [Theory]
+    [InlineData("RAW_SONY_ILCE-7M2.ARW", 400_000)]
+    [InlineData("StillLife.cr2", 100_000)]
+    [InlineData("cam.jpg", 1_000)]
+    public async Task ReadsTheLargestEmbeddedPreviewAsAJpeg(string file, int atLeast)
+    {
+        var preview = await exifTool.Require().ReadPreviewAsync(Private(file), TestContext.Current.CancellationToken);
+
+        Assert.NotNull(preview);
+        Assert.True(preview.Length >= atLeast, $"{file}: {preview.Length} bytes");
+        Assert.Equal([0xFF, 0xD8], preview[..2]);
+    }
+
+
     [Fact]
     public async Task ReadsFiveThousandEmbeddedTagsAndQueriesThem()
     {

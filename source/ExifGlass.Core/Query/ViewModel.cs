@@ -195,6 +195,13 @@ public sealed class ViewResult
 
     public static ViewResult Empty { get; } = new();
 
+    /// <summary>
+    /// The document the view was made from, null for the empty view.
+    /// </summary>
+    public MetadataDocument? Document { get; init; }
+
+    public ViewQuery Query { get; init; } = ViewQuery.Default;
+
     public IReadOnlyList<ViewItem> Items { get; init; } = [];
 
     /// <summary>

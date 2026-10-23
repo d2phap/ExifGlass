@@ -37,13 +37,17 @@ public sealed class MetadataDocument
     private readonly Dictionary<string, TagRecord> _byKey;
     private readonly Dictionary<string, TagRecord> _byGroupAndName;
 
+    // shared by the copies made from one read (derived info, AI data), so a view can tell an update from a new file
+    private readonly object _read;
+
     #endregion // Fields and constants
 
 
     #region Constructors
 
-    private MetadataDocument(IReadOnlyList<TagRecord> tags, IReadOnlyList<TagGroup> groups)
+    private MetadataDocument(IReadOnlyList<TagRecord> tags, IReadOnlyList<TagGroup> groups, object? read = null)
     {
+        _read = read ?? new object();
         Tags = tags;
         Groups = groups;
         _byKey = new Dictionary<string, TagRecord>(tags.Count, StringComparer.Ordinal);
@@ -149,7 +153,7 @@ public sealed class MetadataDocument
 
         var matcher = new AiSourceMatcher(ai.SourceKeys);
         var marked = Tags.Select(t => matcher.Matches(t) ? t.WithFlags(t.Flags | TagRecordFlags.AiSource) : t).ToList();
-        return new MetadataDocument(marked, Groups)
+        return new MetadataDocument(marked, Groups, _read)
         {
             SourcePath = SourcePath,
             FileSize = FileSize,
@@ -165,6 +169,12 @@ public sealed class MetadataDocument
 
 
     public TagRecord? GetByKey(string key) => _byKey.GetValueOrDefault(key);
+
+
+    /// <summary>
+    /// Whether both come from the same read: the AI data arriving makes a copy, a reload of the file doesn't.
+    /// </summary>
+    public bool IsSameRead(MetadataDocument? other) => other is not null && ReferenceEquals(_read, other._read);
 
 
     /// <summary>
@@ -203,7 +213,7 @@ public sealed class MetadataDocument
 
     #region Private methods
 
-    private MetadataDocument With(DerivedInfo? derived = null, AiGenerationInfo? ai = null) => new(Tags, Groups)
+    private MetadataDocument With(DerivedInfo? derived = null, AiGenerationInfo? ai = null) => new(Tags, Groups, _read)
     {
         SourcePath = SourcePath,
         FileSize = FileSize,

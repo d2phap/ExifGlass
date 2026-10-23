@@ -277,6 +277,40 @@ public class QueryEngineTests
 
 
     [Fact]
+    public void AViewKeepsItsDocumentAndQuery()
+    {
+        var doc = Camera();
+        var query = ViewQuery.Default with { Search = "date", SortColumn = SortColumn.TagName, SortDirection = SortDirection.Descending };
+
+        var view = QueryEngine.Run(doc, query);
+
+        Assert.Same(doc, view.Document);
+        Assert.Same(query, view.Query);
+        Assert.Null(ViewResult.Empty.Document);
+    }
+
+
+    [Fact]
+    public void SortsAndCollapsesReuseTheDocumentsRows()
+    {
+        var doc = Camera();
+        var first = QueryEngine.Run(doc, ViewQuery.Default).RowsInView[3];
+
+        var sorted = QueryEngine.Run(doc, ViewQuery.Default with { SortColumn = SortColumn.TagName, SortDirection = SortDirection.Ascending });
+        var collapsed = QueryEngine.Run(doc, ViewQuery.Default with { CollapsedGroups = new HashSet<string>(["EXIF"]) });
+        Assert.Same(first, sorted.RowsInView.Single(r => r.Key == first.Key));
+        Assert.Same(first, collapsed.RowsInView.Single(r => r.Key == first.Key));
+
+        // other display options or edits make other rows
+        var raw = QueryEngine.Run(doc, ViewQuery.Default with { ShowRawValues = true });
+        Assert.NotSame(first, raw.RowsInView.Single(r => r.Key == first.Key));
+        var edited = QueryEngine.Run(doc, ViewQuery.Default with { Edits = Core.Editing.EditSet.Empty.Delete(first.Key, "x", first.Value) });
+        Assert.Equal(Core.Editing.EditState.Deleted, edited.RowsInView.Single(r => r.Key == first.Key).EditState);
+        Assert.Equal(sorted.FilterCounts, raw.FilterCounts);
+    }
+
+
+    [Fact]
     public void ComparesNulls()
     {
         Assert.Equal(-1, NaturalComparer.Instance.Compare(null, "a"));

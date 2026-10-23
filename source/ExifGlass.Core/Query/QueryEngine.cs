@@ -20,6 +20,7 @@ using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Metadata;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace ExifGlass.Core.Query;
 
@@ -28,6 +29,14 @@ namespace ExifGlass.Core.Query;
 /// </summary>
 public static class QueryEngine
 {
+    #region Fields and constants
+
+    // the rows depend on the document, the display options and the edits only: a search, sort or collapse reuses them (plan 8: fewer GCs during FLIP)
+    private static readonly ConditionalWeakTable<MetadataDocument, RowCache> ROWS = [];
+
+    #endregion // Fields and constants
+
+
     #region Public methods
 
     /// <summary>
@@ -37,15 +46,11 @@ public static class QueryEngine
     {
         if (doc is null) return ViewResult.Empty;
 
-        var rows = BuildRows(doc, query);
+        var cache = CachedRows(doc, query);
+        var rows = cache.Rows;
+        var filterCounts = cache.FilterCounts;
         var search = query.Search.Trim();
         var filtering = search.Length > 0 || query.Filters.Count > 0 || query.HiddenGroups.Count > 0;
-
-        var filterCounts = new Dictionary<QuickFilter, int>();
-        foreach (var f in Enum.GetValues<QuickFilter>())
-        {
-            filterCounts[f] = rows.Count(r => Passes(r, f));
-        }
 
         var groupOrder = new List<string>();
         var byGroup = new Dictionary<string, List<ViewRow>>(StringComparer.Ordinal);
@@ -99,6 +104,8 @@ public static class QueryEngine
 
         return new ViewResult
         {
+            Document = doc,
+            Query = query,
             Items = items,
             Groups = groups,
             RowsInView = inView,
@@ -149,6 +156,22 @@ public static class QueryEngine
 
 
     #region Private methods
+
+    private static RowCache CachedRows(MetadataDocument doc, ViewQuery query)
+    {
+        if (ROWS.TryGetValue(doc, out var cached) && cached.Fits(query)) return cached;
+
+        var rows = BuildRows(doc, query);
+
+        // the rail's quick-filter counts ignore the search, so they come with the rows
+        var counts = new Dictionary<QuickFilter, int>();
+        foreach (var f in Enum.GetValues<QuickFilter>()) counts[f] = rows.Count(r => Passes(r, f));
+
+        var cache = new RowCache(query.ShowDuplicates, query.ShowRawValues, query.ShowTagNames, query.Edits, rows, counts);
+        ROWS.AddOrUpdate(doc, cache);
+        return cache;
+    }
+
 
     private static List<ViewRow> BuildRows(MetadataDocument doc, ViewQuery query)
     {
@@ -299,4 +322,16 @@ public static class QueryEngine
     }
 
     #endregion // Private methods
+
+
+    #region Nested types
+
+    // read-only once made, so concurrent queries may share it
+    private sealed record RowCache(bool ShowDuplicates, bool ShowRawValues, bool ShowTagNames, EditSet Edits, List<ViewRow> Rows, IReadOnlyDictionary<QuickFilter, int> FilterCounts)
+    {
+        public bool Fits(ViewQuery query) => query.ShowDuplicates == ShowDuplicates && query.ShowRawValues == ShowRawValues
+            && query.ShowTagNames == ShowTagNames && ReferenceEquals(query.Edits, Edits);
+    }
+
+    #endregion // Nested types
 }

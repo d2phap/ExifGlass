@@ -200,6 +200,18 @@ public static class Exporter
 
 
     /// <summary>
+    /// A cell's text as the table shows it: what a cell copy and the exports write.
+    /// </summary>
+    public static string Cell(ViewRow r, TableColumns column) => column switch
+    {
+        TableColumns.Index => r.Index > 0 ? r.Index.ToString(CultureInfo.InvariantCulture) : string.Empty,
+        TableColumns.TagId => r.DisplayId,
+        TableColumns.TagName => r.Name,
+        _ => r.Value,
+    };
+
+
+    /// <summary>
     /// Writes an export to a stream as UTF-8; CSV gets a BOM.
     /// </summary>
     public static async Task WriteAsync(Stream destination, ExportFormat format, string content, CancellationToken cancellationToken = default)
@@ -215,15 +227,6 @@ public static class Exporter
     #region Private methods
 
     private static List<(TableColumns Column, string Label)> Visible(TableColumns columns) => [.. COLUMNS.Where(c => (columns & c.Column) != 0)];
-
-
-    private static string Cell(ViewRow r, TableColumns column) => column switch
-    {
-        TableColumns.Index => r.Index > 0 ? r.Index.ToString(CultureInfo.InvariantCulture) : string.Empty,
-        TableColumns.TagId => r.DisplayId,
-        TableColumns.TagName => r.Name,
-        _ => r.Value,
-    };
 
 
     private static string Quote(string s) => "\"" + s.Replace("\"", "\"\"", StringComparison.Ordinal) + "\"";

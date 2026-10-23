@@ -189,6 +189,12 @@ public class MetadataDocumentTests
         Assert.Equal("PNG:Parameters", marked.FindSourceTag("PNG:Parameters")!.Key);
         Assert.Null(marked.FindSourceTag("XMP:XMP-dc:Nothing"));
         Assert.Null(doc.WithAi(null).Ai);
+
+        // the AI data arriving is the same read; reading the file again is not (the table reveals a new read, P5)
+        Assert.True(marked.IsSameRead(doc));
+        Assert.True(doc.IsSameRead(doc.WithAi(null)));
+        Assert.False(doc.IsSameRead(Doc(CAMERA_JSON)));
+        Assert.False(doc.IsSameRead(null));
     }
 
 

@@ -1056,7 +1056,7 @@ public sealed record AiFieldView(string Key, string Name, string Value, string? 
 
 
 /// <summary>
-/// The selected AI field card (AI addendum question 4): under the AI card, Accent2 40% border and a 3 px Accent2 ring; AI generation chip and Close; the field's name; the value (prompts in the UI font with their tints, question 14); Source tag with copy, Parsed as, Length; Show source tag in Edit's place.
+/// The selected AI field card (AI addendum question 4): on top of the inspector's cards (owner at G7), Accent2 40% border and a 3 px Accent2 ring; AI generation chip and Close; the field's name; the value (prompts in the UI font with their tints, question 14); Source tag with copy, Parsed as, Length; Show source tag in Edit's place.
 /// </summary>
 public class AiFieldCard : TemplatedControl
 {

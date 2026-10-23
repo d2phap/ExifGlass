@@ -165,7 +165,11 @@ public sealed class AiTests
         Assert.Equal("Prompt", vm.FocusedAiField?.Name);
         Assert.True(vm.FocusedAiField!.IsPrompt);
         Assert.Null(vm.FocusedTag);
-        Assert.True(Inspector(shell).AiFieldCard.IsVisible);
+
+        // the selected row's card is on top of every card, the AI card included (owner at G7)
+        var inspector = Inspector(shell);
+        Assert.True(inspector.AiFieldCard.IsVisible);
+        Assert.Same(inspector.AiFieldCard, FirstShownCard(inspector));
 
         await vm.ShowSourceTagAsync("PNG:Parameters");
         shell.Settle(600);
@@ -173,6 +177,8 @@ public sealed class AiTests
         Assert.Null(vm.FocusedAiField);
         Assert.Equal(vm.Rows.RowsInView.Count(r => r is { IsAi: true, SourceKey: "PNG:Parameters" }), vm.FocusedTag?.AiFields);
         Assert.Equal("same as value", vm.FocusedTag!.Raw);
+        Assert.Same(inspector.TagCard, FirstShownCard(inspector));
+        Assert.True(inspector.AiCard.IsVisible);
     }
 
 
@@ -387,6 +393,9 @@ public sealed class AiTests
 
 
     private static InspectorPanel Inspector(TestShell shell) => (InspectorPanel)shell.Window.InspectorContent.Children[0];
+
+
+    private static Control FirstShownCard(InspectorPanel inspector) => inspector.Cards.Children.Where(c => c.IsVisible).OrderBy(c => c.Bounds.Y).First();
 
 
     private static List<string?> Links(TestShell shell) => [.. shell.Window.Table.Table.GetVisualDescendants().OfType<NameCell>()

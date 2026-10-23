@@ -131,7 +131,7 @@ public partial class InspectorPanel : UserControl
                 if (_viewModel.ShowDetailsCard && !DetailsCard.IsVisible) UI.Controls.Card.PlayAppear(DetailsCard);
                 break;
 
-            // under the AI card (question 4): the inspector scrolls to it
+            // on top of the cards (owner at G7): the inspector scrolls to it
             case nameof(MainViewModel.FocusedAiField):
                 var aiKey = _viewModel.FocusedAiField?.Key;
                 if (aiKey is not null && _focusedAiKey is null) AiFieldCard.Appear();

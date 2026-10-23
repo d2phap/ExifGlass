@@ -538,7 +538,7 @@ public class PushHost : ContentControl
         AvaloniaProperty.Register<PushHost, bool>(nameof(IsRightOpen), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
     public static readonly StyledProperty<double> LeftTravelProperty =
-        AvaloniaProperty.Register<PushHost, double>(nameof(LeftTravel), 244);
+        AvaloniaProperty.Register<PushHost, double>(nameof(LeftTravel), 208);
 
     public static readonly StyledProperty<double> RightTravelProperty =
         AvaloniaProperty.Register<PushHost, double>(nameof(RightTravel), 312);
@@ -585,7 +585,7 @@ public class PushHost : ContentControl
     }
 
     /// <summary>
-    /// Gets or sets how far the left pane pushes the content: its width and the gap after it (rail 244).
+    /// Gets or sets how far the left pane pushes the content: its width and the gap after it (rail 208 by default).
     /// </summary>
     public double LeftTravel
     {

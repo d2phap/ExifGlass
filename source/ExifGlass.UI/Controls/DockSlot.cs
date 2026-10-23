@@ -63,7 +63,7 @@ public class DockSlot : Decorator
     }
 
     /// <summary>
-    /// Gets or sets the column's open width, the panel's own width included its gap (244 rail, 312 inspector).
+    /// Gets or sets the column's open width, the panel's own width included its gap (208 rail, 312 inspector by default).
     /// </summary>
     public double OpenWidth
     {

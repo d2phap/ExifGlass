@@ -16,8 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using ExifGlass.Core.Settings;
-
 namespace ExifGlass.ViewModels;
 
 /// <summary>
@@ -75,11 +73,13 @@ public sealed class ShellLayout
     public const double CONTENT_PADDING = 16;
     public const double PANEL_GAP = 8;
 
-    // a drag in the gap sizes a panel within these (owner at G7: resizable panels with limits)
+    // a drag in the gap sizes a panel within these; the rail starts at its narrowest (owner at G7)
     public const double RAIL_MIN_WIDTH = 200;
     public const double RAIL_MAX_WIDTH = 360;
+    public const double DEFAULT_RAIL_WIDTH = RAIL_MIN_WIDTH;
     public const double INSPECTOR_MIN_WIDTH = 280;
     public const double INSPECTOR_MAX_WIDTH = 480;
+    public const double DEFAULT_INSPECTOR_WIDTH = 304;
 
     public const double TOOLBAR_FULL_WIDTH = 900;
     public const double TOOLBAR_LABEL_WIDTH = 620;
@@ -99,11 +99,11 @@ public sealed class ShellLayout
     public PanelMode Rail { get; private set; } = PanelMode.Docked;
 
     /// <summary>
-    /// Gets or sets the rail's column, its width and gap (244 by default).
+    /// Gets or sets the rail's column, its width and gap (208 by default).
     /// </summary>
-    public double RailColumn { get; set; } = AppSettings.DEFAULT_RAIL_WIDTH + PANEL_GAP;
+    public double RailColumn { get; set; } = DEFAULT_RAIL_WIDTH + PANEL_GAP;
 
-    public double InspectorColumn { get; set; } = AppSettings.DEFAULT_INSPECTOR_WIDTH + PANEL_GAP;
+    public double InspectorColumn { get; set; } = DEFAULT_INSPECTOR_WIDTH + PANEL_GAP;
 
     public PanelMode Inspector { get; private set; } = PanelMode.Docked;
 
@@ -115,10 +115,12 @@ public sealed class ShellLayout
     #region Public methods
 
     /// <summary>
-    /// Places the panels and the toolbar for a window width; the rail docks first, and the inspector counts the rail's column only while the rail is open. The first call has no history, so it uses the thresholds alone. Returns whether anything changed.
+    /// Places the panels and the toolbar for a window width; the rail docks first, and the inspector counts the rail's column only while the rail is open. The first call, or a fresh one, has no history, so it uses the thresholds alone. Returns whether anything changed.
     /// </summary>
-    public bool Update(double windowWidth, bool railOpen = true)
+    public bool Update(double windowWidth, bool railOpen = true, bool fresh = false)
     {
+        if (fresh) _measured = false;
+
         var railRoom = windowWidth - CONTENT_PADDING - RailColumn;
         var rail = Reached(railRoom, Rail == PanelMode.Docked, MIN_TABLE_WIDTH) ? PanelMode.Docked : PanelMode.Push;
         var inspectorRoom = windowWidth - CONTENT_PADDING - InspectorColumn - (rail == PanelMode.Docked && railOpen ? RailColumn : 0);

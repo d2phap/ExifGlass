@@ -141,14 +141,14 @@ public class MainWindowTests
         var w = shell.Window;
 
         Assert.Equal(48, w.Toolbar.Bounds.Height);
-        Assert.Equal(244, w.RailSlot.Bounds.Width);
+        Assert.Equal(208, w.RailSlot.Bounds.Width);
         Assert.Equal(312, w.InspectorSlot.Bounds.Width);
-        Assert.Equal(236, w.RailDockFrame.Bounds.Width);
+        Assert.Equal(200, w.RailDockFrame.Bounds.Width);
         Assert.Equal(304, w.InspectorDockFrame.Bounds.Width);
 
         // padding 8 at the sides and bottom, gap 8 between the rail, table and inspector
         var table = w.Table.TranslatePoint(default, w)!.Value;
-        Assert.Equal(8 + 244, table.X);
+        Assert.Equal(8 + 208, table.X);
         Assert.Equal(1400 - 8 - 312, table.X + w.Table.Bounds.Width);
         Assert.Equal(40, w.CommandBarView.Bounds.Height);
         Assert.Equal(TestShell.HEIGHT - 8, w.CommandBarView.TranslatePoint(default, w)!.Value.Y + 40);
@@ -182,9 +182,9 @@ public class MainWindowTests
         shell.Settle();
         Assert.True(w.Pushes.IsLeftOpen);
         Assert.Same(w.RailPushFrame, w.RailContent.Parent);
-        Assert.Equal(244, w.Pushes.Offset);
+        Assert.Equal(208, w.Pushes.Offset);
         Assert.Equal(tableWidth, w.Table.Bounds.Width);
-        Assert.Equal(8 + 244, w.Table.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(8 + 208, w.Table.TranslatePoint(default, w)!.Value.X);
         Assert.Equal(8, w.RailPushFrame.TranslatePoint(default, w)!.Value.X);
 
         // the table's far side is clipped at the window's edge, which never scrolls
@@ -237,7 +237,7 @@ public class MainWindowTests
         Assert.False(shell.ViewModel.IsRailPushed);
         Assert.Equal(0, shell.Window.Pushes.Offset);
         Assert.Same(shell.Window.RailDockFrame, shell.Window.RailContent.Parent);
-        Assert.Equal(244, shell.Window.RailSlot.Bounds.Width);
+        Assert.Equal(208, shell.Window.RailSlot.Bounds.Width);
     }
 
 
@@ -496,9 +496,10 @@ public class MainWindowTests
 
         // the rail's gap: a drag right widens it and the table gives way; the width is kept
         Drag(shell, w.RailSplitter, 60);
-        Assert.Equal(296, w.RailDockFrame.Bounds.Width);
-        Assert.Equal(8 + 304, w.Table.TranslatePoint(default, w)!.Value.X);
-        Assert.Equal(296, shell.Settings.Current.RailWidth);
+        Assert.Equal(260, w.RailDockFrame.Bounds.Width);
+        Assert.Equal(8 + 268, w.Table.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(260, shell.Settings.Current.RailWidth);
+        Assert.Equal(0, shell.Settings.Current.InspectorWidth);
 
         Drag(shell, w.RailSplitter, 500);
         Assert.Equal(ShellLayout.RAIL_MAX_WIDTH, w.RailDockFrame.Bounds.Width);
@@ -509,15 +510,15 @@ public class MainWindowTests
         Assert.Equal(1400 - 8 - 412, w.Table.TranslatePoint(default, w)!.Value.X + w.Table.Bounds.Width);
         Assert.Equal(404, shell.Settings.Current.InspectorWidth);
 
-        // a double-click puts the default back
+        // a double-click puts the default back, its narrowest, kept as "default" so a new one would reach it
         var gap = Centre(w.RailSplitter, w);
         w.MouseDown(gap, MouseButton.Left);
         w.MouseUp(gap, MouseButton.Left);
         w.MouseDown(gap, MouseButton.Left);
         w.MouseUp(gap, MouseButton.Left);
         shell.Settle();
-        Assert.Equal(AppSettings.DEFAULT_RAIL_WIDTH, w.RailDockFrame.Bounds.Width);
-        Assert.Equal(AppSettings.DEFAULT_RAIL_WIDTH, shell.Settings.Current.RailWidth);
+        Assert.Equal(ShellLayout.RAIL_MIN_WIDTH, w.RailDockFrame.Bounds.Width);
+        Assert.Equal(0, shell.Settings.Current.RailWidth);
     }
 
 
@@ -527,9 +528,9 @@ public class MainWindowTests
         using var shell = await TestShell.OpenWithFileAsync(1000);
         var w = shell.Window;
 
-        // both docked leave the table 428; the inspector takes 8 of it and stops at 420
+        // both docked leave the table 464; the inspector takes 44 of it and stops at 420
         Drag(shell, w.InspectorSplitter, -200);
-        Assert.Equal(312, w.InspectorDockFrame.Bounds.Width);
+        Assert.Equal(348, w.InspectorDockFrame.Bounds.Width);
         Assert.Equal(ShellLayout.MIN_TABLE_WIDTH, w.Table.Bounds.Width);
         Assert.True(shell.ViewModel.IsInspectorDocked);
 
@@ -550,6 +551,11 @@ public class MainWindowTests
             var vm = new MainViewModel(store, new FakeReader());
             Assert.Equal((ShellLayout.RAIL_MAX_WIDTH, 330), (vm.RailWidth, vm.InspectorWidth));
             Assert.Equal((ShellLayout.RAIL_MAX_WIDTH + 8, 338), (vm.Layout.RailColumn, vm.Layout.InspectorColumn));
+
+            // 0, a file that never had a drag, is the default: the rail at its narrowest
+            store.Update(s => (s.RailWidth, s.InspectorWidth) = (0, 0));
+            vm = new MainViewModel(store, new FakeReader());
+            Assert.Equal((ShellLayout.RAIL_MIN_WIDTH, ShellLayout.DEFAULT_INSPECTOR_WIDTH), (vm.RailWidth, vm.InspectorWidth));
             store.FlushAsync().GetAwaiter().GetResult();
         }
         finally

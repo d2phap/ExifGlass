@@ -238,7 +238,7 @@ static class Generator
         ("AppToolbarHeight", 48, "App toolbar"), ("TableToolbarHeight", 50, "Table toolbar"), ("CommandBarHeight", 40, "Command bar collapsed"),
         ("MenuItemHeight", 34, "Simple menu item"), ("MenuItemTallHeight", 44, "Menu item with a description"),
         ("ToastHeight", 44, "Toast"), ("ToastBottomOffset", 62, "Toast above the window bottom"), ("StoreBadgeHeight", 52, "Store badge"),
-        ("RailWidth", 236, "Rail panel"), ("RailColumn", 244, "Docked rail column: the rail and the 8 gap"),
+        ("RailWidth", 200, "Rail panel"), ("RailColumn", 208, "Docked rail column: the rail and the 8 gap"),
         ("InspectorWidth", 304, "Inspector panel"), ("InspectorColumn", 312, "Docked inspector column: the gap and the inspector"),
         ("IconToolbar", 18, "Toolbar icons"), ("IconButton", 16, "Button icons"), ("IconChip", 14, "Chip icons"), ("IconSmall", 12, "Chevrons, small actions"),
     ];

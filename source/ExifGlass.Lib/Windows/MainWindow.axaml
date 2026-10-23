@@ -16,7 +16,7 @@
       <DockPanel>
         <v:AppToolbar Name="Toolbar" DockPanel.Dock="Top" />
 
-        <!--  DS 2 layout grid: padding 8 (none on top), gap 8; rail 236 in a 244 column, inspector 304 in a 312 column, the command bar spans all; a docked panel is resized from its gap (owner at G7)  -->
+        <!--  DS 2 layout grid: padding 8 (none on top), gap 8; rail 200 in a 208 column (the owner's default at G7, was 236), inspector 304 in a 312 column, the command bar spans all; a docked panel is resized from its gap (owner at G7)  -->
         <Grid Name="LayoutGrid"
               Margin="8,0,8,8"
               RowDefinitions="*,8,Auto">

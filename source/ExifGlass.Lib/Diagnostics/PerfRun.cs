@@ -98,8 +98,8 @@ public static class PerfRun
         if (file is not null) budgetsMet &= await MeasureTableAsync(window, vm, probe, output);
         if (file is not null) budgetsMet &= await MeasureRailAsync(vm, probe, output);
 
-        budgetsMet &= await MeasureAsync(probe, output, "rail column 0 <-> 244", onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
-        budgetsMet &= await MeasureAsync(probe, output, "inspector column 0 <-> 312", onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, Invariant($"rail column 0 <-> {vm.RailColumn:0}"), onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, Invariant($"inspector column 0 <-> {vm.InspectorColumn:0}"), onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
         budgetsMet &= await MeasureResizeAsync(window, vm, probe, output);
 
         var width = window.Width;
@@ -151,7 +151,7 @@ public static class PerfRun
     private static async Task<bool> MeasureResizeAsync(MainWindow window, ViewModels.MainViewModel vm, FrameProbe probe, TextWriter output)
     {
         const int STEPS = 40;
-        var (min, max) = (Core.Settings.AppSettings.DEFAULT_RAIL_WIDTH, ViewModels.ShellLayout.RAIL_MAX_WIDTH);
+        var (min, max) = (ViewModels.ShellLayout.DEFAULT_RAIL_WIDTH, ViewModels.ShellLayout.RAIL_MAX_WIDTH);
         var label = Invariant($"rail resize {min:0} <-> {max:0}, a drag of {STEPS} frames");
 
         UiWatchdog.Operation = label;

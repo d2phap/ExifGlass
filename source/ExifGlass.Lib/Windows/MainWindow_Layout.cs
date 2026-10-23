@@ -30,7 +30,7 @@ public partial class MainWindow
 {
     #region Fields and constants
 
-    // until the window has its first real size, band changes apply at once: a restored maximize shouldn't play the panel motion
+    // until the window has its first real size, band changes apply at once and without hysteresis: a restored maximize shouldn't play the panel motion, nor a first width keep the first-run size's bands
     private bool _layoutSettled;
 
     // the panels can't show without a file, so they are made with the first one: the idle heap stays as it was (plan 8)
@@ -46,7 +46,7 @@ public partial class MainWindow
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == ClientSizeProperty && DataContext is MainViewModel viewModel) viewModel.UpdateWindowWidth(ClientSize.Width);
+        if (change.Property == ClientSizeProperty && DataContext is MainViewModel viewModel) viewModel.UpdateWindowWidth(ClientSize.Width, fresh: !_layoutSettled);
     }
 
 
@@ -65,7 +65,7 @@ public partial class MainWindow
 
     private void InitializeLayout()
     {
-        ViewModel.UpdateWindowWidth(Width);
+        ViewModel.UpdateWindowWidth(Width, fresh: true);
         PlaceRail();
         PlaceInspector();
 

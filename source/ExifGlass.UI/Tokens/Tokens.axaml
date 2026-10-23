@@ -390,8 +390,8 @@
   <x:Double x:Key="ToastHeight">44</x:Double>
   <x:Double x:Key="ToastBottomOffset">62</x:Double>
   <x:Double x:Key="StoreBadgeHeight">52</x:Double>
-  <x:Double x:Key="RailWidth">236</x:Double>
-  <x:Double x:Key="RailColumn">244</x:Double>
+  <x:Double x:Key="RailWidth">200</x:Double>
+  <x:Double x:Key="RailColumn">208</x:Double>
   <x:Double x:Key="InspectorWidth">304</x:Double>
   <x:Double x:Key="InspectorColumn">312</x:Double>
   <x:Double x:Key="IconToolbar">18</x:Double>

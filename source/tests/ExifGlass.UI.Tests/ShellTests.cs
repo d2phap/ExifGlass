@@ -30,19 +30,19 @@ public class ShellTests
 {
     #region Layout bands
 
-    // a panel docks while the table keeps 420 beside it (owner at the P6 review): both at 992 and up, the rail alone at 680; the toolbar keeps DS 2.1's bands
+    // a panel docks while the table keeps 420 beside it (owner at the P6 review): both at 956 and up, the rail alone at 644; the toolbar keeps DS 2.1's bands
     [Theory]
     [InlineData(1400, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
     [InlineData(1100, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
-    [InlineData(992, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
-    [InlineData(991, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
+    [InlineData(956, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
+    [InlineData(955, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
     [InlineData(900, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
     [InlineData(900, false, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
     [InlineData(760, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Compact)]
     [InlineData(748, false, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Compact)]
-    [InlineData(680, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Compact)]
-    [InlineData(679, true, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
-    [InlineData(679, false, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(644, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(643, true, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(643, false, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
     [InlineData(480, true, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
     public void PanelsDockWhileTheTableKeepsItsMinimumWidth(double width, bool railOpen, PanelMode rail, PanelMode inspector, ToolbarMode toolbar)
     {
@@ -68,8 +68,8 @@ public class ShellTests
         Assert.Equal(ShellLayout.RAIL_MIN_WIDTH, fit.FitRail(10, 3000, inspectorDocked: true));
         Assert.Equal(ShellLayout.RAIL_MIN_WIDTH, fit.FitRail(double.NaN, 3000, inspectorDocked: false));
 
-        // at 1000 the docked rail leaves the inspector 312 before the table falls under 420; with the rail away, more
-        Assert.Equal(312, fit.FitInspector(400, 1000, railDocked: true));
+        // at 1000 the docked rail leaves the inspector 348 before the table falls under 420; with the rail away, more
+        Assert.Equal(348, fit.FitInspector(400, 1000, railDocked: true));
         Assert.Equal(400, fit.FitInspector(400, 1000, railDocked: false));
     }
 
@@ -80,15 +80,15 @@ public class ShellTests
         var layout = new ShellLayout();
         layout.Update(1300);
 
-        Assert.False(layout.Update(992 - ShellLayout.HYSTERESIS + 1));
+        Assert.False(layout.Update(956 - ShellLayout.HYSTERESIS + 1));
         Assert.Equal(PanelMode.Docked, layout.Inspector);
 
-        Assert.True(layout.Update(992 - ShellLayout.HYSTERESIS - 1));
+        Assert.True(layout.Update(956 - ShellLayout.HYSTERESIS - 1));
         Assert.Equal(PanelMode.Push, layout.Inspector);
 
         // coming back up, the threshold itself is needed again
-        Assert.False(layout.Update(991));
-        Assert.True(layout.Update(992));
+        Assert.False(layout.Update(955));
+        Assert.True(layout.Update(956));
         Assert.Equal(PanelMode.Docked, layout.Inspector);
 
         // closing the rail gives the inspector the rail's room

@@ -97,9 +97,6 @@ public sealed class AppSettings
     public const int CURRENT_VERSION = 3;
 
     public const string WINDOW_MAIN = "Main";
-    public const double DEFAULT_RAIL_WIDTH = 236;
-    public const double DEFAULT_INSPECTOR_WIDTH = 304;
-
     public const string WINDOW_SETTINGS = "Settings";
     public const string WINDOW_ABOUT = "About";
 
@@ -136,11 +133,11 @@ public sealed class AppSettings
     public bool InspectorOpen { get; set; } = true;
 
     /// <summary>
-    /// The rail's width as the user dragged it (owner at G7); the shell keeps it within its limits.
+    /// The rail's width as the user dragged it (owner at G7), within the shell's limits; 0 is the shell's default, so a new default reaches whoever never resized.
     /// </summary>
-    public double RailWidth { get; set; } = DEFAULT_RAIL_WIDTH;
+    public double RailWidth { get; set; }
 
-    public double InspectorWidth { get; set; } = DEFAULT_INSPECTOR_WIDTH;
+    public double InspectorWidth { get; set; }
 
     public bool CommandBarExpanded { get; set; }
 

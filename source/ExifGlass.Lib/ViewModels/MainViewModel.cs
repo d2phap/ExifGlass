@@ -324,13 +324,13 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// Places the panels and the toolbar for the window's width; a pushed panel that docks stops being pushed.
+    /// Places the panels and the toolbar for the window's width; a pushed panel that docks stops being pushed. A fresh width, before the window has its first real size, ignores the bands' hysteresis.
     /// </summary>
-    public void UpdateWindowWidth(double width)
+    public void UpdateWindowWidth(double width, bool fresh = false)
     {
         _windowWidth = width;
         UpdatePushWidths();
-        if (!Layout.Update(width, RailOpen)) return;
+        if (!Layout.Update(width, RailOpen, fresh)) return;
 
         if (Layout.Rail == PanelMode.Docked) IsRailPushed = false;
         if (Layout.Inspector == PanelMode.Docked) IsInspectorPushed = false;

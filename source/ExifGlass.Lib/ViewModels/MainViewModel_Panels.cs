@@ -30,11 +30,11 @@ public sealed partial class MainViewModel
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(RailColumn))]
-    public partial double RailWidth { get; private set; } = AppSettings.DEFAULT_RAIL_WIDTH;
+    public partial double RailWidth { get; private set; } = ShellLayout.DEFAULT_RAIL_WIDTH;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InspectorColumn))]
-    public partial double InspectorWidth { get; private set; } = AppSettings.DEFAULT_INSPECTOR_WIDTH;
+    public partial double InspectorWidth { get; private set; } = ShellLayout.DEFAULT_INSPECTOR_WIDTH;
 
     /// <summary>
     /// The docked rail's column: its width and the gap on the table's side.
@@ -48,11 +48,11 @@ public sealed partial class MainViewModel
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(RailPushTravel))]
-    public partial double RailPushWidth { get; private set; } = AppSettings.DEFAULT_RAIL_WIDTH;
+    public partial double RailPushWidth { get; private set; } = ShellLayout.DEFAULT_RAIL_WIDTH;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(InspectorPushTravel))]
-    public partial double InspectorPushWidth { get; private set; } = AppSettings.DEFAULT_INSPECTOR_WIDTH;
+    public partial double InspectorPushWidth { get; private set; } = ShellLayout.DEFAULT_INSPECTOR_WIDTH;
 
     public double RailPushTravel => RailPushWidth + ShellLayout.PANEL_GAP;
 
@@ -79,8 +79,8 @@ public sealed partial class MainViewModel
     {
         _settings.Update(s =>
         {
-            s.RailWidth = RailWidth;
-            s.InspectorWidth = InspectorWidth;
+            s.RailWidth = RailWidth == ShellLayout.DEFAULT_RAIL_WIDTH ? 0 : RailWidth;
+            s.InspectorWidth = InspectorWidth == ShellLayout.DEFAULT_INSPECTOR_WIDTH ? 0 : InspectorWidth;
         });
         UpdateWindowWidth(_windowWidth);
     }
@@ -88,14 +88,14 @@ public sealed partial class MainViewModel
 
     public void ResetRailWidth()
     {
-        ResizeRail(AppSettings.DEFAULT_RAIL_WIDTH);
+        ResizeRail(ShellLayout.DEFAULT_RAIL_WIDTH);
         CommitPanelWidths();
     }
 
 
     public void ResetInspectorWidth()
     {
-        ResizeInspector(AppSettings.DEFAULT_INSPECTOR_WIDTH);
+        ResizeInspector(ShellLayout.DEFAULT_INSPECTOR_WIDTH);
         CommitPanelWidths();
     }
 
@@ -104,11 +104,13 @@ public sealed partial class MainViewModel
 
     #region Private methods
 
-    // a saved width comes back within the limits; the window's room isn't known yet, and docking follows from the widths
+    // a saved width comes back within the limits, 0 as the default; the window's room isn't known yet, and docking follows from the widths
     private void RestorePanelWidths(AppSettings settings)
     {
-        RailWidth = Layout.FitRail(settings.RailWidth, double.PositiveInfinity, inspectorDocked: false);
-        InspectorWidth = Layout.FitInspector(settings.InspectorWidth, double.PositiveInfinity, railDocked: false);
+        RailWidth = settings.RailWidth == 0 ? ShellLayout.DEFAULT_RAIL_WIDTH : Layout.FitRail(settings.RailWidth, double.PositiveInfinity, inspectorDocked: false);
+        InspectorWidth = settings.InspectorWidth == 0
+            ? ShellLayout.DEFAULT_INSPECTOR_WIDTH
+            : Layout.FitInspector(settings.InspectorWidth, double.PositiveInfinity, railDocked: false);
     }
 
 

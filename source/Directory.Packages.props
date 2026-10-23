@@ -17,6 +17,7 @@
     <PackageVersion Include="Avalonia.Headless.XUnit" Version="12.1.4" />
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
     <PackageVersion Include="ProDataGrid" Version="12.1.0.6" />
+    <PackageVersion Include="ProDataGrid.SourceGenerators" Version="12.1.0.6" />
 
     <!-- Skia fails hard on a managed/native mismatch, and the Linux assets aren't a SkiaSharp dependency: pin all four together -->
     <PackageVersion Include="SkiaSharp" Version="4.153.1" />

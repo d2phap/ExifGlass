@@ -45,6 +45,17 @@ public static class UiText
     public const string SCROLL_LEFT = "Scroll left";
     public const string SCROLL_RIGHT = "Scroll right";
 
+    // the table's column headers are Overline: uppercase (DS 1.1)
+    public const string COLUMN_INDEX = "#";
+    public const string COLUMN_TAG_ID = "TAG ID";
+    public const string COLUMN_TAG_NAME = "TAG NAME";
+    public const string COLUMN_VALUE = "VALUE";
+    public const string COPY_VALUE = "Copy value";
+    public const string BADGE_EDITED = "Edited";
+    public const string BADGE_DELETE = "Delete";
+    public const string BADGE_NEW = "New";
+    public const string AI_GROUP = "AI generation";
+
     #endregion // Constants
 
 
@@ -59,6 +70,12 @@ public static class UiText
 
         return (shift ? "Ctrl+Shift+" : "Ctrl+") + key;
     }
+
+
+    /// <summary>
+    /// A column header's tooltip, as the prototype's title: "Sort by Tag name".
+    /// </summary>
+    public static string SortBy(string column) => $"Sort by {column}";
 
     #endregion // Public methods
 }

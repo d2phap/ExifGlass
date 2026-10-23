@@ -1,25 +1,351 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tok="using:ExifGlass.UI.Tokens"
+        xmlns:ui="using:ExifGlass.UI.Controls">
 
-  <!--  stubs over ProDataGrid's Simple.v2 templates until P5 builds the table's own themes (S2); only Avalonia-core properties, which trim safely  -->
-  <Style Selector="DataGrid">
-    <Setter Property="Background" Value="{DynamicResource BgPanelBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource StrokeHairlineBrush}" />
+  <!--  the metadata table (DS 6.9, S2): a Styles file after Simple.v2, so the grid's theme builds on its template; DataGrid-owned properties are set in MetadataTable's code (IL2026 in a setter)  -->
+  <Styles.Resources>
+    <ResourceDictionary>
+      <!--  marks this file as ExifGlass's for the template audit  -->
+      <x:String x:Key="ExifGlassStyles">table</x:String>
+
+      <!--  the grid keeps Simple.v2's template: the column header sits outside the scroll viewer, so it stays put (sticky)  -->
+      <ControlTheme x:Key="TableGridTheme" TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+      </ControlTheme>
+
+      <!--  column header (DS 6.9): 32 high on Bg.Header, Overline, sort glyph arrow_sort at 35% that turns into an AccentText arrow; the first column carries the inset  -->
+      <ControlTheme x:Key="TableColumnHeaderTheme" TargetType="DataGridColumnHeader">
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeOverline}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="LetterSpacing" Value="0.66" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Transitions">
+          <Transitions>
+            <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+            <ThicknessTransition Easing="{x:Static tok:MotionTokens.ColumnEasing}" Property="Padding" Duration="0:0:0.38" />
+          </Transitions>
+        </Setter>
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Panel Background="Transparent">
+              <ui:InteractionOverlay Name="PART_Overlay"
+                                     HoverBrush="{DynamicResource EmphasisA05Brush}"
+                                     PressBrush="{DynamicResource StatePressedWideBrush}"
+                                     RestBrush="{DynamicResource EmphasisA00Brush}" />
+              <StackPanel Name="PART_Content"
+                          Margin="{TemplateBinding Padding}"
+                          VerticalAlignment="Center"
+                          ClipToBounds="True"
+                          Orientation="Horizontal"
+                          Spacing="6">
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  VerticalAlignment="Center"
+                                  Content="{TemplateBinding Content}" />
+                <ui:GlassIcon Name="PART_SortIcon"
+                              Width="12"
+                              Height="12"
+                              VerticalAlignment="Center"
+                              Icon="{x:Static ui:IconId.ArrowSort}"
+                              Opacity="0.35">
+                  <ui:GlassIcon.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                    </Transitions>
+                  </ui:GlassIcon.Transitions>
+                </ui:GlassIcon>
+              </StackPanel>
+            </Panel>
+          </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^.first">
+          <Setter Property="Padding" Value="34,0,12,0" />
+        </Style>
+        <Style Selector="^.first.narrow">
+          <Setter Property="Padding" Value="28,0,12,0" />
+        </Style>
+        <Style Selector="^.asc, ^.desc">
+          <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+        <Style Selector="^.asc /template/ ui|GlassIcon#PART_SortIcon">
+          <Setter Property="Icon" Value="{x:Static ui:IconId.ArrowUp}" />
+          <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="^.desc /template/ ui|GlassIcon#PART_SortIcon">
+          <Setter Property="Icon" Value="{x:Static ui:IconId.ArrowDown}" />
+          <Setter Property="Opacity" Value="1" />
+        </Style>
+        <Style Selector="^.actions">
+          <Setter Property="IsHitTestVisible" Value="False" />
+        </Style>
+        <Style Selector="^.actions /template/ ui|GlassIcon#PART_SortIcon">
+          <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^:disabled">
+          <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+        </Style>
+      </ControlTheme>
+
+      <!--  row (DS 6.9): min 36 from its cells, hairline Emphasis 5%, one hover layer at 3.5% (Appendix A item 8), selected Accent 10% + the 3 px bar (scaleY spring 260 ms); header rows of the flat model draw a group header instead of cells  -->
+      <ControlTheme x:Key="TableRowTheme" TargetType="DataGridRow">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Panel Background="{TemplateBinding Background}">
+              <Border Name="PART_Selected" Background="{DynamicResource AccentA00Brush}" IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <BrushTransition Easing="{x:Static tok:MotionTokens.SelectEasing}" Property="Background" Duration="0:0:0.16" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+              <!--  a press shows the cell ring, not a fill; header rows toggle, so they keep a press fill  -->
+              <ui:InteractionOverlay Name="PART_Overlay"
+                                     HoverBrush="{DynamicResource EmphasisA035Brush}"
+                                     PressBrush="{DynamicResource EmphasisA035Brush}"
+                                     RestBrush="{DynamicResource EmphasisA00Brush}" />
+              <DataGridCellsPresenter Name="PART_CellsPresenter" />
+              <ui:SquircleBorder Name="PART_Bar"
+                                 Width="3"
+                                 Margin="14,8,0,8"
+                                 HorizontalAlignment="Left"
+                                 Background="{DynamicResource AccentBrush}"
+                                 CornerRadius="1.5"
+                                 IsHitTestVisible="False"
+                                 Opacity="0"
+                                 RenderTransform="scaleY(0)"
+                                 RenderTransformOrigin="50%,50%">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                    <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.RowBarEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
+              </ui:SquircleBorder>
+              <Border Name="PART_Separator"
+                      Height="1"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource EmphasisA05Brush}"
+                      IsHitTestVisible="False" />
+              <ui:RowChrome Name="PART_Header" Height="36" IsVisible="False" />
+            </Panel>
+          </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^.selected /template/ Border#PART_Selected">
+          <Setter Property="Background" Value="{DynamicResource AccentA10Brush}" />
+        </Style>
+        <Style Selector="^.selected /template/ Border#PART_Bar">
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="RenderTransform" Value="scaleY(1)" />
+        </Style>
+
+        <!--  header rows: Bg.Panel 96% (no blur, Appendix A item 17), Emphasis 7% under them, the wide hover and press  -->
+        <Style Selector="^.group">
+          <Setter Property="Background" Value="{DynamicResource BgGroupHeaderBrush}" />
+        </Style>
+        <Style Selector="^.group /template/ DataGridCellsPresenter#PART_CellsPresenter">
+          <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^.group /template/ Border#PART_Separator">
+          <Setter Property="Background" Value="{DynamicResource EmphasisA07Brush}" />
+        </Style>
+        <Style Selector="^.group /template/ ui|InteractionOverlay#PART_Overlay">
+          <Setter Property="HoverBrush" Value="{DynamicResource StateHoverBrush}" />
+          <Setter Property="PressBrush" Value="{DynamicResource StatePressedWideBrush}" />
+        </Style>
+      </ControlTheme>
+
+      <!--  cell: Optimized.xaml's direct chrome and content host with an empty template (S2: 8.4 vs 35.1 ms first layout); 32 + 2 + 2 keeps rows at 36, as the grid clears the row's MinHeight  -->
+      <ControlTheme x:Key="TableCellTheme" TargetType="DataGridCell">
+        <Setter Property="UseDirectChrome" Value="True" />
+        <Setter Property="UseDirectContentHost" Value="True" />
+        <Setter Property="Template">
+          <ControlTemplate />
+        </Setter>
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Transitions">
+          <Transitions>
+            <ThicknessTransition Easing="{x:Static tok:MotionTokens.ColumnEasing}" Property="Padding" Duration="0:0:0.38" />
+          </Transitions>
+        </Setter>
+        <Style Selector="^.first">
+          <Setter Property="Padding" Value="34,6,12,6" />
+        </Style>
+        <Style Selector="^.first.narrow">
+          <Setter Property="Padding" Value="28,6,12,6" />
+        </Style>
+        <Style Selector="^.actions">
+          <Setter Property="Padding" Value="0" />
+        </Style>
+      </ControlTheme>
+
+      <!--  the sticky group header: the header row's look and states, over the rows  -->
+      <ControlTheme x:Key="{x:Type ui:StickyGroupHeader}" TargetType="ui:StickyGroupHeader">
+        <Setter Property="Background" Value="{DynamicResource BgGroupHeaderBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Panel Background="{TemplateBinding Background}">
+              <ui:InteractionOverlay Name="PART_Overlay"
+                                     HoverBrush="{DynamicResource StateHoverBrush}"
+                                     PressBrush="{DynamicResource StatePressedWideBrush}"
+                                     RestBrush="{DynamicResource StateRestBrush}" />
+              <ContentPresenter Name="PART_ContentPresenter"
+                                Margin="{TemplateBinding Padding}"
+                                Content="{TemplateBinding Content}" />
+              <Border Height="1"
+                      VerticalAlignment="Bottom"
+                      Background="{DynamicResource EmphasisA07Brush}"
+                      IsHitTestVisible="False" />
+            </Panel>
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+      <!--  the table shows no summaries: the template's total-summary row stays an empty part  -->
+      <ControlTheme x:Key="{x:Type DataGridSummaryRow}" TargetType="DataGridSummaryRow">
+        <Setter Property="IsVisible" Value="False" />
+        <Setter Property="Template">
+          <ControlTemplate>
+            <Panel />
+          </ControlTemplate>
+        </Setter>
+      </ControlTheme>
+
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!--  the corner header has no row headers to sit over; conditional, so it outranks the theme the template gives it  -->
+  <Style Selector="DataGrid.table /template/ DataGridColumnHeader#PART_TopLeftCornerHeader:not(.none)">
+    <Setter Property="Theme" Value="{StaticResource TableColumnHeaderTheme}" />
   </Style>
-  <Style Selector="DataGridColumnHeader">
+
+  <!--  the header strip's fill and the hairline under it (Proto: Bg.Header, Emphasis 8%)  -->
+  <Style Selector="DataGrid.table /template/ DataGridColumnHeadersPresenter#PART_ColumnHeadersPresenter">
     <Setter Property="Background" Value="{DynamicResource BgHeaderBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
-    <Setter Property="FontSize" Value="{StaticResource FontSizeOverline}" />
-    <Setter Property="FontWeight" Value="Medium" />
-    <Setter Property="MinHeight" Value="32" />
   </Style>
-  <Style Selector="DataGridRow">
-    <Setter Property="MinHeight" Value="36" />
+  <Style Selector="DataGrid.table /template/ Rectangle#PART_ColumnHeadersAndRowsSeparator">
+    <Setter Property="Fill" Value="{DynamicResource StrokeHairlineBrush}" />
+  </Style>
+
+  <!--  cell content made by the recycling factories (Proto): # mono 11 tertiary, Tag ID mono 11.5 secondary (AI fields in Accent2), name secondary, value primary with tabular figures  -->
+  <Style Selector="TextBlock.table-index">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-id">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-id.ai">
+    <Setter Property="Foreground" Value="{DynamicResource Accent2TextBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-name">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-value">
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="FontFeatures" Value="+tnum" />
+  </Style>
+  <Style Selector="TextBlock.table-value.edited">
+    <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-value.deleted">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+    <Setter Property="TextDecorations" Value="Strikethrough" />
+  </Style>
+
+  <!--  the staged-edit badge after a value (Proto): 18 high, radius 8, 6 px from the text  -->
+  <Style Selector="ui|Badge.table-badge">
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Padding" Value="6,0" />
+    <Setter Property="Margin" Value="6,0,0,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl18}" />
+  </Style>
+
+  <!--  the copy button: hidden until its row is hovered or selected, then 140 ms; green while it shows the check  -->
+  <Style Selector="ui|GlassButton.table-copy">
+    <Setter Property="Opacity" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Easing="{x:Static tok:MotionTokens.CopyButtonEasing}" Property="Opacity" Duration="0:0:0.14" />
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+  </Style>
+  <Style Selector="DataGridRow:pointerover ui|GlassButton.table-copy, DataGridRow.selected ui|GlassButton.table-copy, ui|GlassButton.table-copy.copied">
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+  <Style Selector="ui|GlassButton.table-copy:pointerover">
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
   </Style>
-  <Style Selector="DataGridCell">
-    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+  <Style Selector="ui|GlassButton.table-copy.copied">
+    <Setter Property="Foreground" Value="{DynamicResource SuccessTextBrush}" />
+  </Style>
+
+  <!--  group header content  -->
+  <Style Selector="ui|GlassIcon.table-chevron">
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+  </Style>
+  <Style Selector="ui|GlassIcon.table-sparkle">
+    <Setter Property="Foreground" Value="{DynamicResource Accent2TextBrush}" />
+  </Style>
+  <Style Selector="TextBlock.table-group-description">
+    <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+  </Style>
+
+  <!--  the current cell's ring (DS 6.9): 1.5 px accent inset, Accent 8%, radius 10; on a group header, the 2 px focus ring  -->
+  <Style Selector="Border.table-ring">
+    <Setter Property="Background" Value="{DynamicResource AccentA08Brush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="BorderThickness" Value="1.5" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusCell}" />
+  </Style>
+  <Style Selector="Border.table-ring.header">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+  </Style>
+
+  <!--  skeleton rows (Proto): Emphasis 5, 6, 8 and 10% across the columns, hairline between rows  -->
+  <Style Selector="ui|Skeleton.table-skeleton.index">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA05Brush}" />
+  </Style>
+  <Style Selector="ui|Skeleton.table-skeleton.id">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA06Brush}" />
+  </Style>
+  <Style Selector="ui|Skeleton.table-skeleton.name">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA08Brush}" />
+  </Style>
+  <Style Selector="ui|Skeleton.table-skeleton.value">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA10Brush}" />
+  </Style>
+  <Style Selector="Border.table-separator">
+    <Setter Property="Background" Value="{DynamicResource EmphasisA05Brush}" />
   </Style>
 
 </Styles>

@@ -158,7 +158,7 @@ public sealed class GalleryWindow : Window
         LastAudit = result;
 
         _audit.Text = result.Passed
-            ? $"Template check passed: {result.Checked} controls, DataGrid stubs for P5: {result.Deferred.Count}"
+            ? $"Template check passed: {result.Checked} controls"
             : $"Template check FAILED: {result.Failures.Count}";
         _audit[!TextBlock.ForegroundProperty] = _audit.GetResourceObservable(result.Passed ? TokenKeys.SUCCESS_TEXT_BRUSH : TokenKeys.DANGER_TEXT_BRUSH).ToBinding();
 

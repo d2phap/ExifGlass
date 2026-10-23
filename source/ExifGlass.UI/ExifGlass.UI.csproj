@@ -18,6 +18,7 @@
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="ProDataGrid" />
+    <PackageReference Include="ProDataGrid.SourceGenerators" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,7 +28,7 @@ namespace ExifGlass.UI.Gallery;
 /// <summary>
 /// What the template audit found under a visual: controls drawn by a theme that isn't ExifGlass's.
 /// </summary>
-public sealed record TemplateAuditResult(IReadOnlyList<string> Failures, IReadOnlyList<string> Deferred, int Checked)
+public sealed record TemplateAuditResult(IReadOnlyList<string> Failures, int Checked)
 {
     #region Properties
 
@@ -39,17 +39,26 @@ public sealed record TemplateAuditResult(IReadOnlyList<string> Failures, IReadOn
 
 
 /// <summary>
-/// Finds controls still on a SimpleTheme template (O14, gate G3): every templated control under a visual must take an ExifGlass ControlTheme; DataGrid parts are P5's.
+/// Finds controls still on a SimpleTheme template (O14, gate G3): every templated control under a visual must take an ExifGlass ControlTheme.
 /// </summary>
 public static class TemplateAudit
 {
+    #region Fields and constants
+
+    /// <summary>
+    /// The resource key that marks a style file as ExifGlass's.
+    /// </summary>
+    public const string OWN_STYLES = "ExifGlassStyles";
+
+    #endregion // Fields and constants
+
+
     #region Public methods
 
     public static TemplateAuditResult Run(Visual root)
     {
         var ours = OurThemes();
         var failures = new SortedSet<string>(StringComparer.Ordinal);
-        var deferred = new SortedSet<string>(StringComparer.Ordinal);
         var checkedCount = 0;
 
         foreach (var visual in root.GetSelfAndVisualDescendants())
@@ -62,11 +71,10 @@ public static class TemplateAudit
             if (theme is not null && ours.Contains(theme)) continue;
 
             var name = key.Name;
-            if (name.StartsWith("DataGrid", StringComparison.Ordinal) || control.TemplatedParent?.GetType().Name.StartsWith("DataGrid", StringComparison.Ordinal) == true) deferred.Add(name);
-            else failures.Add((theme is null ? $"{name} (no theme)" : name) + (control.TemplatedParent is { } parent ? $" in {parent.GetType().Name}" : string.Empty));
+            failures.Add((theme is null ? $"{name} (no theme)" : name) + (control.TemplatedParent is { } parent ? $" in {parent.GetType().Name}" : string.Empty));
         }
 
-        return new TemplateAuditResult([.. failures], [.. deferred], checkedCount);
+        return new TemplateAuditResult([.. failures], checkedCount);
     }
 
     #endregion // Public methods
@@ -74,11 +82,19 @@ public static class TemplateAudit
 
     #region Private methods
 
-    // every ControlTheme in the app's resources: ours (Themes/Controls.axaml); SimpleTheme keeps its own under Application.Styles
+    // every ControlTheme in the app's resources (Themes/Controls.axaml) and in our own style files (the table's, based on Simple.v2); SimpleTheme keeps its own under Application.Styles
     private static HashSet<ControlTheme> OurThemes()
     {
         var set = new HashSet<ControlTheme>(ReferenceEqualityComparer.Instance);
-        if (Application.Current is { } app) Collect(app.Resources, set);
+        if (Application.Current is not { } app) return set;
+
+        Collect(app.Resources, set);
+        // a compiled StyleInclude is a plain Styles at run time, so our style files carry a marker resource
+        foreach (var style in app.Styles)
+        {
+            if (style is Styles { Resources: { } resources } && resources.ContainsKey(OWN_STYLES)) Collect(resources, set);
+        }
+
         return set;
     }
 

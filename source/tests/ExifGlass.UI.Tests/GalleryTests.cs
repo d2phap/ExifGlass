@@ -35,7 +35,7 @@ public class GalleryTests
     #region Fields and constants
 
     private const double WIDTH = 1180;
-    private const double HEIGHT = 14000;
+    private const double HEIGHT = 17000;
 
     #endregion // Fields and constants
 

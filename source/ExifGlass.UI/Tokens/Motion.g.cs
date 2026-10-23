@@ -151,6 +151,22 @@ public static partial class MotionTokens
     public static readonly TimeSpan RowEnter = TimeSpan.FromMilliseconds(320);
     public static readonly Easing RowEnterEasing = EmphasizedEasing;
 
+    // First-load rows fade in, staggered 140 + i x 22 ms: 400 ms, Standard
+    public static readonly TimeSpan RevealFade = TimeSpan.FromMilliseconds(400);
+    public static readonly Easing RevealFadeEasing = StandardEasing;
+
+    // First-load rows rise 10 px: 600 ms, Emphasized
+    public static readonly TimeSpan RevealRise = TimeSpan.FromMilliseconds(600);
+    public static readonly Easing RevealRiseEasing = EmphasizedEasing;
+
+    // No-match state fades and rises 12 px: 360 ms, Emphasized
+    public static readonly TimeSpan Rise = TimeSpan.FromMilliseconds(360);
+    public static readonly Easing RiseEasing = EmphasizedEasing;
+
+    // Selection toolbar fades and rises 12 px: 220 ms, Emphasized
+    public static readonly TimeSpan SelectionRise = TimeSpan.FromMilliseconds(220);
+    public static readonly Easing SelectionRiseEasing = EmphasizedEasing;
+
     // Command bar height: 360 ms, Emphasized
     public static readonly TimeSpan CommandBar = TimeSpan.FromMilliseconds(360);
     public static readonly Easing CommandBarEasing = EmphasizedEasing;

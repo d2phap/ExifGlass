@@ -69,6 +69,7 @@ public class InteractionOverlay : SquircleBorder
     private TransformOperations? _pressedScale;
     private State _state = State.Rest;
     private bool _pointerDown;
+    private bool? _assumedOver;
 
     #endregion // Fields and constants
 
@@ -111,6 +112,11 @@ public class InteractionOverlay : SquircleBorder
         set => SetValue(IsHeldProperty, value);
     }
 
+    /// <summary>
+    /// Gets whether the pointer-over state comes from <see cref="Snap"/> until the owner's own catches up.
+    /// </summary>
+    public bool IsSnapped => _assumedOver is not null;
+
     #endregion // Properties
 
 
@@ -119,6 +125,19 @@ public class InteractionOverlay : SquircleBorder
     public static InteractionState GetForcedState(InputElement element) => element.GetValue(ForcedStateProperty);
 
     public static void SetForcedState(InputElement element, InteractionState value) => element.SetValue(ForcedStateProperty, value);
+
+
+    /// <summary>
+    /// Shows rest or hover at once and drops a press: a recycled row's IsPointerOver lags a frame or a release behind its new place, so a transition would fade on the wrong row.
+    /// </summary>
+    public void Snap(bool pointerOver)
+    {
+        if (_owner is null) return;
+
+        _pointerDown = false;
+        _assumedOver = pointerOver == _owner.IsPointerOver ? null : pointerOver;
+        Update(animate: false);
+    }
 
     #endregion // Public methods
 
@@ -187,10 +206,10 @@ public class InteractionOverlay : SquircleBorder
     #region Private methods
 
     // a Button's IsPressed includes Space; other surfaces (rows) track the left button
-    private bool IsOwnerPressed() => _owner switch
+    private bool IsOwnerPressed(bool over) => _owner switch
     {
         Button button => button.IsPressed,
-        _ => _pointerDown && _owner?.IsPointerOver == true,
+        _ => _pointerDown && over,
     };
 
 
@@ -199,9 +218,10 @@ public class InteractionOverlay : SquircleBorder
         if (_owner is null) return;
 
         var forced = GetForcedState(_owner);
+        var over = _assumedOver ?? _owner.IsPointerOver;
         var state = !_owner.IsEffectivelyEnabled ? State.Disabled
-            : forced == InteractionState.Pressed || IsOwnerPressed() ? State.Pressed
-            : forced == InteractionState.Hover || _owner.IsPointerOver || IsHeld ? State.Hover
+            : forced == InteractionState.Pressed || IsOwnerPressed(over) ? State.Pressed
+            : forced == InteractionState.Hover || over || IsHeld ? State.Hover
             : State.Rest;
 
         var wasPressed = _state == State.Pressed;
@@ -252,6 +272,7 @@ public class InteractionOverlay : SquircleBorder
     {
         if (e.Property == IsPointerOverProperty || e.Property == IsEffectivelyEnabledProperty || e.Property == Button.IsPressedProperty || e.Property == ForcedStateProperty)
         {
+            if (e.Property == IsPointerOverProperty) _assumedOver = null;
             Update(animate: true);
         }
     }
@@ -259,7 +280,8 @@ public class InteractionOverlay : SquircleBorder
 
     private void Owner_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(_owner).Properties.IsLeftButtonPressed) _pointerDown = true;
+        // the press that reset the rows still bubbles through the row that was under it
+        if (_assumedOver != false && e.GetCurrentPoint(_owner).Properties.IsLeftButtonPressed) _pointerDown = true;
         Update(animate: true);
     }
 

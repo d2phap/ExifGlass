@@ -21,6 +21,7 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using ExifGlass.Core.Query;
 using ExifGlass.UI.Tokens;
 using System.Text.RegularExpressions;
 
@@ -42,6 +43,7 @@ public class HighlightTextBlock : TextBlock
         AvaloniaProperty.Register<HighlightTextBlock, string?>(nameof(Query));
 
     private int[]? _ranges;
+    private IReadOnlyList<TextRange>? _matches;
 
     #endregion // Fields and constants
 
@@ -81,12 +83,12 @@ public class HighlightTextBlock : TextBlock
     #region Public methods
 
     /// <summary>
-    /// Sets the text and its match ranges as (start, length) pairs; the same array again redraws nothing.
+    /// Sets the text and the query engine's match ranges; the same list again redraws nothing.
     /// </summary>
-    public void SetText(string text, int[]? ranges)
+    public void SetText(string text, IReadOnlyList<TextRange>? matches)
     {
-        var redraw = !ReferenceEquals(_ranges, ranges);
-        _ranges = ranges;
+        var redraw = !ReferenceEquals(_matches, matches);
+        _matches = matches is { Count: > 0 } ? matches : null;
         if (Text != text) Text = text;
         else if (redraw) InvalidateVisual();
     }
@@ -131,15 +133,15 @@ public class HighlightTextBlock : TextBlock
     // TextBlock.Render is sealed in Avalonia 12; this hook runs after the background, before the text (S2)
     protected override void RenderTextLayout(DrawingContext context, Point origin)
     {
-        if (_ranges is { Length: > 1 } ranges && HighlightBrush is { } brush)
+        if (HighlightBrush is { } brush)
         {
-            var layout = TextLayout;
-            for (var i = 0; i + 1 < ranges.Length; i += 2)
+            if (_matches is { } matches)
             {
-                foreach (var rect in layout.HitTestTextRange(ranges[i], ranges[i + 1]))
-                {
-                    context.DrawRectangle(brush, null, new RoundedRect(rect.Translate(origin), HIGHLIGHT_RADIUS));
-                }
+                foreach (var match in matches) DrawMatch(context, brush, origin, match.Start, match.Length);
+            }
+            else if (_ranges is { Length: > 1 } ranges)
+            {
+                for (var i = 0; i + 1 < ranges.Length; i += 2) DrawMatch(context, brush, origin, ranges[i], ranges[i + 1]);
             }
         }
 
@@ -147,6 +149,20 @@ public class HighlightTextBlock : TextBlock
     }
 
     #endregion // Protected methods
+
+
+    #region Private methods
+
+    // a match past a clamped or trimmed end has no rectangles, so nothing is drawn for it
+    private void DrawMatch(DrawingContext context, IBrush brush, Point origin, int start, int length)
+    {
+        foreach (var rect in TextLayout.HitTestTextRange(start, length))
+        {
+            context.DrawRectangle(brush, null, new RoundedRect(rect.Translate(origin), HIGHLIGHT_RADIUS));
+        }
+    }
+
+    #endregion // Private methods
 }
 
 

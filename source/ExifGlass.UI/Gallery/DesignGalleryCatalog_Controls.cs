@@ -44,7 +44,7 @@ public static partial class DesignGalleryCatalog
     [
         Buttons(), IconButtons(), Dropdowns(), StoreBadges(), Inputs(), TokenFields(), Checks(), Switches(), Segmented(), Combo(),
         Chips(), Badges(), Menus(), ToolTips(), Toasts(), Dialogs(), PushPanels(), Scrollbars(), Cards(), Feedback(),
-        TextControls(), Expanders(), Windows(), DataGridStub(),
+        TextControls(), Expanders(), Windows(), Table(),
     ];
 
 
@@ -584,21 +584,6 @@ public static partial class DesignGalleryCatalog
         return new GallerySection("c-window", "Owned window and placement (O15)", "plan 5.6, S4: owned, native title bar, resizable from the spec width, Esc closes, placement saved with the frame extents; DWM animates it on Windows, the 260 ms content motion runs where the OS doesn't.",
         [
             new("live", open),
-        ]);
-    }
-
-
-    [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "Debug-only gallery sample; the table's AOT recipe is P5's (S2)")]
-    private static GallerySection DataGridStub()
-    {
-        var grid = new DataGrid { Width = 520, Height = 150, AutoGenerateColumns = false, IsReadOnly = true, HeadersVisibility = DataGridHeadersVisibility.Column };
-        grid.Columns.Add(new DataGridTextColumn { Header = "TAG ID", Width = new DataGridLength(88) });
-        grid.Columns.Add(new DataGridTextColumn { Header = "TAG NAME", Width = new DataGridLength(160) });
-        grid.Columns.Add(new DataGridTextColumn { Header = "VALUE", Width = new DataGridLength(1, DataGridLengthUnitType.Star) });
-
-        return new GallerySection("c-datagrid", "Data grid parts (stubs)", "Token colours and sizes over ProDataGrid's Simple.v2 templates; P5 builds the table's own themes (S2). The template audit lists these as deferred.",
-        [
-            new("stub", grid, "header 32, rows 36"),
         ]);
     }
 

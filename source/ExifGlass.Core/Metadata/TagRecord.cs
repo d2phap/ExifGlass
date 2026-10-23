@@ -43,6 +43,11 @@ public enum TagRecordFlags : byte
     ReadOnly = 1 << 0,
     Writable = 1 << 1,
     AiSource = 1 << 2,
+
+    /// <summary>
+    /// Read by a provenance source: C2PA, IPTC source type, the AIGC label, AI-training signals.
+    /// </summary>
+    AiProvenance = 1 << 3,
 }
 
 
@@ -123,6 +128,8 @@ public sealed class TagRecord
     public bool IsWritable => (Flags & TagRecordFlags.Writable) != 0;
 
     public bool IsAiSource => (Flags & TagRecordFlags.AiSource) != 0;
+
+    public bool IsAiProvenance => (Flags & TagRecordFlags.AiProvenance) != 0;
 
     /// <summary>
     /// The raw value when there is one, otherwise the value.

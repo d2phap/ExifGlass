@@ -16,21 +16,35 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Metadata;
 
 namespace ExifGlass.Core.Query;
 
 /// <summary>
-/// The rail's quick filters; several combine with AND.
+/// The rail's quick filters, AI chips first (AI addendum question 3); several combine with AND.
 /// </summary>
 public enum QuickFilter
 {
+    Ai,
+
+    /// <summary>
+    /// The AI group's prompts; shown only for a file with AI data.
+    /// </summary>
+    AiPrompts,
+
+    AiModels,
+
+    /// <summary>
+    /// The AI group's provenance rows and the tags they were read from.
+    /// </summary>
+    AiProvenance,
+
     DateTime,
     Gps,
     Converted,
     HasTagId,
-    Ai,
 }
 
 
@@ -139,6 +153,11 @@ public sealed class ViewRow
     /// </summary>
     public string? SourceKey { get; init; }
 
+    /// <summary>
+    /// For an AI row: its field, with the chips and prompt tints the table draws.
+    /// </summary>
+    public AiRow? Ai { get; init; }
+
     public EditState EditState { get; init; }
 
     /// <summary>
@@ -164,6 +183,11 @@ public sealed class ViewRow
 public sealed record ViewGroup(string Name, string Description, int Total, int Visible, bool IsHidden, bool IsCollapsed)
 {
     #region Properties
+
+    /// <summary>
+    /// For the AI group: the tag most of its fields come from, named in its header ("from PNG:Parameters").
+    /// </summary>
+    public string? SourceKey { get; init; }
 
     /// <summary>
     /// The count badge: "55", or "12 of 55" while filtering.
@@ -215,9 +239,21 @@ public sealed class ViewResult
     public IReadOnlyList<ViewRow> RowsInView { get; init; } = [];
 
     /// <summary>
-    /// All rows of the document (duplicates per the -a option), the "128 tags" total.
+    /// The document's tags (duplicates per the -a option), the "128 tags" total; AI fields are counted apart (AI addendum question 2).
     /// </summary>
     public int Total { get; init; }
+
+    public int AiInView { get; init; }
+
+    /// <summary>
+    /// The AI group's fields, "23 AI fields".
+    /// </summary>
+    public int AiTotal { get; init; }
+
+    /// <summary>
+    /// Tags that pass the search and filters in visible groups.
+    /// </summary>
+    public int TagsInView { get; init; }
 
     public int GroupCount { get; init; }
 
@@ -228,7 +264,14 @@ public sealed class ViewResult
     /// <summary>
     /// "128 tags" or "42 of 128 tags".
     /// </summary>
-    public string Summary => IsFiltering ? $"{RowsInView.Count} of {Total} tags" : Total == 1 ? "1 tag" : $"{Total} tags";
+    public string Summary => IsFiltering ? $"{TagsInView} of {Total} tags" : Total == 1 ? "1 tag" : $"{Total} tags";
+
+    /// <summary>
+    /// "23 AI fields" or "1 of 23 AI fields"; empty without AI fields.
+    /// </summary>
+    public string AiSummary => AiTotal == 0 ? string.Empty
+        : IsFiltering ? $"{AiInView} of {AiTotal} AI fields"
+        : AiTotal == 1 ? "1 AI field" : $"{AiTotal} AI fields";
 
     #endregion // Properties
 }

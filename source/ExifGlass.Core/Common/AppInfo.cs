@@ -26,6 +26,11 @@ public static class AppInfo
     #region Constants
 
     public const string PRODUCT_NAME = "ExifGlass";
+
+    /// <summary>
+    /// D23: what About and the store listings say under the name.
+    /// </summary>
+    public const string TAGLINE = "AI & EXIF metadata viewer";
     public const string HOMEPAGE_URL = "https://github.com/d2phap/ExifGlass";
 
     #endregion // Constants

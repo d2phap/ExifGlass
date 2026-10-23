@@ -50,7 +50,7 @@ public sealed class EasyDiffusionParser : IAiParser
             if (doc?.RootElement is { ValueKind: JsonValueKind.Object } root)
             {
                 var pairs = root.EnumerateObject().Select(p => (p.Name, AiTagSet.ToText(p.Value))).ToList();
-                var b = Build(pairs, comment.TableKey);
+                var b = Build(pairs, _ => comment.TableKey);
                 b.Use(context, comment);
                 context.Sources.Add(b.Build());
             }
@@ -65,7 +65,9 @@ public sealed class EasyDiffusionParser : IAiParser
     private static void ParseChunks(AiParseContext context)
     {
         var tags = context.Tags.InGroup("PNG").Where(t => !context.IsClaimed(t) && IsField(t.Name)).ToList();
-        var b = Build(tags.Select(t => (t.Name.ToLowerInvariant(), t.Text)).ToList(), null);
+        // one chunk per field, so each field links to its own tag
+        var b = Build(tags.Select(t => (t.Name.ToLowerInvariant(), t.Text)).ToList(),
+            k => tags.FirstOrDefault(t => t.Name.Equals(k, StringComparison.OrdinalIgnoreCase))?.TableKey);
         foreach (var t in tags) b.Use(context, t);
         context.Sources.Add(b.Build());
     }
@@ -77,26 +79,26 @@ public sealed class EasyDiffusionParser : IAiParser
         or "use_hypernetwork_model" or "hypernetwork_strength" or "prompt_strength" or "use_upscale" or "use_face_correction" or "tiling";
 
 
-    private static SourceBuilder Build(List<(string Key, string Value)> pairs, string? key)
+    private static SourceBuilder Build(List<(string Key, string Value)> pairs, Func<string, string?> keyOf)
     {
         var b = new SourceBuilder(AiSourceKind.EasyDiffusion, "Easy Diffusion");
         string? Get(string k) => pairs.FirstOrDefault(p => p.Key.Equals(k, StringComparison.OrdinalIgnoreCase)).Value;
 
-        b.Prompt(Get("prompt"), AiPromptRole.Positive, string.Empty, key);
-        b.Prompt(Get("negative_prompt"), AiPromptRole.Negative, string.Empty, key);
+        b.Prompt(Get("prompt"), AiPromptRole.Positive, string.Empty, keyOf("prompt"));
+        b.Prompt(Get("negative_prompt"), AiPromptRole.Negative, string.Empty, keyOf("negative_prompt"));
 
-        if (Get("width") is { Length: > 0 } w && Get("height") is { Length: > 0 } h) b.Param("Size", $"{w}x{h}", key);
+        if (Get("width") is { Length: > 0 } w && Get("height") is { Length: > 0 } h) b.Param("Size", $"{w}x{h}", keyOf("width"));
         foreach (var (k, v) in pairs)
         {
             if (PROMPT_KEYS.Contains(k, StringComparer.OrdinalIgnoreCase) || k is "width" or "height") continue;
-            b.Param(k, v, key);
+            b.Param(k, v, keyOf(k));
         }
 
-        b.Model(AiModelKind.Checkpoint, Get(MODEL_KEY), null, null, key);
-        b.Model(AiModelKind.Vae, Get("use_vae_model"), null, null, key);
-        b.Model(AiModelKind.Lora, Get("use_lora_model"), Get("lora_alpha"), null, key);
-        b.Model(AiModelKind.Other, Get("use_hypernetwork_model"), Get("hypernetwork_strength"), null, key);
-        b.Model(AiModelKind.Upscaler, Get("use_upscale"), null, null, key);
+        b.Model(AiModelKind.Checkpoint, Get(MODEL_KEY), null, null, keyOf(MODEL_KEY));
+        b.Model(AiModelKind.Vae, Get("use_vae_model"), null, null, keyOf("use_vae_model"));
+        b.Model(AiModelKind.Lora, Get("use_lora_model"), Get("lora_alpha"), null, keyOf("use_lora_model"));
+        b.Model(AiModelKind.Other, Get("use_hypernetwork_model"), Get("hypernetwork_strength"), null, keyOf("use_hypernetwork_model"));
+        b.Model(AiModelKind.Upscaler, Get("use_upscale"), null, null, keyOf("use_upscale"));
         return b;
     }
 

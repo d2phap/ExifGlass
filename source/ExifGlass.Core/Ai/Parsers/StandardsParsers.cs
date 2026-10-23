@@ -175,6 +175,12 @@ public sealed class CharacterCardParser : IAiParser
             var data = LenientJson.Prop(root, "data") ?? root;
             b.CharacterName = LenientJson.Str(data, "name");
             b.Version = LenientJson.Str(root, "spec");
+
+            var tags = LenientJson.Prop(data, "tags") is { ValueKind: JsonValueKind.Array } list
+                ? list.EnumerateArray().Where(t => t.ValueKind == JsonValueKind.String).Select(t => t.GetString()!).Where(t => t.Length > 0).ToList()
+                : [];
+            b.Character = new CharacterCardInfo(b.CharacterName, LenientJson.Str(data, "description"), LenientJson.Str(data, "creator"),
+                LenientJson.Str(data, "character_version"), tags, b.Version, json);
             break;
         }
 

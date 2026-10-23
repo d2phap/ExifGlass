@@ -40,6 +40,8 @@ public sealed class MetadataDocument
     // shared by the copies made from one read (derived info, AI data), so a view can tell an update from a new file
     private readonly object _read;
 
+    private bool? _mayHoldAi;
+
     #endregion // Fields and constants
 
 
@@ -105,6 +107,12 @@ public sealed class MetadataDocument
     /// </summary>
     public TagDb? TagDb { get; init; }
 
+    /// <summary>
+    /// True when the table read shows a tag the AI read parses (PNG AI keywords, C2PA, IPTC source type, the AIGC label): worth a skeleton while that read runs.
+    /// </summary>
+    public bool MayHoldAi => _mayHoldAi ??= Tags.Any(t => t.Group0 == "JUMBF" || (t.Group0 == "PNG" && AiNames.IsAiPngKeyword(t.Name))
+        || t.Name is "DigitalSourceType" or "AISystemUsed" or "AIPromptInformation" || t.Name.Equals("AIGC", StringComparison.OrdinalIgnoreCase));
+
     #endregion // Properties
 
 
@@ -158,7 +166,8 @@ public sealed class MetadataDocument
         if (ai is null || ai.SourceKeys.Count == 0) return With(ai: ai);
 
         var matcher = new AiSourceMatcher(ai.SourceKeys);
-        var marked = Tags.Select(t => matcher.Matches(t) ? t.WithFlags(t.Flags | TagRecordFlags.AiSource) : t).ToList();
+        var provenance = new AiSourceMatcher(ai.Sources.Where(s => s.IsProvenance).SelectMany(s => s.SourceKeys));
+        var marked = Tags.Select(t => Mark(t, matcher, provenance)).ToList();
         return new MetadataDocument(marked, Groups, _read)
         {
             SourcePath = SourcePath,
@@ -239,6 +248,16 @@ public sealed class MetadataDocument
         Ai = ai ?? Ai,
         TagDb = TagDb,
     };
+
+
+    private static TagRecord Mark(TagRecord tag, AiSourceMatcher sources, AiSourceMatcher provenance)
+    {
+        if (!sources.Matches(tag)) return tag;
+
+        var flags = tag.Flags | TagRecordFlags.AiSource;
+        if (provenance.Matches(tag)) flags |= TagRecordFlags.AiProvenance;
+        return tag.WithFlags(flags);
+    }
 
 
     private static List<TagRecord> ApplyFlags(List<TagRecord> tags, TagDb tagDb)

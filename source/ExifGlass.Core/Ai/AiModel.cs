@@ -234,7 +234,30 @@ public sealed record AigcLabel(
 /// <summary>
 /// AI-training signals: PLUS DataMining and Exif 3.1 LearningOptOutIn.
 /// </summary>
-public sealed record TrainingSignals(string? DataMining, string? LearningOptOutIn);
+public sealed record TrainingSignals(string? DataMining, string? LearningOptOutIn)
+{
+    #region Properties
+
+    /// <summary>
+    /// True when a signal says no: "Prohibited", "Opt-out", "Not allowed".
+    /// </summary>
+    public bool IsOptOut => Says(DataMining, "prohibit") || Says(DataMining, "not allowed") || Says(LearningOptOutIn, "opt-out") || Says(LearningOptOutIn, "optout");
+
+    #endregion // Properties
+
+
+    #region Private methods
+
+    private static bool Says(string? value, string word) => value?.Contains(word, StringComparison.OrdinalIgnoreCase) == true;
+
+    #endregion // Private methods
+}
+
+
+/// <summary>
+/// An LLM character card (Tier 2): what its JSON says about the character, and the JSON itself.
+/// </summary>
+public sealed record CharacterCardInfo(string? Name, string? Description, string? Creator, string? CharacterVersion, IReadOnlyList<string> Tags, string? Spec, string Json);
 
 
 /// <summary>
@@ -294,6 +317,13 @@ public sealed class AiSourceInfo
     public TrainingSignals? Training { get; init; }
 
     public string? CharacterName { get; init; }
+
+    public CharacterCardInfo? Character { get; init; }
+
+    /// <summary>
+    /// The first sampler's title when the source has several (ComfyUI); the others are in Passes.
+    /// </summary>
+    public string? MainPassTitle { get; init; }
 
     /// <summary>
     /// True for C2PA, IPTC, the AIGC label and AI-training signals: what a file claims, not how it was generated.

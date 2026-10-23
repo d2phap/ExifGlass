@@ -83,6 +83,8 @@ public sealed class ComfyUiParser : IAiParser
             var (parameters, prompts) = ReadSampler(graph, samplers[i]);
             if (i == 0)
             {
+                if (samplers.Count > 1) b.MainPassTitle = samplers[0].Title is { Length: > 0 } first && first != samplers[0].ClassType ? first : "Pass 1";
+
                 foreach (var p in prompts) b.Prompt(p.Text, p.Role, p.Label, key);
                 foreach (var (k, v) in parameters) b.Param(k, v, key);
                 continue;

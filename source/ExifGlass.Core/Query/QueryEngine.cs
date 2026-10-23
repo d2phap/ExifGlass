@@ -48,6 +48,7 @@ public static class QueryEngine
 
         var cache = CachedRows(doc, query);
         var rows = cache.Rows;
+        var aiTotal = cache.AiTotal;
         var filterCounts = cache.FilterCounts;
         var search = query.Search.Trim();
         var filtering = search.Length > 0 || query.Filters.Count > 0 || query.HiddenGroups.Count > 0;
@@ -71,6 +72,7 @@ public static class QueryEngine
         var comparer = RowComparer(query);
 
         var processed = 0;
+        var aiInView = 0;
         foreach (var name in groupOrder)
         {
             var all = byGroup[name];
@@ -89,13 +91,15 @@ public static class QueryEngine
 
             var hidden = query.HiddenGroups.Contains(name);
             var collapsed = query.CollapsedGroups.Contains(name);
-            var description = name == GroupInfo.AI_GROUP ? GroupInfo.Describe(name) : doc.Groups.FirstOrDefault(g => g.Name == name)?.Description ?? string.Empty;
-            var group = new ViewGroup(name, description, all.Count, passing.Count, hidden, collapsed);
+            var ai = name == GroupInfo.AI_GROUP;
+            var description = ai ? GroupInfo.Describe(name) : doc.Groups.FirstOrDefault(g => g.Name == name)?.Description ?? string.Empty;
+            var group = new ViewGroup(name, description, all.Count, passing.Count, hidden, collapsed) { SourceKey = ai ? cache.AiSource : null };
             groups.Add(group);
 
             if (hidden || passing.Count == 0) continue;
 
             inView.AddRange(passing);
+            if (ai) aiInView += passing.Count;
             items.Add(new GroupHeaderItem(group));
             if (collapsed) continue;
 
@@ -109,7 +113,10 @@ public static class QueryEngine
             Items = items,
             Groups = groups,
             RowsInView = inView,
-            Total = rows.Count,
+            Total = rows.Count - aiTotal,
+            TagsInView = inView.Count - aiInView,
+            AiTotal = aiTotal,
+            AiInView = aiInView,
             GroupCount = groupOrder.Count,
             IsFiltering = filtering,
             FilterCounts = filterCounts,
@@ -118,15 +125,18 @@ public static class QueryEngine
 
 
     /// <summary>
-    /// The Proto quick-filter predicates (S2's rail): dates, GPS, converted values, real tag IDs, AI.
+    /// The quick-filter predicates: Proto's dates, GPS, converted values, real tag IDs and AI, and the AI addendum's prompts, models and provenance.
     /// </summary>
     public static bool Passes(ViewRow row, QuickFilter filter) => filter switch
     {
-        QuickFilter.DateTime => ContainsAny(row.TagName, "date", "time", "stamp") || ContainsAny(row.Name, "date", "time", "stamp"),
+        QuickFilter.Ai => row.IsAi || row.Tag?.IsAiSource == true,
+        QuickFilter.AiPrompts => row.Ai?.Kind == AiFieldKind.Prompt,
+        QuickFilter.AiModels => row.Ai?.Kind == AiFieldKind.Model,
+        QuickFilter.AiProvenance => row.Ai?.Kind == AiFieldKind.Provenance || row.Tag?.IsAiProvenance == true,
+        QuickFilter.DateTime => !row.IsAi && (ContainsAny(row.TagName, "date", "time", "stamp") || ContainsAny(row.Name, "date", "time", "stamp")),
         QuickFilter.Gps => row.TagName.StartsWith("GPS", StringComparison.Ordinal) || row.Name.StartsWith("GPS", StringComparison.Ordinal),
         QuickFilter.Converted => row.Tag?.IsConverted == true,
         QuickFilter.HasTagId => row.DisplayId != TagIdRule.NONE,
-        QuickFilter.Ai => row.IsAi || row.Tag?.IsAiSource == true,
         _ => true,
     };
 
@@ -161,23 +171,24 @@ public static class QueryEngine
     {
         if (ROWS.TryGetValue(doc, out var cached) && cached.Fits(query)) return cached;
 
-        var rows = BuildRows(doc, query);
+        var ai = AiRows.Build(doc.Ai);
+        var rows = BuildRows(doc, ai, query);
 
         // the rail's quick-filter counts ignore the search, so they come with the rows
         var counts = new Dictionary<QuickFilter, int>();
         foreach (var f in Enum.GetValues<QuickFilter>()) counts[f] = rows.Count(r => Passes(r, f));
 
-        var cache = new RowCache(query.ShowDuplicates, query.ShowRawValues, query.ShowTagNames, query.Edits, rows, counts);
+        var cache = new RowCache(query.ShowDuplicates, query.ShowRawValues, query.ShowTagNames, query.Edits, rows, counts, ai.Rows.Count, ai.SourceKey);
         ROWS.AddOrUpdate(doc, cache);
         return cache;
     }
 
 
-    private static List<ViewRow> BuildRows(MetadataDocument doc, ViewQuery query)
+    private static List<ViewRow> BuildRows(MetadataDocument doc, AiRowSet aiRows, ViewQuery query)
     {
-        var rows = new List<ViewRow>(doc.Tags.Count + 16);
+        var rows = new List<ViewRow>(doc.Tags.Count + aiRows.Rows.Count);
 
-        foreach (var ai in AiRows.Build(doc.Ai))
+        foreach (var ai in aiRows.Rows)
         {
             rows.Add(new ViewRow
             {
@@ -188,6 +199,7 @@ public static class QueryEngine
                 Value = ai.Value,
                 SortValue = ai.Value,
                 SourceKey = ai.SourceKey,
+                Ai = ai,
             });
         }
 
@@ -273,6 +285,7 @@ public static class QueryEngine
             SortValue = row.SortValue,
             Tag = row.Tag,
             SourceKey = row.SourceKey,
+            Ai = row.Ai,
             EditState = row.EditState,
             OriginalValue = row.OriginalValue,
             NameMatches = name,
@@ -327,7 +340,8 @@ public static class QueryEngine
     #region Nested types
 
     // read-only once made, so concurrent queries may share it
-    private sealed record RowCache(bool ShowDuplicates, bool ShowRawValues, bool ShowTagNames, EditSet Edits, List<ViewRow> Rows, IReadOnlyDictionary<QuickFilter, int> FilterCounts)
+    private sealed record RowCache(bool ShowDuplicates, bool ShowRawValues, bool ShowTagNames, EditSet Edits, List<ViewRow> Rows,
+        IReadOnlyDictionary<QuickFilter, int> FilterCounts, int AiTotal, string? AiSource)
     {
         public bool Fits(ViewQuery query) => query.ShowDuplicates == ShowDuplicates && query.ShowRawValues == ShowRawValues
             && query.ShowTagNames == ShowTagNames && ReferenceEquals(query.Edits, Edits);

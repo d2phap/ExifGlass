@@ -34,7 +34,7 @@ public static class GroupInfo
 
     private static readonly FrozenDictionary<string, string> DESCRIPTIONS = new Dictionary<string, string>(StringComparer.Ordinal)
     {
-        [AI_GROUP] = "Parsed from the tags below",
+        [AI_GROUP] = "Parsed by ExifGlass",
         ["ExifTool"] = "Reader",
         ["File"] = "File system",
         ["EXIF"] = "Camera & capture",

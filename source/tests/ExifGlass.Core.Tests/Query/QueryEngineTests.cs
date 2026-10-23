@@ -204,7 +204,7 @@ public class QueryEngineTests
         var r = QueryEngine.Run(ai, ViewQuery.Default, TestContext.Current.CancellationToken);
 
         Assert.Equal(GroupInfo.AI_GROUP, r.Groups[0].Name);
-        Assert.Equal("Parsed from the tags below", r.Groups[0].Description);
+        Assert.Equal("Parsed by ExifGlass", r.Groups[0].Description);
         Assert.Equal("AI:generator", r.RowsInView[0].Key);
         Assert.True(r.RowsInView[0].IsAi);
         Assert.Equal(0, r.RowsInView[0].Index);
@@ -216,6 +216,46 @@ public class QueryEngineTests
 
         var seed = QueryEngine.Run(ai, ViewQuery.Default with { Search = "seed", ShowTagNames = true }, TestContext.Current.CancellationToken);
         Assert.Equal("PNG:Parameters", seed.RowsInView.Single(x => x.IsAi).SourceKey);
+    }
+
+
+    [Fact]
+    public void CountsAiFieldsApartFromTags()
+    {
+        var ai = AiDocument();
+
+        var r = QueryEngine.Run(ai, ViewQuery.Default, TestContext.Current.CancellationToken);
+        Assert.Equal(2, r.Total);
+        Assert.Equal("2 tags", r.Summary);
+        Assert.Equal(r.RowsInView.Count(x => x.IsAi), r.AiTotal);
+        Assert.Equal($"{r.AiTotal} AI fields", r.AiSummary);
+        Assert.Equal("PNG:Parameters", r.Groups[0].SourceKey);
+        Assert.Null(r.Groups[1].SourceKey);
+
+        var cat = QueryEngine.Run(ai, ViewQuery.Default with { Search = "cat" }, TestContext.Current.CancellationToken);
+        Assert.Equal("1 of 2 tags", cat.Summary);
+        Assert.Equal($"1 of {r.AiTotal} AI fields", cat.AiSummary);
+
+        Assert.Equal(string.Empty, QueryEngine.Run(Camera(), ViewQuery.Default, TestContext.Current.CancellationToken).AiSummary);
+    }
+
+
+    [Fact]
+    public void FiltersAiPromptsModelsAndProvenance()
+    {
+        var ai = AiDocument();
+
+        var prompts = QueryEngine.Run(ai, ViewQuery.Default with { Filters = new HashSet<QuickFilter> { QuickFilter.AiPrompts } }, TestContext.Current.CancellationToken);
+        Assert.Equal(["a cat <lora:ink:0.5>", "ugly"], prompts.RowsInView.Select(x => x.Value));
+        Assert.Equal(2, prompts.FilterCounts[QuickFilter.AiPrompts]);
+
+        var models = QueryEngine.Run(ai, ViewQuery.Default with { Filters = new HashSet<QuickFilter> { QuickFilter.AiModels } }, TestContext.Current.CancellationToken);
+        Assert.Equal(["LoRA"], models.RowsInView.Select(x => x.Name));
+
+        var provenance = QueryEngine.Run(ai, ViewQuery.Default with { Filters = new HashSet<QuickFilter> { QuickFilter.AiProvenance } }, TestContext.Current.CancellationToken);
+        Assert.Equal(["Source type", "Digital Source Type"], provenance.RowsInView.Select(x => x.Name));
+        Assert.True(provenance.RowsInView[1].Tag!.IsAiProvenance);
+        Assert.False(ai.GetByKey("PNG:Parameters")!.IsAiProvenance);
     }
 
 
@@ -324,6 +364,20 @@ public class QueryEngineTests
     #region Private methods
 
     private static MetadataDocument Camera() => MetadataDocumentTests.Doc(MetadataDocumentTests.CAMERA_JSON);
+
+
+    // an A1111 PNG with an IPTC source type beside it
+    private static MetadataDocument AiDocument()
+    {
+        const string PARAMETERS = "a cat <lora:ink:0.5>\nNegative prompt: ugly\nSteps: 20, Sampler: Euler, CFG scale: 7, Seed: 5";
+        const string DST = "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia";
+        var doc = MetadataDocumentTests.Doc("""
+            [{"PNG:Parameters": {"desc": "Parameters", "id": "parameters", "val": "a cat <lora:ink:0.5>\nNegative prompt: ugly\nSteps: 20, Sampler: Euler, CFG scale: 7, Seed: 5"},
+              "XMP:XMP-iptcExt:DigitalSourceType": {"desc": "Digital Source Type", "id": "DigitalSourceType", "val": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia"}}]
+            """);
+        using var tags = AiTagSet.FromPairs([("PNG:Main:Parameters", PARAMETERS), ("XMP:XMP-iptcExt:Main:DigitalSourceType", DST)]);
+        return doc.WithAi(AiEngine.Parse(tags, null, TestContext.Current.CancellationToken));
+    }
 
     #endregion // Private methods
 }

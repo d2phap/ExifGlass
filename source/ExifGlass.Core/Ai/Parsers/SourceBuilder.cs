@@ -62,6 +62,10 @@ internal sealed partial class SourceBuilder(AiSourceKind source, string generato
 
     public string? CharacterName { get; set; }
 
+    public CharacterCardInfo? Character { get; set; }
+
+    public string? MainPassTitle { get; set; }
+
     public bool HasContent => _prompts.Count > 0 || _params.Count > 0 || _workflows.Count > 0 || _models.Count > 0;
 
     #endregion // Properties
@@ -180,6 +184,8 @@ internal sealed partial class SourceBuilder(AiSourceKind source, string generato
         Aigc = Aigc,
         Training = Training,
         CharacterName = CharacterName,
+        Character = Character,
+        MainPassTitle = MainPassTitle,
     };
 
 

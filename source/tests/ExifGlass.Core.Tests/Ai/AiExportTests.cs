@@ -112,38 +112,89 @@ public class AiExportTests(ExifToolFixture exifTool)
 
 
     [Fact]
-    public async Task TheAiGroupShowsEachFieldOnceWithItsSourceTag()
+    public async Task TheAiGroupShowsEachFieldOnceInTheAddendumOrder()
     {
-        var info = await Read("a1111.png");
-
-        var rows = AiRows.Build(info);
+        var set = AiRows.Build(await Read("a1111.png"));
+        var rows = set.Rows;
 
         Assert.Equal("AI:generator", rows[0].Key);
         Assert.Equal("AUTOMATIC1111 1.10.1", rows[0].Value);
-        Assert.Equal("Generated", rows[1].Value);
-        Assert.Equal("PNG:Parameters", rows.Single(r => r.Label == "Prompt").SourceKey);
-        Assert.Single(rows, r => r.Label == "Negative prompt");
-        Assert.Contains(rows, r => r.Label == "Prompt (Hires)");
-        Assert.Contains(rows, r => r is { Label: "LoRA", Value: "add_detail · 0.8 · 7c6bad76eb54" });
-        Assert.DoesNotContain(rows, r => r.Name == "model");
+        Assert.Equal(("Generated", AiKind.Generated), (rows[1].Value, rows[1].KindChip!.Value));
+        Assert.Equal(["Prompt", "Negative prompt", "Prompt · ADetailer", "Prompt · Hires"], rows.Where(r => r.Kind == AiFieldKind.Prompt).Select(r => r.Label));
+        Assert.Equal(["Model", "VAE", "LoRA", "Embedding", "Upscaler", "ControlNet", "Detailer", "Detailer"], rows.Where(r => r.Kind == AiFieldKind.Model).Select(r => r.Label));
+        Assert.Equal("Sampler", rows.First(r => r.Kind == AiFieldKind.Parameter).Label);
+        Assert.DoesNotContain(rows, r => r.Kind == AiFieldKind.Parameter && r.Name is "model" or "modelHash" or "vae" or "vaeHash");
         Assert.Equal(rows.Count, rows.Select(r => r.Key).Distinct().Count());
-        Assert.Empty(AiRows.Build(null));
+        Assert.Empty(AiRows.Build(null).Rows);
     }
 
 
     [Fact]
-    public async Task TheAiGroupShowsProvenanceTrainingAndUnknownText()
+    public async Task OneTagFeedingTheGroupIsNamedOnceInItsHeader()
     {
-        var c2pa = AiRows.Build(await Read("c2pa_chatgpt.png"));
-        Assert.Contains(c2pa, r => r is { Label: "Content Credentials", Value: "2 manifests · not verified" });
-        Assert.Contains(c2pa, r => r is { Label: "Digital source type", Value: "Trained algorithmic media" });
+        var a1111 = AiRows.Build(await Read("a1111.png"));
+        Assert.Equal("PNG:Parameters", a1111.SourceKey);
+        Assert.All(a1111.Rows, r => Assert.False(r.ShowsSource));
+        Assert.Equal("A1111 infotext", a1111.Rows.Single(r => r.Label == "Prompt").ParsedAs);
 
-        var training = AiRows.Build(await Read("ai_training_signals.jpg"));
-        Assert.Contains(training, r => r.Label == "AI training opt-out");
+        // Easy Diffusion writes a chunk per field, so its rows keep their own links
+        var easy = AiRows.Build(await Read("easydiffusion.png"));
+        Assert.Contains(easy.Rows, r => r.ShowsSource && r.SourceKey != easy.SourceKey);
+        Assert.Equal("PNG:Parameters", AiRows.SourceLabel("PNG:Parameters"));
+        Assert.Equal("XMP-iptcExt:DigitalSourceType", AiRows.SourceLabel("XMP:XMP-iptcExt:DigitalSourceType"));
+        Assert.Equal("JUMBF:Actions", AiRows.SourceLabel("JUMBF:CBOR:Copy1:Actions"));
+    }
 
-        Assert.Contains(AiRows.Build(await Read("aigc.png")), r => r is { Label: "AIGC label", Value: "AI-generated" });
-        Assert.Contains(AiRows.Build(await Read("charactercard.png")), r => r is { Label: "Character card", Value: "Test Character" });
-        Assert.Contains(AiRows.Build(await Read("comfyui.png")), r => r.Label == "Workflow" && r.Value.EndsWith("1 nodes", StringComparison.Ordinal));
+
+    [Fact]
+    public async Task ChipsAfterAValueAreBlankedInWhatTheTableDraws()
+    {
+        var rows = AiRows.Build(await Read("a1111.png")).Rows;
+
+        var lora = rows.Single(r => r.Label == "LoRA");
+        Assert.Equal("add_detail · 0.8 · 7c6bad76eb54", lora.Value);
+        Assert.Equal("add_detail   0.8   7c6bad76eb54", lora.Display);
+        Assert.Equal([new AiSpan(13, 3, AiSpanKind.WeightChip), new AiSpan(19, 12, AiSpanKind.Chip)], lora.Spans);
+
+        var prompt = rows.Single(r => r.Label == "Prompt");
+        Assert.Equal(prompt.Value, prompt.Display);
+        Assert.Contains(prompt.Spans, s => s.Kind == AiSpanKind.Lora && prompt.Value.Substring(s.Start, s.Length) == "<lora:add_detail:0.8>");
+        Assert.Contains(prompt.Spans, s => s.Kind == AiSpanKind.Weight && prompt.Value.Substring(s.Start, s.Length) == "(detailed eyes:1.2)");
+        Assert.Contains(prompt.Spans, s => s.Kind == AiSpanKind.Embedding && prompt.Value.Substring(s.Start, s.Length) == "easynegative");
+        Assert.Contains(prompt.Spans, s => s.Kind == AiSpanKind.Keyword && prompt.Value.Substring(s.Start, s.Length) == "BREAK");
+    }
+
+
+    [Fact]
+    public async Task TheAiGroupShowsProvenanceCharactersAndUnknownText()
+    {
+        var c2pa = AiRows.Build(await Read("c2pa_chatgpt.png")).Rows;
+        Assert.Contains(c2pa, r => r is { Label: "Claim generator", Value: "ChatGPT", Kind: AiFieldKind.Provenance });
+        Assert.Contains(c2pa, r => r is { Label: "Source type", Value: "Trained algorithmic media · trainedAlgorithmicMedia" });
+        Assert.Contains(c2pa, r => r is { Label: "Ingredient 1" } && r.Value.Contains("Created by GPT-4o", StringComparison.Ordinal));
+        Assert.Contains(c2pa, r => r is { Label: "Signature", Value: "Not verified · ExifGlass doesn't check C2PA signatures" });
+
+        var aigc = AiRows.Build(await Read("aigc.png")).Rows;
+        Assert.Contains(aigc, r => r is { Label: "AI label", Value: "AI-generated · GB 45438-2025 code 1" });
+
+        var character = AiRows.Build(await Read("charactercard.png"));
+        Assert.Contains(character.Rows, r => r is { Label: "Character", Value: "Test Character", Kind: AiFieldKind.Character });
+        Assert.Equal(AiKind.CharacterCard, character.Rows[1].KindChip);
+
+        var comfy = AiRows.Build(await Read("comfyui.png")).Rows;
+        Assert.Contains(comfy, r => r is { Label: "Workflow", Kind: AiFieldKind.Workflow } && r.Value.StartsWith("1 node · 1 sampler · 0 models", StringComparison.Ordinal));
+        Assert.Contains(comfy, r => r is { Label: "API prompt" } && r.Value.EndsWith("ComfyUI API prompt", StringComparison.Ordinal));
+
+        var novelai = AiRows.Build(await Read("novelai.png")).Rows;
+        Assert.Contains(novelai, r => r is { Label: "Character 1", Value: "girl, umbrella · at 0.5, 0.5" });
+    }
+
+
+    [Fact]
+    public async Task ProvenanceAloneHasNoAiGroup()
+    {
+        Assert.Empty(AiRows.Build(await Read("ai_training_signals.jpg")).Rows);
+        Assert.Empty(AiRows.Build(await Read("c2pa_capture.jpg")).Rows);
     }
 
 

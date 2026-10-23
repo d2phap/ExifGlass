@@ -32,7 +32,7 @@ public class TokensTests
 
     [AvaloniaTheory]
     [InlineData("Light", "#F3F3F3", "#FFFFFF")]
-    [InlineData("Dark", "#212529", "#282E31")]
+    [InlineData("Dark", "#202020", "#282E31")]
     public void SurfacesFollowTheThemeVariant(string variant, string window, string panel)
     {
         var theme = variant == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;

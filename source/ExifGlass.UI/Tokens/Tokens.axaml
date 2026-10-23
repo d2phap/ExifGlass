@@ -133,8 +133,8 @@
     <ResourceDictionary x:Key="Dark">
       <Color x:Key="BgBackdropColor">#000000</Color>
       <SolidColorBrush x:Key="BgBackdropBrush" Color="#000000" />
-      <Color x:Key="BgWindowColor">#212529</Color>
-      <SolidColorBrush x:Key="BgWindowBrush" Color="#212529" />
+      <Color x:Key="BgWindowColor">#202020</Color>
+      <SolidColorBrush x:Key="BgWindowBrush" Color="#202020" />
       <Color x:Key="BgPanelColor">#282E31</Color>
       <SolidColorBrush x:Key="BgPanelBrush" Color="#282E31" />
       <Color x:Key="BgElevatedColor">#343A40</Color>
@@ -149,8 +149,8 @@
       <SolidColorBrush x:Key="BgGroupHeaderBrush" Color="#F5282E31" />
       <Color x:Key="BgToastColor">#FA343A40</Color>
       <SolidColorBrush x:Key="BgToastBrush" Color="#FA343A40" />
-      <Color x:Key="BgDragScrimColor">#D9212529</Color>
-      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9212529" />
+      <Color x:Key="BgDragScrimColor">#D9202020</Color>
+      <SolidColorBrush x:Key="BgDragScrimBrush" Color="#D9202020" />
       <Color x:Key="BgTerminalTileColor">#212529</Color>
       <SolidColorBrush x:Key="BgTerminalTileBrush" Color="#212529" />
       <Color x:Key="FgTerminalTileColor">#FFBA68</Color>

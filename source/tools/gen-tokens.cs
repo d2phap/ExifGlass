@@ -109,8 +109,8 @@ static class Generator
     static readonly ThemeColor[] Colors =
     [
         new("BgBackdrop", "#DEE2E6", "#000000", "Behind the window in screenshots and the gallery"),
-        // light: the gray of the Windows title bar (plan Appendix A item 46)
-        new("BgWindow", "#F3F3F3", "#212529", "Window fill without Mica"),
+        // the gray of the Windows title bar (plan Appendix A item 46)
+        new("BgWindow", "#F3F3F3", "#202020", "Window fill without Mica"),
         new("BgPanel", "#FFFFFF", "#282E31", "Rail, table, cards, command bar"),
         new("BgElevated", "#FFFFFF", "#343A40", "Menus, flyouts, dialogs, toasts"),
         new("BgHeader", "#F2F5F8", "#343A40", "Sticky column header"),
@@ -118,7 +118,7 @@ static class Generator
         new("BgInput", "#FFFFFF", "#0DFFFFFF", "Text inputs (DS 6.2)"),
         new("BgGroupHeader", "#F5FFFFFF", "#F5282E31", "Sticky group header: Bg.Panel 96%, no blur"),
         new("BgToast", "#FAFFFFFF", "#FA343A40", "Toast: Bg.Elevated 98%, no blur"),
-        new("BgDragScrim", "#D9F3F3F3", "#D9212529", "Drag-over scrim: Bg.Window 85%, no blur"),
+        new("BgDragScrim", "#D9F3F3F3", "#D9202020", "Drag-over scrim: Bg.Window 85%, no blur"),
         new("BgTerminalTile", "#0F000000", "#212529", "Command bar terminal tile"),
         new("FgTerminalTile", "#212529", "#FFBA68", "Command bar terminal glyph"),
         new("TextPrimary", "#212529", "#DEE2E6", "Body text, values"),

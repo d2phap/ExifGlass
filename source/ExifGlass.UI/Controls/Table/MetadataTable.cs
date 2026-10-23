@@ -106,6 +106,7 @@ public partial class MetadataTable : Panel
     public MetadataTable()
     {
         ClipToBounds = true;
+        Styles.Add(new Themes.TableStyles());
 
         _grid = new DataGrid
         {

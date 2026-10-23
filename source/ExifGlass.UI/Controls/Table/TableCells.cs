@@ -48,7 +48,6 @@ public sealed class IndexCell : TextBlock
     public IndexCell()
     {
         Typography.SetRole(this, TextRole.MonoSmall);
-        Classes.Add("table-index");
         VerticalAlignment = VerticalAlignment.Center;
         TextTrimming = TextTrimming.CharacterEllipsis;
     }
@@ -107,12 +106,18 @@ public sealed class IndexCell : TextBlock
 /// </summary>
 public sealed class IdCell : HighlightTextBlock
 {
+    #region Fields and constants
+
+    private bool? _ai;
+
+    #endregion // Fields and constants
+
+
     #region Constructors
 
     public IdCell()
     {
         Typography.SetRole(this, TextRole.Mono);
-        Classes.Add("table-id");
         IdCell.BindHighlight(this);
         VerticalAlignment = VerticalAlignment.Center;
         TextTrimming = TextTrimming.CharacterEllipsis;
@@ -130,7 +135,13 @@ public sealed class IdCell : HighlightTextBlock
     public void Update(TableItem item)
     {
         SetText(item.TagId, item.Row?.IdMatches);
-        Classes.Set("ai", item.Row?.IsAi == true);
+
+        // AI fields in Accent2 (Proto); rebound only when a recycled cell changes side
+        var ai = item.Row?.IsAi == true;
+        if (_ai == ai) return;
+
+        _ai = ai;
+        this[!ForegroundProperty] = this.GetResourceObservable(ai ? TokenKeys.ACCENT2_TEXT_BRUSH : TokenKeys.TEXT_SECONDARY_BRUSH).ToBinding();
     }
 
     #endregion // Public methods
@@ -158,8 +169,8 @@ public sealed class NameCell : HighlightTextBlock
     public NameCell()
     {
         Typography.SetRole(this, TextRole.Body);
-        Classes.Add("table-name");
         IdCell.BindHighlight(this);
+        this[!ForegroundProperty] = this.GetResourceObservable(TokenKeys.TEXT_SECONDARY_BRUSH).ToBinding();
         VerticalAlignment = VerticalAlignment.Center;
         TextTrimming = TextTrimming.CharacterEllipsis;
     }
@@ -212,7 +223,6 @@ public sealed class ValueCell : Panel
     {
         _text = new HighlightTextBlock
         {
-            Classes = { "table-value" },
             TextWrapping = TextWrapping.Wrap,
             TextTrimming = TextTrimming.CharacterEllipsis,
             MaxLines = MAX_LINES,
@@ -240,8 +250,8 @@ public sealed class ValueCell : Panel
         var row = item.Row;
         var state = row?.EditState ?? EditState.None;
         _text.SetText(item.Value, row?.ValueMatches);
-        _text.Classes.Set("edited", state is EditState.Edited or EditState.Added);
-        _text.Classes.Set("deleted", state == EditState.Deleted);
+        Classes.Set("edited", state is EditState.Edited or EditState.Added);
+        Classes.Set("deleted", state == EditState.Deleted);
 
         if (state == EditState.None)
         {

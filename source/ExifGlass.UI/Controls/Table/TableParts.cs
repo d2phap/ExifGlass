@@ -69,24 +69,27 @@ public sealed class GroupHeaderView : Grid
             Icon = IconId.ChevronDown,
             Width = 14,
             Height = 14,
-            Classes = { "table-chevron" },
             VerticalAlignment = VerticalAlignment.Center,
             RenderTransformOrigin = RelativePoint.Center,
             RenderTransform = OPEN,
         };
         _dot = new GroupDot { VerticalAlignment = VerticalAlignment.Center };
-        _sparkle = new GlassIcon { Icon = IconId.Sparkle, Width = 14, Height = 14, Classes = { "table-sparkle" }, VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
+        _sparkle = new GlassIcon { Icon = IconId.Sparkle, Width = 14, Height = 14, VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
         _name = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
         Typography.SetRole(_name, TextRole.BodyStrong);
         _count = new Badge { Kind = BadgeKind.Count };
         _description = new TextBlock
         {
-            Classes = { "table-group-description" },
             VerticalAlignment = VerticalAlignment.Center,
             TextAlignment = TextAlignment.Right,
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
         Typography.SetRole(_description, TextRole.Meta);
+
+        // set here, not by class styles: each of those would cost every icon and text block in the table (G6 finding 2)
+        _chevron[!GlassIcon.ForegroundProperty] = _chevron.GetResourceObservable(TokenKeys.TEXT_SECONDARY_BRUSH).ToBinding();
+        _sparkle[!GlassIcon.ForegroundProperty] = _sparkle.GetResourceObservable(TokenKeys.ACCENT2_TEXT_BRUSH).ToBinding();
+        _description[!TextBlock.ForegroundProperty] = _description.GetResourceObservable(TokenKeys.TEXT_TERTIARY_BRUSH).ToBinding();
 
         SetColumn(_dot, 1);
         SetColumn(_sparkle, 1);

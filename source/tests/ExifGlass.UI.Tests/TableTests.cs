@@ -21,6 +21,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -135,7 +136,7 @@ public class TableTests
         Assert.Equal((BadgeKind.Edited, "Edited"), host.BadgeOf(edited.Key));
         Assert.Equal((BadgeKind.Delete, "Delete"), host.BadgeOf(deleted.Key));
         Assert.Equal((BadgeKind.New, "New"), host.BadgeOf("New:EXIF:Artist"));
-        Assert.Contains("deleted", host.ValueOf(deleted.Key).Classes);
+        Assert.Equal(TextDecorationLocation.Strikethrough, Assert.Single(host.ValueOf(deleted.Key).TextDecorations!).Location);
         Assert.Equal("+", host.IndexOf("New:EXIF:Artist").Text);
         Assert.Null(host.BadgeOf(doc.Tags[5].Key));
     }
@@ -165,6 +166,8 @@ public class TableTests
         var cellAt = cell.TranslatePoint(default, host.Window)!.Value;
         var ringAt = ring.TranslatePoint(default, host.Window)!.Value;
         Assert.True(ring.IsVisible);
+        Assert.NotNull(((SquircleBorder)ring).BorderBrush);
+        Assert.Equal(new Thickness(1.5), ((SquircleBorder)ring).BorderThickness);
         Assert.Equal(cellAt.X, ringAt.X, 1);
         Assert.Equal(cellAt.Y, ringAt.Y, 1);
         Assert.Equal(cell.Bounds.Width, ring.Bounds.Width, 1);

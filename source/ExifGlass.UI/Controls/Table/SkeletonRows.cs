@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using ExifGlass.Core.Export;
+using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Controls;
 
@@ -57,7 +58,8 @@ public sealed class SkeletonRows : Panel
                 Children.Add(bar);
             }
 
-            _lines[r] = new Border { Height = 1, Classes = { "table-separator" } };
+            _lines[r] = new Border { Height = 1 };
+            _lines[r][!Border.BackgroundProperty] = _lines[r].GetResourceObservable(TokenKeys.EMPHASIS_A05_BRUSH).ToBinding();
             Children.Add(_lines[r]);
         }
     }

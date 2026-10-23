@@ -76,15 +76,17 @@ public sealed class GroupHeaderView : Grid
         };
         _dot = new GroupDot { VerticalAlignment = VerticalAlignment.Center };
         _sparkle = new GlassIcon { Icon = IconId.Sparkle, Width = 14, Height = 14, Classes = { "table-sparkle" }, VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
-        _name = new TextBlock { Classes = { "body-strong" }, VerticalAlignment = VerticalAlignment.Center };
+        _name = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+        Typography.SetRole(_name, TextRole.BodyStrong);
         _count = new Badge { Kind = BadgeKind.Count };
         _description = new TextBlock
         {
-            Classes = { "meta", "table-group-description" },
+            Classes = { "table-group-description" },
             VerticalAlignment = VerticalAlignment.Center,
             TextAlignment = TextAlignment.Right,
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
+        Typography.SetRole(_description, TextRole.Meta);
 
         SetColumn(_dot, 1);
         SetColumn(_sparkle, 1);

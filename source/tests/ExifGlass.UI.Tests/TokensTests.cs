@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Styling;
@@ -46,6 +47,31 @@ public class TokensTests
     {
         Assert.True(Application.Current!.TryGetResource(TokenKeys.FONT_UI, null, out var font));
         Assert.IsType<FontFamily>(font);
+    }
+
+
+    [AvaloniaFact]
+    public void ARoleSetsTheRampUnderAValueSetOnTheElementAndGivesItBack()
+    {
+        var plain = new TextBlock();
+        var text = new TextBlock { FontWeight = FontWeight.Bold };
+
+        Typography.SetRole(text, TextRole.Meta);
+        Assert.Equal(11.5, text.FontSize);
+        Assert.Equal(16, text.LineHeight);
+        Assert.Equal(FontWeight.Bold, text.FontWeight);
+
+        Typography.SetRole(text, TextRole.MonoBadge);
+        Assert.Equal(10.5 - AppFonts.SizeOffset, text.FontSize);
+        Assert.True(double.IsNaN(text.LineHeight));
+        Assert.Equal(AppFonts.Mono, text.FontFamily.Name);
+        Assert.NotNull(text.FontFeatures);
+
+        Typography.SetRole(text, TextRole.None);
+        Assert.Equal(plain.FontSize, text.FontSize);
+        Assert.Equal(plain.FontFamily, text.FontFamily);
+        Assert.Null(text.FontFeatures);
+        Assert.Equal(FontWeight.Bold, text.FontWeight);
     }
 
     #endregion // Tests

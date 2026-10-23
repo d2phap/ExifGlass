@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:ExifGlass"
+             xmlns:tok="using:ExifGlass.UI.Tokens"
              xmlns:ui="using:ExifGlass.UI.Controls"
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.RailPanel"
@@ -36,7 +37,7 @@
                       Orientation="Horizontal"
                       Spacing="6">
             <TextBlock VerticalAlignment="Center"
-                       Classes="overline"
+                       tok:Typography.Role="Overline"
                        Foreground="{DynamicResource TextSecondaryBrush}"
                        Text="{x:Static app:AppText.GROUPS}" />
             <ui:Badge Name="GroupCountBadge"
@@ -72,7 +73,7 @@
         <TextBlock Height="22"
                    Margin="10,0"
                    Padding="0,4,0,0"
-                   Classes="overline"
+                   tok:Typography.Role="Overline"
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    Text="{x:Static app:AppText.QUICK_FILTERS}" />
         <ItemsControl Name="FilterList"

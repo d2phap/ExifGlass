@@ -24,6 +24,7 @@ using ExifGlass.UI.Controls;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace ExifGlass.UI.Gallery;
 
@@ -105,33 +106,33 @@ public static partial class DesignGalleryCatalog
 
     private static GallerySection TypeRamp()
     {
-        (string Class, string Sample, string Spec)[] rows =
+        (TextRole Role, string Sample, string Spec)[] rows =
         [
-            (TypeClasses.DISPLAY, "ExifGlass", "22 SemiBold"),
-            (TypeClasses.READOUT, "f/2.0  1/250  ISO 160", "22 Medium tnum"),
-            (TypeClasses.TITLE, "Exposure Time", "16/22 SemiBold"),
-            (TypeClasses.SUBTITLE, "128 tags", "14/20 Medium"),
-            (TypeClasses.EMPTY_TITLE, "Open an AI image or photo", "17 Medium"),
-            (TypeClasses.BODY, "Aperture-priority AE", "13/19"),
-            (TypeClasses.BODY_STRONG, "Remove GPS data", "13/19 Medium"),
-            (TypeClasses.CONTROL, "Export", "12.5 Medium"),
-            (TypeClasses.CAPTION, "Float above other apps while you compare files.", "12/16"),
-            (TypeClasses.META, "JPEG · 18 MB · 7728×5152", "11.5/16"),
-            (TypeClasses.OVERLINE, "GROUPS", "11 Medium +0.06em"),
-            (TypeClasses.BADGE, "Edited", "10.5 Medium"),
-            (TypeClasses.MONO, "-EXIF:FNumber=2.0", "mono 11.5"),
-            (TypeClasses.MONO_VALUE, "FUJIFILM Corporation", "mono 12.5"),
-            (TypeClasses.MONO_BADGE, "128", "mono 10.5 Medium"),
+            (TextRole.Display, "ExifGlass", "22 SemiBold"),
+            (TextRole.Readout, "f/2.0  1/250  ISO 160", "22 Medium tnum"),
+            (TextRole.Title, "Exposure Time", "16/22 SemiBold"),
+            (TextRole.Subtitle, "128 tags", "14/20 Medium"),
+            (TextRole.EmptyTitle, "Open an AI image or photo", "17 Medium"),
+            (TextRole.Body, "Aperture-priority AE", "13/19"),
+            (TextRole.BodyStrong, "Remove GPS data", "13/19 Medium"),
+            (TextRole.Control, "Export", "12.5 Medium"),
+            (TextRole.Caption, "Float above other apps while you compare files.", "12/16"),
+            (TextRole.Meta, "JPEG · 18 MB · 7728×5152", "11.5/16"),
+            (TextRole.Overline, "GROUPS", "11 Medium +0.06em"),
+            (TextRole.Badge, "Edited", "10.5 Medium"),
+            (TextRole.Mono, "-EXIF:FNumber=2.0", "mono 11.5"),
+            (TextRole.MonoValue, "FUJIFILM Corporation", "mono 12.5"),
+            (TextRole.MonoBadge, "128", "mono 10.5 Medium"),
         ];
 
         var states = new List<GalleryState>();
-        foreach (var (cls, sample, spec) in rows)
+        foreach (var (role, sample, spec) in rows)
         {
-            var text = DesignGallery.Text(sample, cls, TokenKeys.TEXT_PRIMARY_BRUSH);
-            states.Add(new GalleryState(cls, text, spec));
+            var text = DesignGallery.Text(sample, role, TokenKeys.TEXT_PRIMARY_BRUSH);
+            states.Add(new GalleryState(KebabCase().Replace(role.ToString(), "-$1").ToLowerInvariant(), text, spec));
         }
 
-        states.Add(new GalleryState("fonts", DesignGallery.Text(AppFonts.Ui + " · " + AppFonts.Mono, TypeClasses.CAPTION, TokenKeys.TEXT_SECONDARY_BRUSH), "UI and mono family on this OS (mono: the system's, owner 2026-10-21)"));
+        states.Add(new GalleryState("fonts", DesignGallery.Text(AppFonts.Ui + " · " + AppFonts.Mono, TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH), "UI and mono family on this OS (mono: the system's, owner 2026-10-21)"));
         return new GallerySection("type", "Type ramp", "DS 1.1; macOS and Linux draw Inter 1 pt smaller (D4), mono sizes add the point back (S3); grayscale antialiasing on every window.", states);
     }
 
@@ -292,6 +293,11 @@ public static partial class DesignGalleryCatalog
 
 
     private static Control GroupBarSegment(string group, double width) => new Controls.GroupDot { Group = group, Width = Math.Max(2, width), Height = 6, Radius = 0 };
+
+
+    // the ramp's names as DS 1.1 writes them: BodyStrong is body-strong
+    [GeneratedRegex("(?<!^)([A-Z])")]
+    private static partial Regex KebabCase();
 
     #endregion // Helpers
 }

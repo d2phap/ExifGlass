@@ -402,7 +402,7 @@
             <ContentPresenter VerticalAlignment="Center" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
             <TextBlock Name="PART_Count"
                        VerticalAlignment="Center"
-                       Classes="mono-badge"
+                       tok:Typography.Role="MonoBadge"
                        FontWeight="Normal"
                        Opacity="0.7"
                        Text="{TemplateBinding Count}" />

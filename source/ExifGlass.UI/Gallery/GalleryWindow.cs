@@ -91,7 +91,7 @@ public sealed class GalleryWindow : Window
         rebuild.Click += (_, _) => Rebuild();
 
         var bar = new DockPanel { Height = 56, Margin = new Thickness(16, 0) };
-        var title = DesignGallery.Text("Design Gallery", TypeClasses.SUBTITLE, TokenKeys.TEXT_PRIMARY_BRUSH);
+        var title = DesignGallery.Text("Design Gallery", TextRole.Subtitle, TokenKeys.TEXT_PRIMARY_BRUSH);
         title.VerticalAlignment = VerticalAlignment.Center;
         title.Margin = new Thickness(0, 0, 20, 0);
         DockPanel.SetDock(title, Dock.Left);

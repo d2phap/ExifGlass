@@ -47,7 +47,7 @@ public sealed class IndexCell : TextBlock
 
     public IndexCell()
     {
-        Classes.Add("mono-small");
+        Typography.SetRole(this, TextRole.MonoSmall);
         Classes.Add("table-index");
         VerticalAlignment = VerticalAlignment.Center;
         TextTrimming = TextTrimming.CharacterEllipsis;
@@ -111,7 +111,7 @@ public sealed class IdCell : HighlightTextBlock
 
     public IdCell()
     {
-        Classes.Add("mono");
+        Typography.SetRole(this, TextRole.Mono);
         Classes.Add("table-id");
         IdCell.BindHighlight(this);
         VerticalAlignment = VerticalAlignment.Center;
@@ -157,7 +157,7 @@ public sealed class NameCell : HighlightTextBlock
 
     public NameCell()
     {
-        Classes.Add("body");
+        Typography.SetRole(this, TextRole.Body);
         Classes.Add("table-name");
         IdCell.BindHighlight(this);
         VerticalAlignment = VerticalAlignment.Center;
@@ -212,12 +212,13 @@ public sealed class ValueCell : Panel
     {
         _text = new HighlightTextBlock
         {
-            Classes = { "body", "table-value" },
+            Classes = { "table-value" },
             TextWrapping = TextWrapping.Wrap,
             TextTrimming = TextTrimming.CharacterEllipsis,
             MaxLines = MAX_LINES,
             VerticalAlignment = VerticalAlignment.Center,
         };
+        Typography.SetRole(_text, TextRole.Body);
         IdCell.BindHighlight(_text);
         Children.Add(_text);
     }

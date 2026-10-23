@@ -55,11 +55,11 @@ public static class DesignGallery
     public static Control BuildSection(GallerySection section)
     {
         var header = new StackPanel { Spacing = 4 };
-        header.Children.Add(Text(section.Id.ToUpperInvariant(), TypeClasses.OVERLINE, TokenKeys.TEXT_TERTIARY_BRUSH));
-        header.Children.Add(Text(section.Name, TypeClasses.TITLE, TokenKeys.TEXT_PRIMARY_BRUSH));
+        header.Children.Add(Text(section.Id.ToUpperInvariant(), TextRole.Overline, TokenKeys.TEXT_TERTIARY_BRUSH));
+        header.Children.Add(Text(section.Name, TextRole.Title, TokenKeys.TEXT_PRIMARY_BRUSH));
         if (section.Spec.Length > 0)
         {
-            var spec = Text(section.Spec, TypeClasses.CAPTION, TokenKeys.TEXT_SECONDARY_BRUSH);
+            var spec = Text(section.Spec, TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH);
             spec.TextWrapping = TextWrapping.Wrap;
             spec.MaxWidth = 620;
             spec.HorizontalAlignment = HorizontalAlignment.Left;
@@ -71,10 +71,10 @@ public static class DesignGallery
         {
             var figure = new StackPanel { Spacing = 8, HorizontalAlignment = HorizontalAlignment.Left };
             figure.Children.Add(new Panel { MinHeight = 24, HorizontalAlignment = HorizontalAlignment.Left, Children = { state.Sample } });
-            figure.Children.Add(Text(state.Label, TypeClasses.MONO, TokenKeys.ACCENT_TEXT_BRUSH));
+            figure.Children.Add(Text(state.Label, TextRole.Mono, TokenKeys.ACCENT_TEXT_BRUSH));
             if (state.Note.Length > 0)
             {
-                var note = Text(state.Note, TypeClasses.META, TokenKeys.TEXT_TERTIARY_BRUSH);
+                var note = Text(state.Note, TextRole.Meta, TokenKeys.TEXT_TERTIARY_BRUSH);
                 note.MaxWidth = 240;
                 note.HorizontalAlignment = HorizontalAlignment.Left;
                 note.TextWrapping = TextWrapping.Wrap;
@@ -108,9 +108,10 @@ public static class DesignGallery
     }
 
 
-    public static TextBlock Text(string text, string typeClass, string brushKey)
+    public static TextBlock Text(string text, TextRole role, string brushKey)
     {
-        var block = new TextBlock { Text = text, Classes = { typeClass } };
+        var block = new TextBlock { Text = text };
+        Typography.SetRole(block, role);
         block[!TextBlock.ForegroundProperty] = block.GetResourceObservable(brushKey).ToBinding();
         return block;
     }

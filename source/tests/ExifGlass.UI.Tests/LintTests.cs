@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using Avalonia.Styling;
+using ExifGlass.UI.Tokens;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -58,13 +59,19 @@ public partial class LintTests
     public void LineHeightNeverCutsIntoTheContentArea()
     {
         var offenders = new List<string>();
-        foreach (var file in ViewFiles().Append(Path.Combine(Render.SourceDir, "ExifGlass.UI", "Tokens", "Typography.axaml")))
+        foreach (var file in ViewFiles())
         {
             var text = File.ReadAllText(file);
 
             // a style that sets both, or an element that does
             foreach (Match block in StyleBlock().Matches(text)) Check(file, block.Value, offenders);
             foreach (Match element in ElementWithLineHeight().Matches(text)) Check(file, element.Value, offenders);
+        }
+
+        foreach (var role in Enum.GetValues<TextRole>())
+        {
+            var spec = Typography.Spec(role);
+            if (spec.LineHeight < spec.Size * CONTENT_AREA - 0.01) offenders.Add($"TextRole.{role}: LineHeight {spec.LineHeight} under {spec.Size} x {CONTENT_AREA:0.###}");
         }
 
         Assert.True(offenders.Count == 0, "LineHeight below the content area (S3):\n" + string.Join("\n", offenders));

@@ -65,7 +65,7 @@ public class IconTests
 
             var cell = new StackPanel { Width = CELL, Margin = new Thickness(0, 0, 0, 8), Spacing = 2 };
             cell.Children.Add(row);
-            cell.Children.Add(DesignGallery.Text(id.ToString(), TypeClasses.META, TokenKeys.TEXT_SECONDARY_BRUSH));
+            cell.Children.Add(DesignGallery.Text(id.ToString(), TextRole.Meta, TokenKeys.TEXT_SECONDARY_BRUSH));
             grid.Children.Add(cell);
         }
 

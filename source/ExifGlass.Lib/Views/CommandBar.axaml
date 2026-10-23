@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:ExifGlass"
+             xmlns:tok="using:ExifGlass.UI.Tokens"
              xmlns:ui="using:ExifGlass.UI.Controls"
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.CommandBar"
@@ -38,7 +39,7 @@
                       IsEnabled="{Binding HasCommand}"
                       ToolTip.Tip="{x:Static app:AppText.COPY_COMMAND}" />
       <TextBlock Name="CommandText"
-                 Classes="mono"
+                 tok:Typography.Role="Mono"
                  VerticalAlignment="Center"
                  TextTrimming="CharacterEllipsis" />
     </DockPanel>

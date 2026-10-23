@@ -119,8 +119,8 @@
                 <ui:GlassIcon Width="16" Height="16" Icon="{TemplateBinding Icon}" />
               </Panel>
               <StackPanel Spacing="6">
-                <TextBlock Classes="title" Text="{TemplateBinding Title}" TextWrapping="Wrap" />
-                <TextBlock Classes="body"
+                <TextBlock tok:Typography.Role="Title" Text="{TemplateBinding Title}" TextWrapping="Wrap" />
+                <TextBlock tok:Typography.Role="Body"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            IsVisible="{TemplateBinding Body, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                            Text="{TemplateBinding Body}"

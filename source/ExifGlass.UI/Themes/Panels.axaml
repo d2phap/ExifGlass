@@ -43,7 +43,7 @@
                            Text="{TemplateBinding Title}"
                            TextTrimming="CharacterEllipsis" />
                 <TextBlock Name="PART_Meta"
-                           Classes="meta"
+                           tok:Typography.Role="Meta"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Text="{TemplateBinding Meta}"
                            TextTrimming="CharacterEllipsis" />
@@ -230,7 +230,7 @@
               <TextBlock Name="PART_Count"
                          Margin="8,0,0,0"
                          VerticalAlignment="Center"
-                         Classes="mono-small"
+                         tok:Typography.Role="MonoSmall"
                          DockPanel.Dock="Right"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{TemplateBinding Count}" />
@@ -418,14 +418,14 @@
                 </ui:SquircleBorder>
                 <TextBlock Name="PART_Id"
                            VerticalAlignment="Center"
-                           Classes="mono-small"
+                           tok:Typography.Role="MonoSmall"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Text="{Binding TagId}" />
               </StackPanel>
             </DockPanel>
 
             <TextBlock Name="PART_Name"
-                       Classes="title"
+                       tok:Typography.Role="Title"
                        Text="{Binding Name}"
                        TextWrapping="Wrap" />
 
@@ -439,7 +439,7 @@
                               Margin="12,10,40,10"
                               HorizontalScrollBarVisibility="Disabled">
                   <SelectableTextBlock Name="PART_Value"
-                                       Classes="mono-value"
+                                       tok:Typography.Role="MonoValue"
                                        Text="{Binding Value}"
                                        TextWrapping="Wrap">
                     <SelectableTextBlock.Transitions>
@@ -492,7 +492,7 @@
                               Content="{x:Static eg:UiText.REVERT}"
                               DockPanel.Dock="Right" />
               <TextBlock VerticalAlignment="Center"
-                         Classes="meta"
+                         tok:Typography.Role="Meta"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{Binding WasText}"
                          TextTrimming="CharacterEllipsis" />
@@ -502,18 +502,18 @@
             <Grid Name="PART_Details"
                   ColumnDefinitions="70,*"
                   RowDefinitions="Auto,6,Auto,6,Auto">
-              <TextBlock Classes="caption"
+              <TextBlock tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.RAW_VALUE}" />
               <TextBlock Name="PART_Raw"
                          Grid.Column="1"
                          Margin="12,0,0,0"
                          VerticalAlignment="Center"
-                         Classes="mono"
+                         tok:Typography.Role="Mono"
                          Text="{Binding Raw}"
                          TextWrapping="Wrap" />
               <TextBlock Grid.Row="2"
-                         Classes="caption"
+                         tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.FORMAT}" />
               <TextBlock Name="PART_Format"
@@ -521,11 +521,11 @@
                          Grid.Column="1"
                          Margin="12,0,0,0"
                          VerticalAlignment="Center"
-                         Classes="mono"
+                         tok:Typography.Role="Mono"
                          Text="{Binding Format}" />
               <TextBlock Grid.Row="4"
                          VerticalAlignment="Center"
-                         Classes="caption"
+                         tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.TAG_KEY}" />
               <DockPanel Grid.Row="4"
@@ -542,7 +542,7 @@
                                 ToolTip.Tip="{x:Static eg:UiText.COPY_TAG_KEY}" />
                 <TextBlock Name="PART_Key"
                            VerticalAlignment="Center"
-                           Classes="mono"
+                           tok:Typography.Role="Mono"
                            Text="{Binding ArgumentKey}"
                            TextTrimming="CharacterEllipsis"
                            ToolTip.Tip="{Binding ArgumentKey}" />
@@ -637,7 +637,7 @@
                         Text="{TemplateBinding Generator}"
                         ToolTip.Tip="{TemplateBinding Generator}" />
               <TextBlock VerticalAlignment="Center"
-                         Classes="overline"
+                         tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
             </DockPanel>
@@ -654,7 +654,7 @@
                                 Icon="{x:Static ui:IconId.Copy}"
                                 IconSize="13" />
                 <TextBlock VerticalAlignment="Center"
-                           Classes="overline"
+                           tok:Typography.Role="Overline"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Text="{x:Static eg:UiText.PROMPT_OVERLINE}" />
               </DockPanel>
@@ -673,7 +673,7 @@
             </StackPanel>
 
             <StackPanel Name="PART_NegativeSection" Spacing="4">
-              <TextBlock Classes="overline"
+              <TextBlock tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.NEGATIVE_PROMPT_OVERLINE}" />
               <ui:PromptText Name="PART_Negative"
@@ -706,7 +706,7 @@
                                      Foreground="{DynamicResource TextSecondaryBrush}"
                                      Text="{Binding Label}"
                                      TextTrimming="CharacterEllipsis" />
-                          <TextBlock Classes="mono"
+                          <TextBlock tok:Typography.Role="Mono"
                                      Text="{Binding Value}"
                                      TextTrimming="CharacterEllipsis"
                                      ToolTip.Tip="{Binding Value}" />
@@ -764,12 +764,12 @@
             <DockPanel Height="20">
               <TextBlock Name="PART_Dimensions"
                          VerticalAlignment="Center"
-                         Classes="mono-small"
+                         tok:Typography.Role="MonoSmall"
                          DockPanel.Dock="Right"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{TemplateBinding Dimensions}" />
               <TextBlock VerticalAlignment="Center"
-                         Classes="overline"
+                         tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{x:Static eg:UiText.FRAME_OVERLINE}" />
             </DockPanel>
@@ -807,7 +807,7 @@
                                    CornerRadius="{StaticResource RadiusControl20}">
                   <TextBlock Name="PART_Ratio"
                              VerticalAlignment="Center"
-                             Classes="mono-badge"
+                             tok:Typography.Role="MonoBadge"
                              FontWeight="Normal"
                              Text="{TemplateBinding Ratio}" />
                 </ui:SquircleBorder>
@@ -819,7 +819,7 @@
                                    CornerRadius="{StaticResource RadiusControl20}">
                   <TextBlock Name="PART_Megapixels"
                              VerticalAlignment="Center"
-                             Classes="mono-badge"
+                             tok:Typography.Role="MonoBadge"
                              FontWeight="Normal"
                              Text="{TemplateBinding Megapixels}" />
                 </ui:SquircleBorder>
@@ -865,25 +865,25 @@
                 <DataTemplate x:DataType="ui:ExposureCellView">
                   <ui:SquircleBorder Padding="14,12" Background="{DynamicResource BgPanelBrush}">
                     <StackPanel Spacing="2">
-                      <TextBlock Classes="overline"
+                      <TextBlock tok:Typography.Role="Overline"
                                  Foreground="{DynamicResource TextSecondaryBrush}"
                                  Text="{Binding Label}" />
                       <Panel Height="28">
                         <ui:CountUpText VerticalAlignment="Center"
-                                        Classes="readout"
+                                        tok:Typography.Role="Readout"
                                         Format="{Binding Format}"
                                         IsVisible="{Binding HasValue}"
                                         Prefix="{Binding Prefix}"
                                         Suffix="{Binding Suffix}"
                                         Value="{Binding Value}" />
                         <TextBlock VerticalAlignment="Center"
-                                   Classes="readout"
+                                   tok:Typography.Role="Readout"
                                    Foreground="{DynamicResource TextTertiaryBrush}"
                                    IsVisible="{Binding !HasValue}"
                                    Text="—" />
                       </Panel>
                       <TextBlock MinHeight="16"
-                                 Classes="meta"
+                                 tok:Typography.Role="Meta"
                                  Foreground="{DynamicResource TextSecondaryBrush}"
                                  Text="{Binding Sub}"
                                  TextTrimming="CharacterEllipsis" />
@@ -930,7 +930,7 @@
                         <SelectableTextBlock FontWeight="Medium"
                                              Text="{Binding Value}"
                                              TextWrapping="Wrap" />
-                        <TextBlock Classes="meta"
+                        <TextBlock tok:Typography.Role="Meta"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
                                    IsVisible="{Binding HasSub}"
                                    Text="{Binding Sub}"

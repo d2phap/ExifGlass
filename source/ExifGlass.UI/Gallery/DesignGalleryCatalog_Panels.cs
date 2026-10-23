@@ -94,7 +94,7 @@ public static partial class DesignGalleryCatalog
             Orientation = Orientation.Horizontal,
             Spacing = 6,
             VerticalAlignment = VerticalAlignment.Center,
-            Children = { DesignGallery.Text("GROUPS", TypeClasses.OVERLINE, TokenKeys.TEXT_SECONDARY_BRUSH), new Badge { Kind = BadgeKind.Count, Text = "5/7" } },
+            Children = { DesignGallery.Text("GROUPS", TextRole.Overline, TokenKeys.TEXT_SECONDARY_BRUSH), new Badge { Kind = BadgeKind.Count, Text = "5/7" } },
         });
 
         DropTarget Drop() => new() { Width = RAIL_CONTENT, Content = "Open a file, or drop one here to view", Icon = IconId.ArrowUpload };

@@ -18,7 +18,6 @@
     <SimpleTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.v2.xaml" />
     <StyleInclude Source="avares://ExifGlass.UI/Themes/DataGrid.axaml" />
-    <StyleInclude Source="avares://ExifGlass.UI/Tokens/Typography.axaml" />
   </Application.Styles>
 
 </Application>

@@ -439,7 +439,7 @@ public static partial class DesignGalleryCatalog
             return surface;
         }
 
-        static Control Pane(string text, double width) => Surface(DesignGallery.Text(text, TypeClasses.BODY_STRONG, TokenKeys.TEXT_PRIMARY_BRUSH), width);
+        static Control Pane(string text, double width) => Surface(DesignGallery.Text(text, TextRole.BodyStrong, TokenKeys.TEXT_PRIMARY_BRUSH), width);
 
         var host = new PushHost { Width = 560, Height = 240, LeftPane = Pane("Rail", 180), RightPane = Pane("Inspector", 200), LeftTravel = 188, RightTravel = 208 };
         var left = new GlassButton { Content = "Rail", Icon = IconId.PanelLeft };
@@ -483,7 +483,7 @@ public static partial class DesignGalleryCatalog
     {
         static Card Sample(string title, params string[] classes)
         {
-            var card = new Card { Width = 280, Content = new StackPanel { Spacing = 6, Children = { DesignGallery.Text(title, TypeClasses.TITLE, TokenKeys.TEXT_PRIMARY_BRUSH), DesignGallery.Text("Value well, details, actions.", TypeClasses.CAPTION, TokenKeys.TEXT_SECONDARY_BRUSH) } } };
+            var card = new Card { Width = 280, Content = new StackPanel { Spacing = 6, Children = { DesignGallery.Text(title, TextRole.Title, TokenKeys.TEXT_PRIMARY_BRUSH), DesignGallery.Text("Value well, details, actions.", TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH) } } };
             foreach (var c in classes) card.Classes.Add(c);
             return card;
         }
@@ -510,8 +510,10 @@ public static partial class DesignGalleryCatalog
         var pulsing = new StackPanel { Spacing = 8, Width = 220 };
         for (var i = 0; i < 4; i++) pulsing.Children.Add(new Skeleton { Width = 220 - i * 30, HorizontalAlignment = HorizontalAlignment.Left, IsPulsing = true, Index = i });
 
-        var countUp = new CountUpText { Classes = { TypeClasses.READOUT }, Value = 250, Format = CountUpFormat.Shutter };
-        var aperture = new CountUpText { Classes = { TypeClasses.READOUT }, Value = 2.0, Format = CountUpFormat.OneDecimal, Prefix = "f/" };
+        var countUp = new CountUpText { Value = 250, Format = CountUpFormat.Shutter };
+        var aperture = new CountUpText { Value = 2.0, Format = CountUpFormat.OneDecimal, Prefix = "f/" };
+        Typography.SetRole(countUp, TextRole.Readout);
+        Typography.SetRole(aperture, TextRole.Readout);
         var replay = new GlassButton { Content = "Count again", Icon = IconId.ArrowSync, Classes = { "small" } };
         replay.Click += (_, _) =>
         {
@@ -554,7 +556,7 @@ public static partial class DesignGalleryCatalog
     private static GallerySection Expanders()
     {
         var content = new StackPanel { Spacing = 6 };
-        foreach (var line in new[] { "Hires upscale: 1.5", "Hires steps: 12", "Denoising strength: 0.45", "Clip skip: 2" }) content.Children.Add(DesignGallery.Text(line, TypeClasses.CAPTION, TokenKeys.TEXT_SECONDARY_BRUSH));
+        foreach (var line in new[] { "Hires upscale: 1.5", "Hires steps: 12", "Denoising strength: 0.45", "Clip skip: 2" }) content.Children.Add(DesignGallery.Text(line, TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH));
 
         var panel = new ExpandPanel { Child = content, Width = 260 };
         var toggle = new DisclosureButton { Content = "All parameters", Classes = { "ghost", "small" } };
@@ -576,7 +578,7 @@ public static partial class DesignGalleryCatalog
         {
             if (TopLevel.GetTopLevel(open) is not Window owner) return;
 
-            var window = new OwnedWindow { Title = "Settings", Height = 420, Content = new Border { Padding = new Thickness(20), Child = DesignGallery.Text("Placement is saved: move or resize, close, open again.", TypeClasses.BODY, TokenKeys.TEXT_PRIMARY_BRUSH) } };
+            var window = new OwnedWindow { Title = "Settings", Height = 420, Content = new Border { Padding = new Thickness(20), Child = DesignGallery.Text("Placement is saved: move or resize, close, open again.", TextRole.Body, TokenKeys.TEXT_PRIMARY_BRUSH) } };
             window.UsePlacement("GallerySettings", new Size(560, 420), GalleryPlacements, owner);
             window.Show(owner);
         };

@@ -360,7 +360,7 @@
       <ControlTemplate>
         <TextBlock Margin="{TemplateBinding Padding}"
                    VerticalAlignment="Center"
-                   Classes="overline"
+                   tok:Typography.Role="Overline"
                    Text="{TemplateBinding Text}"
                    TextTrimming="CharacterEllipsis" />
       </ControlTemplate>

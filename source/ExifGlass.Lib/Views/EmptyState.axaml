@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:app="using:ExifGlass"
+             xmlns:tok="using:ExifGlass.UI.Tokens"
              xmlns:ui="using:ExifGlass.UI.Controls"
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.EmptyState"
@@ -31,13 +32,13 @@
     <StackPanel Spacing="4">
       <TextBlock Name="TitleText"
                  MaxWidth="320"
-                 Classes="empty-title"
+                 tok:Typography.Role="EmptyTitle"
                  Text="{x:Static app:AppText.EMPTY_TITLE}"
                  TextAlignment="Center"
                  TextWrapping="Wrap" />
       <TextBlock Name="CaptionText"
                  MaxWidth="250"
-                 Classes="body"
+                 tok:Typography.Role="Body"
                  Foreground="{DynamicResource TextSecondaryBrush}"
                  Text="{x:Static app:AppText.EMPTY_CAPTION}"
                  TextAlignment="Center"

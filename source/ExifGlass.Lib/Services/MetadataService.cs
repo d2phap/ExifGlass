@@ -59,6 +59,11 @@ public interface IMetadataReader
     /// </summary>
     Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The largest embedded preview image's bytes; null when the file has none.
+    /// </summary>
+    Task<byte[]?> ReadPreviewAsync(string path, CancellationToken cancellationToken) => Task.FromResult<byte[]?>(null);
+
     #endregion // Methods
 }
 
@@ -169,6 +174,13 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
     {
         var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
         return await service.ReadAiAsync(path, cancellationToken).ConfigureAwait(false);
+    }
+
+
+    public async Task<byte[]?> ReadPreviewAsync(string path, CancellationToken cancellationToken)
+    {
+        var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
+        return await service.ReadPreviewAsync(path, cancellationToken).ConfigureAwait(false);
     }
 
 

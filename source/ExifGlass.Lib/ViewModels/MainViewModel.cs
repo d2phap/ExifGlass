@@ -57,6 +57,11 @@ public interface IShellView
     /// </summary>
     Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format);
 
+    /// <summary>
+    /// Opens a web link in the system's browser (the Details card's map).
+    /// </summary>
+    Task OpenUriAsync(string uri) => Task.CompletedTask;
+
     #endregion // Methods
 }
 
@@ -94,6 +99,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly MetadataService? _metadata;
     private readonly ArgumentAnalysis _arguments;
     private int _queryGeneration;
+    private double _windowWidth;
 
     #endregion // Fields and constants
 
@@ -112,6 +118,7 @@ public sealed partial class MainViewModel : ObservableObject
         Loader = new DocumentLoader(reader);
         Loader.Changed += Loader_Changed;
         Loader.Failed += Loader_Failed;
+        Loader.PreviewChanged += Loader_PreviewChanged;
 
         Theme = settings.Current.Theme;
         IsPinned = settings.Current.AlwaysOnTop;
@@ -138,14 +145,14 @@ public sealed partial class MainViewModel : ObservableObject
     public TableLayout Table { get; } = new();
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsLoading), nameof(ShowEmptyCard), nameof(Summary), nameof(ShowSkeleton))]
+    [NotifyPropertyChangedFor(nameof(IsLoading), nameof(ShowEmptyCard), nameof(Summary), nameof(ShowSkeleton), nameof(FileTitle), nameof(FileMeta))]
     public partial LoadPhase Phase { get; private set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasDocument), nameof(WindowTitle), nameof(ShowEmptyCard), nameof(Summary), nameof(SummaryDetail), nameof(ShowSummaryDetail))]
     [NotifyPropertyChangedFor(nameof(IsRailDocked), nameof(IsRailShown), nameof(RailTooltip), nameof(IsInspectorDocked), nameof(IsInspectorShown), nameof(InspectorTooltip))]
     [NotifyPropertyChangedFor(nameof(ShowSkeleton), nameof(ShowNoMatch))]
-    [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand), nameof(ToggleCollapseAllCommand), nameof(ExportCommand), nameof(CopyAsJsonCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand), nameof(ToggleCollapseAllCommand), nameof(ExportCommand), nameof(CopyAsJsonCommand), nameof(ToggleQuickFilterCommand))]
     public partial MetadataDocument? Document { get; private set; }
 
     /// <summary>
@@ -288,10 +295,16 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// The part of the Esc chain the window owns, after edits, menus and dialogs: a pushed panel, the search, then the selection (cell, then rows); true when it did something.
+    /// The part of the Esc chain the window owns, after menus and dialogs: an edit, a pushed panel, the search, then the selection (cell, then rows); true when it did something.
     /// </summary>
     public bool Escape()
     {
+        if (IsEditing)
+        {
+            IsEditing = false;
+            return true;
+        }
+
         if (IsRailPushed || IsInspectorPushed)
         {
             IsRailPushed = false;
@@ -310,11 +323,12 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// Places the DS 2.1 bands for the window's width; a pushed panel that docks stops being pushed.
+    /// Places the panels and the toolbar for the window's width; a pushed panel that docks stops being pushed.
     /// </summary>
     public void UpdateWindowWidth(double width)
     {
-        if (!Layout.Update(width)) return;
+        _windowWidth = width;
+        if (!Layout.Update(width, RailOpen)) return;
 
         if (Layout.Rail == PanelMode.Docked) IsRailPushed = false;
         if (Layout.Inspector == PanelMode.Docked) IsInspectorPushed = false;
@@ -374,6 +388,9 @@ public sealed partial class MainViewModel : ObservableObject
 
         RailOpen = !RailOpen;
         _settings.Update(s => s.RailOpen = RailOpen);
+
+        // the inspector docks in the room the rail leaves, or makes way for it
+        UpdateWindowWidth(_windowWidth);
     }
 
 
@@ -441,6 +458,7 @@ public sealed partial class MainViewModel : ObservableObject
         }
 
         UpdateCommandTokens();
+        NotifyInspector();
     }
 
 
@@ -449,11 +467,13 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var generation = ++_queryGeneration;
 
-        // a new read starts with every group open and nothing selected (Proto); the AI data arriving is the same read
+        // a new read starts with every group open, nothing selected and nothing staged (Proto; P8 asks first, D8); the AI data arriving is the same read
         if (document is not null && !document.IsSameRead(Document))
         {
             _collapsed.Clear();
             Selection.Clear();
+            _edits = EditSet.Empty;
+            IsEditing = false;
         }
 
         var query = BuildQuery();
@@ -498,6 +518,9 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     private void Metadata_StatusChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(UpdateExifToolState);
+
+
+    private void Loader_PreviewChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(Preview));
 
     #endregion // Event handlers
 }

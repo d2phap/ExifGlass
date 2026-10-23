@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.RailPanel"
+             x:DataType="vm:MainViewModel">
+
+  <!--  DS 6.10 / S2 rail: file card, groups, quick filters, the drop target at the foot; sections 14 apart (Proto)  -->
+  <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+    <Grid Name="Sections"
+          Margin="8"
+          RowDefinitions="Auto,Auto,Auto,*,Auto">
+      <ui:FileCard Name="File"
+                   Extension="{Binding FileExtension}"
+                   Meta="{Binding FileMeta}"
+                   Preview="{Binding Preview}"
+                   Segments="{Binding Segments}"
+                   Title="{Binding FileTitle}" />
+
+      <!--  groups: the overline with its count and Hide all, then the rows 4 apart  -->
+      <StackPanel Grid.Row="1"
+                  Margin="0,14,0,0"
+                  Spacing="4">
+        <DockPanel Height="22" Margin="10,0">
+          <ui:GlassButton Name="AllGroupsButton"
+                          Height="22"
+                          Margin="0,0,-6,0"
+                          Classes="link"
+                          Command="{Binding ToggleAllGroupsCommand}"
+                          Content="{Binding AllGroupsLabel}"
+                          CornerRadius="{StaticResource RadiusControl22}"
+                          DockPanel.Dock="Right"
+                          FontSize="{StaticResource FontSizeMeta}" />
+          <StackPanel VerticalAlignment="Center"
+                      Orientation="Horizontal"
+                      Spacing="6">
+            <TextBlock VerticalAlignment="Center"
+                       Classes="overline"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="{x:Static app:AppText.GROUPS}" />
+            <ui:Badge Name="GroupCountBadge"
+                      VerticalAlignment="Center"
+                      Kind="Count"
+                      Text="{Binding GroupCountLabel}" />
+          </StackPanel>
+        </DockPanel>
+        <ItemsControl Name="GroupList" ItemsSource="{Binding RailGroups}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="4" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:RailGroupItem">
+              <ui:RailGroupRow Count="{Binding Count}"
+                               Group="{Binding Name}"
+                               IsAi="{Binding IsAi}"
+                               IsShown="{Binding IsShown}"
+                               JumpTip="{Binding JumpTip}"
+                               Text="{Binding Label}"
+                               ToggleTip="{Binding ToggleTip}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <!--  quick filters (DS 6.6): chips 6 apart, AND, with live counts  -->
+      <StackPanel Grid.Row="2"
+                  Margin="0,14,0,0"
+                  Spacing="8">
+        <TextBlock Height="22"
+                   Margin="10,0"
+                   Padding="0,4,0,0"
+                   Classes="overline"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.QUICK_FILTERS}" />
+        <ItemsControl Name="FilterList"
+                      Margin="6,0"
+                      ItemsSource="{Binding QuickFilters}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel ItemSpacing="6" LineSpacing="6" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:QuickFilterItem">
+              <ui:Chip Classes.ai="{Binding IsAi}"
+                       Content="{Binding Label}"
+                       Count="{Binding Count}"
+                       Icon="{Binding Icon}"
+                       IsChecked="{Binding IsOn, Mode=OneWay}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <ui:DropTarget Name="Drop"
+                     Grid.Row="4"
+                     Margin="0,14,0,0"
+                     Command="{Binding OpenCommand}"
+                     Content="{x:Static app:AppText.DROP_HINT}"
+                     Icon="{x:Static ui:IconId.ArrowUpload}"
+                     ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
+    </Grid>
+  </ScrollViewer>
+
+</UserControl>

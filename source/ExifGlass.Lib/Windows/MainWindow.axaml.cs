@@ -142,6 +142,12 @@ public partial class MainWindow : Window, IShellView
         return file is null ? null : new SaveTarget(await file.OpenWriteAsync(), file.Name);
     }
 
+
+    public async Task OpenUriAsync(string uri)
+    {
+        if (Uri.TryCreate(uri, UriKind.Absolute, out var target) && target.Scheme == Uri.UriSchemeHttps) await Launcher.LaunchUriAsync(target);
+    }
+
     #endregion // IShellView
 
 

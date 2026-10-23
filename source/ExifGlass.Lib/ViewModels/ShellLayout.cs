@@ -64,8 +64,16 @@ public sealed class ShellLayout
 {
     #region Fields and constants
 
-    public const double INSPECTOR_DOCK_WIDTH = 1200;
-    public const double RAIL_DOCK_WIDTH = 900;
+    /// <summary>
+    /// A panel docks while the table keeps this much beside it (owner at the P6 review; DS 2: the table is fully usable at 420).
+    /// </summary>
+    public const double MIN_TABLE_WIDTH = 420;
+
+    // the layout grid (DS 2): content padding 8 each side, the rail's and inspector's columns with their 8 gap
+    public const double CONTENT_PADDING = 16;
+    public const double RAIL_COLUMN = 244;
+    public const double INSPECTOR_COLUMN = 312;
+
     public const double TOOLBAR_FULL_WIDTH = 900;
     public const double TOOLBAR_LABEL_WIDTH = 620;
 
@@ -93,12 +101,14 @@ public sealed class ShellLayout
     #region Public methods
 
     /// <summary>
-    /// Places the bands for a window width; the first call has no history, so it uses the thresholds alone. Returns whether anything changed.
+    /// Places the panels and the toolbar for a window width; the rail docks first, and the inspector counts the rail's column only while the rail is open. The first call has no history, so it uses the thresholds alone. Returns whether anything changed.
     /// </summary>
-    public bool Update(double windowWidth)
+    public bool Update(double windowWidth, bool railOpen = true)
     {
-        var rail = Reached(windowWidth, Rail == PanelMode.Docked, RAIL_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Push;
-        var inspector = Reached(windowWidth, Inspector == PanelMode.Docked, INSPECTOR_DOCK_WIDTH) ? PanelMode.Docked : PanelMode.Push;
+        var railRoom = windowWidth - CONTENT_PADDING - RAIL_COLUMN;
+        var rail = Reached(railRoom, Rail == PanelMode.Docked, MIN_TABLE_WIDTH) ? PanelMode.Docked : PanelMode.Push;
+        var inspectorRoom = windowWidth - CONTENT_PADDING - INSPECTOR_COLUMN - (rail == PanelMode.Docked && railOpen ? RAIL_COLUMN : 0);
+        var inspector = Reached(inspectorRoom, Inspector == PanelMode.Docked, MIN_TABLE_WIDTH) ? PanelMode.Docked : PanelMode.Push;
         var toolbar = Reached(windowWidth, Toolbar == ToolbarMode.Full, TOOLBAR_FULL_WIDTH) ? ToolbarMode.Full
             : Reached(windowWidth, Toolbar != ToolbarMode.IconOnly, TOOLBAR_LABEL_WIDTH) ? ToolbarMode.Compact
             : ToolbarMode.IconOnly;

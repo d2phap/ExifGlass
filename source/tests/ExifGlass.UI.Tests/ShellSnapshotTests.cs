@@ -56,10 +56,10 @@ public class ShellSnapshotTests
             await shell.WaitForAsync(() => shell.ViewModel.HasDocument);
             Check(shell, $"shell-{width}", theme, failures);
 
-            if (width == 1100)
+            if (width == 760)
             {
                 shell.ViewModel.ToggleInspectorCommand.Execute(null);
-                Check(shell, "shell-inspector-push-1100", theme, failures);
+                Check(shell, "shell-inspector-push-760", theme, failures);
             }
             else if (width == 480)
             {

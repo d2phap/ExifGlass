@@ -37,7 +37,7 @@ public static class PerfRun
 
     private const int REPEATED_LOADS = 50;
     private const int MOTION_ROUNDS = 3;
-    private const double PUSH_WIDTH = 760;
+    private const double PUSH_WIDTH = 640;
     private static readonly TimeSpan Idle = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan Motion = TimeSpan.FromMilliseconds(600);
 
@@ -96,6 +96,7 @@ public static class PerfRun
         }
 
         if (file is not null) budgetsMet &= await MeasureTableAsync(window, vm, probe, output);
+        if (file is not null) budgetsMet &= await MeasureRailAsync(vm, probe, output);
 
         budgetsMet &= await MeasureAsync(probe, output, "rail column 0 <-> 244", onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
         budgetsMet &= await MeasureAsync(probe, output, "inspector column 0 <-> 312", onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
@@ -183,6 +184,25 @@ public static class PerfRun
         }
 
         met &= await MeasureAsync(probe, output, "column # 0 <-> 74", onRenderThread: false, () => vm.ToggleColumnCommand.Execute(Core.Export.TableColumns.Index));
+        return met;
+    }
+
+
+    // P6: the rail's jump (the table's scroll glides on the UI thread) and a group hidden from the rail (FLIP and the composition bar)
+    private static async Task<bool> MeasureRailAsync(ViewModels.MainViewModel vm, FrameProbe probe, TextWriter output)
+    {
+        if (vm.RailGroups.Count < 3) return true;
+
+        var (first, last) = (vm.RailGroups[0].Name, vm.RailGroups[^1].Name);
+        var down = false;
+        var met = await MeasureAsync(probe, output, $"rail jump {first} <-> {last}", onRenderThread: false, () =>
+        {
+            down = !down;
+            _ = vm.JumpToGroupAsync(down ? last : first);
+        });
+
+        var group = vm.RailGroups[1];
+        met &= await MeasureAsync(probe, output, $"rail hide {group.Name}", onRenderThread: true, () => vm.SetGroupHidden(group.Name, group.IsShown));
         return met;
     }
 

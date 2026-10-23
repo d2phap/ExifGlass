@@ -543,6 +543,12 @@ public class PushHost : ContentControl
     public static readonly StyledProperty<double> RightTravelProperty =
         AvaloniaProperty.Register<PushHost, double>(nameof(RightTravel), 312);
 
+    /// <summary>
+    /// How far past its edges the host still draws: the window's padding, for the inspector's scroll bar and the selected card's ring; a pushed table is cut at the window's edge.
+    /// </summary>
+    public static readonly StyledProperty<double> BleedProperty =
+        AvaloniaProperty.Register<PushHost, double>(nameof(Bleed), 8);
+
     private Control? _strip;
     private Control? _left;
     private Control? _right;
@@ -596,6 +602,12 @@ public class PushHost : ContentControl
         set => SetValue(RightTravelProperty, value);
     }
 
+    public double Bleed
+    {
+        get => GetValue(BleedProperty);
+        set => SetValue(BleedProperty, value);
+    }
+
     /// <summary>
     /// Gets where the content rests now: LeftTravel with the left pane open, minus RightTravel with the right one, else 0.
     /// </summary>
@@ -616,6 +628,16 @@ public class PushHost : ContentControl
 
 
     #region Protected methods
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        var size = base.ArrangeOverride(finalSize);
+        var bounds = new Rect(size).Inflate(Bleed);
+        if (Clip is not RectangleGeometry clip || clip.Rect != bounds) Clip = new RectangleGeometry(bounds);
+
+        return size;
+    }
+
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {

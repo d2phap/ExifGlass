@@ -21,6 +21,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Input.Raw;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
@@ -72,8 +73,10 @@ public class MainWindowTests
 
     [AvaloniaTheory]
     [InlineData(1400, true, true, true, true)]
-    [InlineData(1100, true, false, true, true)]
-    [InlineData(760, false, false, false, true)]
+    [InlineData(1100, true, true, true, true)]
+    [InlineData(900, true, false, true, true)]
+    [InlineData(760, true, false, false, true)]
+    [InlineData(640, false, false, false, true)]
     [InlineData(480, false, false, false, false)]
     public async Task EachBandDocksAndShowsWhatDs21Says(double width, bool railDocked, bool inspectorDocked, bool secondaryButtons, bool openLabel)
     {
@@ -170,7 +173,7 @@ public class MainWindowTests
     [AvaloniaFact]
     public async Task APushedPanelMovesTheTableAsideWithoutResizingIt()
     {
-        using var shell = await TestShell.OpenWithFileAsync(760);
+        using var shell = await TestShell.OpenWithFileAsync(640);
         var vm = shell.ViewModel;
         var w = shell.Window;
         var tableWidth = w.Table.Bounds.Width;
@@ -184,8 +187,8 @@ public class MainWindowTests
         Assert.Equal(8 + 244, w.Table.TranslatePoint(default, w)!.Value.X);
         Assert.Equal(8, w.RailPushFrame.TranslatePoint(default, w)!.Value.X);
 
-        // the table's far side is clipped at the host, which never scrolls
-        Assert.True(w.Pushes.ClipToBounds);
+        // the table's far side is clipped at the window's edge, which never scrolls
+        Assert.Equal(new Rect(w.Pushes.Bounds.Size).Inflate(8), Assert.IsType<RectangleGeometry>(w.Pushes.Clip).Rect);
 
         vm.ToggleInspectorCommand.Execute(null);
         shell.Settle();
@@ -193,7 +196,7 @@ public class MainWindowTests
         Assert.True(w.Pushes.IsRightOpen);
         Assert.Equal(-312, w.Pushes.Offset);
         Assert.Equal(8 - 312, w.Table.TranslatePoint(default, w)!.Value.X);
-        Assert.Equal(760 - 8 - 304, w.InspectorPushFrame.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(640 - 8 - 304, w.InspectorPushFrame.TranslatePoint(default, w)!.Value.X);
         Assert.True(vm.IsInspectorShown);
 
         shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
@@ -224,7 +227,7 @@ public class MainWindowTests
     [AvaloniaFact]
     public async Task WideningDocksAPushedRail()
     {
-        using var shell = await TestShell.OpenWithFileAsync(760);
+        using var shell = await TestShell.OpenWithFileAsync(640);
         shell.ViewModel.ToggleRailCommand.Execute(null);
         shell.Settle();
 

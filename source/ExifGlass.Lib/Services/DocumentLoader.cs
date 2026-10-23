@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.ExifTool;
 using ExifGlass.Core.Metadata;
@@ -87,6 +89,16 @@ public sealed class DocumentLoader(IMetadataReader reader)
     /// </summary>
     public TimeSpan LastLoadTime { get; private set; }
 
+    /// <summary>
+    /// The document's preview, decoded at the Frame card's size; null until it is ready or when there is none.
+    /// </summary>
+    public Bitmap? Preview { get; private set; }
+
+    /// <summary>
+    /// Device pixels per DIP that previews are decoded for; the window sets its own.
+    /// </summary>
+    public double PreviewScaling { get; set; } = 2;
+
     #endregion // Properties
 
 
@@ -98,6 +110,8 @@ public sealed class DocumentLoader(IMetadataReader reader)
     public event EventHandler? Changed;
 
     public event EventHandler<LoadFailedEventArgs>? Failed;
+
+    public event EventHandler? PreviewChanged;
 
     #endregion // Events
 
@@ -146,27 +160,39 @@ public sealed class DocumentLoader(IMetadataReader reader)
         PendingPath = null;
         Phase = LoadPhase.Ready;
         LastLoadTime = watch.Elapsed;
+        SetPreview(null);
         Changed?.Invoke(this, EventArgs.Empty);
 
-        AiGenerationInfo? ai;
+        // a file Skia decodes itself needs no ExifTool, so it decodes while the AI read runs; an embedded preview waits behind it
+        var preview = PreviewService.IsDirect(document) ? PreviewService.LoadAsync(document, reader, PreviewScaling, token) : null;
+
+        AiGenerationInfo? ai = null;
         try
         {
             ai = await reader.ReadAiAsync(path, token);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
+            Abandon(preview);
             return;
         }
         catch (Exception ex) when (IsReadFailure(ex))
         {
             // the table is already shown; a failed AI read leaves it as it is
-            return;
         }
 
-        if (generation != _generation || ai is null) return;
+        if (generation != _generation)
+        {
+            Abandon(preview);
+            return;
+        }
+        if (ai is not null)
+        {
+            Document = document.WithAi(ai);
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
 
-        Document = document.WithAi(ai);
-        Changed?.Invoke(this, EventArgs.Empty);
+        await ApplyPreviewAsync(preview ?? PreviewService.LoadAsync(document, reader, PreviewScaling, token), generation, token);
     }
 
     #endregion // Public methods
@@ -176,6 +202,45 @@ public sealed class DocumentLoader(IMetadataReader reader)
 
     private static bool IsReadFailure(Exception ex) => ex is ExifToolException or ExifToolUnavailableException or IOException or TimeoutException
         or UnauthorizedAccessException or InvalidDataException or JsonException or ArgumentException or ObjectDisposedException;
+
+
+    // a newer file took over: its decode may still finish, and nothing else will free it
+    private static void Abandon(Task<Bitmap?>? preview) =>
+        preview?.ContinueWith(static t => t.Result?.Dispose(), CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+
+
+    private async Task ApplyPreviewAsync(Task<Bitmap?> load, int generation, CancellationToken token)
+    {
+        Bitmap? bitmap;
+        try
+        {
+            bitmap = await load;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (generation != _generation)
+        {
+            bitmap?.Dispose();
+            return;
+        }
+
+        SetPreview(bitmap);
+    }
+
+
+    // one preview in memory (plan 8); the old one goes after the views have let go of it
+    private void SetPreview(Bitmap? bitmap)
+    {
+        if (ReferenceEquals(Preview, bitmap)) return;
+
+        var old = Preview;
+        Preview = bitmap;
+        PreviewChanged?.Invoke(this, EventArgs.Empty);
+        if (old is not null) Dispatcher.UIThread.Post(old.Dispose, DispatcherPriority.Background);
+    }
 
 
     // a failed read keeps the last good document (Appendix B item 3)

@@ -145,9 +145,9 @@
     </Style>
   </ControlTheme>
 
-  <!--  push panels (owner at G4 review): the content and the panes in one strip that slides; the host clips it at its edges  -->
+  <!--  push panels (owner at G4 review): the content and the panes in one strip that slides; the host clips it just past its edges (Bleed) in code  -->
   <ControlTheme x:Key="{x:Type ui:PushHost}" TargetType="ui:PushHost">
-    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
         <ui:PushStrip Name="PART_Strip" LeftTravel="{TemplateBinding LeftTravel}" RightTravel="{TemplateBinding RightTravel}">

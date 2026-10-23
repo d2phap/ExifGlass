@@ -30,19 +30,24 @@ public class ShellTests
 {
     #region Layout bands
 
+    // a panel docks while the table keeps 420 beside it (owner at the P6 review): both at 992 and up, the rail alone at 680; the toolbar keeps DS 2.1's bands
     [Theory]
-    [InlineData(1400, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
-    [InlineData(1200, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
-    [InlineData(1100, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
-    [InlineData(900, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
-    [InlineData(760, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
-    [InlineData(620, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
-    [InlineData(480, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
-    [InlineData(420, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
-    public void TheFourBandsFollowDs21(double width, PanelMode rail, PanelMode inspector, ToolbarMode toolbar)
+    [InlineData(1400, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
+    [InlineData(1100, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
+    [InlineData(992, true, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
+    [InlineData(991, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
+    [InlineData(900, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Full)]
+    [InlineData(900, false, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Full)]
+    [InlineData(760, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(748, false, PanelMode.Docked, PanelMode.Docked, ToolbarMode.Compact)]
+    [InlineData(680, true, PanelMode.Docked, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(679, true, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(679, false, PanelMode.Push, PanelMode.Push, ToolbarMode.Compact)]
+    [InlineData(480, true, PanelMode.Push, PanelMode.Push, ToolbarMode.IconOnly)]
+    public void PanelsDockWhileTheTableKeepsItsMinimumWidth(double width, bool railOpen, PanelMode rail, PanelMode inspector, ToolbarMode toolbar)
     {
         var layout = new ShellLayout();
-        layout.Update(width);
+        layout.Update(width, railOpen);
 
         Assert.Equal((rail, inspector, toolbar), (layout.Rail, layout.Inspector, layout.Toolbar));
     }
@@ -54,15 +59,21 @@ public class ShellTests
         var layout = new ShellLayout();
         layout.Update(1300);
 
-        Assert.False(layout.Update(1200 - ShellLayout.HYSTERESIS + 1));
+        Assert.False(layout.Update(992 - ShellLayout.HYSTERESIS + 1));
         Assert.Equal(PanelMode.Docked, layout.Inspector);
 
-        Assert.True(layout.Update(1200 - ShellLayout.HYSTERESIS - 1));
+        Assert.True(layout.Update(992 - ShellLayout.HYSTERESIS - 1));
         Assert.Equal(PanelMode.Push, layout.Inspector);
 
         // coming back up, the threshold itself is needed again
-        Assert.False(layout.Update(1199));
-        Assert.True(layout.Update(1200));
+        Assert.False(layout.Update(991));
+        Assert.True(layout.Update(992));
+        Assert.Equal(PanelMode.Docked, layout.Inspector);
+
+        // closing the rail gives the inspector the rail's room
+        Assert.True(layout.Update(900));
+        Assert.Equal(PanelMode.Push, layout.Inspector);
+        Assert.True(layout.Update(900, railOpen: false));
         Assert.Equal(PanelMode.Docked, layout.Inspector);
     }
 

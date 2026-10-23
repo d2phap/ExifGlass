@@ -470,8 +470,8 @@ public class AiCard : TemplatedControl
         PseudoClasses.Set(":negative", !string.IsNullOrEmpty(NegativePrompt));
         PseudoClasses.Set(":parameters", Parameters.Count > 0);
 
-        // provenance alone (a C2PA manifest) has no generation parameters to copy; P7 shows it
-        PseudoClasses.Set(":copyable", !string.IsNullOrEmpty(Prompt) || Parameters.Count > 0);
+        // provenance alone (a C2PA manifest's fields) has no generation parameters to copy; P7 shows it
+        PseudoClasses.Set(":copyable", Info?.Primary is { IsGeneration: true });
     }
 
     #endregion // Private methods

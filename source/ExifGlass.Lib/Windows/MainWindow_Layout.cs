@@ -19,7 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using ExifGlass.Core.Query;
 using ExifGlass.ViewModels;
+using ExifGlass.Views;
 using System.ComponentModel;
 
 namespace ExifGlass.Windows;
@@ -30,6 +32,10 @@ public partial class MainWindow
 
     // until the window has its first real size, band changes apply at once: a restored maximize shouldn't play the panel motion
     private bool _layoutSettled;
+
+    // the panels can't show without a file, so they are made with the first one: the idle heap stays as it was (plan 8)
+    private RailPanel? _rail;
+    private InspectorPanel? _inspector;
 
     #endregion // Fields and constants
 
@@ -64,9 +70,24 @@ public partial class MainWindow
         PlaceInspector();
 
         ViewModel.PropertyChanged += ViewModel_LayoutChanged;
+        ViewModel.GroupJumpRequested += ViewModel_GroupJumpRequested;
         RailSlot.Closed += RailSlot_Closed;
         InspectorSlot.Closed += InspectorSlot_Closed;
         Table.SizeChanged += (_, e) => ViewModel.UpdateTableWidth(e.NewSize.Width);
+        Table.Table.RowActivated += Table_RowActivated;
+        ScalingChanged += (_, _) => ViewModel.Loader.PreviewScaling = RenderScaling;
+        ViewModel.Loader.PreviewScaling = RenderScaling;
+    }
+
+
+    private void EnsurePanels()
+    {
+        if (_rail is not null || !ViewModel.HasDocument) return;
+
+        _rail = new RailPanel();
+        _inspector = new InspectorPanel();
+        RailContent.Children.Add(_rail);
+        InspectorContent.Children.Add(_inspector);
     }
 
 
@@ -119,7 +140,24 @@ public partial class MainWindow
             case nameof(MainViewModel.IsInspectorDocked):
                 if (!_layoutSettled) InspectorSlot.Snap(ViewModel.IsInspectorDocked);
                 break;
+
+            case nameof(MainViewModel.HasDocument):
+                EnsurePanels();
+                break;
         }
+    }
+
+
+    // the rows of a group the jump showed or expanded are on screen once this view is applied
+    private void ViewModel_GroupJumpRequested(object? sender, string group) =>
+        Dispatcher.UIThread.Post(() => _ = Table.Table.JumpToGroupAsync(group), DispatcherPriority.Loaded);
+
+
+    // Enter on a row (Appendix B item 10): the inspector shows, and keyboard focus moves into its card
+    private void Table_RowActivated(object? sender, ViewRow e)
+    {
+        if (!ViewModel.IsInspectorShown) ViewModel.ToggleInspectorCommand.Execute(null);
+        _inspector?.FocusSelectedTag();
     }
 
 

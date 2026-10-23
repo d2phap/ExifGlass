@@ -27,9 +27,10 @@
                        LeftTravel="{StaticResource RailColumn}"
                        RightTravel="{StaticResource InspectorColumn}">
             <ui:PushHost.LeftPane>
+              <!--  the rail's padding is its scroll content's, so the scroll bar meets the panel's edge (owner at the P6 review)  -->
               <ui:SquircleBorder Name="RailPushFrame"
                                  Width="{StaticResource RailWidth}"
-                                 Padding="8"
+                                 ClipToBounds="True"
                                  Background="{DynamicResource BgPanelBrush}"
                                  BorderBrush="{DynamicResource StrokeHairlineBrush}"
                                  BorderThickness="1"
@@ -48,7 +49,7 @@
                   <ui:SquircleBorder Name="RailDockFrame"
                                      Width="{StaticResource RailWidth}"
                                      HorizontalAlignment="Left"
-                                     Padding="8"
+                                     ClipToBounds="True"
                                      Background="{DynamicResource BgPanelBrush}"
                                      BorderBrush="{DynamicResource StrokeHairlineBrush}"
                                      BorderThickness="1"

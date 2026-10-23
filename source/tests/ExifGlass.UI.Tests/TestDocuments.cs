@@ -90,6 +90,11 @@ public sealed class FakeReader : IMetadataReader
     /// </summary>
     public Exception? Failure { get; set; }
 
+    /// <summary>
+    /// Gets or sets what the AI read returns.
+    /// </summary>
+    public AiGenerationInfo? Ai { get; set; }
+
     #endregion // Properties
 
 
@@ -113,7 +118,7 @@ public sealed class FakeReader : IMetadataReader
     public Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken)
     {
         AiReads++;
-        return Task.FromResult<AiGenerationInfo?>(null);
+        return Task.FromResult(Ai);
     }
 
     #endregion // Public methods

@@ -132,6 +132,22 @@ public static class AppText
     public const string TOAST_COPIED_AS_JSON = "Copied as JSON";
     public const string TOAST_EXPORT_FAILED = "Export failed";
 
+    // the rail (DS 6.10; Proto) and the inspector (DS 6.11; Appendix B item 16)
+    public const string GROUPS = "GROUPS";
+    public const string QUICK_FILTERS = "QUICK FILTERS";
+    public const string HIDE_ALL = "Hide all";
+    public const string SHOW_ALL = "Show all";
+    public const string DROP_HINT = "Open a file, or drop one here to view";
+    public const string FILE_READING = "Reading…";
+    public const string FILE_READING_SUB = "ExifTool is parsing the file";
+    public const string FILE_NONE = "No file open";
+    public const string FILE_NONE_SUB = "Open or drop a file";
+    public const string TOAST_COPIED_KEY = "Copied tag key";
+    public const string TOAST_EDIT_STAGED = "Edit staged";
+    public const string TOAST_NO_CHANGE = "No change";
+    public const string TOAST_COPIED_PROMPT = "Copied prompt";
+    public const string TOAST_COPIED_PARAMETERS = "Copied generation parameters";
+
     #endregion // Constants
 
 
@@ -180,6 +196,14 @@ public static class AppText
     public static string Clip(string text) => text.Length > 40 ? string.Concat(text.AsSpan(0, 40), "…") : text;
 
     public static string SettingsTooltip => $"{SETTINGS} ({UiText.Shortcut(",")})";
+
+    public static string HideGroup(string group) => $"Hide {group} tags";
+
+    public static string ShowGroup(string group) => $"Show {group} tags";
+
+    public static string JumpTo(string group) => $"Jump to {group}";
+
+    public static string Characters(int count) => count == 1 ? "1 character" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} characters");
 
     public static string AboutTooltip => $"{ABOUT} (F1)";
 

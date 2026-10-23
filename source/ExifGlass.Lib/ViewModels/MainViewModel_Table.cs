@@ -404,6 +404,7 @@ public sealed partial class MainViewModel
         ShowDuplicates = _arguments.ShowDuplicates,
         ShowRawValues = _arguments.ShowRawValues,
         ShowTagNames = _arguments.ShowTagNames,
+        Edits = _edits,
     };
 
 
@@ -494,6 +495,8 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(ExportHeader));
         OnPropertyChanged(nameof(GpsDescription));
         UpdateChips();
+        UpdateRail();
+        UpdateFocus();
     }
 
     #endregion // Private methods
@@ -501,7 +504,11 @@ public sealed partial class MainViewModel
 
     #region Event handlers
 
-    private void Selection_Changed(object? sender, EventArgs e) => SelectedCount = Selection.RowCount;
+    private void Selection_Changed(object? sender, EventArgs e)
+    {
+        SelectedCount = Selection.RowCount;
+        UpdateFocus();
+    }
 
     #endregion // Event handlers
 }

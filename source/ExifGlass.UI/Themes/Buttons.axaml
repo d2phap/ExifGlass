@@ -202,9 +202,12 @@
       <Setter Property="Padding" Value="0" />
     </Style>
 
-    <!--  DisclosureButton: a 12 chevron at 70% that turns from right to down while its panel is open, as the dropdown chevron turns; after the sizes so its icon size wins  -->
+    <!--  DisclosureButton: a 12 chevron at 70% that turns from right to down while its panel is open, as the dropdown chevron turns; after the sizes so its icon size wins; a press scales its chevron and text, not the row (owner at G7)  -->
     <Style Selector="^.disclosure">
       <Setter Property="IconSize" Value="12" />
+    </Style>
+    <Style Selector="^.disclosure /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="ScalesContent" Value="True" />
     </Style>
     <Style Selector="^.disclosure /template/ ui|GlassIcon#PART_Icon">
       <Setter Property="Opacity" Value="0.7" />
@@ -216,6 +219,10 @@
     </Style>
     <Style Selector="^.disclosure:expanded /template/ ui|GlassIcon#PART_Icon">
       <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    </Style>
+    <!--  a "n more" toggle opens the list above it, so its chevron turns up for Show less (owner at G7)  -->
+    <Style Selector="^.disclosure.more:expanded /template/ ui|GlassIcon#PART_Icon">
+      <Setter Property="RenderTransform" Value="rotate(-90deg)" />
     </Style>
   </ControlTheme>
 

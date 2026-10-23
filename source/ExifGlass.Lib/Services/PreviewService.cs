@@ -53,6 +53,13 @@ public static class PreviewService
 
 
     /// <summary>
+    /// Whether a preview should come: the file decodes by itself, or carries one of the previews ExifTool extracts.
+    /// </summary>
+    public static bool MayHavePreview(MetadataDocument doc) =>
+        IsDirect(doc) || doc.Tags.Any(t => t.Name is "JpgFromRaw" or "PreviewImage" or "ThumbnailImage");
+
+
+    /// <summary>
     /// The preview for <paramref name="scaling"/> device pixels per DIP, or null when there is none or it can't be decoded.
     /// </summary>
     public static async Task<Bitmap?> LoadAsync(MetadataDocument doc, IMetadataReader reader, double scaling, CancellationToken cancellationToken)

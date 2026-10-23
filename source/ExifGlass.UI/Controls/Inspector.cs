@@ -748,6 +748,13 @@ public class ExposureCard : TemplatedControl
 
     #region Public methods
 
+    /// <summary>
+    /// Whether any of the four readouts has a value; the card hides without one (owner at G7).
+    /// </summary>
+    public static bool HasReadout(IReadOnlyList<ExposureItem>? items) =>
+        items?.Any(x => double.IsFinite(x.Number) && LABELS.Contains(x.Label)) == true;
+
+
     public static IReadOnlyList<ExposureCellView> BuildCells(IReadOnlyList<ExposureItem>? items)
     {
         var cells = new ExposureCellView[LABELS.Length];
@@ -801,7 +808,7 @@ public sealed record DetailRowView(IconId Icon, string Label, string Value, stri
 
 
 /// <summary>
-/// The Details card (DS 6.11): Camera, Lens, Captured, Location (+ Open in OpenStreetMap) and Software; skeleton rows without a file; "No camera data in this file" when there are none.
+/// The Details card (DS 6.11): Camera, Lens, Captured, Location (+ Open in OpenStreetMap) and Software; skeleton rows without a file; hidden when the file has none (owner at G7).
 /// </summary>
 public class DetailsCard : TemplatedControl
 {
@@ -868,9 +875,6 @@ public class DetailsCard : TemplatedControl
 
     #region Public methods
 
-    /// <summary>
-    /// The rows the card shows (Proto): known labels in the spec's order with their icons, else one "no camera data" row.
-    /// </summary>
     public static IReadOnlyList<DetailRowView> BuildRows(IReadOnlyList<DetailItem> items)
     {
         var rows = new List<DetailRowView>(ROWS.Length);
@@ -880,8 +884,14 @@ public class DetailsCard : TemplatedControl
             if (icon >= 0) rows.Add(new DetailRowView(ROWS[icon].Icon, item.Label, item.Value, item.Sub, item.Link, rows.Count == 0));
         }
 
-        return rows.Count > 0 ? rows : [new DetailRowView(IconId.Camera, ROWS[0].Label, UiText.NO_CAMERA_DATA, string.Empty, null, true)];
+        return rows;
     }
+
+
+    /// <summary>
+    /// Whether the file has any row the card shows.
+    /// </summary>
+    public static bool HasRows(IReadOnlyList<DetailItem>? items) => items?.Any(x => Array.Exists(ROWS, r => r.Label == x.Label)) == true;
 
     #endregion // Public methods
 

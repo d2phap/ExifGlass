@@ -33,7 +33,6 @@ public static class UiText
     public const string REMOVE = "Remove";
     public const string SHOW_MORE = "Show more";
     public const string SHOW_LESS = "Show less";
-    public const string SHOW_FEWER = "Show fewer";
     public const string LOCKED_ARGUMENT = "Always on: ExifGlass needs it to read the file";
     public const string ADD_ARGUMENT = "Add an argument";
     public const string STORE_CAPTION = "Get it from";
@@ -76,9 +75,8 @@ public static class UiText
     public const string PROMPT_OVERLINE = "PROMPT";
     public const string NEGATIVE_PROMPT_OVERLINE = "NEGATIVE PROMPT";
     public const string COPY_PARAMETERS = "Copy generation parameters";
-    public const string FRAME_OVERLINE = "FRAME";
+    public const string PREVIEW_OVERLINE = "PREVIEW";
     public const string OPEN_IN_OSM = "Open in OpenStreetMap";
-    public const string NO_CAMERA_DATA = "No camera data in this file";
     public const string DETAIL_CAMERA = "Camera";
     public const string DETAIL_LENS = "Lens";
     public const string DETAIL_CAPTURED = "Captured";

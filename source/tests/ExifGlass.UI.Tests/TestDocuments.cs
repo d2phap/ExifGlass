@@ -76,6 +76,21 @@ public static class TestDocuments
 
 
     /// <summary>
+    /// A raw file with a thumbnail ExifTool can extract and nothing for the Exposure or Details cards.
+    /// </summary>
+    public static MetadataDocument MakeRaw(string path)
+    {
+        var json = new StringBuilder("[{\"SourceFile\": \"").Append(path.Replace('\\', '/')).Append('"');
+        json.Append(", \"ExifTool:ExifTool:ExifToolVersion\": {\"id\": \"ExifToolVersion\", \"desc\": \"ExifTool Version Number\", \"val\": 13.59}");
+        json.Append(", \"File:System:FileType\": {\"id\": \"FileType\", \"desc\": \"File Type\", \"val\": \"ARW\"}");
+        json.Append(", \"EXIF:IFD1:ThumbnailImage\": {\"id\": \"0x0201\", \"desc\": \"Thumbnail Image\", \"val\": \"(Binary data 9 bytes, use -b option to extract)\"}");
+        json.Append("}]");
+        var read = TableReader.Read(new ReadOnlySequence<byte>(Encoding.UTF8.GetBytes(json.ToString())), new StringPool());
+        return MetadataDocument.Create(path, read);
+    }
+
+
+    /// <summary>
     /// What the AI read finds in MakeAi's file.
     /// </summary>
     public static AiGenerationInfo Ai()

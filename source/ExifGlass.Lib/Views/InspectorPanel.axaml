@@ -6,7 +6,7 @@
              ClipToBounds="False"
              x:DataType="vm:MainViewModel">
 
-  <!--  DS 6.11 / S4: cards 8 apart, AI generation, the selected AI field under it (AI addendum question 4) or the character card, Selected tag, Frame, Exposure, Details (Add tag comes with P8); the viewer reaches 3 px past the cards so the selected card's ring isn't cut, and to the window's edge so its scroll bar meets it (owner at the P6 review); Avalonia 12 clips a UserControl, so this one doesn't  -->
+  <!--  DS 6.11 / S4: cards 8 apart, AI generation, the selected AI field under it (AI addendum question 4) or the character card, Selected tag, Preview (DS 6.11's Frame, renamed by the owner at G7), Exposure, Details (Add tag comes with P8), each hidden when the file has nothing for it; the viewer reaches 3 px past the cards so the selected card's ring isn't cut, and to the window's edge so its scroll bar meets it (owner at the P6 review); Avalonia 12 clips a UserControl, so this one doesn't  -->
   <ScrollViewer Name="Scroller"
                 Margin="-3,-3,-8,-3"
                 HorizontalScrollBarVisibility="Disabled">
@@ -42,9 +42,15 @@
                           IsVisible="{Binding HasFocusedTag}"
                           RevertCommand="{Binding RevertFocusCommand}"
                           View="{Binding FocusedTag}" />
-      <ui:FrameCard Name="FrameCard" Frame="{Binding Frame}" Preview="{Binding Preview}" />
-      <ui:ExposureCard Name="ExposureCard" Items="{Binding Exposure}" />
-      <ui:DetailsCard Name="DetailsCard" Items="{Binding Details}" OpenLinkCommand="{Binding OpenLinkCommand}" />
+      <ui:FrameCard Name="FrameCard"
+                    Frame="{Binding Frame}"
+                    IsVisible="{Binding ShowPreviewCard}"
+                    Preview="{Binding Preview}" />
+      <ui:ExposureCard Name="ExposureCard" IsVisible="{Binding ShowExposureCard}" Items="{Binding Exposure}" />
+      <ui:DetailsCard Name="DetailsCard"
+                      IsVisible="{Binding ShowDetailsCard}"
+                      Items="{Binding Details}"
+                      OpenLinkCommand="{Binding OpenLinkCommand}" />
     </StackPanel>
   </ScrollViewer>
 

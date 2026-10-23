@@ -100,6 +100,11 @@ public sealed class DocumentLoader(IMetadataReader reader)
     public Bitmap? Preview { get; private set; }
 
     /// <summary>
+    /// Gets whether the document's preview is still being decoded.
+    /// </summary>
+    public bool IsPreviewPending { get; private set; }
+
+    /// <summary>
     /// Device pixels per DIP that previews are decoded for; the window sets its own.
     /// </summary>
     public double PreviewScaling { get; set; } = 2;
@@ -167,7 +172,7 @@ public sealed class DocumentLoader(IMetadataReader reader)
         Phase = LoadPhase.Ready;
         IsReadingAi = true;
         LastLoadTime = watch.Elapsed;
-        SetPreview(null);
+        SetPreview(null, pending: true);
         Changed?.Invoke(this, EventArgs.Empty);
 
         // a file Skia decodes itself needs no ExifTool, so it decodes while the AI read runs; an embedded preview waits behind it
@@ -233,19 +238,20 @@ public sealed class DocumentLoader(IMetadataReader reader)
             return;
         }
 
-        SetPreview(bitmap);
+        SetPreview(bitmap, pending: false);
     }
 
 
     // one preview in memory (plan 8); the old one goes after the views have let go of it
-    private void SetPreview(Bitmap? bitmap)
+    private void SetPreview(Bitmap? bitmap, bool pending)
     {
-        if (ReferenceEquals(Preview, bitmap)) return;
+        if (ReferenceEquals(Preview, bitmap) && IsPreviewPending == pending) return;
 
         var old = Preview;
         Preview = bitmap;
+        IsPreviewPending = pending;
         PreviewChanged?.Invoke(this, EventArgs.Empty);
-        if (old is not null) Dispatcher.UIThread.Post(old.Dispose, DispatcherPriority.Background);
+        if (old is not null && !ReferenceEquals(old, bitmap)) Dispatcher.UIThread.Post(old.Dispose, DispatcherPriority.Background);
     }
 
 

@@ -522,7 +522,11 @@ public sealed partial class MainViewModel : ObservableObject
     private void Metadata_StatusChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(UpdateExifToolState);
 
 
-    private void Loader_PreviewChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(Preview));
+    private void Loader_PreviewChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(Preview));
+        OnPropertyChanged(nameof(ShowPreviewCard));
+    }
 
     #endregion // Event handlers
 }

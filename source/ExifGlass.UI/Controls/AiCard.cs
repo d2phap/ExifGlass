@@ -645,7 +645,7 @@ public class AiCard : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == IsExpandedProperty) PseudoClasses.Set(":expanded", IsExpanded);
-        else if (change.Property == AllModelsOpenProperty) MoreModelsLabel = MoreModels.Count == 0 ? null : AllModelsOpen ? UiText.SHOW_FEWER : UiText.MoreCount(MoreModels.Count);
+        else if (change.Property == AllModelsOpenProperty) MoreModelsLabel = MoreModels.Count == 0 ? null : AllModelsOpen ? UiText.SHOW_LESS : UiText.MoreCount(MoreModels.Count);
         else if (change.Property == SelectedPassProperty) ShowPass(SelectedPass);
         else if (change.Property == IsLoadingProperty) UpdatePseudoClasses();
         else if (change.Property == InfoProperty)

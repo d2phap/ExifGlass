@@ -152,7 +152,7 @@ public static partial class DesignGalleryCatalog
             new("ISO", 160, 0, "", "", "EV -1/3"), new("Focal", 33, 0, "", " mm", "50 mm full-frame eq."),
         ];
 
-        return new GallerySection("c-inspector", "Inspector cards", "DS 6.11 / S4: cards 304 wide, 8 apart, each rising 12 px as it appears (400 ms). Selected tag: Accent 35% border + 3 px ring; chip, Tag ID, Delete or Undo, Close; name Title; mono value well radius 12 with Copy; Raw (-n), Format, Tag key; Edit primary; edit mode Cancel / Apply; no edit UI for read-only groups; a tag the AI group was read from says how many fields it fed (the AI card is in c-ai). Frame, Exposure (22 Medium, counting up 1100 ms), Details.",
+        return new GallerySection("c-inspector", "Inspector cards", "DS 6.11 / S4: cards 304 wide, 8 apart, each rising 12 px as it appears (400 ms). Selected tag: Accent 35% border + 3 px ring; chip, Tag ID, Delete or Undo, Close; name Title with the value's Copy at its end; mono value well radius 12, its scroll bar at the edge; Raw (-n), Format, Tag key; Edit primary; edit mode Cancel / Apply; no edit UI for read-only groups; a tag the AI group was read from says how many fields it fed (the AI card is in c-ai). Preview (DS 6.11's Frame, renamed by the owner at G7), Exposure (22 Medium, counting up 1100 ms), Details; each hides when the file has nothing for it.",
         [
             new("selected tag", Card(Tag()), "an editable EXIF tag"),
             new("edited", Card(Tag(EditState.Edited)), "Was: and Revert"),
@@ -160,13 +160,11 @@ public static partial class DesignGalleryCatalog
             new("read-only group", Card(Tag(readOnly: true)), "File, Composite, ExifTool, ICC_Profile, PNG: no Delete, no Edit, no badge"),
             new("edit mode", Card(Tag(), editing: true), "mono editor; Cancel (Esc), Apply (Ctrl+Enter)"),
             new("AI source tag", Card(source), "Parsed into 23 AI fields, Go to AI generation; Raw says same as value (AI addendum)"),
-            new("frame", new FrameCard { Width = CARD_WIDTH, Frame = frame }, "rule of thirds, AF point, ratio and MP chips"),
-            new("frame :preview", new FrameCard { Width = CARD_WIDTH, Frame = frame, Preview = PreviewSample() }, "the preview as cover; its own shape"),
-            new("frame, unknown size", new FrameCard { Width = CARD_WIDTH, Frame = new FrameInfo(0, 0, "—", 0, null, null) }),
+            new("preview, decoding", new FrameCard { Width = CARD_WIDTH, Frame = frame }, "rule of thirds, AF point, ratio and MP chips while a preview is on its way"),
+            new("preview", new FrameCard { Width = CARD_WIDTH, Frame = frame, Preview = PreviewSample() }, "the preview as cover; its own shape"),
+            new("preview, unknown size", new FrameCard { Width = CARD_WIDTH, Frame = new FrameInfo(0, 0, "—", 0, null, null) }),
             new("exposure", new ExposureCard { Width = CARD_WIDTH, Items = exposure }),
-            new("exposure, none", new ExposureCard { Width = CARD_WIDTH, Items = [] }, "TextTertiary dashes"),
             new("details", new DetailsCard { Width = CARD_WIDTH, Items = details }),
-            new("details, none", new DetailsCard { Width = CARD_WIDTH, Items = [] }),
             new("details, no file", new DetailsCard { Width = CARD_WIDTH }, "pulsing skeleton rows"),
         ]);
     }

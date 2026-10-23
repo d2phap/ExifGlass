@@ -144,11 +144,16 @@ public class PanelTests
         Assert.False(cells[2].HasValue);
         Assert.False(cells[3].HasValue);
         Assert.Equal("1/250", CountUpText.FormatValue(cells[1].Value, cells[1].Format));
+
+        // the card hides when none of the four has a value
+        Assert.True(ExposureCard.HasReadout(items));
+        Assert.False(ExposureCard.HasReadout([new("ISO", double.NaN, 0, "", "", ""), new("Look", 3, 0, "", "", "")]));
+        Assert.False(ExposureCard.HasReadout(null));
     }
 
 
     [Fact]
-    public void DetailsKeepTheSpecRowsWithTheirIconsOrSayThereIsNoCameraData()
+    public void DetailsKeepTheSpecRowsWithTheirIconsAndHideWithoutThem()
     {
         DetailItem[] items = [new("Camera", "FUJIFILM X-T5"), new("Look", "Classic Chrome", "Film simulation"), new("Location", "22.2759° N", "", "https://www.openstreetmap.org/")];
         var rows = DetailsCard.BuildRows(items);
@@ -159,8 +164,10 @@ public class PanelTests
         Assert.False(rows[1].IsFirst);
         Assert.True(rows[1].HasLink);
 
-        var none = Assert.Single(DetailsCard.BuildRows([]));
-        Assert.Equal(UiText.NO_CAMERA_DATA, none.Value);
+        Assert.True(DetailsCard.HasRows(items));
+        Assert.Empty(DetailsCard.BuildRows([new("Look", "Classic Chrome")]));
+        Assert.False(DetailsCard.HasRows([new("Look", "Classic Chrome")]));
+        Assert.False(DetailsCard.HasRows(null));
     }
 
 

@@ -439,6 +439,7 @@
                                              HorizontalAlignment="Stretch"
                                              HorizontalContentAlignment="Left"
                                              BorderThickness="0"
+                                             Classes="more"
                                              Content="{TemplateBinding MoreModelsLabel}"
                                              CornerRadius="0"
                                              FontSize="{StaticResource FontSizeCaption}"
@@ -765,39 +766,43 @@
               </ui:SquircleBorder>
             </DockPanel>
 
-            <TextBlock tok:Typography.Role="Title" Text="{Binding Name}" TextWrapping="Wrap" />
-
-            <!--  the value: a prompt in the UI font with its tints (question 14), anything else in mono; up to 220 high, then it scrolls  -->
-            <Panel>
-              <ui:SquircleBorder MinHeight="40"
-                                 Background="{DynamicResource BgSubtleBrush}"
-                                 ClipToBounds="True"
-                                 CornerRadius="{StaticResource RadiusWell}">
-                <ScrollViewer MaxHeight="220" Margin="12,10,40,10" HorizontalScrollBarVisibility="Disabled">
-                  <Panel>
-                    <ui:PromptText Name="PART_Prompt"
-                                   ClampLines="0"
-                                   Embeddings="{Binding Embeddings}"
-                                   FontSize="13"
-                                   IsVisible="False"
-                                   LineHeight="19"
-                                   Prompt="{Binding ShownValue}" />
-                    <SelectableTextBlock Name="PART_Value"
-                                         tok:Typography.Role="MonoValue"
-                                         Text="{Binding ShownValue}"
-                                         TextWrapping="Wrap" />
-                  </Panel>
-                </ScrollViewer>
-              </ui:SquircleBorder>
-              <ui:GlassButton Margin="0,6,6,0"
-                              HorizontalAlignment="Right"
+            <!--  the field's name, with the value's Copy at the line's end as the selected tag's (owner at G7)  -->
+            <DockPanel>
+              <ui:GlassButton Margin="8,-3,-2,-3"
                               VerticalAlignment="Top"
                               Classes="small"
+                              DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Copy}"
                               Tag="{x:Static ui:AiAction.CopyText}"
                               ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
-            </Panel>
+              <TextBlock tok:Typography.Role="Title" Text="{Binding Name}" TextWrapping="Wrap" />
+            </DockPanel>
+
+            <!--  the value: a prompt in the UI font with its tints (question 14), anything else in mono; up to 240 high, then it scrolls, its bar at the well's edge  -->
+            <ui:SquircleBorder MinHeight="40"
+                               Background="{DynamicResource BgSubtleBrush}"
+                               ClipToBounds="True"
+                               CornerRadius="{StaticResource RadiusWell}">
+              <ScrollViewer MaxHeight="228"
+                            Margin="0,6,2,6"
+                            Padding="12,4,16,4"
+                            HorizontalScrollBarVisibility="Disabled">
+                <Panel>
+                  <ui:PromptText Name="PART_Prompt"
+                                 ClampLines="0"
+                                 Embeddings="{Binding Embeddings}"
+                                 FontSize="13"
+                                 IsVisible="False"
+                                 LineHeight="19"
+                                 Prompt="{Binding ShownValue}" />
+                  <SelectableTextBlock Name="PART_Value"
+                                       tok:Typography.Role="MonoValue"
+                                       Text="{Binding ShownValue}"
+                                       TextWrapping="Wrap" />
+                </Panel>
+              </ScrollViewer>
+            </ui:SquircleBorder>
 
             <!--  Source tag, Parsed as, Length: label 70, gap 12, rows 6 apart  -->
             <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,6,Auto,6,Auto">

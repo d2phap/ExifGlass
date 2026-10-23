@@ -55,6 +55,12 @@ public class InteractionOverlay : SquircleBorder
         AvaloniaProperty.Register<InteractionOverlay, double>(nameof(PressScale), 1);
 
     /// <summary>
+    /// Press-scales the template's PART_Content instead of its root: a full-width row keeps its edges (owner at G7).
+    /// </summary>
+    public static readonly StyledProperty<bool> ScalesContentProperty =
+        AvaloniaProperty.Register<InteractionOverlay, bool>(nameof(ScalesContent));
+
+    /// <summary>
     /// Holds the hover brush while set: an open dropdown keeps its hover fill (DS 6.1).
     /// </summary>
     public static readonly StyledProperty<bool> IsHeldProperty =
@@ -98,12 +104,18 @@ public class InteractionOverlay : SquircleBorder
     }
 
     /// <summary>
-    /// The template root's scale while pressed; 1 (wide items) turns it off.
+    /// The scale while pressed, of the template's root or, with ScalesContent, its content; 1 (wide items) turns it off.
     /// </summary>
     public double PressScale
     {
         get => GetValue(PressScaleProperty);
         set => SetValue(PressScaleProperty, value);
+    }
+
+    public bool ScalesContent
+    {
+        get => GetValue(ScalesContentProperty);
+        set => SetValue(ScalesContentProperty, value);
     }
 
     public bool IsHeld
@@ -151,7 +163,6 @@ public class InteractionOverlay : SquircleBorder
         IsHitTestVisible = false;
 
         _owner = TemplatedParent as InputElement;
-        _scaleTarget = Parent as Visual;
         if (_owner is null) return;
 
         // rows and toggles mark their pointer events handled, so listen to handled ones too
@@ -163,12 +174,7 @@ public class InteractionOverlay : SquircleBorder
         Transitions ??= [];
         if (!Transitions.Contains(_brushTransition)) Transitions.Add(_brushTransition);
 
-        if (_scaleTarget is not null)
-        {
-            _scaleTarget.Transitions ??= [];
-            if (!_scaleTarget.Transitions.Contains(_scaleTransition)) _scaleTarget.Transitions.Add(_scaleTransition);
-        }
-
+        AttachScaleTarget();
         Update(animate: false);
     }
 
@@ -186,7 +192,7 @@ public class InteractionOverlay : SquircleBorder
         }
 
         _owner = null;
-        _scaleTarget = null;
+        DetachScaleTarget();
     }
 
 
@@ -198,6 +204,11 @@ public class InteractionOverlay : SquircleBorder
         if (change.Property == RestBrushProperty || change.Property == HoverBrushProperty || change.Property == PressBrushProperty) Update(animate: false);
         else if (change.Property == IsHeldProperty) Update(animate: true);
         else if (change.Property == PressScaleProperty) _pressedScale = null;
+        else if (change.Property == ScalesContentProperty && _owner is not null)
+        {
+            DetachScaleTarget();
+            AttachScaleTarget();
+        }
     }
 
     #endregion // Protected methods
@@ -247,6 +258,26 @@ public class InteractionOverlay : SquircleBorder
             var scale = state == State.Pressed ? _pressedScale : SCALE_ONE;
             Apply(target.Transitions, _scaleTransition, instant, () => target.RenderTransform = scale);
         }
+    }
+
+
+    private void AttachScaleTarget()
+    {
+        _scaleTarget = ScalesContent && Parent is Panel root ? root.Children.FirstOrDefault(c => c.Name == "PART_Content") ?? root : Parent as Visual;
+        if (_scaleTarget is null) return;
+
+        _scaleTarget.Transitions ??= [];
+        if (!_scaleTarget.Transitions.Contains(_scaleTransition)) _scaleTarget.Transitions.Add(_scaleTransition);
+    }
+
+
+    private void DetachScaleTarget()
+    {
+        if (_scaleTarget is null) return;
+
+        _scaleTarget.Transitions?.Remove(_scaleTransition);
+        _scaleTarget.RenderTransform = null;
+        _scaleTarget = null;
     }
 
 

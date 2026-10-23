@@ -118,6 +118,19 @@ public partial class InspectorPanel : UserControl
                 _hadCharacter = _viewModel.HasCharacterCard;
                 break;
 
+            // a standing card that was hidden for an earlier file rises in when this one has something for it
+            case nameof(MainViewModel.ShowPreviewCard):
+                if (_viewModel.ShowPreviewCard && !FrameCard.IsVisible) UI.Controls.Card.PlayAppear(FrameCard);
+                break;
+
+            case nameof(MainViewModel.ShowExposureCard):
+                if (_viewModel.ShowExposureCard && !ExposureCard.IsVisible) UI.Controls.Card.PlayAppear(ExposureCard);
+                break;
+
+            case nameof(MainViewModel.ShowDetailsCard):
+                if (_viewModel.ShowDetailsCard && !DetailsCard.IsVisible) UI.Controls.Card.PlayAppear(DetailsCard);
+                break;
+
             // under the AI card (question 4): the inspector scrolls to it
             case nameof(MainViewModel.FocusedAiField):
                 var aiKey = _viewModel.FocusedAiField?.Key;

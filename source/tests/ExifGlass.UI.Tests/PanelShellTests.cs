@@ -25,6 +25,7 @@ using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.Query;
+using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 using ExifGlass.ViewModels;
 using ExifGlass.Views;
@@ -257,6 +258,34 @@ public class PanelShellTests
         Assert.Equal("a lighthouse", card.Prompt);
         Assert.Contains(vm.RailGroups, g => g.IsAi);
         Assert.DoesNotContain(vm.Segments, s => s.Group == Core.Metadata.GroupInfo.AI_GROUP);
+    }
+
+
+    [AvaloniaFact]
+    public async Task ACardWithNothingForTheFileHides()
+    {
+        using var shell = TestShell.Open(1400);
+        var vm = shell.ViewModel;
+        var ai = new TaskCompletionSource<AiGenerationInfo?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        shell.Reader.Maker = TestDocuments.MakeRaw;
+        shell.Reader.AiHold = ai;
+        var open = vm.OpenFileAsync("a.arw");
+        await shell.WaitForAsync(() => vm.HasDocument);
+        shell.Settle();
+
+        // its embedded preview waits behind the AI read: the Preview card holds its place meanwhile
+        var inspector = Inspector(shell);
+        Assert.True(PreviewService.MayHavePreview(vm.Document!));
+        Assert.True(inspector.FrameCard.IsVisible);
+        Assert.False(inspector.ExposureCard.IsVisible);
+        Assert.False(inspector.DetailsCard.IsVisible);
+
+        // none came, so the empty card goes (owner at G7)
+        ai.SetResult(null);
+        await open;
+        shell.Settle();
+        Assert.False(vm.ShowPreviewCard);
+        Assert.False(inspector.FrameCard.IsVisible);
     }
 
 

@@ -22,6 +22,7 @@ using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
+using ExifGlass.Services;
 using ExifGlass.UI;
 using ExifGlass.UI.Controls;
 using System.Globalization;
@@ -69,6 +70,15 @@ public sealed partial class MainViewModel
     public FrameInfo? Frame => Document?.Derived.Frame;
 
     public IReadOnlyList<ExposureItem>? Exposure => Document?.Derived.Exposure;
+
+    /// <summary>
+    /// Whether the Preview card shows: an empty card hides (owner at G7), but it stays while a preview that should come is decoding, so the cards below don't jump.
+    /// </summary>
+    public bool ShowPreviewCard => Document is { } doc && (Loader.Preview is not null || (Loader.IsPreviewPending && PreviewService.MayHavePreview(doc)));
+
+    public bool ShowExposureCard => ExposureCard.HasReadout(Exposure);
+
+    public bool ShowDetailsCard => DetailsCard.HasRows(Details);
 
     /// <summary>
     /// The Details card's rows; an AI-training signal on a file not made with AI is a row of its own (AI addendum question 10).
@@ -248,6 +258,9 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(Frame));
         OnPropertyChanged(nameof(Exposure));
         OnPropertyChanged(nameof(Details));
+        OnPropertyChanged(nameof(ShowPreviewCard));
+        OnPropertyChanged(nameof(ShowExposureCard));
+        OnPropertyChanged(nameof(ShowDetailsCard));
         OnPropertyChanged(nameof(FileTitle));
         OnPropertyChanged(nameof(FileMeta));
         OnPropertyChanged(nameof(FileExtension));

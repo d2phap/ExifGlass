@@ -450,19 +450,32 @@
               </StackPanel>
             </DockPanel>
 
-            <TextBlock Name="PART_Name"
-                       tok:Typography.Role="Title"
-                       Text="{Binding Name}"
-                       TextWrapping="Wrap" />
+            <!--  the name, with the value's Copy at the line's end (owner at G7); its icon lines up with Close above  -->
+            <DockPanel>
+              <ui:GlassButton Name="PART_CopyValue"
+                              Margin="8,-3,-2,-3"
+                              VerticalAlignment="Top"
+                              Classes="small"
+                              Command="{TemplateBinding CopyValueCommand}"
+                              DockPanel.Dock="Right"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Copy}"
+                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
+              <TextBlock Name="PART_Name"
+                         tok:Typography.Role="Title"
+                         Text="{Binding Name}"
+                         TextWrapping="Wrap" />
+            </DockPanel>
 
-            <!--  value well: mono 12.5 on Bg.Subtle, radius 12, copy 28 in its corner; up to 240 high, then it scrolls (Appendix B item 7)  -->
+            <!--  value well: mono 12.5 on Bg.Subtle, radius 12; up to 240 high, then it scrolls (Appendix B item 7) with its bar at the well's edge (owner at G7)  -->
             <Panel Name="PART_Well">
               <ui:SquircleBorder MinHeight="40"
                                  Background="{DynamicResource BgSubtleBrush}"
                                  ClipToBounds="True"
                                  CornerRadius="{StaticResource RadiusWell}">
-                <ScrollViewer MaxHeight="220"
-                              Margin="12,10,40,10"
+                <ScrollViewer MaxHeight="228"
+                              Margin="0,6,2,6"
+                              Padding="12,4,16,4"
                               HorizontalScrollBarVisibility="Disabled">
                   <SelectableTextBlock Name="PART_Value"
                                        tok:Typography.Role="MonoValue"
@@ -476,15 +489,6 @@
                   </SelectableTextBlock>
                 </ScrollViewer>
               </ui:SquircleBorder>
-              <ui:GlassButton Name="PART_CopyValue"
-                              Margin="0,6,6,0"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Top"
-                              Classes="small"
-                              Command="{TemplateBinding CopyValueCommand}"
-                              Foreground="{DynamicResource TextSecondaryBrush}"
-                              Icon="{x:Static ui:IconId.Copy}"
-                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
             </Panel>
 
             <!--  edit mode: the mono editor, then Cancel and Apply on the right  -->
@@ -638,6 +642,9 @@
     <Style Selector="^:editing /template/ Panel#PART_Well">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <Style Selector="^:editing /template/ ui|GlassButton#PART_CopyValue">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
     <Style Selector="^:editing /template/ StackPanel#PART_EditPanel">
       <Setter Property="IsVisible" Value="True" />
     </Style>
@@ -683,7 +690,7 @@
               <TextBlock VerticalAlignment="Center"
                          tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.FRAME_OVERLINE}" />
+                         Text="{x:Static eg:UiText.PREVIEW_OVERLINE}" />
             </DockPanel>
             <ui:FrameBox Name="PART_Box"
                          HorizontalAlignment="Center"

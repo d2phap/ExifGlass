@@ -54,6 +54,27 @@ public class ShellTests
 
 
     [Fact]
+    public void WiderPanelsDockLaterAndADragKeepsTheTableItsRoom()
+    {
+        var layout = new ShellLayout { RailColumn = 368, InspectorColumn = 488 };
+        layout.Update(1290);
+        Assert.Equal((PanelMode.Docked, PanelMode.Push), (layout.Rail, layout.Inspector));
+        Assert.True(layout.Update(1292));
+        Assert.Equal(PanelMode.Docked, layout.Inspector);
+
+        // within the limits; a width that isn't a number comes back as the minimum
+        var fit = new ShellLayout();
+        Assert.Equal(ShellLayout.RAIL_MAX_WIDTH, fit.FitRail(999, 3000, inspectorDocked: true));
+        Assert.Equal(ShellLayout.RAIL_MIN_WIDTH, fit.FitRail(10, 3000, inspectorDocked: true));
+        Assert.Equal(ShellLayout.RAIL_MIN_WIDTH, fit.FitRail(double.NaN, 3000, inspectorDocked: false));
+
+        // at 1000 the docked rail leaves the inspector 312 before the table falls under 420; with the rail away, more
+        Assert.Equal(312, fit.FitInspector(400, 1000, railDocked: true));
+        Assert.Equal(400, fit.FitInspector(400, 1000, railDocked: false));
+    }
+
+
+    [Fact]
     public void ABandHoldsUntilTheWidthFallsPastItsHysteresis()
     {
         var layout = new ShellLayout();

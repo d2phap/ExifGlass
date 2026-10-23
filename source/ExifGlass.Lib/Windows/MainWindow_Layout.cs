@@ -74,6 +74,12 @@ public partial class MainWindow
         RailSlot.Closed += RailSlot_Closed;
         InspectorSlot.Closed += InspectorSlot_Closed;
         Table.SizeChanged += (_, e) => ViewModel.UpdateTableWidth(e.NewSize.Width);
+        RailSplitter.ResizeRequested += (_, width) => ViewModel.ResizeRail(width);
+        RailSplitter.ResizeCompleted += (_, _) => ViewModel.CommitPanelWidths();
+        RailSplitter.ResetRequested += (_, _) => ViewModel.ResetRailWidth();
+        InspectorSplitter.ResizeRequested += (_, width) => ViewModel.ResizeInspector(width);
+        InspectorSplitter.ResizeCompleted += (_, _) => ViewModel.CommitPanelWidths();
+        InspectorSplitter.ResetRequested += (_, _) => ViewModel.ResetInspectorWidth();
         Table.Table.RowActivated += Table_RowActivated;
         ScalingChanged += (_, _) => ViewModel.Loader.PreviewScaling = RenderScaling;
         ViewModel.Loader.PreviewScaling = RenderScaling;

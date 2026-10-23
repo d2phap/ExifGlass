@@ -100,6 +100,7 @@ public static class PerfRun
 
         budgetsMet &= await MeasureAsync(probe, output, "rail column 0 <-> 244", onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
         budgetsMet &= await MeasureAsync(probe, output, "inspector column 0 <-> 312", onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
+        budgetsMet &= await MeasureResizeAsync(window, vm, probe, output);
 
         var width = window.Width;
         window.Width = PUSH_WIDTH;
@@ -142,6 +143,34 @@ public static class PerfRun
         var judged = onRenderThread ? "render-thread frames" : "UI-thread frames";
         var met = (onRenderThread ? stats.Render : stats.Ui).MeetsBudget && stats.Gc1 == 0 && stats.Gc2 == 0;
         output.WriteLine(stats + (met ? $"\n    budget met ({judged})" : $"\n    BUDGET MISSED on {judged} (p95 16.7, p99 25, none over 50 ms, no gen-1/2 GC)"));
+        return met;
+    }
+
+
+    // a drag in the rail's gap re-lays out the table every frame, as a docked glide does (owner at G7: resizable panels)
+    private static async Task<bool> MeasureResizeAsync(MainWindow window, ViewModels.MainViewModel vm, FrameProbe probe, TextWriter output)
+    {
+        const int STEPS = 40;
+        var (min, max) = (Core.Settings.AppSettings.DEFAULT_RAIL_WIDTH, ViewModels.ShellLayout.RAIL_MAX_WIDTH);
+        var label = Invariant($"rail resize {min:0} <-> {max:0}, a drag of {STEPS} frames");
+
+        UiWatchdog.Operation = label;
+        probe.Start();
+        for (var i = 0; i < MOTION_ROUNDS * 2; i++)
+        {
+            var (from, to) = i % 2 == 0 ? (min, max) : (max, min);
+            for (var step = 1; step <= STEPS; step++)
+            {
+                vm.ResizeRail(from + ((to - from) * step / STEPS));
+                await NextFrameAsync(window);
+            }
+        }
+
+        var stats = probe.Stop(Invariant($"MOTION {label}, {MOTION_ROUNDS} times each way"));
+        UiWatchdog.Operation = "idle";
+
+        var met = stats.Ui.MeetsBudget && stats.Gc1 == 0 && stats.Gc2 == 0;
+        output.WriteLine(stats + (met ? "\n    budget met (UI-thread frames)" : "\n    BUDGET MISSED on UI-thread frames (p95 16.7, p99 25, none over 50 ms, no gen-1/2 GC)"));
         return met;
     }
 

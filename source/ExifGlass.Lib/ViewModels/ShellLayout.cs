@@ -16,6 +16,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Settings;
+
 namespace ExifGlass.ViewModels;
 
 /// <summary>
@@ -71,8 +73,13 @@ public sealed class ShellLayout
 
     // the layout grid (DS 2): content padding 8 each side, the rail's and inspector's columns with their 8 gap
     public const double CONTENT_PADDING = 16;
-    public const double RAIL_COLUMN = 244;
-    public const double INSPECTOR_COLUMN = 312;
+    public const double PANEL_GAP = 8;
+
+    // a drag in the gap sizes a panel within these (owner at G7: resizable panels with limits)
+    public const double RAIL_MIN_WIDTH = 200;
+    public const double RAIL_MAX_WIDTH = 360;
+    public const double INSPECTOR_MIN_WIDTH = 280;
+    public const double INSPECTOR_MAX_WIDTH = 480;
 
     public const double TOOLBAR_FULL_WIDTH = 900;
     public const double TOOLBAR_LABEL_WIDTH = 620;
@@ -91,6 +98,13 @@ public sealed class ShellLayout
 
     public PanelMode Rail { get; private set; } = PanelMode.Docked;
 
+    /// <summary>
+    /// Gets or sets the rail's column, its width and gap (244 by default).
+    /// </summary>
+    public double RailColumn { get; set; } = AppSettings.DEFAULT_RAIL_WIDTH + PANEL_GAP;
+
+    public double InspectorColumn { get; set; } = AppSettings.DEFAULT_INSPECTOR_WIDTH + PANEL_GAP;
+
     public PanelMode Inspector { get; private set; } = PanelMode.Docked;
 
     public ToolbarMode Toolbar { get; private set; } = ToolbarMode.Full;
@@ -105,9 +119,9 @@ public sealed class ShellLayout
     /// </summary>
     public bool Update(double windowWidth, bool railOpen = true)
     {
-        var railRoom = windowWidth - CONTENT_PADDING - RAIL_COLUMN;
+        var railRoom = windowWidth - CONTENT_PADDING - RailColumn;
         var rail = Reached(railRoom, Rail == PanelMode.Docked, MIN_TABLE_WIDTH) ? PanelMode.Docked : PanelMode.Push;
-        var inspectorRoom = windowWidth - CONTENT_PADDING - INSPECTOR_COLUMN - (rail == PanelMode.Docked && railOpen ? RAIL_COLUMN : 0);
+        var inspectorRoom = windowWidth - CONTENT_PADDING - InspectorColumn - (rail == PanelMode.Docked && railOpen ? RailColumn : 0);
         var inspector = Reached(inspectorRoom, Inspector == PanelMode.Docked, MIN_TABLE_WIDTH) ? PanelMode.Docked : PanelMode.Push;
         var toolbar = Reached(windowWidth, Toolbar == ToolbarMode.Full, TOOLBAR_FULL_WIDTH) ? ToolbarMode.Full
             : Reached(windowWidth, Toolbar != ToolbarMode.IconOnly, TOOLBAR_LABEL_WIDTH) ? ToolbarMode.Compact
@@ -122,6 +136,17 @@ public sealed class ShellLayout
         return true;
     }
 
+
+    /// <summary>
+    /// The rail's width for a drag: within its limits, and never so wide that the table beside the docked panels falls under MIN_TABLE_WIDTH.
+    /// </summary>
+    public double FitRail(double width, double windowWidth, bool inspectorDocked) =>
+        Fit(width, RAIL_MIN_WIDTH, RAIL_MAX_WIDTH, windowWidth - CONTENT_PADDING - MIN_TABLE_WIDTH - PANEL_GAP - (inspectorDocked ? InspectorColumn : 0));
+
+
+    public double FitInspector(double width, double windowWidth, bool railDocked) =>
+        Fit(width, INSPECTOR_MIN_WIDTH, INSPECTOR_MAX_WIDTH, windowWidth - CONTENT_PADDING - MIN_TABLE_WIDTH - PANEL_GAP - (railDocked ? RailColumn : 0));
+
     #endregion // Public methods
 
 
@@ -129,6 +154,11 @@ public sealed class ShellLayout
 
     private bool Reached(double width, bool wasReached, double threshold) =>
         width >= threshold || (_measured && wasReached && width >= threshold - HYSTERESIS);
+
+
+    // a saved width out of range (an edited settings file) comes back within the limits; the room only caps growth
+    private static double Fit(double width, double min, double max, double room) =>
+        Math.Clamp(double.IsFinite(width) ? width : min, min, Math.Max(min, Math.Min(max, room)));
 
     #endregion // Private methods
 }

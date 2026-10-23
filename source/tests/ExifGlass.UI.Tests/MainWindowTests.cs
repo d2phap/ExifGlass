@@ -489,6 +489,77 @@ public class MainWindowTests
 
 
     [AvaloniaFact]
+    public async Task DraggingAGapResizesItsPanelAndRemembersIt()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
+        var w = shell.Window;
+
+        // the rail's gap: a drag right widens it and the table gives way; the width is kept
+        Drag(shell, w.RailSplitter, 60);
+        Assert.Equal(296, w.RailDockFrame.Bounds.Width);
+        Assert.Equal(8 + 304, w.Table.TranslatePoint(default, w)!.Value.X);
+        Assert.Equal(296, shell.Settings.Current.RailWidth);
+
+        Drag(shell, w.RailSplitter, 500);
+        Assert.Equal(ShellLayout.RAIL_MAX_WIDTH, w.RailDockFrame.Bounds.Width);
+
+        // the inspector's gap: a drag left widens it
+        Drag(shell, w.InspectorSplitter, -100);
+        Assert.Equal(404, w.InspectorDockFrame.Bounds.Width);
+        Assert.Equal(1400 - 8 - 412, w.Table.TranslatePoint(default, w)!.Value.X + w.Table.Bounds.Width);
+        Assert.Equal(404, shell.Settings.Current.InspectorWidth);
+
+        // a double-click puts the default back
+        var gap = Centre(w.RailSplitter, w);
+        w.MouseDown(gap, MouseButton.Left);
+        w.MouseUp(gap, MouseButton.Left);
+        w.MouseDown(gap, MouseButton.Left);
+        w.MouseUp(gap, MouseButton.Left);
+        shell.Settle();
+        Assert.Equal(AppSettings.DEFAULT_RAIL_WIDTH, w.RailDockFrame.Bounds.Width);
+        Assert.Equal(AppSettings.DEFAULT_RAIL_WIDTH, shell.Settings.Current.RailWidth);
+    }
+
+
+    [AvaloniaFact]
+    public async Task APanelNeverSqueezesTheTableUnderItsMinimum()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1000);
+        var w = shell.Window;
+
+        // both docked leave the table 428; the inspector takes 8 of it and stops at 420
+        Drag(shell, w.InspectorSplitter, -200);
+        Assert.Equal(312, w.InspectorDockFrame.Bounds.Width);
+        Assert.Equal(ShellLayout.MIN_TABLE_WIDTH, w.Table.Bounds.Width);
+        Assert.True(shell.ViewModel.IsInspectorDocked);
+
+        Drag(shell, w.InspectorSplitter, 500);
+        Assert.Equal(ShellLayout.INSPECTOR_MIN_WIDTH, w.InspectorDockFrame.Bounds.Width);
+    }
+
+
+    [AvaloniaFact]
+    public void ASavedWidthComesBackWithinItsLimits()
+    {
+        var folder = Directory.CreateTempSubdirectory("eg-panels-").FullName;
+        try
+        {
+            var store = new SettingsStore(folder);
+            store.Update(s => (s.RailWidth, s.InspectorWidth) = (999, 330));
+
+            var vm = new MainViewModel(store, new FakeReader());
+            Assert.Equal((ShellLayout.RAIL_MAX_WIDTH, 330), (vm.RailWidth, vm.InspectorWidth));
+            Assert.Equal((ShellLayout.RAIL_MAX_WIDTH + 8, 338), (vm.Layout.RailColumn, vm.Layout.InspectorColumn));
+            store.FlushAsync().GetAwaiter().GetResult();
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
+
+    [AvaloniaFact]
     public void TheSummaryDropsTheGroupCountBelow520()
     {
         using var shell = TestShell.Open(560);
@@ -507,6 +578,21 @@ public class MainWindowTests
     #region Private methods
 
     private static RawInputModifiers Modifier => OperatingSystem.IsMacOS() ? RawInputModifiers.Meta : RawInputModifiers.Control;
+
+
+    private static Point Centre(Control control, Visual root) => control.TranslatePoint(new Point(control.Bounds.Width / 2, control.Bounds.Height / 2), root)!.Value;
+
+
+    private static void Drag(TestShell shell, Control splitter, double dx)
+    {
+        var from = Centre(splitter, shell.Window);
+        var to = from + new Point(dx, 0);
+        shell.Window.MouseMove(from);
+        shell.Window.MouseDown(from, MouseButton.Left);
+        shell.Window.MouseMove(to);
+        shell.Window.MouseUp(to, MouseButton.Left);
+        shell.Settle();
+    }
 
     #endregion // Private methods
 

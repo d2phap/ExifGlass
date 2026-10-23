@@ -16,7 +16,7 @@
       <DockPanel>
         <v:AppToolbar Name="Toolbar" DockPanel.Dock="Top" />
 
-        <!--  DS 2 layout grid: padding 8 (none on top), gap 8; rail 236 in a 244 column, inspector 304 in a 312 column, the command bar spans all  -->
+        <!--  DS 2 layout grid: padding 8 (none on top), gap 8; rail 236 in a 244 column, inspector 304 in a 312 column, the command bar spans all; a docked panel is resized from its gap (owner at G7)  -->
         <Grid Name="LayoutGrid"
               Margin="8,0,8,8"
               RowDefinitions="*,8,Auto">
@@ -24,12 +24,12 @@
           <ui:PushHost Name="Pushes"
                        IsLeftOpen="{Binding IsRailPushed, Mode=TwoWay}"
                        IsRightOpen="{Binding IsInspectorPushed, Mode=TwoWay}"
-                       LeftTravel="{StaticResource RailColumn}"
-                       RightTravel="{StaticResource InspectorColumn}">
+                       LeftTravel="{Binding RailPushTravel}"
+                       RightTravel="{Binding InspectorPushTravel}">
             <ui:PushHost.LeftPane>
               <!--  the rail's padding is its scroll content's, so the scroll bar meets the panel's edge (owner at the P6 review)  -->
               <ui:SquircleBorder Name="RailPushFrame"
-                                 Width="{StaticResource RailWidth}"
+                                 Width="{Binding RailPushWidth}"
                                  ClipToBounds="True"
                                  Background="{DynamicResource BgPanelBrush}"
                                  BorderBrush="{DynamicResource StrokeHairlineBrush}"
@@ -37,17 +37,17 @@
                                  CornerRadius="{StaticResource RadiusPanel}" />
             </ui:PushHost.LeftPane>
             <ui:PushHost.RightPane>
-              <ui:SquircleBorder Name="InspectorPushFrame" Width="{StaticResource InspectorWidth}" />
+              <ui:SquircleBorder Name="InspectorPushFrame" Width="{Binding InspectorPushWidth}" />
             </ui:PushHost.RightPane>
 
             <Grid ColumnDefinitions="Auto,*,Auto">
               <ui:DockSlot Name="RailSlot"
                            Anchor="Right"
                            IsOpen="{Binding IsRailDocked}"
-                           OpenWidth="{StaticResource RailColumn}">
+                           OpenWidth="{Binding RailColumn}">
                 <Panel>
                   <ui:SquircleBorder Name="RailDockFrame"
-                                     Width="{StaticResource RailWidth}"
+                                     Width="{Binding RailWidth}"
                                      HorizontalAlignment="Left"
                                      ClipToBounds="True"
                                      Background="{DynamicResource BgPanelBrush}"
@@ -57,6 +57,10 @@
                     <!--  P6 fills the rail  -->
                     <Panel Name="RailContent" />
                   </ui:SquircleBorder>
+                  <ui:PanelSplitter Name="RailSplitter"
+                                    Width="{x:Static vm:ShellLayout.PANEL_GAP}"
+                                    HorizontalAlignment="Right"
+                                    PanelWidth="{Binding RailWidth}" />
                 </Panel>
               </ui:DockSlot>
 
@@ -66,14 +70,19 @@
                            Grid.Column="2"
                            Anchor="Left"
                            IsOpen="{Binding IsInspectorDocked}"
-                           OpenWidth="{StaticResource InspectorColumn}">
+                           OpenWidth="{Binding InspectorColumn}">
                 <Panel>
                   <ui:SquircleBorder Name="InspectorDockFrame"
-                                     Width="{StaticResource InspectorWidth}"
+                                     Width="{Binding InspectorWidth}"
                                      HorizontalAlignment="Right">
                     <!--  P6 fills the inspector  -->
                     <Panel Name="InspectorContent" />
                   </ui:SquircleBorder>
+                  <ui:PanelSplitter Name="InspectorSplitter"
+                                    Width="{x:Static vm:ShellLayout.PANEL_GAP}"
+                                    HorizontalAlignment="Left"
+                                    GrowsLeft="True"
+                                    PanelWidth="{Binding InspectorWidth}" />
                 </Panel>
               </ui:DockSlot>
             </Grid>

@@ -124,6 +124,7 @@ public sealed partial class MainViewModel : ObservableObject
         IsPinned = settings.Current.AlwaysOnTop;
         RailOpen = settings.Current.RailOpen;
         InspectorOpen = settings.Current.InspectorOpen;
+        RestorePanelWidths(settings.Current);
         Columns = ParseColumns(settings.Current.VisibleColumns);
         Selection.Changed += Selection_Changed;
 
@@ -328,6 +329,7 @@ public sealed partial class MainViewModel : ObservableObject
     public void UpdateWindowWidth(double width)
     {
         _windowWidth = width;
+        UpdatePushWidths();
         if (!Layout.Update(width, RailOpen)) return;
 
         if (Layout.Rail == PanelMode.Docked) IsRailPushed = false;

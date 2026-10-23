@@ -41,12 +41,18 @@ public class Card : ContentControl
     /// <summary>
     /// Plays the inspector's entry: fade and a 12 px rise in 400 ms Emphasized (DS 5.2).
     /// </summary>
-    public void Appear(TimeSpan delay = default)
+    public void Appear(TimeSpan delay = default) => PlayAppear(this, delay);
+
+
+    /// <summary>
+    /// The card entry for any surface that draws itself as a card.
+    /// </summary>
+    public static void PlayAppear(Visual target, TimeSpan delay = default)
     {
         Dispatcher.UIThread.Post(() =>
         {
-            CompositionMotion.Fade(this, 0, 1, MotionTokens.CardAppear, MotionTokens.CardAppearEasing, delay);
-            CompositionMotion.Move(this, new Vector(0, RISE), default, MotionTokens.CardAppear, MotionTokens.CardAppearEasing, delay);
+            CompositionMotion.Fade(target, 0, 1, MotionTokens.CardAppear, MotionTokens.CardAppearEasing, delay);
+            CompositionMotion.Move(target, new Vector(0, RISE), default, MotionTokens.CardAppear, MotionTokens.CardAppearEasing, delay);
         }, DispatcherPriority.Render);
     }
 

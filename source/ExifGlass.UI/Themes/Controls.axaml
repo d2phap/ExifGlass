@@ -11,6 +11,7 @@
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/Overlays.axaml" />
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/Scrolling.axaml" />
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/Surfaces.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Panels.axaml" />
   </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

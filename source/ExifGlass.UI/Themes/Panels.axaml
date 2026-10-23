@@ -1,0 +1,1031 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  the rail (DS 6.10, S2) and the inspector's cards (DS 6.11, S4); values from Proto where the spec leaves them open  -->
+
+  <!--  file card: Emphasis 3.5%, radius 12, padding 10, gap 12; thumbnail 38 radius 10 (Appendix A item 4)  -->
+  <ControlTheme x:Key="{x:Type ui:FileCard}" TargetType="ui:FileCard">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="10"
+                           Background="{DynamicResource EmphasisA035Brush}"
+                           CornerRadius="{StaticResource RadiusWell}">
+          <StackPanel Spacing="12">
+            <DockPanel>
+              <ui:SquircleBorder Name="PART_Thumb"
+                                 Width="38"
+                                 Height="38"
+                                 Margin="0,0,10,0"
+                                 Background="{DynamicResource AccentA12Brush}"
+                                 BorderBrush="{DynamicResource EmphasisA25Brush}"
+                                 BorderThickness="0"
+                                 ClipToBounds="True"
+                                 CornerRadius="{StaticResource RadiusThumbnail}"
+                                 DockPanel.Dock="Left">
+                <Panel>
+                  <TextBlock Name="PART_Extension"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontFamily="{DynamicResource FontMono}"
+                             FontSize="{StaticResource FontSizeMonoBadge}"
+                             FontWeight="SemiBold"
+                             Foreground="{DynamicResource AccentTextBrush}"
+                             Text="{TemplateBinding Extension}" />
+                  <Image Name="PART_Image" Source="{TemplateBinding Preview}" Stretch="UniformToFill" />
+                </Panel>
+              </ui:SquircleBorder>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Name="PART_Title"
+                           FontWeight="Medium"
+                           Text="{TemplateBinding Title}"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Name="PART_Meta"
+                           Classes="meta"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{TemplateBinding Meta}"
+                           TextTrimming="CharacterEllipsis" />
+              </StackPanel>
+            </DockPanel>
+            <ui:CompositionBar Name="PART_Bar" Segments="{TemplateBinding Segments}" TrackBrush="{DynamicResource EmphasisA06Brush}" />
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:preview /template/ Border#PART_Thumb">
+      <Setter Property="Background" Value="{DynamicResource TransparentBrush}" />
+    </Style>
+    <Style Selector="^:preview /template/ TextBlock#PART_Extension">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <!--  no file: a dashed outline (Proto)  -->
+    <Style Selector="^:empty /template/ Border#PART_Thumb">
+      <Setter Property="Background" Value="{DynamicResource TransparentBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="(ui:SquircleBorder.BorderDashArray)" Value="3,2" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the group row's two parts (owner at the P6 review: each action hovers on its own, replacing DS 6.10's one layer per row): the checkbox's 36 x 32 area and the name; hover Emphasis 5%, radius 14  -->
+  <ControlTheme x:Key="RailCheckButton" TargetType="Button">
+    <Setter Property="Width" Value="36" />
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource EmphasisA05Brush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}"
+                            RenderTransformOrigin="50%,50%">
+            <ContentPresenter.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.PressInEasing}" Property="RenderTransform" Duration="0:0:0.14" />
+              </Transitions>
+            </ContentPresenter.Transitions>
+          </ContentPresenter>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <!--  the box presses in as the checkbox's does (DS 6.3)  -->
+    <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="RenderTransform" Value="scale(0.96)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="RailJumpButton" TargetType="Button">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource EmphasisA05Brush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <!--  group row: 32 high; the checkbox's area shows or hides the group, the name jumps to it, 2 apart; hidden groups in TextTertiary with the dot at 35%  -->
+  <ControlTheme x:Key="{x:Type ui:RailGroupRow}" TargetType="ui:RailGroupRow">
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <DockPanel>
+          <Button Name="PART_Check"
+                  Margin="0,0,2,0"
+                  DockPanel.Dock="Left"
+                  Theme="{StaticResource RailCheckButton}"
+                  ToolTip.Tip="{TemplateBinding ToggleTip}">
+            <Panel Width="16" Height="16">
+              <ui:SquircleBorder Name="PART_BoxFill"
+                                 Background="{DynamicResource AccentA00Brush}"
+                                 BorderBrush="{DynamicResource EmphasisA40Brush}"
+                                 BorderThickness="1"
+                                 CornerRadius="{StaticResource RadiusCheckBox}">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="Background" Duration="0:0:0.15" />
+                    <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="BorderBrush" Duration="0:0:0.15" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
+              </ui:SquircleBorder>
+              <ui:GlassIcon Name="PART_Glyph"
+                            Width="12"
+                            Height="12"
+                            Foreground="{DynamicResource OnAccentBrush}"
+                            Icon="{x:Static ui:IconId.CheckmarkFilled}"
+                            RenderTransform="scale(0)"
+                            RenderTransformOrigin="50%,50%">
+                <ui:GlassIcon.Transitions>
+                  <Transitions>
+                    <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.CheckGlyphEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                  </Transitions>
+                </ui:GlassIcon.Transitions>
+              </ui:GlassIcon>
+            </Panel>
+          </Button>
+          <Button Name="PART_Jump"
+                  Theme="{StaticResource RailJumpButton}"
+                  ToolTip.Tip="{TemplateBinding JumpTip}">
+            <DockPanel>
+              <!--  the sparkle is wider than the dot; it overhangs so every name starts at one x  -->
+              <Panel Width="8"
+                     Margin="0,0,8,0"
+                     VerticalAlignment="Center"
+                     DockPanel.Dock="Left">
+                <ui:GroupDot Name="PART_Dot" Group="{TemplateBinding Group}">
+                  <ui:GroupDot.Transitions>
+                    <Transitions>
+                      <DoubleTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Opacity" Duration="0:0:0.16" />
+                    </Transitions>
+                  </ui:GroupDot.Transitions>
+                </ui:GroupDot>
+                <ui:GlassIcon Name="PART_Sparkle"
+                              Width="12"
+                              Height="12"
+                              Margin="-2,0"
+                              Foreground="{DynamicResource Accent2TextBrush}"
+                              Icon="{x:Static ui:IconId.Sparkle}"
+                              IsVisible="False" />
+              </Panel>
+              <TextBlock Name="PART_Count"
+                         Margin="8,0,0,0"
+                         VerticalAlignment="Center"
+                         Classes="mono-small"
+                         DockPanel.Dock="Right"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{TemplateBinding Count}" />
+              <TextBlock Name="PART_Name"
+                         VerticalAlignment="Center"
+                         Foreground="{TemplateBinding Foreground}"
+                         Text="{TemplateBinding Text}"
+                         TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+          </Button>
+        </DockPanel>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+
+    <Style Selector="^:shown /template/ Border#PART_BoxFill">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="^:shown /template/ ui|GlassIcon#PART_Glyph">
+      <Setter Property="RenderTransform" Value="scale(1)" />
+    </Style>
+    <Style Selector="^:not(:shown)">
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+    </Style>
+    <Style Selector="^:not(:shown) /template/ ui|GroupDot#PART_Dot">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+    <Style Selector="^:not(:shown) /template/ ui|GlassIcon#PART_Sparkle">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+    <Style Selector="^:ai /template/ ui|GroupDot#PART_Dot">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:ai /template/ ui|GlassIcon#PART_Sparkle">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!--  footer drop target: dashed Emphasis 18%, radius 12, padding 10 12, icon 16 + 11.5 text; hover Accent border and TextPrimary; wide press, no scale  -->
+  <ControlTheme x:Key="{x:Type ui:DropTarget}" TargetType="ui:DropTarget">
+    <Setter Property="Padding" Value="12,10" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusWell}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA18Brush}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeMeta}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="BorderBrush" Duration="0:0:0.16" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource EmphasisA05Brush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_Outline"
+                             ui:SquircleBorder.BorderDashArray="3,2"
+                             BorderBrush="{TemplateBinding BorderBrush}"
+                             BorderThickness="1"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <DockPanel Margin="{TemplateBinding Padding}">
+            <ui:GlassIcon Width="16"
+                          Height="16"
+                          Margin="0,0,10,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Left"
+                          Icon="{TemplateBinding Icon}" />
+            <ContentPresenter Name="PART_ContentPresenter"
+                              VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}"
+                              TextWrapping="Wrap" />
+          </DockPanel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  selected-tag card: accent border 35% and a 3 px Accent 8% ring, padding 14, gap 12  -->
+  <ControlTheme x:Key="{x:Type ui:SelectedTagCard}" TargetType="ui:SelectedTagCard">
+    <!--  Avalonia 12 clips templated controls; the ring lies outside the card  -->
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="14"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource AccentA35Brush}"
+                           BorderThickness="1"
+                           BoxShadow="{StaticResource ShadowSelectedCard}"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel x:DataType="ui:SelectedTagView"
+                      DataContext="{TemplateBinding View}"
+                      Spacing="12">
+            <!--  group chip, Tag ID; Delete or Undo, a divider, Close  -->
+            <DockPanel Height="24">
+              <ui:GlassButton Name="PART_Close"
+                              Classes="ghost tiny"
+                              Command="{TemplateBinding CloseCommand}"
+                              DockPanel.Dock="Right"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Dismiss}"
+                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+              <ui:SquircleBorder Name="PART_Divider"
+                                 Width="1"
+                                 Height="16"
+                                 Margin="2,0"
+                                 Background="{DynamicResource EmphasisA12Brush}"
+                                 DockPanel.Dock="Right" />
+              <ui:GlassButton Name="PART_Delete"
+                              Classes="small danger"
+                              Command="{TemplateBinding DeleteCommand}"
+                              DockPanel.Dock="Right"
+                              Icon="{x:Static ui:IconId.Delete}"
+                              ToolTip.Tip="{x:Static eg:UiText.DELETE_TAG}" />
+              <ui:GlassButton Name="PART_Undo"
+                              Classes="small"
+                              Command="{TemplateBinding DeleteCommand}"
+                              DockPanel.Dock="Right"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.ArrowUndo}"
+                              IsVisible="False"
+                              ToolTip.Tip="{x:Static eg:UiText.UNDO_DELETE}" />
+              <StackPanel VerticalAlignment="Center"
+                          Orientation="Horizontal"
+                          Spacing="8">
+                <ui:SquircleBorder Height="22"
+                                   Padding="9,0"
+                                   Background="{DynamicResource EmphasisA06Brush}"
+                                   CornerRadius="{StaticResource RadiusControl22}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Panel Width="7" VerticalAlignment="Center">
+                      <ui:GroupDot Name="PART_Dot"
+                                   Width="7"
+                                   Height="7"
+                                   Group="{Binding Group}"
+                                   Radius="3.5" />
+                      <ui:GlassIcon Name="PART_Sparkle"
+                                    Width="11"
+                                    Height="11"
+                                    Margin="-2,0"
+                                    Foreground="{DynamicResource Accent2TextBrush}"
+                                    Icon="{x:Static ui:IconId.Sparkle}"
+                                    IsVisible="False" />
+                    </Panel>
+                    <TextBlock Name="PART_Group"
+                               VerticalAlignment="Center"
+                               FontSize="{StaticResource FontSizeMeta}"
+                               FontWeight="Medium"
+                               Text="{Binding Group}" />
+                  </StackPanel>
+                </ui:SquircleBorder>
+                <TextBlock Name="PART_Id"
+                           VerticalAlignment="Center"
+                           Classes="mono-small"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{Binding TagId}" />
+              </StackPanel>
+            </DockPanel>
+
+            <TextBlock Name="PART_Name"
+                       Classes="title"
+                       Text="{Binding Name}"
+                       TextWrapping="Wrap" />
+
+            <!--  value well: mono 12.5 on Bg.Subtle, radius 12, copy 28 in its corner; up to 240 high, then it scrolls (Appendix B item 7)  -->
+            <Panel Name="PART_Well">
+              <ui:SquircleBorder MinHeight="40"
+                                 Background="{DynamicResource BgSubtleBrush}"
+                                 ClipToBounds="True"
+                                 CornerRadius="{StaticResource RadiusWell}">
+                <ScrollViewer MaxHeight="220"
+                              Margin="12,10,40,10"
+                              HorizontalScrollBarVisibility="Disabled">
+                  <SelectableTextBlock Name="PART_Value"
+                                       Classes="mono-value"
+                                       Text="{Binding Value}"
+                                       TextWrapping="Wrap">
+                    <SelectableTextBlock.Transitions>
+                      <Transitions>
+                        <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+                      </Transitions>
+                    </SelectableTextBlock.Transitions>
+                  </SelectableTextBlock>
+                </ScrollViewer>
+              </ui:SquircleBorder>
+              <ui:GlassButton Name="PART_CopyValue"
+                              Margin="0,6,6,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Classes="small"
+                              Command="{TemplateBinding CopyValueCommand}"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Copy}"
+                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
+            </Panel>
+
+            <!--  edit mode: the mono editor, then Cancel and Apply on the right  -->
+            <StackPanel Name="PART_EditPanel"
+                        IsVisible="False"
+                        Spacing="8">
+              <TextBox Name="PART_Editor"
+                       Classes="mono-editor"
+                       Text="{TemplateBinding EditText, Mode=TwoWay}" />
+              <StackPanel HorizontalAlignment="Right"
+                          Orientation="Horizontal"
+                          Spacing="6">
+                <ui:GlassButton Name="PART_Cancel"
+                                Classes="card"
+                                Command="{TemplateBinding CancelCommand}"
+                                Content="{x:Static eg:UiText.CANCEL}"
+                                ToolTip.Tip="{x:Static eg:UiText.CANCEL_TIP}" />
+                <ui:GlassButton Name="PART_Apply"
+                                Classes="card primary"
+                                Command="{TemplateBinding ApplyCommand}"
+                                Content="{x:Static eg:UiText.APPLY}"
+                                ToolTip.Tip="{x:Static eg:UiText.ApplyTip}" />
+              </StackPanel>
+            </StackPanel>
+
+            <!--  an edited value: what it was, and Revert  -->
+            <DockPanel Name="PART_Was" IsVisible="False">
+              <ui:GlassButton Margin="0,0,-6,0"
+                              Classes="link"
+                              Command="{TemplateBinding RevertCommand}"
+                              Content="{x:Static eg:UiText.REVERT}"
+                              DockPanel.Dock="Right" />
+              <TextBlock VerticalAlignment="Center"
+                         Classes="meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{Binding WasText}"
+                         TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+
+            <!--  Raw (-n), Format (D18), Tag key: label 70, gap 12, rows 6 apart  -->
+            <Grid Name="PART_Details"
+                  ColumnDefinitions="70,*"
+                  RowDefinitions="Auto,6,Auto,6,Auto">
+              <TextBlock Classes="caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.RAW_VALUE}" />
+              <TextBlock Name="PART_Raw"
+                         Grid.Column="1"
+                         Margin="12,0,0,0"
+                         VerticalAlignment="Center"
+                         Classes="mono"
+                         Text="{Binding Raw}"
+                         TextWrapping="Wrap" />
+              <TextBlock Grid.Row="2"
+                         Classes="caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.FORMAT}" />
+              <TextBlock Name="PART_Format"
+                         Grid.Row="2"
+                         Grid.Column="1"
+                         Margin="12,0,0,0"
+                         VerticalAlignment="Center"
+                         Classes="mono"
+                         Text="{Binding Format}" />
+              <TextBlock Grid.Row="4"
+                         VerticalAlignment="Center"
+                         Classes="caption"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.TAG_KEY}" />
+              <DockPanel Grid.Row="4"
+                         Grid.Column="1"
+                         Height="20"
+                         Margin="12,0,0,0">
+                <ui:GlassButton Name="PART_CopyKey"
+                                Margin="4,-4,0,-4"
+                                Classes="small"
+                                Command="{TemplateBinding CopyKeyCommand}"
+                                DockPanel.Dock="Right"
+                                Foreground="{DynamicResource TextSecondaryBrush}"
+                                Icon="{x:Static ui:IconId.Copy}"
+                                ToolTip.Tip="{x:Static eg:UiText.COPY_TAG_KEY}" />
+                <TextBlock Name="PART_Key"
+                           VerticalAlignment="Center"
+                           Classes="mono"
+                           Text="{Binding ArgumentKey}"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding ArgumentKey}" />
+              </DockPanel>
+            </Grid>
+
+            <ui:GlassButton Name="PART_Edit"
+                            HorizontalAlignment="Right"
+                            Classes="primary"
+                            Command="{TemplateBinding EditCommand}"
+                            Content="{x:Static eg:UiText.EDIT}"
+                            Icon="{x:Static ui:IconId.Edit}"
+                            IconSize="15"
+                            ToolTip.Tip="{x:Static eg:UiText.EDIT_VALUE}" />
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <!--  read-only groups have no edit or delete UI at all, and no badge saying so (DS 6.11)  -->
+    <Style Selector="^:readonly /template/ ui|GlassButton#PART_Delete">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:readonly /template/ Border#PART_Divider">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:readonly /template/ ui|GlassButton#PART_Edit">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:deleted /template/ ui|GlassButton#PART_Delete">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:deleted:not(:readonly) /template/ ui|GlassButton#PART_Undo">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:deleted /template/ SelectableTextBlock#PART_Value">
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="^:edited /template/ DockPanel#PART_Was">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:editing /template/ Panel#PART_Well">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:editing /template/ StackPanel#PART_EditPanel">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:editing /template/ ui|GlassButton#PART_Edit">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <!--  an AI row: the sparkle and no ExifTool details (P7 adds its own card)  -->
+    <Style Selector="^:ai /template/ ui|GroupDot#PART_Dot">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:ai /template/ ui|GlassIcon#PART_Sparkle">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:ai /template/ Grid#PART_Details">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!--  AI card as the spec draws it: Accent2 30% border, padding 12, gap 12  -->
+  <ControlTheme x:Key="{x:Type ui:AiCard}" TargetType="ui:AiCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="12"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource Accent2A30Brush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel Spacing="12">
+            <DockPanel Height="24">
+              <ui:SquircleBorder Width="24"
+                                 Height="24"
+                                 Margin="0,0,8,0"
+                                 Background="{DynamicResource Accent2A12Brush}"
+                                 CornerRadius="{StaticResource RadiusControl24}"
+                                 DockPanel.Dock="Left">
+                <ui:GlassIcon Width="14"
+                              Height="14"
+                              Foreground="{DynamicResource Accent2TextBrush}"
+                              Icon="{x:Static ui:IconId.Sparkle}" />
+              </ui:SquircleBorder>
+              <ui:Badge Name="PART_Generator"
+                        MaxWidth="150"
+                        Margin="8,0,0,0"
+                        DockPanel.Dock="Right"
+                        Kind="Ai"
+                        Text="{TemplateBinding Generator}"
+                        ToolTip.Tip="{TemplateBinding Generator}" />
+              <TextBlock VerticalAlignment="Center"
+                         Classes="overline"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
+            </DockPanel>
+
+            <!--  prompt: 4 lines with Show more, Copy on its overline  -->
+            <StackPanel Name="PART_PromptSection" Spacing="4">
+              <DockPanel Height="24">
+                <ui:GlassButton Name="PART_CopyPrompt"
+                                Margin="0,0,-6,0"
+                                Classes="link"
+                                Command="{TemplateBinding CopyPromptCommand}"
+                                Content="{x:Static eg:UiText.COPY}"
+                                DockPanel.Dock="Right"
+                                Icon="{x:Static ui:IconId.Copy}"
+                                IconSize="13" />
+                <TextBlock VerticalAlignment="Center"
+                           Classes="overline"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static eg:UiText.PROMPT_OVERLINE}" />
+              </DockPanel>
+              <ui:PromptText Name="PART_Prompt"
+                             ClampLines="4"
+                             FontSize="12.5"
+                             IsExpanded="{TemplateBinding IsExpanded}"
+                             LineHeight="19"
+                             Prompt="{TemplateBinding Prompt}" />
+              <ui:GlassButton Name="PART_More"
+                              Margin="-6,0,0,0"
+                              HorizontalAlignment="Left"
+                              Classes="link"
+                              Content="{x:Static eg:UiText.SHOW_MORE}"
+                              IsVisible="False" />
+            </StackPanel>
+
+            <StackPanel Name="PART_NegativeSection" Spacing="4">
+              <TextBlock Classes="overline"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.NEGATIVE_PROMPT_OVERLINE}" />
+              <ui:PromptText Name="PART_Negative"
+                             ClampLines="2"
+                             FontSize="12"
+                             Foreground="{DynamicResource TextSecondaryBrush}"
+                             LineHeight="18"
+                             Prompt="{TemplateBinding NegativePrompt}" />
+            </StackPanel>
+
+            <!--  parameters 2 x N: 1 px lines of Emphasis 8% between Bg.Panel tiles, radius 12; the tiles are clipped to the ring's inner edge (11, concentric), so they never cover its corners  -->
+            <ui:SquircleBorder Name="PART_Parameters"
+                               BorderBrush="{DynamicResource EmphasisA08Brush}"
+                               BorderThickness="1"
+                               CornerRadius="{StaticResource RadiusWell}">
+              <ui:SquircleBorder Background="{DynamicResource EmphasisA08Brush}"
+                                 ClipToBounds="True"
+                                 CornerRadius="11">
+                <ItemsControl ItemsSource="{TemplateBinding Parameters}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <ui:TileGrid />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="ui:AiParameterView">
+                      <ui:SquircleBorder Padding="10,7" Background="{DynamicResource BgPanelBrush}">
+                        <StackPanel Spacing="1">
+                          <TextBlock FontSize="{StaticResource FontSizeBadge}"
+                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                     Text="{Binding Label}"
+                                     TextTrimming="CharacterEllipsis" />
+                          <TextBlock Classes="mono"
+                                     Text="{Binding Value}"
+                                     TextTrimming="CharacterEllipsis"
+                                     ToolTip.Tip="{Binding Value}" />
+                        </StackPanel>
+                      </ui:SquircleBorder>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                </ui:SquircleBorder>
+            </ui:SquircleBorder>
+
+            <ui:GlassButton Name="PART_CopyParameters"
+                            HorizontalAlignment="Stretch"
+                            Command="{TemplateBinding CopyParametersCommand}"
+                            Content="{x:Static eg:UiText.COPY_PARAMETERS}"
+                            Icon="{x:Static ui:IconId.Copy}"
+                            IconSize="14" />
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:not(:prompt) /template/ StackPanel#PART_PromptSection">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:negative) /template/ StackPanel#PART_NegativeSection">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:parameters) /template/ Border#PART_Parameters">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:not(:copyable) /template/ ui|GlassButton#PART_CopyParameters">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:clamped /template/ ui|GlassButton#PART_More">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:expanded /template/ ui|GlassButton#PART_More">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Content" Value="{x:Static eg:UiText.SHOW_LESS}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  Frame card: padding 12, gap 10; the box radius 12 on Emphasis 4% with a 1 px Emphasis 7% inner line  -->
+  <ControlTheme x:Key="{x:Type ui:FrameCard}" TargetType="ui:FrameCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="12"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel Spacing="10">
+            <DockPanel Height="20">
+              <TextBlock Name="PART_Dimensions"
+                         VerticalAlignment="Center"
+                         Classes="mono-small"
+                         DockPanel.Dock="Right"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{TemplateBinding Dimensions}" />
+              <TextBlock VerticalAlignment="Center"
+                         Classes="overline"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.FRAME_OVERLINE}" />
+            </DockPanel>
+            <ui:FrameBox Name="PART_Box"
+                         HorizontalAlignment="Center"
+                         Aspect="{TemplateBinding Aspect}">
+              <ui:SquircleBorder Background="{DynamicResource EmphasisA04Brush}"
+                                 ClipToBounds="True"
+                                 CornerRadius="{StaticResource RadiusWell}">
+                <Panel>
+                  <Image Name="PART_Image" Source="{TemplateBinding Preview}" Stretch="UniformToFill" />
+                  <ui:ThirdsLines Name="PART_Thirds" Brush="{DynamicResource EmphasisA08Brush}" />
+                </Panel>
+              </ui:SquircleBorder>
+              <ui:SquircleBorder Name="PART_FocusPoint"
+                                 Width="28"
+                                 Height="20"
+                                 ui:FrameBox.Anchor="{TemplateBinding FocusPoint}"
+                                 BorderBrush="{DynamicResource AccentBrush}"
+                                 BorderThickness="1.5"
+                                 BoxShadow="{StaticResource ShadowFocusPoint}"
+                                 CornerRadius="{StaticResource RadiusControl20}"
+                                 IsVisible="False" />
+              <StackPanel Name="PART_Chips"
+                          Margin="8"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Bottom"
+                          Orientation="Horizontal"
+                          Spacing="4">
+                <ui:SquircleBorder Height="20"
+                                   Padding="7,0"
+                                   Background="{DynamicResource BgElevatedBrush}"
+                                   BorderBrush="{DynamicResource EmphasisA08Brush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusControl20}">
+                  <TextBlock Name="PART_Ratio"
+                             VerticalAlignment="Center"
+                             Classes="mono-badge"
+                             FontWeight="Normal"
+                             Text="{TemplateBinding Ratio}" />
+                </ui:SquircleBorder>
+                <ui:SquircleBorder Height="20"
+                                   Padding="7,0"
+                                   Background="{DynamicResource BgElevatedBrush}"
+                                   BorderBrush="{DynamicResource EmphasisA08Brush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusControl20}">
+                  <TextBlock Name="PART_Megapixels"
+                             VerticalAlignment="Center"
+                             Classes="mono-badge"
+                             FontWeight="Normal"
+                             Text="{TemplateBinding Megapixels}" />
+                </ui:SquircleBorder>
+              </StackPanel>
+              <ui:SquircleBorder BorderBrush="{DynamicResource EmphasisA07Brush}"
+                                 BorderThickness="1"
+                                 CornerRadius="{StaticResource RadiusWell}"
+                                 IsHitTestVisible="False" />
+            </ui:FrameBox>
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:preview /template/ ui|ThirdsLines#PART_Thirds">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:preview /template/ StackPanel#PART_Chips">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:focus-point:not(:preview) /template/ Border#PART_FocusPoint">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!--  Exposure card: 2 x 2 tiles with 1 px Emphasis 8% lines, radius 18; label, a 22 Medium readout counting up, a sub-label; the tiles are clipped to the ring's inner edge (17, concentric), so they never cover its corners  -->
+  <ControlTheme x:Key="{x:Type ui:ExposureCard}" TargetType="ui:ExposureCard">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder BorderBrush="{DynamicResource EmphasisA08Brush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <ui:SquircleBorder Background="{DynamicResource EmphasisA08Brush}"
+                             ClipToBounds="True"
+                             CornerRadius="17">
+            <ItemsControl ItemsSource="{TemplateBinding Cells}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <ui:TileGrid />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="ui:ExposureCellView">
+                  <ui:SquircleBorder Padding="14,12" Background="{DynamicResource BgPanelBrush}">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="overline"
+                                 Foreground="{DynamicResource TextSecondaryBrush}"
+                                 Text="{Binding Label}" />
+                      <Panel Height="28">
+                        <ui:CountUpText VerticalAlignment="Center"
+                                        Classes="readout"
+                                        Format="{Binding Format}"
+                                        IsVisible="{Binding HasValue}"
+                                        Prefix="{Binding Prefix}"
+                                        Suffix="{Binding Suffix}"
+                                        Value="{Binding Value}" />
+                        <TextBlock VerticalAlignment="Center"
+                                   Classes="readout"
+                                   Foreground="{DynamicResource TextTertiaryBrush}"
+                                   IsVisible="{Binding !HasValue}"
+                                   Text="—" />
+                      </Panel>
+                      <TextBlock MinHeight="16"
+                                 Classes="meta"
+                                 Foreground="{DynamicResource TextSecondaryBrush}"
+                                 Text="{Binding Sub}"
+                                 TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </ui:SquircleBorder>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            </ui:SquircleBorder>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!--  Details card: padding 2 14, rows 10 apart with an Emphasis 7% line between them; icon 16, label 11, value Medium  -->
+  <ControlTheme x:Key="{x:Type ui:DetailsCard}" TargetType="ui:DetailsCard">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="14,2"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <Panel>
+            <ItemsControl Name="PART_Rows" ItemsSource="{TemplateBinding Rows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="ui:DetailRowView">
+                  <StackPanel>
+                    <ui:SquircleBorder Height="1"
+                                       Background="{DynamicResource EmphasisA07Brush}"
+                                       IsVisible="{Binding !IsFirst}" />
+                    <DockPanel Margin="0,10">
+                      <ui:GlassIcon Width="16"
+                                    Height="16"
+                                    Margin="0,1,10,0"
+                                    VerticalAlignment="Top"
+                                    DockPanel.Dock="Left"
+                                    Foreground="{DynamicResource TextSecondaryBrush}"
+                                    Icon="{Binding Icon}" />
+                      <StackPanel Margin="6,0,0,0" Spacing="1">
+                        <TextBlock FontSize="{StaticResource FontSizeOverline}"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{Binding Label}" />
+                        <SelectableTextBlock FontWeight="Medium"
+                                             Text="{Binding Value}"
+                                             TextWrapping="Wrap" />
+                        <TextBlock Classes="meta"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   IsVisible="{Binding HasSub}"
+                                   Text="{Binding Sub}"
+                                   TextWrapping="Wrap" />
+                        <ui:GlassButton Margin="-6,2,0,0"
+                                        HorizontalAlignment="Left"
+                                        Classes="link"
+                                        Command="{Binding $parent[ui:DetailsCard].OpenLinkCommand}"
+                                        CommandParameter="{Binding Link}"
+                                        IsVisible="{Binding HasLink}"
+                                        ToolTip.Tip="{Binding Link}">
+                          <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock VerticalAlignment="Center" Text="{x:Static eg:UiText.OPEN_IN_OSM}" />
+                            <ui:GlassIcon Width="11"
+                                          Height="11"
+                                          VerticalAlignment="Center"
+                                          Icon="{x:Static ui:IconId.Open}" />
+                          </StackPanel>
+                        </ui:GlassButton>
+                      </StackPanel>
+                    </DockPanel>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!--  no file yet: four skeleton rows (Proto)  -->
+            <StackPanel Name="PART_Skeleton" IsVisible="False">
+              <DockPanel Margin="0,10">
+                <ui:GlassIcon Width="16"
+                              Height="16"
+                              Margin="0,1,16,0"
+                              VerticalAlignment="Top"
+                              DockPanel.Dock="Left"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Camera}" />
+                <Grid ColumnDefinitions="70*,30*" RowDefinitions="Auto,Auto">
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_CAMERA}" />
+                  <ui:Skeleton Grid.Row="1" Margin="0,5" Index="0" />
+                </Grid>
+              </DockPanel>
+              <ui:SquircleBorder Height="1" Background="{DynamicResource EmphasisA07Brush}" />
+              <DockPanel Margin="0,10">
+                <ui:GlassIcon Width="16"
+                              Height="16"
+                              Margin="0,1,16,0"
+                              VerticalAlignment="Top"
+                              DockPanel.Dock="Left"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Aperture}" />
+                <Grid ColumnDefinitions="85*,15*" RowDefinitions="Auto,Auto">
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_LENS}" />
+                  <ui:Skeleton Grid.Row="1" Margin="0,5" Index="1" />
+                </Grid>
+              </DockPanel>
+              <ui:SquircleBorder Height="1" Background="{DynamicResource EmphasisA07Brush}" />
+              <DockPanel Margin="0,10">
+                <ui:GlassIcon Width="16"
+                              Height="16"
+                              Margin="0,1,16,0"
+                              VerticalAlignment="Top"
+                              DockPanel.Dock="Left"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Clock}" />
+                <Grid ColumnDefinitions="60*,40*" RowDefinitions="Auto,Auto">
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_CAPTURED}" />
+                  <ui:Skeleton Grid.Row="1" Margin="0,5" Index="2" />
+                </Grid>
+              </DockPanel>
+              <ui:SquircleBorder Height="1" Background="{DynamicResource EmphasisA07Brush}" />
+              <DockPanel Margin="0,10">
+                <ui:GlassIcon Width="16"
+                              Height="16"
+                              Margin="0,1,16,0"
+                              VerticalAlignment="Top"
+                              DockPanel.Dock="Left"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Location}" />
+                <Grid ColumnDefinitions="75*,25*" RowDefinitions="Auto,Auto">
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_LOCATION}" />
+                  <ui:Skeleton Grid.Row="1" Margin="0,5" Index="3" />
+                </Grid>
+              </DockPanel>
+            </StackPanel>
+          </Panel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:loading /template/ ItemsControl#PART_Rows">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:loading /template/ StackPanel#PART_Skeleton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

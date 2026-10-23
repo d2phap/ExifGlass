@@ -92,6 +92,8 @@
       <SolidColorBrush x:Key="EmphasisA03Brush" Color="#08000000" />
       <Color x:Key="EmphasisA035Color">#09000000</Color>
       <SolidColorBrush x:Key="EmphasisA035Brush" Color="#09000000" />
+      <Color x:Key="EmphasisA04Color">#0A000000</Color>
+      <SolidColorBrush x:Key="EmphasisA04Brush" Color="#0A000000" />
       <Color x:Key="EmphasisA05Color">#0D000000</Color>
       <SolidColorBrush x:Key="EmphasisA05Brush" Color="#0D000000" />
       <Color x:Key="EmphasisA06Color">#0F000000</Color>
@@ -108,8 +110,12 @@
       <SolidColorBrush x:Key="EmphasisA14Brush" Color="#24000000" />
       <Color x:Key="EmphasisA16Color">#29000000</Color>
       <SolidColorBrush x:Key="EmphasisA16Brush" Color="#29000000" />
+      <Color x:Key="EmphasisA18Color">#2E000000</Color>
+      <SolidColorBrush x:Key="EmphasisA18Brush" Color="#2E000000" />
       <Color x:Key="EmphasisA24Color">#3D000000</Color>
       <SolidColorBrush x:Key="EmphasisA24Brush" Color="#3D000000" />
+      <Color x:Key="EmphasisA25Color">#40000000</Color>
+      <SolidColorBrush x:Key="EmphasisA25Brush" Color="#40000000" />
       <Color x:Key="EmphasisA35Color">#59000000</Color>
       <SolidColorBrush x:Key="EmphasisA35Brush" Color="#59000000" />
       <Color x:Key="EmphasisA40Color">#66000000</Color>
@@ -212,6 +218,8 @@
       <SolidColorBrush x:Key="EmphasisA03Brush" Color="#08FFFFFF" />
       <Color x:Key="EmphasisA035Color">#09FFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA035Brush" Color="#09FFFFFF" />
+      <Color x:Key="EmphasisA04Color">#0AFFFFFF</Color>
+      <SolidColorBrush x:Key="EmphasisA04Brush" Color="#0AFFFFFF" />
       <Color x:Key="EmphasisA05Color">#0DFFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA05Brush" Color="#0DFFFFFF" />
       <Color x:Key="EmphasisA06Color">#0FFFFFFF</Color>
@@ -228,8 +236,12 @@
       <SolidColorBrush x:Key="EmphasisA14Brush" Color="#24FFFFFF" />
       <Color x:Key="EmphasisA16Color">#29FFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA16Brush" Color="#29FFFFFF" />
+      <Color x:Key="EmphasisA18Color">#2EFFFFFF</Color>
+      <SolidColorBrush x:Key="EmphasisA18Brush" Color="#2EFFFFFF" />
       <Color x:Key="EmphasisA24Color">#3DFFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA24Brush" Color="#3DFFFFFF" />
+      <Color x:Key="EmphasisA25Color">#40FFFFFF</Color>
+      <SolidColorBrush x:Key="EmphasisA25Brush" Color="#40FFFFFF" />
       <Color x:Key="EmphasisA35Color">#59FFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisA35Brush" Color="#59FFFFFF" />
       <Color x:Key="EmphasisA40Color">#66FFFFFF</Color>
@@ -280,6 +292,8 @@
   <!--  Accent2 alphas: AI badges and the AI card  -->
   <Color x:Key="Accent2A10Color">#1ABF3298</Color>
   <SolidColorBrush x:Key="Accent2A10Brush" Color="#1ABF3298" />
+  <Color x:Key="Accent2A12Color">#1FBF3298</Color>
+  <SolidColorBrush x:Key="Accent2A12Brush" Color="#1FBF3298" />
   <Color x:Key="Accent2A30Color">#4CBF3298</Color>
   <SolidColorBrush x:Key="Accent2A30Brush" Color="#4CBF3298" />
 
@@ -377,6 +391,7 @@
   <BoxShadows x:Key="ElevationToast">0 18 74.48 -14 #66000000</BoxShadows>
   <BoxShadows x:Key="ShadowSegmentedThumb">0 1 3.46 0 #29000000</BoxShadows>
   <BoxShadows x:Key="ShadowSelectedCard">0 0 0 3 #14225EDB</BoxShadows>
+  <BoxShadows x:Key="ShadowFocusPoint">0 0 0 4 #1F225EDB</BoxShadows>
   <BoxShadows x:Key="ShadowTooltip">0 8 32.91 -6 #40000000</BoxShadows>
 
   <!--  Font sizes (DS 1.1); mono +1 off Windows cancels the -1 pt coercion (S3)  -->

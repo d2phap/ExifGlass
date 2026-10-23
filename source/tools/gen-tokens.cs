@@ -167,9 +167,9 @@ static class Generator
 
     static readonly AlphaFamily[] Families =
     [
-        new("Emphasis", "#000000", "#FFFFFF", [0, 3, 3.5, 5, 6, 7, 8, 10, 12, 14, 16, 24, 35, 40, 50, 55, 62, 70], "Overlays in both themes"),
+        new("Emphasis", "#000000", "#FFFFFF", [0, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 24, 25, 35, 40, 50, 55, 62, 70], "Overlays in both themes"),
         new("Accent", "#225EDB", "#225EDB", [0, 8, 10, 12, 30, 35], "Selection, chips, edited badges"),
-        new("Accent2", "#BF3298", "#BF3298", [10, 30], "AI badges and the AI card"),
+        new("Accent2", "#BF3298", "#BF3298", [10, 12, 30], "AI badges and the AI card"),
         new("Success", "#198754", "#198754", [14], "New badge"),
         new("Danger", "#DC3545", "#DC3545", [0, 8, 12], "Danger ghost hover, Delete badge"),
         new("White", "#FFFFFF", "#FFFFFF", [0, 8, 14], "Layers over accent fills"),
@@ -247,6 +247,7 @@ static class Generator
         ("ElevationToast", "0 18 44 -14 rgba(0,0,0,.4)", "Toast"),
         ("ShadowSegmentedThumb", "0 1 3 0 rgba(0,0,0,.16)", "Segmented thumb"),
         ("ShadowSelectedCard", "0 0 0 3 rgba(34,94,219,.08)", "Selected-tag card ring"),
+        ("ShadowFocusPoint", "0 0 0 4 rgba(34,94,219,.12)", "Frame card autofocus point halo"),
         ("ShadowTooltip", "0 8 20 -6 rgba(0,0,0,.25)", "Tooltips: elevation 1 at half its offset, blur and darkness"),
     ];
 

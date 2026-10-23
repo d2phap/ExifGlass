@@ -56,6 +56,33 @@ public static class UiText
     public const string BADGE_NEW = "New";
     public const string AI_GROUP = "AI generation";
 
+    // the inspector's cards (DS 6.11, S4); overlines are uppercase (DS 1.1)
+    public const string CLOSE = "Close";
+    public const string DELETE_TAG = "Delete tag";
+    public const string UNDO_DELETE = "Undo delete";
+    public const string COPY_TAG_KEY = "Copy tag key";
+    public const string EDIT = "Edit";
+    public const string EDIT_VALUE = "Edit value";
+    public const string CANCEL = "Cancel";
+    public const string APPLY = "Apply";
+    public const string CANCEL_TIP = "Cancel (Esc)";
+    public const string REVERT = "Revert";
+    public const string RAW_VALUE = "Raw (-n)";
+    public const string FORMAT = "Format";
+    public const string TAG_KEY = "Tag key";
+    public const string WAS = "Was: {0}";
+    public const string AI_GENERATION_OVERLINE = "AI GENERATION";
+    public const string PROMPT_OVERLINE = "PROMPT";
+    public const string NEGATIVE_PROMPT_OVERLINE = "NEGATIVE PROMPT";
+    public const string COPY_PARAMETERS = "Copy generation parameters";
+    public const string FRAME_OVERLINE = "FRAME";
+    public const string OPEN_IN_OSM = "Open in OpenStreetMap";
+    public const string NO_CAMERA_DATA = "No camera data in this file";
+    public const string DETAIL_CAMERA = "Camera";
+    public const string DETAIL_LENS = "Lens";
+    public const string DETAIL_CAPTURED = "Captured";
+    public const string DETAIL_LOCATION = "Location";
+
     #endregion // Constants
 
 
@@ -76,6 +103,9 @@ public static class UiText
     /// A column header's tooltip, as the prototype's title: "Sort by Tag name".
     /// </summary>
     public static string SortBy(string column) => $"Sort by {column}";
+
+
+    public static string ApplyTip => $"{APPLY} ({Shortcut("Enter")})";
 
     #endregion // Public methods
 }

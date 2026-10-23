@@ -178,6 +178,18 @@ public sealed class TableSelection
     }
 
 
+    /// <summary>
+    /// The inspector card's Close: it lets go of the tag, the cell keeps its ring.
+    /// </summary>
+    public void Unfocus()
+    {
+        if (FocusedKey is null) return;
+
+        FocusedKey = null;
+        OnChanged();
+    }
+
+
     public void Clear()
     {
         if (CurrentKey is null && _rows.Count == 0 && FocusedKey is null) return;

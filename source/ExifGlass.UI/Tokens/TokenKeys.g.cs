@@ -228,6 +228,10 @@ public static class TokenKeys
     public const string EMPHASIS_A035_COLOR = "EmphasisA035Color";
     // Emphasis at 3.5%
     public const string EMPHASIS_A035_BRUSH = "EmphasisA035Brush";
+    // Emphasis at 4%
+    public const string EMPHASIS_A04_COLOR = "EmphasisA04Color";
+    // Emphasis at 4%
+    public const string EMPHASIS_A04_BRUSH = "EmphasisA04Brush";
     // Emphasis at 5%
     public const string EMPHASIS_A05_COLOR = "EmphasisA05Color";
     // Emphasis at 5%
@@ -260,10 +264,18 @@ public static class TokenKeys
     public const string EMPHASIS_A16_COLOR = "EmphasisA16Color";
     // Emphasis at 16%
     public const string EMPHASIS_A16_BRUSH = "EmphasisA16Brush";
+    // Emphasis at 18%
+    public const string EMPHASIS_A18_COLOR = "EmphasisA18Color";
+    // Emphasis at 18%
+    public const string EMPHASIS_A18_BRUSH = "EmphasisA18Brush";
     // Emphasis at 24%
     public const string EMPHASIS_A24_COLOR = "EmphasisA24Color";
     // Emphasis at 24%
     public const string EMPHASIS_A24_BRUSH = "EmphasisA24Brush";
+    // Emphasis at 25%
+    public const string EMPHASIS_A25_COLOR = "EmphasisA25Color";
+    // Emphasis at 25%
+    public const string EMPHASIS_A25_BRUSH = "EmphasisA25Brush";
     // Emphasis at 35%
     public const string EMPHASIS_A35_COLOR = "EmphasisA35Color";
     // Emphasis at 35%
@@ -316,6 +328,10 @@ public static class TokenKeys
     public const string ACCENT2_A10_COLOR = "Accent2A10Color";
     // Accent2 at 10%
     public const string ACCENT2_A10_BRUSH = "Accent2A10Brush";
+    // Accent2 at 12%
+    public const string ACCENT2_A12_COLOR = "Accent2A12Color";
+    // Accent2 at 12%
+    public const string ACCENT2_A12_BRUSH = "Accent2A12Brush";
     // Accent2 at 30%
     public const string ACCENT2_A30_COLOR = "Accent2A30Color";
     // Accent2 at 30%
@@ -478,6 +494,8 @@ public static class TokenKeys
     public const string SHADOW_SEGMENTED_THUMB = "ShadowSegmentedThumb";
     // Selected-tag card ring
     public const string SHADOW_SELECTED_CARD = "ShadowSelectedCard";
+    // Frame card autofocus point halo
+    public const string SHADOW_FOCUS_POINT = "ShadowFocusPoint";
     // Tooltips: elevation 1 at half its offset, blur and darkness
     public const string SHADOW_TOOLTIP = "ShadowTooltip";
     // 22

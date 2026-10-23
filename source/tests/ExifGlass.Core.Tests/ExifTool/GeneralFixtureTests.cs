@@ -26,8 +26,16 @@ using Xunit;
 namespace ExifGlass.Core.Tests.ExifTool;
 
 /// <summary>
+/// Runs alone: every test shares the one ExifTool daemon, so parallel reads would queue ahead of the timed ones.
+/// </summary>
+[CollectionDefinition(nameof(TimingCollection), DisableParallelization = true)]
+public sealed class TimingCollection;
+
+
+/// <summary>
 /// Camera files: HEIC, TIFF, RAW and a 5,000-tag video from the owner's samples (§9: never committed, used when present).
 /// </summary>
+[Collection(nameof(TimingCollection))]
 public class GeneralFixtureTests(ExifToolFixture exifTool)
 {
     #region Properties

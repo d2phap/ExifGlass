@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -111,12 +112,23 @@ public partial class MainWindow
     }
 
 
-    // DS 7.6 Esc chain after the focused control's own use: close a pushed panel, then clear the search; Esc never closes the window
+    // DS 7.6 Esc chain after the focused control's own use: close a pushed panel, clear the search, then the selection; Esc never closes the window
     private void Window_KeyDown(object? sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Escape || e.KeyModifiers != KeyModifiers.None) return;
+        if (e.Key == Key.Escape && e.KeyModifiers == KeyModifiers.None)
+        {
+            e.Handled = ViewModel.Escape();
+            return;
+        }
 
-        e.Handled = ViewModel.Escape();
+        // a text box has its own Ctrl+A and Ctrl+C and marks them handled; elsewhere they act on the table (DS 7.6)
+        if (e.Source is TextBox) return;
+        if (Shortcuts.Is(e, Key.A))
+        {
+            ViewModel.SelectAllRows();
+            e.Handled = true;
+        }
+        else if (Shortcuts.Is(e, Key.C)) e.Handled = ViewModel.CopySelection();
     }
 
 

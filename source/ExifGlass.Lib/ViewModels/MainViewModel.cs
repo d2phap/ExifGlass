@@ -20,6 +20,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Export;
 using ExifGlass.Core.ExifTool;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
@@ -51,7 +52,34 @@ public interface IShellView
 
     Task CopyTextAsync(string text);
 
+    /// <summary>
+    /// Shows the save picker for an export; null when cancelled.
+    /// </summary>
+    Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format);
+
     #endregion // Methods
+}
+
+
+/// <summary>
+/// A file the user chose to save to: its stream and the name the toast shows.
+/// </summary>
+public sealed class SaveTarget(Stream stream, string name) : IAsyncDisposable
+{
+    #region Properties
+
+    public Stream Stream { get; } = stream;
+
+    public string Name { get; } = name;
+
+    #endregion // Properties
+
+
+    #region Public methods
+
+    public ValueTask DisposeAsync() => Stream.DisposeAsync();
+
+    #endregion // Public methods
 }
 
 
@@ -89,6 +117,8 @@ public sealed partial class MainViewModel : ObservableObject
         IsPinned = settings.Current.AlwaysOnTop;
         RailOpen = settings.Current.RailOpen;
         InspectorOpen = settings.Current.InspectorOpen;
+        Columns = ParseColumns(settings.Current.VisibleColumns);
+        Selection.Changed += Selection_Changed;
 
         if (metadata is not null) metadata.StatusChanged += Metadata_StatusChanged;
         UpdateExifToolState();
@@ -108,13 +138,14 @@ public sealed partial class MainViewModel : ObservableObject
     public TableLayout Table { get; } = new();
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsLoading), nameof(ShowEmptyCard), nameof(Summary))]
+    [NotifyPropertyChangedFor(nameof(IsLoading), nameof(ShowEmptyCard), nameof(Summary), nameof(ShowSkeleton))]
     public partial LoadPhase Phase { get; private set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasDocument), nameof(WindowTitle), nameof(ShowEmptyCard), nameof(Summary), nameof(SummaryDetail), nameof(ShowSummaryDetail))]
     [NotifyPropertyChangedFor(nameof(IsRailDocked), nameof(IsRailShown), nameof(RailTooltip), nameof(IsInspectorDocked), nameof(IsInspectorShown), nameof(InspectorTooltip))]
-    [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand))]
+    [NotifyPropertyChangedFor(nameof(ShowSkeleton), nameof(ShowNoMatch))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleRailCommand), nameof(ToggleInspectorCommand), nameof(ToggleCollapseAllCommand), nameof(ExportCommand), nameof(CopyAsJsonCommand))]
     public partial MetadataDocument? Document { get; private set; }
 
     /// <summary>
@@ -197,7 +228,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string SummaryDetail => Document is null ? string.Empty : AppText.InGroups(Document.Groups.Count);
 
-    public bool ShowSummaryDetail => Document is not null && GroupCountFits;
+    // Proto: "in 8 groups" makes room for the filter chips
+    public bool ShowSummaryDetail => Document is not null && GroupCountFits && !HasFilterChips;
 
     public IconId ThemeIcon => Theme switch
     {
@@ -256,7 +288,7 @@ public sealed partial class MainViewModel : ObservableObject
 
 
     /// <summary>
-    /// The part of the Esc chain the window owns, after edits, menus and dialogs: a pushed panel, then search; true when it did something.
+    /// The part of the Esc chain the window owns, after edits, menus and dialogs: a pushed panel, the search, then the selection (cell, then rows); true when it did something.
     /// </summary>
     public bool Escape()
     {
@@ -273,7 +305,7 @@ public sealed partial class MainViewModel : ObservableObject
             return true;
         }
 
-        return false;
+        return Selection.ClearStep();
     }
 
 
@@ -294,7 +326,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public void UpdateTableWidth(double width)
     {
-        if (Table.Update(width)) GroupCountFits = Table.GroupCountFits;
+        if (Table.Update(width)) OnTableLayoutChanged();
     }
 
     #endregion // Public methods
@@ -416,14 +448,15 @@ public sealed partial class MainViewModel : ObservableObject
     private async Task RunQueryAsync(MetadataDocument? document, LoadPhase? phase = null)
     {
         var generation = ++_queryGeneration;
-        var query = new ViewQuery
-        {
-            Search = SearchText,
-            ShowDuplicates = _arguments.ShowDuplicates,
-            ShowRawValues = _arguments.ShowRawValues,
-            ShowTagNames = _arguments.ShowTagNames,
-        };
 
+        // a new read starts with every group open and nothing selected (Proto); the AI data arriving is the same read
+        if (document is not null && !document.IsSameRead(Document))
+        {
+            _collapsed.Clear();
+            Selection.Clear();
+        }
+
+        var query = BuildQuery();
         var result = document is null ? ViewResult.Empty : await Task.Run(() => QueryEngine.Run(document, query));
         if (generation != _queryGeneration) return;
 

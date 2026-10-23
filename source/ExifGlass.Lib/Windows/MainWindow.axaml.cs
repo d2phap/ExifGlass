@@ -20,6 +20,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
+using ExifGlass.Core.Export;
 using ExifGlass.Core.Settings;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
@@ -124,6 +125,21 @@ public partial class MainWindow : Window, IShellView
     public async Task CopyTextAsync(string text)
     {
         if (Clipboard is { } clipboard) await clipboard.SetTextAsync(text);
+    }
+
+
+    public async Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format)
+    {
+        var extension = Exporter.Extension(format);
+        var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            SuggestedFileName = suggestedName,
+            DefaultExtension = extension,
+            ShowOverwritePrompt = true,
+            FileTypeChoices = [new FilePickerFileType(extension.ToUpperInvariant()) { Patterns = ["*." + extension] }],
+        });
+
+        return file is null ? null : new SaveTarget(await file.OpenWriteAsync(), file.Name);
     }
 
     #endregion // IShellView

@@ -95,6 +95,8 @@ public static class PerfRun
             output.WriteLine("  Skia GPU cache " + (await probe.ReadGpuCacheAsync() ?? "n/a"));
         }
 
+        if (file is not null) budgetsMet &= await MeasureTableAsync(window, vm, probe, output);
+
         budgetsMet &= await MeasureAsync(probe, output, "rail column 0 <-> 244", onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
         budgetsMet &= await MeasureAsync(probe, output, "inspector column 0 <-> 312", onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
 
@@ -140,6 +142,73 @@ public static class PerfRun
         var met = (onRenderThread ? stats.Render : stats.Ui).MeetsBudget && stats.Gc1 == 0 && stats.Gc2 == 0;
         output.WriteLine(stats + (met ? $"\n    budget met ({judged})" : $"\n    BUDGET MISSED on {judged} (p95 16.7, p99 25, none over 50 ms, no gen-1/2 GC)"));
         return met;
+    }
+
+
+    // P5: the table's own motion and scrolling with the file's rows (plan 8: view apply, FLIP, 60 fps scrolling, allocations per frame)
+    private static async Task<bool> MeasureTableAsync(MainWindow window, ViewModels.MainViewModel vm, FrameProbe probe, TextWriter output)
+    {
+        var table = window.Table.Table;
+        var met = true;
+
+        vm.CycleSort(Core.Query.SortColumn.Value);
+        await WaitForAsync(() => vm.Rows.Query.SortColumn == Core.Query.SortColumn.Value, TimeSpan.FromSeconds(5));
+        await Task.Delay(Motion);
+        output.WriteLine(Invariant($"TABLE {vm.Rows.Items.Count} items: a sorted view applied in {table.LastApply.TotalMilliseconds:0.0} ms on the UI thread (reset + layout)"));
+        vm.CycleSort(Core.Query.SortColumn.Value);
+        vm.CycleSort(Core.Query.SortColumn.Value);
+        await Task.Delay(Motion);
+
+        if (table.Scroller is { } scroller)
+        {
+            UiWatchdog.Operation = "table scroll";
+            probe.Start();
+            var frames = await ScrollAsync(window, scroller, TimeSpan.FromSeconds(8), 24);
+            var stats = probe.Stop(Invariant($"SCROLL 24 px a frame over {vm.Rows.Items.Count} items"));
+            var perFrame = stats.AllocatedKb / Math.Max(1, frames);
+            var ok = stats.Ui.MeetsBudget && perFrame <= 64;
+            var verdict = ok ? "budget met (UI-thread frames, 64 KB a frame)" : "BUDGET MISSED (UI-thread frames p95 16.7, 64 KB a frame)";
+            output.WriteLine(stats + Invariant($"\n    {perFrame:0.0} KB allocated a frame over {frames} frames\n    {verdict}"));
+            met &= ok;
+            scroller.Offset = default;
+            await Task.Delay(Motion);
+        }
+
+        met &= await MeasureAsync(probe, output, "FLIP sort by value (asc, desc, none)", onRenderThread: true, () => vm.CycleSort(Core.Query.SortColumn.Value));
+        met &= await MeasureAsync(probe, output, "FLIP search date and clear", onRenderThread: true, () => vm.SearchText = vm.SearchText.Length == 0 ? "date" : string.Empty);
+        if (vm.Rows.Groups.Count > 1)
+        {
+            var group = vm.Rows.Groups[1].Name;
+            met &= await MeasureAsync(probe, output, $"group collapse {group}", onRenderThread: true, () => vm.ToggleGroup(group));
+        }
+
+        met &= await MeasureAsync(probe, output, "column # 0 <-> 74", onRenderThread: false, () => vm.ToggleColumnCommand.Execute(Core.Export.TableColumns.Index));
+        return met;
+    }
+
+
+    // one step a frame, back and forth through the whole table
+    private static Task<int> ScrollAsync(MainWindow window, Avalonia.Controls.ScrollViewer scroller, TimeSpan duration, double step)
+    {
+        var done = new TaskCompletionSource<int>();
+        var watch = Stopwatch.StartNew();
+        var direction = 1;
+        var frames = 0;
+        void Tick(TimeSpan _)
+        {
+            var max = Math.Max(0, scroller.Extent.Height - scroller.Viewport.Height);
+            var y = scroller.Offset.Y + direction * step;
+            if (y >= max) (y, direction) = (max, -1);
+            else if (y <= 0) (y, direction) = (0, 1);
+
+            scroller.Offset = scroller.Offset.WithY(y);
+            frames++;
+            if (watch.Elapsed < duration) window.RequestAnimationFrame(Tick);
+            else done.TrySetResult(frames);
+        }
+
+        window.RequestAnimationFrame(Tick);
+        return done.Task;
     }
 
 

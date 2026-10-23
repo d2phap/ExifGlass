@@ -70,6 +70,68 @@ public static class AppText
     public const string PICKER_IMAGES = "Images";
     public const string PICKER_ALL = "All files";
 
+    // the table (DS 6.9, 7.2, 7.4; Proto)
+    public const string COLLAPSE_ALL = "Collapse all";
+    public const string EXPAND_ALL = "Expand all";
+    public const string COLLAPSE_ALL_TIP = "Collapse all groups";
+    public const string EXPAND_ALL_TIP = "Expand all groups";
+    public const string EDIT = "Edit";
+    public const string EDIT_TIP = "Edit metadata";
+    public const string COLUMNS = "Columns";
+    public const string COLUMNS_TIP = "Show or hide columns";
+    public const string COLUMNS_HEADER = "COLUMNS";
+    public const string EXPORT = "Export";
+    public const string SELECTED = "selected";
+    public const string COPY = "Copy";
+    public const string JSON = "JSON";
+    public const string CLEAR = "Clear";
+    public const string CLEAR_ALL = "Clear all";
+    public const string REMOVE_FILTER = "Remove filter";
+    public const string COPY_ROWS_TIP = "Copy as tab-separated name and value";
+    public const string COPY_ROWS_JSON_TIP = "Copy as JSON with group-prefixed keys";
+    public const string CLEAR_SELECTION_TIP = "Clear the selection (Esc)";
+    public const string NO_MATCH_TITLE = "No tags match";
+    public const string NO_MATCH_CAPTION = "Try a different search, or clear the filters.";
+    public const string CLEAR_FILTERS = "Clear filters";
+
+    public const string COLUMN_INDEX = "Index";
+    public const string COLUMN_TAG_ID = "Tag ID";
+    public const string COLUMN_TAG_NAME = "Tag name";
+    public const string COLUMN_VALUE = "Value";
+    public const string AT_LEAST_ONE = "At least one";
+    public const string HIDDEN_AT_WIDTH = "Hidden at this width";
+
+    public const string EXPORT_CSV = "CSV";
+    public const string EXPORT_CSV_DESC = "Spreadsheet-ready, one row per tag";
+    public const string EXPORT_TEXT = "Plain text";
+    public const string EXPORT_TEXT_DESC = "Tab-separated, like exiftool -t";
+    public const string EXPORT_JSON = "JSON";
+    public const string EXPORT_JSON_DESC = "Compatible with exiftool -j -G";
+    public const string EXPORT_COPY = "Copy as JSON";
+    public const string EXPORT_COPY_DESC = "Straight to the clipboard";
+
+    public const string EDIT_ADD = "Add tag…";
+    public const string EDIT_ADD_DESC = "Write a new EXIF, XMP or IPTC tag";
+    public const string EDIT_GPS = "Remove GPS data";
+    public const string EDIT_GPS_NONE = "No GPS data in this file";
+    public const string EDIT_AI = "Remove AI generation data";
+    public const string EDIT_AI_DESC = "Prompts, workflows and parameters · provenance kept";
+    public const string EDIT_STRIP = "Strip all metadata";
+    public const string EDIT_STRIP_DESC = "Removes every writable tag · -all=";
+
+    public const string FILTER_DATES = "Date & time";
+    public const string FILTER_GPS = "GPS";
+    public const string FILTER_CONVERTED = "Converted";
+    public const string FILTER_TAG_ID = "Has tag ID";
+    public const string FILTER_AI = "AI generation";
+
+    public const string TOAST_COPIED_VALUE = "Copied value";
+    public const string TOAST_COPIED_CELL = "Copied cell";
+    public const string TOAST_COPIED_TSV_SUB = "Tab-separated name and value";
+    public const string TOAST_COPIED_JSON_SUB = "Group-prefixed keys";
+    public const string TOAST_COPIED_AS_JSON = "Copied as JSON";
+    public const string TOAST_EXPORT_FAILED = "Export failed";
+
     #endregion // Constants
 
 
@@ -85,6 +147,37 @@ public static class AppText
     public static string OpenedOneOf(int total) => string.Create(CultureInfo.InvariantCulture, $"Opened 1 of {total:N0} files");
 
     public static string OpenTooltip => $"Open file ({UiText.Shortcut("O")})";
+
+    public static string Tags(int count) => count == 1 ? "1 tag" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} tags");
+
+    public static string CopiedTags(int count) => $"Copied {Tags(count)}";
+
+    public static string CopiedAsJson(int count) => string.Create(CultureInfo.InvariantCulture, $"Copied {count:N0} as JSON");
+
+    public static string TagsInView(int count) => $"{Tags(count)} in view";
+
+    /// <summary>
+    /// The Export menu's header (DS 8: be concrete), uppercase as a menu header (DS 6.8).
+    /// </summary>
+    public static string ExportsInView(int count) => string.Create(CultureInfo.InvariantCulture, $"EXPORTS THE {count:N0} {(count == 1 ? "TAG" : "TAGS")} IN VIEW");
+
+    public static string Exported(string file) => $"Exported {file}";
+
+    public static string ExportedSub(int count, long bytes) => string.Create(CultureInfo.InvariantCulture, $"{Tags(count)} · {bytes / 1024.0:0.0} kB");
+
+    public static string GpsTags(int count) => string.Create(CultureInfo.InvariantCulture, $"{count:N0} location {(count == 1 ? "tag" : "tags")} · -gps:all=");
+
+    /// <summary>
+    /// The hidden-groups chip (Proto): "Hiding EXIF" or "Hiding 3 groups".
+    /// </summary>
+    public static string Hiding(IReadOnlyCollection<string> groups) => groups.Count == 1
+        ? $"Hiding {groups.First()}"
+        : string.Create(CultureInfo.InvariantCulture, $"Hiding {groups.Count} groups");
+
+    /// <summary>
+    /// A copied cell's toast line: the text, cut at 40 characters (Proto).
+    /// </summary>
+    public static string Clip(string text) => text.Length > 40 ? string.Concat(text.AsSpan(0, 40), "…") : text;
 
     public static string SettingsTooltip => $"{SETTINGS} ({UiText.Shortcut(",")})";
 

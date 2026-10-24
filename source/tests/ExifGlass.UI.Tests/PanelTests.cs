@@ -143,6 +143,24 @@ public class PanelTests
 
 
     [AvaloniaFact]
+    public void TheSelectedTagCardsButtonsShareOneSizeAndEdge()
+    {
+        var card = new SelectedTagCard { Width = 304, View = new SelectedTagView("EXIF:FNumber", "EXIF", "0x829D", "F Number", "2.0", "2.0", "rational64u", "-ExifIFD:FNumber", false) };
+        var window = Show(card);
+
+        // Close and every copy: 28 square, right edges 7 from the card's (owner after G7)
+        foreach (var name in new[] { "PART_Close", "PART_CopyValue", "PART_CopyRaw", "PART_CopyFormat", "PART_CopyKey" })
+        {
+            var button = Part<Button>(card, name);
+            Assert.Equal((28, 28), (button.Bounds.Width, button.Bounds.Height));
+            Assert.Equal(card.Bounds.Width - 7, button.TranslatePoint(new Point(button.Bounds.Width, 0), card)!.Value.X, 1);
+        }
+
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
     public void TheCameraCardsCopyEachValueOnHover()
     {
         var requests = new List<AiActionRequest>();

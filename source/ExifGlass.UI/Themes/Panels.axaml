@@ -332,8 +332,10 @@
                       Spacing="12">
             <!--  group chip, Tag ID; Delete or Undo, a divider, Close  -->
             <DockPanel Height="24">
+              <!--  Close and the copy buttons: one size, 7 from the card's edge (owner after G7)  -->
               <ui:GlassButton Name="PART_Close"
-                              Classes="ghost tiny"
+                              Margin="2,-2,-8,-2"
+                              Classes="ghost small"
                               Command="{TemplateBinding CloseCommand}"
                               DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
@@ -399,7 +401,7 @@
             <!--  the name, with the value's Copy at the line's end (owner at G7); its icon lines up with Close above  -->
             <DockPanel>
               <ui:GlassButton Name="PART_CopyValue"
-                              Margin="8,-3,-2,-3"
+                              Margin="8,-3,-8,-3"
                               VerticalAlignment="Top"
                               Classes="small"
                               Command="{TemplateBinding CopyValueCommand}"
@@ -484,7 +486,7 @@
               <!--  Raw and Format copy as Tag key does (owner after G7)  -->
               <DockPanel Grid.Column="1" MinHeight="20" Margin="12,0,0,0">
                 <ui:GlassButton Name="PART_CopyRaw"
-                                Margin="4,-4,0,-4"
+                                Margin="4,-4,-8,-4"
                                 VerticalAlignment="Top"
                                 Classes="small"
                                 Command="{TemplateBinding CopyRawCommand}"
@@ -507,7 +509,7 @@
                          Height="20"
                          Margin="12,0,0,0">
                 <ui:GlassButton Name="PART_CopyFormat"
-                                Margin="4,-4,0,-4"
+                                Margin="4,-4,-8,-4"
                                 Classes="small"
                                 Command="{TemplateBinding CopyFormatCommand}"
                                 DockPanel.Dock="Right"
@@ -530,7 +532,7 @@
                          Height="20"
                          Margin="12,0,0,0">
                 <ui:GlassButton Name="PART_CopyKey"
-                                Margin="4,-4,0,-4"
+                                Margin="4,-4,-8,-4"
                                 Classes="small"
                                 Command="{TemplateBinding CopyKeyCommand}"
                                 DockPanel.Dock="Right"

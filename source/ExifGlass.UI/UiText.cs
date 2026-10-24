@@ -61,6 +61,8 @@ public static class UiText
     public const string DELETE_TAG = "Delete tag";
     public const string UNDO_DELETE = "Undo delete";
     public const string COPY_TAG_KEY = "Copy tag key";
+    public const string COPY_RAW_VALUE = "Copy raw value";
+    public const string COPY_FORMAT = "Copy format";
     public const string EDIT = "Edit";
     public const string EDIT_VALUE = "Edit value";
     public const string CANCEL = "Cancel";
@@ -157,7 +159,7 @@ public static class UiText
     public const string GO_TO_AI = "Go to AI generation";
     public const string CHARACTER = "Character";
     public const string JSON = "JSON";
-    public const string SAME_AS_VALUE = "same as value";
+    public const string SAME_AS_VALUE = "(same as value)";
 
     #endregion // Constants
 

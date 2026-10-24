@@ -153,7 +153,7 @@ public static partial class DesignGalleryCatalog
             new("deleted", Card(Tag(EditState.Deleted)), "struck through; Delete turns into Undo"),
             new("read-only group", Card(Tag(readOnly: true)), "File, Composite, ExifTool, ICC_Profile, PNG: no Delete, no Edit, no badge"),
             new("edit mode", Card(Tag(), editing: true), "mono editor; Cancel (Esc), Apply (Ctrl+Enter)"),
-            new("AI source tag", Card(source), "Parsed into 23 AI fields, Go to AI generation; Raw says same as value (AI addendum)"),
+            new("AI source tag", Card(source), "Parsed into 23 AI fields, Go to AI generation; Raw says (same as value) and copies the value (AI addendum, owner after G7)"),
             new("preview, decoding", new FrameCard { Width = CARD_WIDTH, Frame = frame }, "rule of thirds, AF point, ratio and MP chips while a preview is on its way"),
             new("preview", new FrameCard { Width = CARD_WIDTH, Frame = frame, Preview = PreviewSample() }, "the preview as cover; its own shape"),
             new("preview, unknown size", new FrameCard { Width = CARD_WIDTH, Frame = new FrameInfo(0, 0, "—", 0, null, null) }),

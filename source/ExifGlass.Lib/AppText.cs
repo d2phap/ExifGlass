@@ -149,6 +149,8 @@ public static class AppText
     public const string FILE_NONE = "No file open";
     public const string FILE_NONE_SUB = "Open or drop a file";
     public const string TOAST_COPIED_KEY = "Copied tag key";
+    public const string TOAST_COPIED_RAW = "Copied raw value";
+    public const string TOAST_COPIED_FORMAT = "Copied format";
     public const string TOAST_EDIT_STAGED = "Edit staged";
     public const string TOAST_NO_CHANGE = "No change";
     public const string TOAST_COPIED_PROMPT = "Copied prompt";

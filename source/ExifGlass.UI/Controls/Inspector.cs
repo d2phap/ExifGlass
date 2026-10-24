@@ -60,6 +60,8 @@ public sealed record SelectedTagView(
 
     public bool IsDeleted => State == EditState.Deleted;
 
+    public bool HasFormat => Format != TagIdRule.NONE;
+
     public string ShownValue => ShownText.Well(Value);
 
     public string ShownRaw => ShownText.Cut(Raw, ShownText.CELL);
@@ -67,7 +69,7 @@ public sealed record SelectedTagView(
     public bool IsEdited => State == EditState.Edited;
 
     /// <summary>
-    /// Gets whether the raw value says "same as value" (AI addendum): ExifTool's print conversion left it alone.
+    /// Gets whether the raw value says "(same as value)" (AI addendum, owner after G7): ExifTool's print conversion left it alone.
     /// </summary>
     public bool IsRawSame => Raw == UiText.SAME_AS_VALUE;
 
@@ -104,6 +106,12 @@ public class SelectedTagCard : TemplatedControl
 
     public static readonly StyledProperty<ICommand?> CopyKeyCommandProperty =
         AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(CopyKeyCommand));
+
+    public static readonly StyledProperty<ICommand?> CopyRawCommandProperty =
+        AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(CopyRawCommand));
+
+    public static readonly StyledProperty<ICommand?> CopyFormatCommandProperty =
+        AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(CopyFormatCommand));
 
     public static readonly StyledProperty<ICommand?> DeleteCommandProperty =
         AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(DeleteCommand));
@@ -176,6 +184,18 @@ public class SelectedTagCard : TemplatedControl
     {
         get => GetValue(CopyKeyCommandProperty);
         set => SetValue(CopyKeyCommandProperty, value);
+    }
+
+    public ICommand? CopyRawCommand
+    {
+        get => GetValue(CopyRawCommandProperty);
+        set => SetValue(CopyRawCommandProperty, value);
+    }
+
+    public ICommand? CopyFormatCommand
+    {
+        get => GetValue(CopyFormatCommandProperty);
+        set => SetValue(CopyFormatCommandProperty, value);
     }
 
     /// <summary>

@@ -176,9 +176,20 @@ public sealed class AiTests
         Assert.Equal(("PNG:Parameters", TableColumns.Value), (vm.Selection.CurrentKey, vm.Selection.CurrentColumn));
         Assert.Null(vm.FocusedAiField);
         Assert.Equal(vm.Rows.RowsInView.Count(r => r is { IsAi: true, SourceKey: "PNG:Parameters" }), vm.FocusedTag?.AiFields);
-        Assert.Equal("same as value", vm.FocusedTag!.Raw);
+        Assert.Equal("(same as value)", vm.FocusedTag!.Raw);
         Assert.Same(inspector.TagCard, FirstShownCard(inspector));
         Assert.True(inspector.AiCard.IsVisible);
+
+        // Raw and Format copy as Tag key does; "(same as value)" copies the value (owner after G7)
+        var recorder = new RecordingShell();
+        vm.Shell = recorder;
+        await vm.CopyFocusRawCommand.ExecuteAsync(null);
+        Assert.Equal(vm.FocusedTag.Value, recorder.Copied[^1]);
+        Assert.Equal("Copied raw value", recorder.Toasts[^1].Title);
+        // a tag without a format ("—") has nothing to copy
+        Assert.Equal(TagIdRule.NONE, vm.FocusedTag.Format);
+        await vm.CopyFocusFormatCommand.ExecuteAsync(null);
+        Assert.Single(recorder.Copied);
     }
 
 

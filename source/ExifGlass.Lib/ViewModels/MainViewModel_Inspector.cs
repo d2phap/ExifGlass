@@ -123,6 +123,19 @@ public sealed partial class MainViewModel
     private Task CopyFocusValueAsync() => FocusedTag is { } tag ? CopyAndToastAsync(tag.Value, AppText.TOAST_COPIED_VALUE, tag.Name) : Task.CompletedTask;
 
 
+    // "(same as value)" stands for the value itself, so that is what it copies
+    [RelayCommand]
+    private Task CopyFocusRawAsync() => FocusedTag is { } tag
+        ? CopyAndToastAsync(tag.IsRawSame ? tag.Value : tag.Raw, AppText.TOAST_COPIED_RAW, AppText.Clip(tag.IsRawSame ? tag.Value : tag.Raw))
+        : Task.CompletedTask;
+
+
+    [RelayCommand]
+    private Task CopyFocusFormatAsync() => FocusedTag is { } tag && tag.Format != TagIdRule.NONE
+        ? CopyAndToastAsync(tag.Format, AppText.TOAST_COPIED_FORMAT, tag.Format)
+        : Task.CompletedTask;
+
+
     [RelayCommand]
     private Task CopyFocusKeyAsync() => FocusedTag is { IsAi: false } tag ? CopyAndToastAsync(tag.ArgumentKey, AppText.TOAST_COPIED_KEY, tag.ArgumentKey) : Task.CompletedTask;
 

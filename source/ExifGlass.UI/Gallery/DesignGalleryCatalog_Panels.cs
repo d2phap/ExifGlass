@@ -96,9 +96,8 @@ public static partial class DesignGalleryCatalog
             Children = { DesignGallery.Text("GROUPS", TextRole.Overline, TokenKeys.TEXT_SECONDARY_BRUSH), new Badge { Kind = BadgeKind.Count, Text = "5/7" } },
         });
 
-        DropTarget Drop() => new() { Width = RAIL_CONTENT, Content = "Open a file, or drop one here to view", Icon = IconId.ArrowUpload };
 
-        return new GallerySection("c-rail", "Rail", "DS 6.10 / S2: file card (Emphasis 3.5%, radius 12; thumbnail 38 radius 10 with the preview, the extension, or a dashed outline; composition bar 6 px, 2 px gaps, square segments clipped to radius 2, growing 1100 ms); group rows 32 in two parts 2 apart (owner after G7): the checkbox, dot and name show or hide, the count jumps; hovering either lights both, a press only its own (hover Emphasis 5%, radius 14); hidden in TextTertiary with the dot at 35%; dashed drop target, radius 12.",
+        return new GallerySection("c-rail", "Rail", "DS 6.10 / S2: file card (Emphasis 3.5%, radius 12; thumbnail 38 radius 10 with the preview, the extension, or a dashed outline; composition bar 6 px, 2 px gaps, square segments clipped to radius 2, growing 1100 ms); group rows 32 in two parts 2 apart (owner after G7): the checkbox, dot and name show or hide, the count jumps; hovering either lights both, a press only its own (hover Emphasis 5%, radius 14); hidden in TextTertiary with the dot at 35%.",
         [
             new("file card", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS), "the extension until the preview comes"),
             new("file card :preview", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS, preview: true), "preview as cover, radius 10"),
@@ -114,10 +113,6 @@ public static partial class DesignGalleryCatalog
             new("row AI group", Row("AI", "23", ai: true), "the sparkle in Accent2 (D22)"),
             new("name :focus-visible", Part(Row("XMP", "4"), "PART_Check", b => b.FocusVisible()), "Space shows or hides"),
             new("count :focus-visible", Part(Row("XMP", "4"), "PART_Jump", b => b.FocusVisible()), "Enter or Space jumps"),
-            new("drop target", Drop()),
-            new("drop target :pointerover", Drop().Hover(), "Accent border, TextPrimary"),
-            new("drop target :pressed", Drop().Pressed()),
-            new("drop target :focus-visible", Drop().FocusVisible()),
         ]);
     }
 

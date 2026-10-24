@@ -7,11 +7,11 @@
              x:Class="ExifGlass.Views.RailPanel"
              x:DataType="vm:MainViewModel">
 
-  <!--  DS 6.10 / S2 rail: file card, groups, quick filters, the drop target at the foot; sections 14 apart (Proto)  -->
+  <!--  DS 6.10 / S2 rail: file card, groups, quick filters, sections 14 apart (Proto); no drop target at the foot (owner after G7: the window takes drops)  -->
   <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
     <Grid Name="Sections"
           Margin="8"
-          RowDefinitions="Auto,Auto,Auto,*,Auto">
+          RowDefinitions="Auto,Auto,Auto">
       <ui:FileCard Name="File"
                    AiBadge="{Binding AiBadge}"
                    AiBadgeCommand="{Binding JumpToAiCommand}"
@@ -121,13 +121,6 @@
         </StackPanel>
       </StackPanel>
 
-      <ui:DropTarget Name="Drop"
-                     Grid.Row="4"
-                     Margin="0,14,0,0"
-                     Command="{Binding OpenCommand}"
-                     Content="{x:Static app:AppText.DROP_HINT}"
-                     Icon="{x:Static ui:IconId.ArrowUpload}"
-                     ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
     </Grid>
   </ScrollViewer>
 

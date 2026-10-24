@@ -144,7 +144,6 @@ public static class AppText
     public const string QUICK_FILTERS = "QUICK FILTERS";
     public const string HIDE_ALL = "Hide all";
     public const string SHOW_ALL = "Show all";
-    public const string DROP_HINT = "Open a file, or drop one here to view";
     public const string FILE_READING = "Reading…";
     public const string FILE_READING_SUB = "ExifTool is parsing the file";
     public const string FILE_NONE = "No file open";

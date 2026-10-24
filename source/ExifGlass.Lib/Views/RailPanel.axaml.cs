@@ -30,7 +30,7 @@ using System.ComponentModel;
 namespace ExifGlass.Views;
 
 /// <summary>
-/// The rail (DS 6.10): file card, groups (show or hide, jump), quick filters and the drop target; made when the first file opens.
+/// The rail (DS 6.10): file card, groups (show or hide, jump) and quick filters; made when the first file opens.
 /// </summary>
 public partial class RailPanel : UserControl
 {
@@ -56,7 +56,6 @@ public partial class RailPanel : UserControl
         GroupList.AddHandler(RailGroupRow.ToggleRequestedEvent, Group_ToggleRequested);
         GroupList.AddHandler(RailGroupRow.JumpRequestedEvent, Group_JumpRequested);
         FilterList.AddHandler(Button.ClickEvent, Filter_Click);
-        Scroller.PropertyChanged += Scroller_PropertyChanged;
     }
 
     #endregion // Constructors
@@ -108,13 +107,6 @@ public partial class RailPanel : UserControl
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.Rows)) Reveal(_viewModel?.Rows.Document);
-    }
-
-
-    // Proto: the drop target sits at the foot of the rail until the content outgrows it
-    private void Scroller_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property == ScrollViewer.ViewportProperty) Sections.MinHeight = Math.Max(0, Scroller.Viewport.Height - Sections.Margin.Top - Sections.Margin.Bottom);
     }
 
 

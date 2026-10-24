@@ -591,29 +591,3 @@ public class RailGroupRow : TemplatedControl
     #endregion // Event handlers
 }
 
-
-/// <summary>
-/// The rail's footer (DS 6.10): a dashed drop target that opens the picker; its text wraps.
-/// </summary>
-public class DropTarget : Button
-{
-    #region Fields and constants
-
-    public static readonly StyledProperty<IconId?> IconProperty =
-        AvaloniaProperty.Register<DropTarget, IconId?>(nameof(Icon));
-
-    #endregion // Fields and constants
-
-
-    #region Properties
-
-    public IconId? Icon
-    {
-        get => GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
-    }
-
-    protected override Type StyleKeyOverride => typeof(DropTarget);
-
-    #endregion // Properties
-}

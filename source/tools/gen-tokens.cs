@@ -221,7 +221,7 @@ static class Generator
         ("RadiusPanel", 18, "Panels, cards, command bar"), ("RadiusMenu", 20, "Menus and flyouts, pending bar"),
         ("RadiusMenuItem", 14, "Menu items (menu 20 - padding 6)"), ("RadiusIconTile", 12, "Menu icon tile, terminal tile"),
         ("RadiusWell", 12, "Value wells, frame preview, file card, drop target"), ("RadiusSegmentedThumb", 11, "Segmented thumb (14 - 3)"),
-        ("RadiusCheckBox", 5, "Checkbox box"), ("RadiusKbd", 8, "Kbd hint (plan Appendix A item 13)"),
+        ("RadiusCheckBox", 6, "Checkbox box (owner after G7: was 5, too close to round at 16 px)"), ("RadiusKbd", 8, "Kbd hint (plan Appendix A item 13)"),
         ("RadiusThumbnail", 10, "Rail thumbnail"), ("RadiusCell", 10, "Selected cell ring"), ("RadiusHighlight", 3, "Search match"),
         ("RadiusSkeleton", 4, "Skeleton bars"), ("RadiusToast", 16, "Toast"),
         ("RadiusStoreBadge", 16, "Store badge"),

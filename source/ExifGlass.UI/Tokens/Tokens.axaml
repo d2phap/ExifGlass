@@ -356,7 +356,7 @@
   <CornerRadius x:Key="RadiusIconTile">12</CornerRadius>
   <CornerRadius x:Key="RadiusWell">12</CornerRadius>
   <CornerRadius x:Key="RadiusSegmentedThumb">11</CornerRadius>
-  <CornerRadius x:Key="RadiusCheckBox">5</CornerRadius>
+  <CornerRadius x:Key="RadiusCheckBox">6</CornerRadius>
   <CornerRadius x:Key="RadiusKbd">8</CornerRadius>
   <CornerRadius x:Key="RadiusThumbnail">10</CornerRadius>
   <CornerRadius x:Key="RadiusCell">10</CornerRadius>

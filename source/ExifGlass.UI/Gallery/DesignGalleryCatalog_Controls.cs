@@ -195,7 +195,7 @@ public static partial class DesignGalleryCatalog
     {
         static CheckBox Box(bool? on = true, string? label = null) => new() { IsChecked = on, Content = label, IsThreeState = on is null };
 
-        return new GallerySection("c-check", "Checkbox", "DS 6.3: 16, radius 5, border Emphasis 40%; on: Accent fill, white check 12 springing in (260 ms); the 36 x 32 hit area carries the state layer.",
+        return new GallerySection("c-check", "Checkbox", "DS 6.3: 16, radius 6 (owner after G7, DS says 5), border Emphasis 40%; on: Accent fill, white check 12 springing in (260 ms); the 36 x 32 hit area carries the state layer.",
         [
             new("off", Box(false)),
             new("on", Box()),

@@ -165,6 +165,12 @@ public class EditingTests
         await vm.OpenFileAsync("b.jpg");
         Assert.Equal("a.jpg", vm.Document!.FileName);
         Assert.Equal(1, vm.PendingCount);
+
+        // each answer is a save of its own, a failed one ending before it returned included
+        Assert.Equal(2, shell.Reader.Writes.Count);
+        shell.Reader.WriteResult = new SaveResult(SaveOutcome.Updated, [], [], "backup");
+        Assert.True(await vm.SaveAsync());
+        Assert.Equal(3, shell.Reader.Writes.Count);
     }
 
 

@@ -133,7 +133,7 @@ public sealed partial class MainViewModel
     /// </summary>
     public async Task<bool> ConfirmLeaveAsync()
     {
-        if (_saving is { } saving) await saving;
+        if (_saving is { IsCompleted: false } saving) await saving;
         if (!HasPending || Shell is null || Document is not { } doc) return true;
 
         var answer = await Shell.AskAsync(new DialogRequest(AppText.UnsavedTitle(doc.FileName), AppText.UnsavedBody(PendingCount),
@@ -159,12 +159,11 @@ public sealed partial class MainViewModel
     /// </summary>
     public Task<bool> SaveAsync(bool reload = true)
     {
-        if (_saving is { } running) return running;
+        if (_saving is { IsCompleted: false } running) return running;
         if (!HasPending || Document is null) return Task.FromResult(false);
 
-        var task = SaveCoreAsync(reload);
-        _saving = task;
-        return task;
+        // a save that ends before it returns (a write that fails at once) leaves a finished task, which the checks above skip
+        return _saving = SaveCoreAsync(reload);
     }
 
     #endregion // Public methods
@@ -367,7 +366,6 @@ public sealed partial class MainViewModel
         finally
         {
             IsSaving = false;
-            _saving = null;
         }
     }
 

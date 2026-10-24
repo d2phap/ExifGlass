@@ -6,13 +6,23 @@
              ClipToBounds="False"
              x:DataType="vm:MainViewModel">
 
-  <!--  DS 6.11 / S4: cards 8 apart, the selected row's card on top (the AI field's or the tag's; owner at G7, was under the AI card in AI addendum question 4), AI generation or the character card, Preview (DS 6.11's Frame, renamed by the owner at G7), Exposure, Details (Add tag comes with P8), each hidden when the file has nothing for it; the viewer reaches 3 px past the cards so the selected card's ring isn't cut, and to the window's edge so its scroll bar meets it (owner at the P6 review); Avalonia 12 clips a UserControl, so this one doesn't  -->
+  <!--  DS 6.11 / S4: cards 8 apart, Add tag while adding, the selected row's card (the AI field's or the tag's; owner at G7, was under the AI card in AI addendum question 4), AI generation or the character card, Preview (DS 6.11's Frame, renamed by the owner at G7), Exposure, Details, each hidden when the file has nothing for it; the viewer reaches 3 px past the cards so the selected card's ring isn't cut, and to the window's edge so its scroll bar meets it (owner at the P6 review); Avalonia 12 clips a UserControl, so this one doesn't  -->
   <ScrollViewer Name="Scroller"
                 Margin="-3,-3,-8,-3"
                 HorizontalScrollBarVisibility="Disabled">
     <StackPanel Name="Cards"
                 Margin="3,3,8,3"
                 Spacing="8">
+      <ui:AddTagCard Name="AddTagCard"
+                     AddCommand="{Binding AddTagCommand}"
+                     CancelCommand="{Binding CancelAddTagCommand}"
+                     Group="{Binding AddGroup, Mode=TwoWay}"
+                     Groups="{Binding AddGroups}"
+                     Hint="{Binding AddHint}"
+                     IsVisible="{Binding IsAddingTag}"
+                     Suggestions="{Binding AddSuggestions}"
+                     TagName="{Binding AddName, Mode=TwoWay}"
+                     Value="{Binding AddValue, Mode=TwoWay}" />
       <ui:AiFieldCard Name="AiFieldCard"
                       ActionCommand="{Binding AiActionCommand}"
                       CloseCommand="{Binding CloseFocusCommand}"
@@ -33,6 +43,7 @@
                           IsEditing="{Binding IsEditing}"
                           IsVisible="{Binding HasFocusedTag}"
                           RevertCommand="{Binding RevertFocusCommand}"
+                          SaveBinaryCommand="{Binding SaveBinaryCommand}"
                           View="{Binding FocusedTag}" />
       <ui:AiCard Name="AiCard"
                  ActionCommand="{Binding AiActionCommand}"

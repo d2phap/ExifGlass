@@ -179,6 +179,25 @@ internal sealed class RecordingShell : IShellView
         return Task.FromResult<SaveTarget?>(new SaveTarget(Saved, suggestedName));
     }
 
+    public Task<SaveTarget?> PickSaveFileAsync(string suggestedName, string extension, string typeName)
+    {
+        Saved = new KeptStream();
+        return Task.FromResult<SaveTarget?>(new SaveTarget(Saved, suggestedName));
+    }
+
+    /// <summary>
+    /// Gets or sets the answer every dialog gets; the questions asked are kept.
+    /// </summary>
+    public DialogAnswer Answer { get; set; } = DialogAnswer.Cancel;
+
+    public List<DialogRequest> Asked { get; } = [];
+
+    public Task<DialogAnswer> AskAsync(DialogRequest request)
+    {
+        Asked.Add(request);
+        return Task.FromResult(Answer);
+    }
+
     // the export disposes its stream; the test still reads it
     private sealed class KeptStream : MemoryStream
     {

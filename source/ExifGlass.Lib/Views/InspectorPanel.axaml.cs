@@ -107,6 +107,15 @@ public partial class InspectorPanel : UserControl
 
         switch (e.PropertyName)
         {
+            // the Add-tag card rises in on top with the caret in its name field
+            case nameof(MainViewModel.IsAddingTag):
+                if (!_viewModel.IsAddingTag) break;
+
+                AddTagCard.Appear();
+                AddTagCard.FocusName();
+                Dispatcher.UIThread.Post(() => AddTagCard.BringIntoView(), DispatcherPriority.Loaded);
+                break;
+
             // the skeleton becomes the card in place; a card that wasn't there rises in
             case nameof(MainViewModel.ShowAiCard):
                 if (_viewModel.ShowAiCard && !_hadAi) AiCard.Appear();

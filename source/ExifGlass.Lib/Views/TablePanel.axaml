@@ -133,7 +133,7 @@
                             Icon="{Binding CollapseAllIcon}"
                             ToolTip.Tip="{Binding CollapseAllTip}" />
 
-            <!--  P8 wires the edits; until then the menu shows what it will hold  -->
+            <!--  S5 Edit menu: each item says what it removes, and turns off once staged or when the file has nothing for it  -->
             <ui:GlassDropDownButton Name="EditButton"
                                     AutomationProperties.Name="{x:Static app:AppText.EDIT_TIP}"
                                     Content="{Binding EditContent}"
@@ -142,23 +142,27 @@
                                     ToolTip.Tip="{x:Static app:AppText.EDIT_TIP}">
               <ui:GlassDropDownButton.Flyout>
                 <MenuFlyout Placement="BottomEdgeAlignedRight">
-                  <ui:GlassMenuItem Description="{x:Static app:AppText.EDIT_ADD_DESC}"
+                  <ui:GlassMenuItem Name="AddTagItem"
+                                    Command="{Binding OpenAddTagCommand}"
+                                    Description="{x:Static app:AppText.EDIT_ADD_DESC}"
                                     Glyph="{x:Static ui:IconId.Add}"
-                                    Header="{x:Static app:AppText.EDIT_ADD}"
-                                    IsEnabled="False" />
-                  <ui:GlassMenuItem Description="{Binding GpsDescription}"
+                                    Header="{x:Static app:AppText.EDIT_ADD}" />
+                  <ui:GlassMenuItem Name="RemoveGpsItem"
+                                    Command="{Binding RemoveGpsCommand}"
+                                    Description="{Binding GpsDescription}"
                                     Glyph="{x:Static ui:IconId.LocationOff}"
-                                    Header="{x:Static app:AppText.EDIT_GPS}"
-                                    IsEnabled="False" />
-                  <ui:GlassMenuItem Description="{x:Static app:AppText.EDIT_AI_DESC}"
+                                    Header="{x:Static app:AppText.EDIT_GPS}" />
+                  <ui:GlassMenuItem Name="RemoveAiItem"
+                                    Command="{Binding RemoveAiCommand}"
+                                    Description="{Binding AiRemovalDescription}"
                                     Glyph="{x:Static ui:IconId.Sparkle}"
-                                    Header="{x:Static app:AppText.EDIT_AI}"
-                                    IsEnabled="False" />
-                  <ui:GlassMenuItem Classes="danger"
-                                    Description="{x:Static app:AppText.EDIT_STRIP_DESC}"
+                                    Header="{x:Static app:AppText.EDIT_AI}" />
+                  <ui:GlassMenuItem Name="StripAllItem"
+                                    Classes="danger"
+                                    Command="{Binding StripAllCommand}"
+                                    Description="{Binding StripDescription}"
                                     Glyph="{x:Static ui:IconId.Eraser}"
-                                    Header="{x:Static app:AppText.EDIT_STRIP}"
-                                    IsEnabled="False" />
+                                    Header="{x:Static app:AppText.EDIT_STRIP}" />
                 </MenuFlyout>
               </ui:GlassDropDownButton.Flyout>
             </ui:GlassDropDownButton>
@@ -263,6 +267,7 @@
 
       <Panel Grid.Row="1">
         <ui:MetadataTable Name="Grid"
+                          BottomInset="{Binding TableBottomInset}"
                           Columns="{Binding Columns}"
                           HidesIdColumns="{Binding IdColumnsHidden}"
                           IsLoading="{Binding ShowSkeleton}"
@@ -305,10 +310,17 @@
           <v:EmptyState Name="Empty" IsVisible="{Binding ShowEmptyCard}" />
         </Viewbox>
 
-        <!--  the pending bar's place (P8): 12 px inset at the bottom  -->
-        <Panel Name="PendingBarHost"
-               Margin="12"
-               VerticalAlignment="Bottom" />
+        <!--  DS 6.13: the pending bar floats 12 in from the table panel's edges  -->
+        <ui:PendingBar Name="PendingBar"
+                       Margin="12"
+                       VerticalAlignment="Bottom"
+                       DiscardCommand="{Binding DiscardCommand}"
+                       IsOpen="{Binding HasPending}"
+                       IsSaving="{Binding IsSaving}"
+                       Note="{Binding PendingNote}"
+                       SaveCommand="{Binding SaveCommand}"
+                       Subtitle="{Binding PendingSubtitle}"
+                       Title="{Binding PendingTitle}" />
       </Panel>
     </Grid>
   </ui:SquircleBorder>

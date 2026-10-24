@@ -162,8 +162,6 @@ public sealed partial class MainViewModel
 
     public string ExportHeader => AppText.ExportsInView(Rows.TagsInView, Rows.AiInView);
 
-    public string GpsDescription => Rows.FilterCounts.GetValueOrDefault(QuickFilter.Gps) is var gps and > 0 ? AppText.GpsTags(gps) : AppText.EDIT_GPS_NONE;
-
     public IReadOnlyList<ColumnChoice> ColumnChoices
     {
         get

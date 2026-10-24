@@ -33,7 +33,6 @@ public sealed partial class MainViewModel
 {
     #region Fields and constants
 
-    // staged in memory only until P8 brings the pending bar and Save
     private EditSet _edits = EditSet.Empty;
 
     #endregion // Fields and constants
@@ -99,7 +98,7 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// Staged changes, for the table's badges until P8's pending bar shows them.
+    /// The staged changes for the open file; Save writes them (DS 7.3).
     /// </summary>
     public EditSet Edits => _edits;
 
@@ -146,6 +145,7 @@ public sealed partial class MainViewModel
         if (FocusedTag is not { } tag) return;
 
         EditText = tag.Value;
+        IsAddingTag = false;
         IsEditing = true;
     }
 
@@ -156,14 +156,23 @@ public sealed partial class MainViewModel
     [RelayCommand]
     private void ApplyEdit()
     {
-        if (!IsEditing || FocusedTag is not { } view || Document?.GetByKey(view.Key) is not { } tag) return;
+        if (!IsEditing || FocusedTag is not { } view) return;
+
+        var value = EditText ?? string.Empty;
+        if (AddedFor(view.Key) is { } added)
+        {
+            IsEditing = false;
+            Stage(_edits.Add(added with { Value = value }));
+            Shell?.ShowToast(added.Value == value ? AppText.TOAST_NO_CHANGE : AppText.TOAST_EDIT_STAGED, view.Name, added.Value == value ? ToastKind.Info : ToastKind.Success);
+            return;
+        }
+
+        if (Document?.GetByKey(view.Key) is not { } tag) return;
 
         IsEditing = false;
-        var value = EditText ?? string.Empty;
         var original = _arguments.ShowRawValues ? tag.RawOrValue : tag.Value;
         var unchanged = value == original;
-        _edits = unchanged ? _edits.Revert(tag.Key) : _edits.Set(tag.Key, tag.WriteName, value, original, _arguments.ShowRawValues);
-        Requery();
+        Stage(unchanged ? _edits.Revert(tag.Key) : _edits.Set(tag.Key, tag.WriteName, value, original, _arguments.ShowRawValues));
 
         Shell?.ShowToast(unchanged ? AppText.TOAST_NO_CHANGE : AppText.TOAST_EDIT_STAGED, view.Name, unchanged ? ToastKind.Info : ToastKind.Success);
     }
@@ -174,16 +183,24 @@ public sealed partial class MainViewModel
 
 
     /// <summary>
-    /// Delete, or Undo a staged delete (DS 6.11).
+    /// Delete, or Undo a staged delete (DS 6.11); a staged new tag is simply dropped (Proto).
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanEditFocus))]
     private void ToggleDelete()
     {
-        if (FocusedTag is not { } view || Document?.GetByKey(view.Key) is not { } tag) return;
+        if (FocusedTag is not { } view) return;
 
         IsEditing = false;
-        _edits = view.IsDeleted ? _edits.Revert(tag.Key) : _edits.Delete(tag.Key, tag.WriteName, _arguments.ShowRawValues ? tag.RawOrValue : tag.Value);
-        Requery();
+        if (AddedFor(view.Key) is { } added)
+        {
+            Selection.Unfocus();
+            Stage(_edits.RemoveAdded(added.Key));
+            return;
+        }
+
+        if (Document?.GetByKey(view.Key) is not { } tag) return;
+
+        Stage(view.IsDeleted ? _edits.Revert(tag.Key) : _edits.Delete(tag.Key, tag.WriteName, _arguments.ShowRawValues ? tag.RawOrValue : tag.Value));
     }
 
 
@@ -192,8 +209,7 @@ public sealed partial class MainViewModel
     {
         if (FocusedTag is not { } view) return;
 
-        _edits = _edits.Revert(view.Key);
-        Requery();
+        Stage(_edits.Revert(view.Key));
     }
 
 
@@ -222,7 +238,7 @@ public sealed partial class MainViewModel
     {
         var row = Selection.FocusedKey is { } key ? FindRow(key) : null;
         UpdateAiFocus(row);
-        if (row is null || row.IsAi || row.EditState == EditState.Added)
+        if (row is null || row.IsAi)
         {
             IsEditing = false;
             FocusedTag = null;
@@ -230,6 +246,11 @@ public sealed partial class MainViewModel
         }
 
         if (FocusedTag?.Key != row.Key) IsEditing = false;
+        if (row.EditState == EditState.Added)
+        {
+            if (AddedView(row) is { } added && added != FocusedTag) FocusedTag = added;
+            return;
+        }
 
         var tag = row.Tag;
         var view = new SelectedTagView(
@@ -245,9 +266,32 @@ public sealed partial class MainViewModel
             row.EditState,
             row.OriginalValue,
             row.IsAi,
-            tag?.IsAiSource == true ? AiFieldsFrom(tag) : 0);
+            tag?.IsAiSource == true ? AiFieldsFrom(tag) : 0,
+            tag?.IsBinary == true);
 
         if (view != FocusedTag) FocusedTag = view;
+    }
+
+
+    // a staged new tag: no ID or raw value yet, its format from ExifTool's tag table
+    private SelectedTagView? AddedView(ViewRow row)
+    {
+        if (AddedFor(row.Key) is not { } added) return null;
+
+        var format = Document?.TagDb is { } tagDb && tagDb.TryFind(added.Group, added.Name, null, out var def) ? def.Format : TagIdRule.NONE;
+        return new SelectedTagView(row.Key, added.Group, TagIdRule.NONE, added.Name, added.Value, UiText.SAME_AS_VALUE, format,
+            $"-{added.Group}:{added.Name}", IsReadOnly: false, EditState.Added);
+    }
+
+
+    private AddedTag? AddedFor(string rowKey)
+    {
+        foreach (var added in _edits.Added)
+        {
+            if ("New:" + added.Key == rowKey) return added;
+        }
+
+        return null;
     }
 
 

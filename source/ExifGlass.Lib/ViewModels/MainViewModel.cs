@@ -62,6 +62,16 @@ public interface IShellView
     /// </summary>
     Task OpenUriAsync(string uri) => Task.CompletedTask;
 
+    /// <summary>
+    /// Shows the save picker for a file of any type (Save binary data); null when cancelled.
+    /// </summary>
+    Task<SaveTarget?> PickSaveFileAsync(string suggestedName, string extension, string typeName) => Task.FromResult<SaveTarget?>(null);
+
+    /// <summary>
+    /// Asks in the window's dialog (D8); Cancel when there is none.
+    /// </summary>
+    Task<DialogAnswer> AskAsync(DialogRequest request) => Task.FromResult(DialogAnswer.Cancel);
+
     #endregion // Methods
 }
 
@@ -96,6 +106,7 @@ public sealed partial class MainViewModel : ObservableObject
     #region Fields and constants
 
     private readonly SettingsStore _settings;
+    private readonly IMetadataReader _reader;
     private readonly MetadataService? _metadata;
     private readonly ArgumentAnalysis _arguments;
     private int _queryGeneration;
@@ -112,6 +123,7 @@ public sealed partial class MainViewModel : ObservableObject
     public MainViewModel(SettingsStore settings, IMetadataReader reader, MetadataService? metadata = null)
     {
         _settings = settings;
+        _reader = reader;
         _metadata = metadata;
         _arguments = ArgumentPolicy.Analyze(settings.Current.ExifToolArguments);
 
@@ -126,6 +138,7 @@ public sealed partial class MainViewModel : ObservableObject
         InspectorOpen = settings.Current.InspectorOpen;
         RestorePanelWidths(settings.Current);
         Columns = ParseColumns(settings.Current.VisibleColumns);
+        IsCommandExpanded = settings.Current.CommandBarExpanded;
         Selection.Changed += Selection_Changed;
 
         if (metadata is not null) metadata.StatusChanged += Metadata_StatusChanged;
@@ -147,6 +160,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsLoading), nameof(ShowEmptyCard), nameof(Summary), nameof(ShowSkeleton), nameof(FileTitle), nameof(FileMeta))]
+    [NotifyPropertyChangedFor(nameof(IsCommandWrite))]
     public partial LoadPhase Phase { get; private set; }
 
     [ObservableProperty]
@@ -176,6 +190,18 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCommand))]
     public partial IReadOnlyList<CommandToken> CommandTokens { get; private set; } = [];
+
+    /// <summary>
+    /// The command bar's expanded state, kept in the settings (plan P8).
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsCommandExpanded { get; set; }
+
+    /// <summary>
+    /// The command types itself in while a file is read (DS 7.1).
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsCommandTyping { get; private set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ThemeIcon), nameof(ThemeTooltip))]
@@ -279,7 +305,16 @@ public sealed partial class MainViewModel : ObservableObject
 
     #region Public methods
 
-    public Task OpenFileAsync(string path) => Loader.OpenAsync(path);
+    /// <summary>
+    /// Opens a file; with edits staged it asks first (D8), whatever asked for it: the picker, a drop, the command line, ImageGlass.
+    /// </summary>
+    public async Task OpenFileAsync(string path)
+    {
+        if (!await ConfirmLeaveAsync()) return;
+
+        IsAddingTag = false;
+        await Loader.OpenAsync(path);
+    }
 
 
     /// <summary>
@@ -303,6 +338,12 @@ public sealed partial class MainViewModel : ObservableObject
         if (IsEditing)
         {
             IsEditing = false;
+            return true;
+        }
+
+        if (IsAddingTag)
+        {
+            IsAddingTag = false;
             return true;
         }
 
@@ -459,10 +500,13 @@ public sealed partial class MainViewModel : ObservableObject
             IsInspectorPushed = false;
         }
 
-        UpdateCommandTokens();
+        NotifyEdits();
         NotifyInspector();
         NotifyAi();
     }
+
+
+    partial void OnIsCommandExpandedChanged(bool value) => _settings.Update(s => s.CommandBarExpanded = value);
 
 
     // the query runs off the UI thread; only the newest result is applied, as one reset (plan 4.2), with its document and phase
@@ -470,12 +514,16 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var generation = ++_queryGeneration;
 
-        // a new read starts with every group open, nothing selected and nothing staged (Proto; P8 asks first, D8); the AI data arriving is the same read
+        // a new read starts with every group open, nothing selected and nothing staged (Proto; D8 asked first), but the read after a save keeps the view; the AI data arriving is the same read
         if (document is not null && !document.IsSameRead(Document))
         {
-            _collapsed.Clear();
-            Selection.Clear();
-            _edits = EditSet.Empty;
+            if (document.SourcePath != _reloadPath)
+            {
+                _collapsed.Clear();
+                Selection.Clear();
+            }
+
+            SetEdits(EditSet.Empty);
             IsEditing = false;
         }
 
@@ -489,7 +537,21 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
 
-    private void UpdateCommandTokens() => CommandTokens = _metadata?.ReadCommand(Document?.SourcePath ?? Loader.PendingPath) ?? [];
+    // the read command, typed in while a file is read, or the write Save runs while edits are staged (DS 6.12, 7.1, 7.3)
+    private void UpdateCommandTokens()
+    {
+        var loading = Loader.Phase == LoadPhase.Loading && Loader.PendingPath is not null;
+        IsCommandTyping = loading && _reloadPath is null;
+        if (_metadata is null)
+        {
+            CommandTokens = [];
+            return;
+        }
+
+        CommandTokens = !loading && HasPending && Document is { } doc
+            ? _metadata.WriteCommand(doc.SourcePath, _edits)
+            : _metadata.ReadCommand(loading ? Loader.PendingPath : Document?.SourcePath);
+    }
 
 
     private void UpdateExifToolState()

@@ -216,7 +216,15 @@ public class PanelShellTests
 
         vm.ToggleDeleteCommand.Execute(null);
         await shell.WaitForAsync(() => vm.FocusedTag?.IsDeleted == true);
-        await vm.OpenFileAsync("b.jpg");
+
+        // another file asks first (D8); the window's own dialog, answered with Discard
+        var open = vm.OpenFileAsync("b.jpg");
+        await shell.WaitForAsync(() => shell.Window.Dialogs.IsOpen);
+        shell.Settle();
+        var discard = shell.Window.Dialogs.GetVisualDescendants().OfType<Avalonia.Controls.Button>().Single(b => b.Name == "PART_Secondary");
+        Assert.Equal("Discard", discard.Content);
+        discard.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+        await open;
         await shell.WaitForAsync(() => vm.Document?.FileName == "b.jpg");
         Assert.True(vm.Edits.IsEmpty);
         Assert.Null(vm.FocusedTag);

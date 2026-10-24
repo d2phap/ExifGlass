@@ -64,6 +64,17 @@ public interface IMetadataReader
     /// </summary>
     Task<byte[]?> ReadPreviewAsync(string path, CancellationToken cancellationToken) => Task.FromResult<byte[]?>(null);
 
+    /// <summary>
+    /// Writes the staged edits in one ExifTool call; ExifTool keeps FILE_original.
+    /// </summary>
+    Task<SaveResult> WriteAsync(string path, EditSet edits, CancellationToken cancellationToken) =>
+        Task.FromResult(new SaveResult(SaveOutcome.Failed, [AppText.SAVE_UNAVAILABLE], [], null));
+
+    /// <summary>
+    /// A binary tag's bytes (D12); null when there are none.
+    /// </summary>
+    Task<byte[]?> ReadBinaryAsync(string path, string writeName, CancellationToken cancellationToken) => Task.FromResult<byte[]?>(null);
+
     #endregion // Methods
 }
 
@@ -184,14 +195,39 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
     }
 
 
+    public async Task<SaveResult> WriteAsync(string path, EditSet edits, CancellationToken cancellationToken)
+    {
+        var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
+        using var plan = WritePlan.Build(path, edits);
+        return await service.WriteAsync(plan, cancellationToken).ConfigureAwait(false);
+    }
+
+
+    public async Task<byte[]?> ReadBinaryAsync(string path, string writeName, CancellationToken cancellationToken)
+    {
+        var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
+        return await service.ReadBinaryAsync(path, writeName, cancellationToken).ConfigureAwait(false);
+    }
+
+
     /// <summary>
     /// The terminal-equivalent read command for the command bar (plan 4.4), with the file or a placeholder.
     /// </summary>
     public IReadOnlyList<CommandToken> ReadCommand(string? path)
     {
         var location = Location;
-        var executable = location?.Path ?? (OperatingSystem.IsWindows() ? "exiftool.exe" : "exiftool");
-        return WritePlan.ReadTokens(executable, location?.ConfigPath, ArgumentPolicy.Split(_settings().ExifToolArguments), path);
+        return WritePlan.ReadTokens(Executable(location), location?.ConfigPath, ArgumentPolicy.Split(_settings().ExifToolArguments), path);
+    }
+
+
+    /// <summary>
+    /// The write Save runs, for the command bar while edits are staged (DS 7.3); values inline, no temp file.
+    /// </summary>
+    public IReadOnlyList<CommandToken> WriteCommand(string path, EditSet edits)
+    {
+        var location = Location;
+        using var plan = WritePlan.Preview(path, edits);
+        return plan.Tokens(Executable(location), location?.ConfigPath);
     }
 
 
@@ -233,6 +269,9 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
             SetStatus(ExifToolStatus.Failed, ex.Message);
         }
     }
+
+
+    private static string Executable(ExifToolLocation? location) => location?.Path ?? (OperatingSystem.IsWindows() ? "exiftool.exe" : "exiftool");
 
 
     private async Task<ExifToolService> ReadyAsync(CancellationToken cancellationToken)

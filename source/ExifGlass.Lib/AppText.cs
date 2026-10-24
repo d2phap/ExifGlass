@@ -173,6 +173,21 @@ public static class AppText
     public const string EXPORT_AI_WORKFLOW = "Workflow";
     public const string EXPORT_AI_WORKFLOW_DESC = "Exactly as embedded, as .json";
 
+    // editing, the pending bar, Save and the unsaved-changes dialog (DS 7.3, 6.13; S5; D8; Appendix B items 3 and 16)
+    public const string EDIT_STAGED = "Already staged";
+    public const string EDIT_AI_NONE = "No AI generation data in this file";
+    public const string EDIT_GPS_MANIFEST = "Only in the Content Credentials, which ExifTool can't edit";
+    public const string NOTE_MANIFEST_GPS = "The location in the Content Credentials stays: Strip all metadata removes it with the manifest";
+    public const string TOAST_TAG_STAGED = "Tag staged";
+    public const string TOAST_NOTHING_SAVED = "Nothing to change";
+    public const string TOAST_NOTHING_SAVED_SUB = "The file already had these values";
+    public const string TOAST_SAVED_BINARY = "Saved binary data";
+    public const string TOAST_BINARY_FAILED = "Couldn't read the binary data";
+    public const string SAVE = "Save";
+    public const string DISCARD = "Discard";
+    public const string SAVE_UNAVAILABLE = "ExifTool isn't available";
+    public const string BINARY_FILES = "Binary data";
+
     // the Details card's AI-training row (AI addendum question 10)
     public const string AI_TRAINING = "AI training";
     public const string NOT_ALLOWED = "Not allowed";
@@ -217,7 +232,49 @@ public static class AppText
 
     public static string ExportedSub(int tags, int ai, long bytes) => string.Create(CultureInfo.InvariantCulture, $"{TagsAndAi(tags, ai)} · {bytes / 1024.0:0.0} kB");
 
-    public static string GpsTags(int count) => string.Create(CultureInfo.InvariantCulture, $"{count:N0} location {(count == 1 ? "tag" : "tags")} · -gps:all=");
+    public static string GpsTags(int count) => string.Create(CultureInfo.InvariantCulture, $"{count:N0} location {(count == 1 ? "tag" : "tags")} · {Core.Editing.WritePlan.REMOVE_GPS}");
+
+    /// <summary>
+    /// The pending bar's title (S5): "3 pending changes".
+    /// </summary>
+    public static string PendingChanges(int count) => count == 1 ? "1 pending change" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} pending changes");
+
+    /// <summary>
+    /// The pending bar's line (DS 6.13): "Save writes DSCF4127.JPG · backup kept as DSCF4127.JPG_original".
+    /// </summary>
+    public static string SaveWrites(string file) => $"Save writes {file} · backup kept as {file}_original";
+
+    public static string TagStaged(string group, string name) => $"{group}:{name}";
+
+    public static string Saved(int count) => count == 1 ? "Saved 1 change" : string.Create(CultureInfo.InvariantCulture, $"Saved {count:N0} changes");
+
+    public static string BackupKept(string file) => $"Backup kept as {file}_original";
+
+    public static string SaveFailed(string file) => $"Couldn't save {file}";
+
+    /// <summary>
+    /// D8's question when another file is asked for or the window closes with edits staged.
+    /// </summary>
+    public static string UnsavedTitle(string file) => $"Save changes to {file}?";
+
+    public static string UnsavedBody(int count) => $"{PendingChanges(count)} not written yet. Discard drops them.";
+
+    /// <summary>
+    /// The Add-tag card's hint for a name ExifTool has no writable tag for: "ExifTool has no EXIF tag it can write named Foo".
+    /// </summary>
+    public static string NotWritable(string group, string name) => $"ExifTool has no {group} tag it can write named {name}";
+
+    /// <summary>
+    /// A note from the AI redaction, with how many more there are: "PNG:Comment can't be removed (+2 more)".
+    /// </summary>
+    public static string FirstOf(IReadOnlyList<string> notes) => notes.Count switch
+    {
+        0 => string.Empty,
+        1 => notes[0],
+        _ => string.Create(CultureInfo.InvariantCulture, $"{notes[0]} (+{notes.Count - 1} more)"),
+    };
+
+    public static string SavedBinary(string file, int bytes) => string.Create(CultureInfo.InvariantCulture, $"{file} · {bytes / 1024.0:0.0} kB");
 
     /// <summary>
     /// The hidden-groups chip (Proto): "Hiding EXIF" or "Hiding 3 groups".

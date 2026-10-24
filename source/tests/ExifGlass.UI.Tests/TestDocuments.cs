@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Ai;
+using ExifGlass.Core.Editing;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Services;
 using System.Buffers;
@@ -165,6 +166,26 @@ public sealed class FakeReader : IMetadataReader
     /// </summary>
     public TaskCompletionSource<AiGenerationInfo?>? AiHold { get; set; }
 
+    /// <summary>
+    /// Gets the saves asked for, with what each wrote.
+    /// </summary>
+    public List<(string Path, EditSet Edits)> Writes { get; } = [];
+
+    /// <summary>
+    /// Gets or sets how every save ends; updated with a backup by default.
+    /// </summary>
+    public SaveResult WriteResult { get; set; } = new(SaveOutcome.Updated, [], [], "backup");
+
+    /// <summary>
+    /// Gets or sets a save that ends when the test completes it.
+    /// </summary>
+    public TaskCompletionSource<SaveResult>? WriteHold { get; set; }
+
+    /// <summary>
+    /// Gets or sets the bytes a binary read returns.
+    /// </summary>
+    public byte[]? Binary { get; set; }
+
     #endregion // Properties
 
 
@@ -190,6 +211,16 @@ public sealed class FakeReader : IMetadataReader
         AiReads++;
         return AiHold is { } hold ? hold.Task.WaitAsync(cancellationToken) : Task.FromResult(Ai);
     }
+
+
+    public Task<SaveResult> WriteAsync(string path, EditSet edits, CancellationToken cancellationToken)
+    {
+        Writes.Add((path, edits));
+        return WriteHold is { } hold ? hold.Task : Task.FromResult(WriteResult);
+    }
+
+
+    public Task<byte[]?> ReadBinaryAsync(string path, string writeName, CancellationToken cancellationToken) => Task.FromResult(Binary);
 
     #endregion // Public methods
 }

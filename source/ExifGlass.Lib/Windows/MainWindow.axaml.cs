@@ -57,6 +57,7 @@ public partial class MainWindow : Window, IShellView
     private readonly IWindowPlacementStore _placements;
     private SettingsWindow? _settingsWindow;
     private AboutWindow? _aboutWindow;
+    private bool _closeConfirmed;
 
     #endregion // Fields and constants
 
@@ -128,19 +129,28 @@ public partial class MainWindow : Window, IShellView
     }
 
 
-    public async Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format)
+    public Task<SaveTarget?> PickSaveFileAsync(string suggestedName, ExportFormat format)
     {
         var extension = Exporter.Extension(format);
+        return PickSaveFileAsync(suggestedName, extension, extension.ToUpperInvariant());
+    }
+
+
+    public async Task<SaveTarget?> PickSaveFileAsync(string suggestedName, string extension, string typeName)
+    {
         var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             SuggestedFileName = suggestedName,
             DefaultExtension = extension,
             ShowOverwritePrompt = true,
-            FileTypeChoices = [new FilePickerFileType(extension.ToUpperInvariant()) { Patterns = ["*." + extension] }],
+            FileTypeChoices = [new FilePickerFileType(typeName) { Patterns = ["*." + extension] }],
         });
 
         return file is null ? null : new SaveTarget(await file.OpenWriteAsync(), file.Name);
     }
+
+
+    public Task<DialogAnswer> AskAsync(DialogRequest request) => Dialogs.ShowAsync(request);
 
 
     public async Task OpenUriAsync(string uri)
@@ -151,7 +161,31 @@ public partial class MainWindow : Window, IShellView
     #endregion // IShellView
 
 
+    #region Protected methods
+
+    // D8: with edits staged the window asks before it closes; a shutdown of the OS isn't held up by a dialog
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        base.OnClosing(e);
+        if (e.Cancel || _closeConfirmed || !ViewModel.HasPending || e.CloseReason == WindowCloseReason.OSShutdown) return;
+
+        e.Cancel = true;
+        _ = ConfirmCloseAsync();
+    }
+
+    #endregion // Protected methods
+
+
     #region Private methods
+
+    private async Task ConfirmCloseAsync()
+    {
+        if (!await ViewModel.ConfirmLeaveAsync()) return;
+
+        _closeConfirmed = true;
+        Close();
+    }
+
 
     // one of each child window: a second request brings the open one forward
     private void ShowChild<T>(ref T? window, Func<T> create) where T : OwnedWindow

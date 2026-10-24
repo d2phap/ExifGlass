@@ -188,6 +188,7 @@ public static class QueryEngine
     private static List<ViewRow> BuildRows(MetadataDocument doc, AiRowSet aiRows, ViewQuery query)
     {
         var rows = new List<ViewRow>(doc.Tags.Count + aiRows.Rows.Count);
+        var edits = query.Edits;
 
         foreach (var ai in aiRows.Rows)
         {
@@ -201,10 +202,10 @@ public static class QueryEngine
                 SortValue = ai.Value,
                 SourceKey = ai.SourceKey,
                 Ai = ai,
+                EditState = EditTargets.IsBulkDeleted(edits, ai) ? EditState.Removed : EditState.None,
             });
         }
 
-        var edits = query.Edits;
         foreach (var tag in doc.Tags)
         {
             if (tag.Copy > 0 && !query.ShowDuplicates) continue;
@@ -217,6 +218,11 @@ public static class QueryEngine
                 state = edit.IsDelete ? EditState.Deleted : EditState.Edited;
                 original = value;
                 if (!edit.IsDelete) value = edit.Value!;
+            }
+            else if (EditTargets.IsBulkDeleted(edits, tag))
+            {
+                state = EditState.Removed;
+                original = value;
             }
 
             rows.Add(new ViewRow

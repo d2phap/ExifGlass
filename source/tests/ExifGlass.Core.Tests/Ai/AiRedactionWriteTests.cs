@@ -66,7 +66,7 @@ public class AiRedactionWriteTests(ExifToolFixture exifTool)
                 return;
             }
 
-            using var plan = WritePlan.Build(path, EditSet.Empty.WithRemoveAi(true), redaction);
+            using var plan = WritePlan.Build(path, EditSet.Empty.WithRemoveAi(redaction));
             var result = await service.WriteAsync(plan, ct);
             Assert.True(result.Outcome == SaveOutcome.Updated, string.Join("; ", result.Errors));
 

@@ -176,7 +176,7 @@ public static class CoreChecks
             await using var service = new ExifToolService(location, EXIFTOOL_TIMEOUT);
 
             const string TITLE = "Self-test ✓ 写真\nsecond line";
-            using var plan = WritePlan.Build(path, EditSet.Empty.Add(new AddedTag("XMP", "Title", TITLE)), null, dir);
+            using var plan = WritePlan.Build(path, EditSet.Empty.Add(new AddedTag("XMP", "Title", TITLE)), dir);
             var result = await service.WriteAsync(plan, cancellationToken).ConfigureAwait(false);
             if (result.Outcome != SaveOutcome.Updated) throw new InvalidOperationException($"Save {result.Outcome}: {string.Join("; ", result.Errors)}");
 

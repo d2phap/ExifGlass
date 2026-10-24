@@ -146,6 +146,45 @@ public class ExifToolServiceTests(ExifToolFixture exifTool)
 
 
     [Fact]
+    public async Task RemovesEveryGpsTagThenStripsAll()
+    {
+        var service = exifTool.Require();
+        var path = TestEnvironment.CopyToTemp(TestEnvironment.Fixture("negative_camera.jpg"));
+        var ct = TestContext.Current.CancellationToken;
+        try
+        {
+            // a location in EXIF and in XMP, as phones and photo apps write it
+            var located = EditSet.Empty
+                .Add(new AddedTag("EXIF", "GPSLatitude", "22.2759"))
+                .Add(new AddedTag("EXIF", "GPSLatitudeRef", "N"))
+                .Add(new AddedTag("XMP", "GPSLatitude", "22.2759"))
+                .Add(new AddedTag("XMP", "GPSLongitude", "114.1455"));
+            using (var plan = WritePlan.Build(path, located)) Assert.Equal(SaveOutcome.Updated, (await service.WriteAsync(plan, ct)).Outcome);
+
+            var before = await service.ReadAsync(path, [], TagDb.LoadEmbedded(), ct);
+            Assert.Contains(before.Tags, t => t.Group0 == "XMP" && t.Name == "GPSLatitude");
+            Assert.True(EditTargets.GpsCount(before) >= 3);
+
+            using (var plan = WritePlan.Build(path, EditSet.Empty.WithRemoveGps(true))) Assert.Equal(SaveOutcome.Updated, (await service.WriteAsync(plan, ct)).Outcome);
+
+            var after = await service.ReadAsync(path, [], null, ct);
+            Assert.DoesNotContain(after.Tags, t => t.Name.StartsWith("GPS", StringComparison.Ordinal));
+            Assert.Equal(before.Find("EXIF", "Make")!.Value, after.Find("EXIF", "Make")!.Value);
+
+            using (var plan = WritePlan.Build(path, EditSet.Empty.WithStripAll(true))) Assert.Equal(SaveOutcome.Updated, (await service.WriteAsync(plan, ct)).Outcome);
+
+            var stripped = await service.ReadAsync(path, [], null, ct);
+            Assert.DoesNotContain(stripped.Tags, t => t.Group0 is "EXIF" or "XMP" or "IPTC" or "MakerNotes");
+            Assert.True(File.Exists(path + "_original"));
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, true);
+        }
+    }
+
+
+    [Fact]
     public async Task ReportsANoOpWriteAsUnchanged()
     {
         var service = exifTool.Require();

@@ -253,10 +253,113 @@ public sealed class TagDb
         return true;
     }
 
+    /// <summary>
+    /// Writable names of a family-0 group for the Add-tag card: names starting with the text first, then names holding it; each name once.
+    /// </summary>
+    public IReadOnlyList<string> Suggest(string group0, string text, int max)
+    {
+        var result = new List<string>(max);
+        if (max <= 0 || !TryGroupRange(group0, out var start, out var end)) return result;
+
+        Span<byte> query = stackalloc byte[256];
+        if (!Encoding.UTF8.TryGetBytes(text.Trim(), query, out var length)) return result;
+        query = query[..length];
+
+        // two passes keep the order without sorting: starts-with, then contains
+        var inner = new List<string>();
+        var previous = ReadOnlySpan<byte>.Empty;
+        for (var i = start; i < end && result.Count < max; i++)
+        {
+            var name = Utf8(_records[(i * FIELDS) + 2]);
+            if (name.SequenceEqual(previous) || !IsAddable((TagDefFlags)_records[(i * FIELDS) + 5])) continue;
+
+            previous = name;
+            if (name.Length >= query.Length && System.Text.Ascii.EqualsIgnoreCase(name[..query.Length], query)) result.Add(Encoding.UTF8.GetString(name));
+            else if (inner.Count < max && IndexOfIgnoreCase(name, query) > 0) inner.Add(Encoding.UTF8.GetString(name));
+        }
+
+        foreach (var name in inner)
+        {
+            if (result.Count >= max) break;
+            result.Add(name);
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// The exact spelling of a writable tag of the group, matched without case ("artist" is "Artist"); false when ExifTool can't write it.
+    /// </summary>
+    public bool TryFindWritable(string group0, string name, out string exactName)
+    {
+        exactName = string.Empty;
+        if (!TryGroupRange(group0, out var start, out var end)) return false;
+
+        Span<byte> wanted = stackalloc byte[256];
+        if (!Encoding.UTF8.TryGetBytes(name.Trim(), wanted, out var length) || length == 0) return false;
+
+        for (var i = start; i < end; i++)
+        {
+            var candidate = Utf8(_records[(i * FIELDS) + 2]);
+            if (!System.Text.Ascii.EqualsIgnoreCase(candidate, wanted[..length]) || !IsAddable((TagDefFlags)_records[(i * FIELDS) + 5])) continue;
+
+            exactName = Encoding.UTF8.GetString(candidate);
+            return true;
+        }
+
+        return false;
+    }
+
     #endregion // Public methods
 
 
     #region Private methods
+
+    // a value the card can type: binary, struct, protected and unknown tags need more than a line of text
+    private static bool IsAddable(TagDefFlags flags) =>
+        (flags & TagDefFlags.Writable) != 0 && (flags & (TagDefFlags.Binary | TagDefFlags.Struct | TagDefFlags.Protected | TagDefFlags.Unknown)) == 0;
+
+
+    private bool TryGroupRange(string group0, out int start, out int end)
+    {
+        start = end = 0;
+        Span<byte> g0 = stackalloc byte[128];
+        if (!Encoding.UTF8.TryGetBytes(group0, g0, out var g0Length)) return false;
+
+        var group = g0[..g0Length];
+        start = Bound(group, upper: false);
+        end = Bound(group, upper: true);
+        return start < end;
+    }
+
+
+    // the first record whose group sorts at or after (upper: after) the group
+    private int Bound(ReadOnlySpan<byte> group0, bool upper)
+    {
+        int lo = 0, hi = Count;
+        while (lo < hi)
+        {
+            var mid = (lo + hi) >>> 1;
+            var c = Utf8(_records[mid * FIELDS]).SequenceCompareTo(group0);
+            if (c < 0 || (upper && c == 0)) lo = mid + 1;
+            else hi = mid;
+        }
+
+        return lo;
+    }
+
+
+    private static int IndexOfIgnoreCase(ReadOnlySpan<byte> text, ReadOnlySpan<byte> part)
+    {
+        for (var i = 0; i + part.Length <= text.Length; i++)
+        {
+            if (System.Text.Ascii.EqualsIgnoreCase(text.Slice(i, part.Length), part)) return i;
+        }
+
+        return -1;
+    }
+
 
     // the first record with this (group0, name), or -1
     private int LowerBound(ReadOnlySpan<byte> group0, ReadOnlySpan<byte> name)

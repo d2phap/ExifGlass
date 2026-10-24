@@ -18,12 +18,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Metadata;
+using ExifGlass.Core.Query;
+using ExifGlass.Core.Tests.Metadata;
 using Xunit;
 
 namespace ExifGlass.Core.Tests.Editing;
 
 public class EditingTests
 {
+    #region Fields and constants
+
+    private static readonly AiRedactionPlan Redaction = new(["-PNG:Parameters="], ["PNG:Parameters"], ["something stays"]);
+
+    #endregion // Fields and constants
+
+
     #region Tests
 
     [Fact]
@@ -35,7 +45,7 @@ public class EditingTests
             .Add(new AddedTag("XMP", "Title", "t"))
             .WithRemoveGps(true)
             .WithStripAll(true)
-            .WithRemoveAi(true);
+            .WithRemoveAi(Redaction);
 
         Assert.True(a.IsEmpty);
         Assert.Equal(6, b.PendingCount);
@@ -46,7 +56,7 @@ public class EditingTests
 
         // undo a delete, revert an edit, restage the same value, remove an added tag
         var c = b.Revert("EXIF:IFD0:Model").Set("EXIF:IFD0:Make", "IFD0:Make", "FUJIFILM", "FUJIFILM").RemoveAdded("xmp:title")
-            .WithRemoveGps(false).WithStripAll(false).WithRemoveAi(false);
+            .WithRemoveGps(false).WithStripAll(false).WithRemoveAi(null);
         Assert.True(c.IsEmpty);
         Assert.Same(c, c.Revert("nope"));
 
@@ -63,16 +73,16 @@ public class EditingTests
     public void BuildsWriteArgumentsInOrder()
     {
         var edits = EditSet.Empty
-            .WithStripAll(true).WithRemoveGps(true).WithRemoveAi(true)
+            .WithStripAll(true).WithRemoveGps(true).WithRemoveAi(Redaction)
             .Set("EXIF:IFD0:Make", "IFD0:Make", "Fujifilm", "FUJIFILM")
             .Set("EXIF:ExifIFD:FNumber", "ExifIFD:FNumber", "2.8", "4", isRaw: true)
             .Delete("EXIF:IFD0:Model", "IFD0:Model", "X")
             .Add(new AddedTag("XMP", "Title", "Lanterns"));
-        var redaction = new AiRedactionPlan(["-PNG:Parameters="], ["PNG:Parameters"], ["something stays"]);
 
-        using var plan = WritePlan.Build("C:/photos/DSCF4127.JPG", edits, redaction);
+        using var plan = WritePlan.Build("C:/photos/DSCF4127.JPG", edits);
 
-        Assert.Equal(["-all=", "-gps:all=", "-PNG:Parameters=", "-ExifIFD:FNumber#=2.8", "-IFD0:Make=Fujifilm", "-IFD0:Model=", "-XMP:Title=Lanterns"], plan.Arguments);
+        // -gps*= and not -gps:all=, which leaves XMP GPS tags (G8)
+        Assert.Equal(["-all=", "-gps*=", "-PNG:Parameters=", "-ExifIFD:FNumber#=2.8", "-IFD0:Make=Fujifilm", "-IFD0:Model=", "-XMP:Title=Lanterns"], plan.Arguments);
         Assert.Equal(["something stays"], plan.Warnings);
         Assert.Equal("DSCF4127.JPG_original", plan.BackupName);
         Assert.False(plan.IsEmpty);
@@ -93,7 +103,7 @@ public class EditingTests
                 .Set("XMP:XMP-dc:Rights", "XMP-dc:Rights", "line\nbreak", "x");
 
             string file;
-            using (var plan = WritePlan.Build("a.jpg", edits, null, dir))
+            using (var plan = WritePlan.Build("a.jpg", edits, dir))
             {
                 Assert.Equal("-codedcharacterset=utf8", plan.Arguments[^1]);
                 Assert.Contains("-IPTC:Keywords=từ khóa", plan.Arguments);
@@ -123,9 +133,16 @@ public class EditingTests
 
         var tokens = plan.Tokens("exiftool");
 
-        Assert.Equal(["exiftool", "-gps:all=", "\"-IFD0:Make=Fuji film\"", "\"C:/My Photos/a.jpg\""], tokens.Select(t => t.Text));
+        Assert.Equal(["exiftool", "-gps*=", "\"-IFD0:Make=Fuji film\"", "\"C:/My Photos/a.jpg\""], tokens.Select(t => t.Text));
         Assert.Equal([CommandTokenKind.Executable, CommandTokenKind.Write, CommandTokenKind.Write, CommandTokenKind.Path], tokens.Select(t => t.Kind));
-        Assert.Equal("exiftool -gps:all= \"-IFD0:Make=Fuji film\" \"C:/My Photos/a.jpg\"", WritePlan.ToCommandLine(tokens));
+        Assert.Equal("exiftool -gps*= \"-IFD0:Make=Fuji film\" \"C:/My Photos/a.jpg\"", WritePlan.ToCommandLine(tokens));
+
+        // the write Save runs, as the command bar shows it: the app's config, then every value inline, no temp file
+        var before = Directory.GetFiles(Path.GetTempPath(), "exifglass-value-*").Length;
+        using var preview = WritePlan.Preview("a.jpg", EditSet.Empty.Set("k", "XMP-dc:Description", "two\nlines with $5", "x"));
+        Assert.Equal(["-XMP-dc:Description=two\nlines with $5"], preview.Arguments);
+        Assert.Equal(before, Directory.GetFiles(Path.GetTempPath(), "exifglass-value-*").Length);
+        Assert.Equal("exiftool -config C:/app/exifglass.config \"-XMP-dc:Description=two\nlines with $5\" a.jpg", WritePlan.ToCommandLine(preview.Tokens("exiftool", "C:/app/exifglass.config")));
 
         var read = WritePlan.ReadTokens("C:/Program Files/exiftool.exe", "C:/app/exifglass.config", ["-fast", "-charset", "UTF8"], null);
         Assert.Equal("\"C:/Program Files/exiftool.exe\" -config C:/app/exifglass.config -fast -charset UTF8 <file>", WritePlan.ToCommandLine(read));
@@ -161,6 +178,86 @@ public class EditingTests
         {
             File.Delete(path + "_original");
         }
+    }
+
+    [Fact]
+    public void BulkActionsMarkWhatTheyRemove()
+    {
+        var doc = MetadataDocumentTests.Doc(MetadataDocumentTests.CAMERA_JSON);
+        var gps = doc.Find("EXIF", "GPSAltitude")!;
+        var composite = doc.Find("Composite", "GPSPosition")!;
+        var make = doc.Find("EXIF", "Make")!;
+
+        // Composite GPS is derived: no write touches it, it goes with the reload
+        Assert.True(EditTargets.IsRemovableGps(gps));
+        Assert.False(EditTargets.IsRemovableGps(composite));
+        Assert.Equal(1, EditTargets.GpsCount(doc));
+        Assert.False(EditTargets.HasManifestGps(doc));
+
+        var gpsOnly = EditSet.Empty.WithRemoveGps(true);
+        Assert.True(EditTargets.IsBulkDeleted(gpsOnly, gps));
+        Assert.True(EditTargets.IsBulkDeleted(gpsOnly, composite));
+        Assert.False(EditTargets.IsBulkDeleted(gpsOnly, make));
+
+        // Strip all keeps what is about the file itself; an explicit edit still wins in the table
+        var strip = EditSet.Empty.WithStripAll(true).Set(make.Key, make.WriteName, "Fujifilm", make.Value);
+        Assert.True(EditTargets.IsBulkDeleted(strip, make));
+        Assert.False(EditTargets.IsBulkDeleted(strip, doc.Find("File", "FileType")!));
+        Assert.False(EditTargets.IsBulkDeleted(strip, composite));
+
+        var rows = QueryEngine.Run(doc, ViewQuery.Default with { Edits = strip }, TestContext.Current.CancellationToken).RowsInView;
+        Assert.Equal(EditState.Edited, rows.Single(r => r.Key == make.Key).EditState);
+        Assert.Equal(EditState.Removed, rows.Single(r => r.Key == gps.Key).EditState);
+        Assert.Equal(EditState.None, rows.Single(r => r.Key == composite.Key).EditState);
+
+        var manifest = MetadataDocumentTests.Doc("""[{"JUMBF:JSON:EXIF_GPSLatitude": {"desc": "EXIF GPS Latitude", "val": 43.15}, "File:FileType": {"val": "JPEG"}}]""");
+        Assert.True(EditTargets.HasManifestGps(manifest));
+        Assert.Equal(0, EditTargets.GpsCount(manifest));
+    }
+
+
+    [Fact]
+    public void SuggestsWritableTagNamesFromTheTagTable()
+    {
+        var tagDb = TagDb.LoadEmbedded()!;
+
+        var artist = tagDb.Suggest("EXIF", "art", 8);
+        Assert.Equal("Artist", artist[0]);
+        Assert.All(artist, n => Assert.Contains("art", n, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(artist.Count, artist.Distinct().Count());
+
+        // starts-with first, then names that hold it
+        var title = tagDb.Suggest("XMP", "title", 20);
+        Assert.Equal("Title", title[0]);
+        Assert.Contains(title, n => !n.StartsWith("title", StringComparison.OrdinalIgnoreCase));
+        Assert.Empty(tagDb.Suggest("NoSuchGroup", "a", 8));
+
+        Assert.True(tagDb.TryFindWritable("EXIF", "artist", out var exact));
+        Assert.Equal("Artist", exact);
+        Assert.True(tagDb.TryFindWritable("IPTC", "keywords", out exact));
+        Assert.Equal("Keywords", exact);
+        Assert.False(tagDb.TryFindWritable("EXIF", "NotATag", out _));
+
+        Assert.Equal(["EXIF", "XMP"], TagWriteRules.AddableGroupsFor("HEIC"));
+        Assert.Equal(["EXIF", "XMP", "IPTC"], TagWriteRules.AddableGroupsFor("JPEG"));
+        Assert.Equal("Artist", TagWriteRules.CommonNames("EXIF")[0]);
+    }
+
+
+    [Fact]
+    public void NamesBinaryDataByWhatItIs()
+    {
+        Assert.Equal("jpg", BinaryData.Extension([0xFF, 0xD8, 0xFF, 0xE0]));
+        Assert.Equal("png", BinaryData.Extension([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0]));
+        Assert.Equal("tif", BinaryData.Extension("II*\0rest"u8));
+        Assert.Equal("xml", BinaryData.Extension("  <?xml version='1.0'?>"u8));
+        Assert.Equal("json", BinaryData.Extension([0xEF, 0xBB, 0xBF, (byte)'{']));
+        Assert.Equal("bin", BinaryData.Extension([1, 2, 3]));
+
+        var icc = new byte[64];
+        "acsp"u8.CopyTo(icc.AsSpan(36));
+        Assert.Equal("icc", BinaryData.Extension(icc));
+        Assert.Equal("DSCF4127_ThumbnailImage.jpg", BinaryData.SuggestedName("C:/x/DSCF4127.JPG", "ThumbnailImage", [0xFF, 0xD8, 0xFF]));
     }
 
     #endregion // Tests

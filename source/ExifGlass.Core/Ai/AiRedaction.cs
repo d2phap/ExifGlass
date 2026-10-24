@@ -30,6 +30,25 @@ public sealed record AiRedactionPlan(IReadOnlyList<string> Arguments, IReadOnlyL
     public bool IsEmpty => Arguments.Count == 0;
 
     #endregion // Properties
+
+
+    #region Public methods
+
+    /// <summary>
+    /// Whether the plan deletes the tag with this key, in the table read's form or the AI read's.
+    /// </summary>
+    public bool Removes(string key)
+    {
+        var tableKey = TagKey.Parse(key).TableKey;
+        foreach (var k in TableKeys)
+        {
+            if (k == tableKey) return true;
+        }
+
+        return false;
+    }
+
+    #endregion // Public methods
 }
 
 
@@ -72,9 +91,9 @@ public static class AiRedaction
             if (source.IsProvenance && source.Source != AiSourceKind.Iptc) continue;
             if (source.Source is AiSourceKind.CharacterCard or AiSourceKind.ToolName) continue;
 
-            foreach (var tableKey in source.SourceKeys)
+            foreach (var sourceKey in source.SourceKeys)
             {
-                var key = TagKey.Parse(tableKey);
+                var key = TagKey.Parse(sourceKey);
                 if (KEEP.Contains(key.Name)) continue;
 
                 // IPTC is provenance except the prompt fields of IPTC 2025.1
@@ -96,7 +115,7 @@ public static class AiRedaction
                 if (args.Contains(arg)) continue;
 
                 args.Add(arg);
-                keys.Add(tableKey);
+                keys.Add(key.TableKey);
             }
 
             warnings.AddRange(source.Warnings.Where(w => w.Contains("can't remove", StringComparison.OrdinalIgnoreCase)));

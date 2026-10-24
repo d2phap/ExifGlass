@@ -16,7 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using ExifGlass.Core.Ai;
 using ExifGlass.Core.ExifTool;
 using System.Text;
 
@@ -48,18 +47,27 @@ public sealed class WritePlan : IDisposable
 {
     #region Fields and constants
 
+    /// <summary>
+    /// Every GPS tag in every writable group: -gps:all= alone leaves the XMP ones (G8).
+    /// </summary>
+    public const string REMOVE_GPS = "-gps*=";
+
+    public const string STRIP_ALL = "-all=";
+
     private readonly List<string> _tempFiles = [];
     private readonly List<string> _arguments = [];
     private readonly List<string> _warnings = [];
+    private readonly bool _isPreview;
 
     #endregion // Fields and constants
 
 
     #region Constructors
 
-    private WritePlan(string path)
+    private WritePlan(string path, bool isPreview)
     {
         SourcePath = path;
+        _isPreview = isPreview;
     }
 
     #endregion // Constructors
@@ -91,51 +99,37 @@ public sealed class WritePlan : IDisposable
     /// <summary>
     /// Builds the arguments for the staged edits: bulk deletes first, then edits, deletes and added tags.
     /// </summary>
-    public static WritePlan Build(string path, EditSet edits, AiRedactionPlan? redaction = null, string? tempDirectory = null)
-    {
-        var plan = new WritePlan(path);
-        var args = plan._arguments;
-
-        if (edits.StripAll) args.Add("-all=");
-        if (edits.RemoveGps) args.Add("-gps:all=");
-        if (edits.RemoveAi && redaction is not null)
-        {
-            args.AddRange(redaction.Arguments);
-            plan._warnings.AddRange(redaction.Warnings);
-        }
-
-        foreach (var edit in edits.Edits.Values.OrderBy(e => e.Key, StringComparer.Ordinal))
-        {
-            var target = "-" + edit.WriteName + (edit.IsRaw ? "#" : string.Empty);
-            if (edit.IsDelete) args.Add(target + "=");
-            else plan.AddAssignment(target, edit.Value!, tempDirectory);
-        }
-
-        var writesIptc = false;
-        foreach (var added in edits.Added)
-        {
-            plan.AddAssignment($"-{added.Group}:{added.Name}", added.Value, tempDirectory);
-            writesIptc |= added.Group.Equals("IPTC", StringComparison.OrdinalIgnoreCase);
-        }
-
-        writesIptc |= edits.Edits.Values.Any(e => e.WriteName.StartsWith("IPTC:", StringComparison.OrdinalIgnoreCase));
-
-        // without it IPTC stores non-Latin text as "?" (S5)
-        if (writesIptc) args.Add("-codedcharacterset=utf8");
-
-        return plan;
-    }
+    public static WritePlan Build(string path, EditSet edits, string? tempDirectory = null) => Build(path, edits, tempDirectory, isPreview: false);
 
 
     /// <summary>
-    /// The command bar for a write: exiftool, the arguments, the file.
+    /// The same arguments for the command bar, with every value inline: no temp file is written.
     /// </summary>
-    public IReadOnlyList<CommandToken> Tokens(string executable) =>
-    [
-        new(Quote(executable), CommandTokenKind.Executable),
-        .. _arguments.Select(a => new CommandToken(Quote(a), a.Contains('=', StringComparison.Ordinal) ? CommandTokenKind.Write : CommandTokenKind.Flag)),
-        new(Quote(SourcePath), CommandTokenKind.Path),
-    ];
+    public static WritePlan Preview(string path, EditSet edits) => Build(path, edits, null, isPreview: true);
+
+
+    /// <summary>
+    /// The command bar for a write: exiftool, its config, the arguments, the file.
+    /// </summary>
+    public IReadOnlyList<CommandToken> Tokens(string executable, string? configPath = null)
+    {
+        var tokens = new List<CommandToken>(_arguments.Count + 4) { new(Quote(executable), CommandTokenKind.Executable) };
+
+        // custom keyword deletes in the AI redaction need the same config as the app (S5)
+        if (configPath is not null)
+        {
+            tokens.Add(new("-config", CommandTokenKind.Flag));
+            tokens.Add(new(Quote(configPath), CommandTokenKind.Value));
+        }
+
+        foreach (var a in _arguments)
+        {
+            tokens.Add(new(Quote(a), a.Contains('=', StringComparison.Ordinal) ? CommandTokenKind.Write : CommandTokenKind.Flag));
+        }
+
+        tokens.Add(new(Quote(SourcePath), CommandTokenKind.Path));
+        return tokens;
+    }
 
 
     /// <summary>
@@ -190,11 +184,47 @@ public sealed class WritePlan : IDisposable
 
     #region Private methods
 
+    private static WritePlan Build(string path, EditSet edits, string? tempDirectory, bool isPreview)
+    {
+        var plan = new WritePlan(path, isPreview);
+        var args = plan._arguments;
+
+        if (edits.StripAll) args.Add(STRIP_ALL);
+        if (edits.RemoveGps) args.Add(REMOVE_GPS);
+        if (edits.AiRedaction is { } redaction)
+        {
+            args.AddRange(redaction.Arguments);
+            plan._warnings.AddRange(redaction.Warnings);
+        }
+
+        foreach (var edit in edits.Edits.Values.OrderBy(e => e.Key, StringComparer.Ordinal))
+        {
+            var target = "-" + edit.WriteName + (edit.IsRaw ? "#" : string.Empty);
+            if (edit.IsDelete) args.Add(target + "=");
+            else plan.AddAssignment(target, edit.Value!, tempDirectory);
+        }
+
+        var writesIptc = false;
+        foreach (var added in edits.Added)
+        {
+            plan.AddAssignment($"-{added.Group}:{added.Name}", added.Value, tempDirectory);
+            writesIptc |= added.Group.Equals("IPTC", StringComparison.OrdinalIgnoreCase);
+        }
+
+        writesIptc |= edits.Edits.Values.Any(e => e.WriteName.StartsWith("IPTC:", StringComparison.OrdinalIgnoreCase));
+
+        // without it IPTC stores non-Latin text as "?" (S5)
+        if (writesIptc) args.Add("-codedcharacterset=utf8");
+
+        return plan;
+    }
+
+
     // a value that can't travel on one argument line (newlines with $ or @, edge spaces) is written from a file (S5)
     private void AddAssignment(string target, string value, string? tempDirectory)
     {
         var arg = target + "=" + value;
-        if (ArgFile.IsPlainSafe(arg) || (ArgFile.CanEncode(arg) && !HasEdgeSpace(value)))
+        if (_isPreview || ArgFile.IsPlainSafe(arg) || (ArgFile.CanEncode(arg) && !HasEdgeSpace(value)))
         {
             _arguments.Add(arg);
             return;

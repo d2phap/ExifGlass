@@ -46,10 +46,32 @@ public static class TagWriteRules
         "JPEG", "TIFF", "PNG", "PSD", "CR2", "NEF", "ARW", "DNG", "ORF", "RW2", "PEF", "SR2", "ERF", "3FR", "MOS", "MRW", "NRW",
     };
 
+    // the Add-tag card's first suggestions, before anything is typed (Proto)
+    private static readonly string[] COMMON_EXIF = ["Artist", "Copyright", "ImageDescription", "UserComment", "Software", "DateTimeOriginal", "Make", "Model", "LensModel"];
+    private static readonly string[] COMMON_XMP = ["Title", "Description", "Creator", "Rights", "Rating", "Label", "Subject"];
+    private static readonly string[] COMMON_IPTC = ["ObjectName", "Caption-Abstract", "By-line", "Keywords", "City", "Country-PrimaryLocationName", "CopyrightNotice", "Credit"];
+
     #endregion // Fields and constants
 
 
     #region Public methods
+
+    /// <summary>
+    /// The groups the Add-tag card offers for a file type: IPTC only where ExifTool writes it (S5); all three when the type is unknown.
+    /// </summary>
+    public static IReadOnlyList<string> AddableGroupsFor(string? fileType) => fileType is null || IptcFileTypes.Contains(fileType) ? AddableGroups : ["EXIF", "XMP"];
+
+
+    /// <summary>
+    /// The names the Add-tag card suggests for a group before anything is typed.
+    /// </summary>
+    public static IReadOnlyList<string> CommonNames(string group) => group.ToUpperInvariant() switch
+    {
+        "XMP" => COMMON_XMP,
+        "IPTC" => COMMON_IPTC,
+        _ => COMMON_EXIF,
+    };
+
 
     /// <summary>
     /// True when the tag can't be edited or deleted: a read-only group, a binary value, or not writable in ExifTool.

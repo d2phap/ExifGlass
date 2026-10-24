@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Ai;
 using System.Collections.Immutable;
 
 namespace ExifGlass.Core.Editing;
@@ -29,6 +30,11 @@ public enum EditState
     Edited,
     Deleted,
     Added,
+
+    /// <summary>
+    /// Deleted by a bulk action (Remove GPS data, Remove AI generation data, Strip all): no Undo of its own.
+    /// </summary>
+    Removed,
 }
 
 
@@ -68,13 +74,13 @@ public sealed class EditSet
 {
     #region Constructors
 
-    private EditSet(ImmutableDictionary<string, TagEdit> edits, ImmutableList<AddedTag> added, bool removeGps, bool stripAll, bool removeAi)
+    private EditSet(ImmutableDictionary<string, TagEdit> edits, ImmutableList<AddedTag> added, bool removeGps, bool stripAll, AiRedactionPlan? aiRedaction)
     {
         Edits = edits;
         Added = added;
         RemoveGps = removeGps;
         StripAll = stripAll;
-        RemoveAi = removeAi;
+        AiRedaction = aiRedaction;
     }
 
     #endregion // Constructors
@@ -82,14 +88,14 @@ public sealed class EditSet
 
     #region Properties
 
-    public static EditSet Empty { get; } = new(ImmutableDictionary<string, TagEdit>.Empty.WithComparers(StringComparer.Ordinal), [], false, false, false);
+    public static EditSet Empty { get; } = new(ImmutableDictionary<string, TagEdit>.Empty.WithComparers(StringComparer.Ordinal), [], false, false, null);
 
     public ImmutableDictionary<string, TagEdit> Edits { get; }
 
     public ImmutableList<AddedTag> Added { get; }
 
     /// <summary>
-    /// -gps:all=
+    /// Remove GPS data: -gps*=, every GPS tag in every writable group.
     /// </summary>
     public bool RemoveGps { get; }
 
@@ -101,7 +107,9 @@ public sealed class EditSet
     /// <summary>
     /// Remove AI generation data (D24).
     /// </summary>
-    public bool RemoveAi { get; }
+    public AiRedactionPlan? AiRedaction { get; }
+
+    public bool RemoveAi => AiRedaction is not null;
 
     /// <summary>
     /// The pending-bar count: each edit, each added tag and each bulk action.
@@ -147,7 +155,10 @@ public sealed class EditSet
     public EditSet WithStripAll(bool on) => With(stripAll: on);
 
 
-    public EditSet WithRemoveAi(bool on) => With(removeAi: on);
+    /// <summary>
+    /// Stages the AI redaction with its plan; null drops it.
+    /// </summary>
+    public EditSet WithRemoveAi(AiRedactionPlan? plan) => new(Edits, Added, RemoveGps, StripAll, plan);
 
 
     public EditState StateOf(string key) => Edits.TryGetValue(key, out var e) ? (e.IsDelete ? EditState.Deleted : EditState.Edited) : EditState.None;
@@ -157,8 +168,8 @@ public sealed class EditSet
 
     #region Private methods
 
-    private EditSet With(ImmutableDictionary<string, TagEdit>? edits = null, ImmutableList<AddedTag>? added = null, bool? removeGps = null, bool? stripAll = null, bool? removeAi = null) =>
-        new(edits ?? Edits, added ?? Added, removeGps ?? RemoveGps, stripAll ?? StripAll, removeAi ?? RemoveAi);
+    private EditSet With(ImmutableDictionary<string, TagEdit>? edits = null, ImmutableList<AddedTag>? added = null, bool? removeGps = null, bool? stripAll = null) =>
+        new(edits ?? Edits, added ?? Added, removeGps ?? RemoveGps, stripAll ?? StripAll, AiRedaction);
 
     #endregion // Private methods
 }

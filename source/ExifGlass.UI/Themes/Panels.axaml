@@ -799,8 +799,9 @@
             <ItemsControl Name="PART_Rows" ItemsSource="{TemplateBinding Rows}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="ui:DetailRowView">
-                  <ui:CopyHost CopyLabel="{Binding Label}" CopyText="{Binding Value}">
-                    <StackPanel>
+                  <!--  the copy button sits in the card's padding, 9 from its edge (owner after G7); the row's text keeps its width  -->
+                  <ui:CopyHost Margin="0,0,-10,0" CopyLabel="{Binding Label}" CopyText="{Binding Value}">
+                    <StackPanel Margin="0,0,10,0">
                       <ui:SquircleBorder Height="1"
                                          Background="{DynamicResource EmphasisA07Brush}"
                                          IsVisible="{Binding !IsFirst}" />

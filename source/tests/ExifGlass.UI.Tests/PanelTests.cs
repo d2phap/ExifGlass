@@ -162,6 +162,9 @@ public class PanelTests
             var at = button.TranslatePoint(new Point(11, 11), window)!.Value;
             window.MouseDown(at, MouseButton.Left);
             window.MouseUp(at, MouseButton.Left);
+
+            // a Details row's button sits in the card's padding, 9 from its edge (owner after G7)
+            if (label == "Lens") Assert.Equal(details.Bounds.Width - 9, button.TranslatePoint(new Point(button.Bounds.Width, 0), details)!.Value.X, 1);
         }
 
         Assert.Equal([("1/5882", "Shutter"), ("iPhone 13 Pro back triple camera 5.7mm f/1.5", "Lens")], requests.Select(r => (r.Text, r.Label)));

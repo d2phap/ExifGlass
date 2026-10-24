@@ -490,6 +490,35 @@ public class EditingTests
     }
 
 
+    // the buttons narrow while the text grows, so the text's width changes on every frame of the expand; the height must still glide
+    [AvaloniaFact]
+    public void TheCommandBarGlidesOpenAsItGlidesClosed()
+    {
+        var path = "C:/Users/someone/Pictures/" + string.Concat(Enumerable.Repeat("long folder name/", 16)) + "DSCF4127.JPG";
+        var panel = new CommandPanel
+        {
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top,
+            Tokens = [new("exiftool", CommandTokenKind.Executable), new("-fast", CommandTokenKind.Flag), new(path, CommandTokenKind.Path)],
+        };
+        var window = Show(panel, 480);
+        var host = Part<Panel>(panel, "PART_TextHost");
+
+        panel.IsExpanded = true;
+        var opening = Heights(host, 500);
+        var open = opening[^1];
+        Assert.InRange(open, 60, 140);
+        Assert.True(opening.Count(h => h > 22 && h < open - 2) >= 5, "opening: " + string.Join(", ", opening));
+        Assert.True(opening.Zip(opening.Skip(1)).All(p => p.Second >= p.First - 0.5), "opening: " + string.Join(", ", opening));
+
+        panel.IsExpanded = false;
+        var closing = Heights(host, 500);
+        Assert.Equal(20, closing[^1], 0.5);
+        Assert.True(closing.Count(h => h > 22 && h < open - 2) >= 5, "closing: " + string.Join(", ", closing));
+        Assert.True(closing.Zip(closing.Skip(1)).All(p => p.Second <= p.First + 0.5), "closing: " + string.Join(", ", closing));
+        window.Close();
+    }
+
+
     [AvaloniaFact]
     public void TheCommandTypesItselfInWhileAFileIsRead()
     {
@@ -707,6 +736,24 @@ public class EditingTests
     {
         Dispatcher.UIThread.RunJobs();
         return control.GetVisualDescendants().OfType<T>().First(c => c.Name == name);
+    }
+
+
+    // the text host's height at every render tick for a while, motion running
+    private static List<double> Heights(Control host, int milliseconds)
+    {
+        var heights = new List<double>();
+        var frame = new DispatcherFrame();
+        var ticker = new DispatcherTimer(TimeSpan.FromMilliseconds(15), DispatcherPriority.Background, (_, _) =>
+        {
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            heights.Add(host.Height);
+        });
+        ticker.Start();
+        DispatcherTimer.RunOnce(() => frame.Continue = false, TimeSpan.FromMilliseconds(milliseconds));
+        Dispatcher.UIThread.PushFrame(frame);
+        ticker.Stop();
+        return heights;
     }
 
 

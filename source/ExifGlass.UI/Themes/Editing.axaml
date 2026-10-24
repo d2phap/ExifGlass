@@ -302,18 +302,10 @@
                                      ToolTip.Tip="{TemplateBinding CommandLine}" />
               </ScrollViewer>
             </Panel>
-            <!--  Expand stays at the bottom right; Copy slides from its left to above it (Proto: right 34 to 0, bottom 0 to 34)  -->
+            <!--  Expand stays at the bottom right; Copy slides from its left to above it (Proto: right 34 to 0, bottom 0 to 34); its size glides with the text's height (code)  -->
             <Panel Name="PART_Buttons"
                    Grid.Column="3"
-                   Width="66"
-                   MinHeight="32"
                    Margin="10,0,0,0">
-              <Panel.Transitions>
-                <Transitions>
-                  <DoubleTransition Easing="{x:Static tok:MotionTokens.CommandBarEasing}" Property="Width" Duration="0:0:0.36" />
-                  <DoubleTransition Easing="{x:Static tok:MotionTokens.CommandBarEasing}" Property="MinHeight" Duration="0:0:0.36" />
-                </Transitions>
-              </Panel.Transitions>
               <ui:GlassButton Name="PART_Copy"
                               HorizontalAlignment="Right"
                               VerticalAlignment="Bottom"
@@ -351,10 +343,6 @@
     </Style>
     <Style Selector="^:expanded:scrolls /template/ ScrollViewer#PART_Scroller">
       <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-    </Style>
-    <Style Selector="^:expanded /template/ Panel#PART_Buttons">
-      <Setter Property="Width" Value="32" />
-      <Setter Property="MinHeight" Value="66" />
     </Style>
     <Style Selector="^:expanded /template/ ui|GlassButton#PART_Copy">
       <Setter Property="RenderTransform" Value="translate(0px, -34px)" />

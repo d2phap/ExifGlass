@@ -42,6 +42,10 @@ public class CommandPanel : TemplatedControl
     private const double LINE = 20;
     private const double MAX_TEXT = 140;
 
+    // Copy beside Expand collapsed, stacked above it expanded (Proto: 66 x 32, then 32 x 66)
+    private const double BUTTONS_WIDE = 66;
+    private const double BUTTONS_NARROW = 32;
+
     // Proto: the typed command adds 3 characters a frame
     private const int TYPE_STEP = 3;
     private static readonly TimeSpan TypeFrame = TimeSpan.FromMilliseconds(16);
@@ -69,11 +73,13 @@ public class CommandPanel : TemplatedControl
 
     private SelectableTextBlock? _text;
     private Control? _textHost;
+    private Control? _buttons;
     private ScrollViewer? _scroller;
     private DispatcherTimer? _typer;
     private string? _commandLine;
     private int _typed = int.MaxValue;
     private int _unwrapGeneration;
+    private bool _gliding;
 
     #endregion // Fields and constants
 
@@ -151,6 +157,8 @@ public class CommandPanel : TemplatedControl
         _text = e.NameScope.Find<SelectableTextBlock>("PART_Text");
         _textHost = e.NameScope.Find<Control>("PART_TextHost");
         _scroller = e.NameScope.Find<ScrollViewer>("PART_Scroller");
+        _buttons = e.NameScope.Find<Control>("PART_Buttons");
+        SetButtons(IsExpanded, animate: false);
         if (_text is not null) _text.LineHeight = LINE;
         if (_textHost is not null)
         {
@@ -217,24 +225,52 @@ public class CommandPanel : TemplatedControl
     }
 
 
-    // text wraps at once on expand and unwraps only after the collapse ends (DS 5.2)
+    // text wraps at once on expand and unwraps only after the collapse ends (DS 5.2); the buttons and the text glide together
     private void Expand(bool expanded)
     {
         var generation = ++_unwrapGeneration;
+
+        // the text gains the width the buttons give up, in 360 ms: measured at the width it ends at, and not again until then
+        var gained = _buttons is { Bounds.Width: > 0 } buttons ? buttons.Bounds.Width - (expanded ? BUTTONS_NARROW : BUTTONS_WIDE) : 0;
+        _gliding = true;
+        SetButtons(expanded, animate: true);
+
         if (expanded)
         {
             ApplyWrap(true);
-            Dispatcher.UIThread.Post(() => Resize(animate: true), DispatcherPriority.Loaded);
-            return;
+            Resize(animate: true, gained);
+        }
+        else
+        {
+            PseudoClasses.Set(":scrolls", false);
+            SetTextHeight(LINE, animate: true);
+            _scroller?.ScrollToHome();
         }
 
-        PseudoClasses.Set(":scrolls", false);
-        SetTextHeight(LINE, animate: true);
-        _scroller?.ScrollToHome();
         DispatcherTimer.RunOnce(() =>
         {
-            if (generation == _unwrapGeneration && !IsExpanded) ApplyWrap(false);
+            if (generation != _unwrapGeneration) return;
+
+            _gliding = false;
+            if (IsExpanded) Resize(animate: true);
+            else ApplyWrap(false);
         }, MotionTokens.IsFrozen ? TimeSpan.FromMilliseconds(1) : MotionTokens.CommandBar);
+    }
+
+
+    private void SetButtons(bool expanded, bool animate)
+    {
+        if (_buttons is null) return;
+
+        _buttons.Transitions = animate && !MotionTokens.IsFrozen
+            ?
+            [
+                new DoubleTransition { Property = WidthProperty, Duration = MotionTokens.CommandBar, Easing = MotionTokens.CommandBarEasing },
+                new DoubleTransition { Property = MinHeightProperty, Duration = MotionTokens.CommandBar, Easing = MotionTokens.CommandBarEasing },
+            ]
+            : null;
+        _buttons.Width = expanded ? BUTTONS_NARROW : BUTTONS_WIDE;
+        _buttons.MinHeight = expanded ? BUTTONS_WIDE : BUTTONS_NARROW;
     }
 
 
@@ -247,12 +283,12 @@ public class CommandPanel : TemplatedControl
     }
 
 
-    // the wrapped text's height at the host's width, 20 to 140
-    private void Resize(bool animate)
+    // the wrapped text's height at the host's width (plus what it is about to gain), 20 to 140
+    private void Resize(bool animate, double gained = 0)
     {
         if (!IsExpanded || _text is null || _textHost is null || _textHost.Bounds.Width <= 0) return;
 
-        _text.Measure(new Size(_textHost.Bounds.Width, double.PositiveInfinity));
+        _text.Measure(new Size(_textHost.Bounds.Width + gained, double.PositiveInfinity));
         var height = Math.Ceiling(_text.DesiredSize.Height);
 
         // a scroll bar only past 140: one that came from rounding would be too short for its arrows
@@ -356,8 +392,8 @@ public class CommandPanel : TemplatedControl
 
     private void TextHost_SizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        // a new width wraps the text again; the glide that changed the height is left alone
-        if (e.WidthChanged && IsExpanded) Resize(animate: false);
+        // a new width (a window resize) wraps the text again; during the glide the width is the buttons', already counted
+        if (e.WidthChanged && IsExpanded && !_gliding) Resize(animate: false);
     }
 
     #endregion // Event handlers

@@ -796,7 +796,8 @@
                            BorderThickness="1"
                            CornerRadius="{StaticResource RadiusPanel}">
           <Panel>
-            <ItemsControl Name="PART_Rows" ItemsSource="{TemplateBinding Rows}">
+            <!--  rows' copy buttons reach into the card's padding; Avalonia 12 clips an ItemsControl by default  -->
+            <ItemsControl Name="PART_Rows" ClipToBounds="False" ItemsSource="{TemplateBinding Rows}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="ui:DetailRowView">
                   <!--  the copy button sits in the card's padding, 9 from its edge (owner after G7); the row's text keeps its width  -->

@@ -165,6 +165,13 @@ public class PanelTests
 
             // a Details row's button sits in the card's padding, 9 from its edge (owner after G7)
             if (label == "Lens") Assert.Equal(details.Bounds.Width - 9, button.TranslatePoint(new Point(button.Bounds.Width, 0), details)!.Value.X, 1);
+
+            // no control between the button and its card cuts its hover and press fill
+            foreach (var clip in Avalonia.VisualTree.VisualExtensions.GetVisualAncestors(button).OfType<Control>().TakeWhile(c => c != cards).Where(c => c.ClipToBounds))
+            {
+                var box = new Rect(button.TranslatePoint(default, clip)!.Value, button.Bounds.Size);
+                Assert.True(new Rect(clip.Bounds.Size).Contains(box), $"{label}: {clip.GetType().Name} {clip.Name} cuts the copy button at {box} in {clip.Bounds.Size}");
+            }
         }
 
         Assert.Equal([("1/5882", "Shutter"), ("iPhone 13 Pro back triple camera 5.7mm f/1.5", "Lens")], requests.Select(r => (r.Text, r.Label)));

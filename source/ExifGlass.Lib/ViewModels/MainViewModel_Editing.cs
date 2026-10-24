@@ -32,9 +32,6 @@ public sealed partial class MainViewModel
 
     private const int SUGGESTIONS = 8;
 
-    // DS 6.13: the table's room under its last row while the pending bar shows
-    private const double PENDING_INSET = 76;
-
     private Task<bool>? _saving;
     private string? _reloadPath;
 
@@ -99,8 +96,6 @@ public sealed partial class MainViewModel
             return notes.Count == 0 ? null : AppText.FirstOf(notes);
         }
     }
-
-    public double TableBottomInset => HasPending ? PENDING_INSET : 0;
 
     public bool CanRemoveGps => Document is { } doc && !_edits.RemoveGps && !_edits.StripAll && EditTargets.GpsCount(doc) > 0;
 
@@ -299,7 +294,6 @@ public sealed partial class MainViewModel
         OnPropertyChanged(nameof(PendingTitle));
         OnPropertyChanged(nameof(PendingSubtitle));
         OnPropertyChanged(nameof(PendingNote));
-        OnPropertyChanged(nameof(TableBottomInset));
         OnPropertyChanged(nameof(CanRemoveGps));
         OnPropertyChanged(nameof(GpsDescription));
         OnPropertyChanged(nameof(CanRemoveAi));

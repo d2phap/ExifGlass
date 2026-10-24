@@ -17,10 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Threading;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
@@ -29,13 +32,16 @@ using System.Windows.Input;
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
-/// The pending changes bar (DS 6.13, S5): Inverse.Bg, radius 20, min 50; the count, what Save writes, an optional note; Discard and Save with its spinner; slides up from +90 in 380 ms with a 220 ms fade.
+/// The pending changes bar (DS 6.13, S5): a card under the table styled as the selected tag's (owner at G8); the count, what Save writes, an optional note; Discard and Save with its spinner. Its room glides open in 380 ms while the card fades in and rises 12 px.
 /// </summary>
 public class PendingBar : TemplatedControl
 {
     #region Fields and constants
 
-    private const double TRAVEL = 90;
+    private const double RISE = 12;
+
+    // the selected card's 3 px ring lies outside the card, so the clip leaves room for it
+    private const double RING = 4;
 
     public static readonly StyledProperty<string?> TitleProperty =
         AvaloniaProperty.Register<PendingBar, string?>(nameof(Title));
@@ -58,12 +64,24 @@ public class PendingBar : TemplatedControl
     public static readonly StyledProperty<ICommand?> DiscardCommandProperty =
         AvaloniaProperty.Register<PendingBar, ICommand?>(nameof(DiscardCommand));
 
+    // 0 to 1, animated: the room the bar takes in the layout, its gap above included
+    private static readonly StyledProperty<double> OpennessProperty =
+        AvaloniaProperty.Register<PendingBar, double>("Openness");
+
+    private Control? _card;
     private int _generation;
 
     #endregion // Fields and constants
 
 
     #region Constructors
+
+    static PendingBar()
+    {
+        AffectsMeasure<PendingBar>(OpennessProperty);
+        AffectsArrange<PendingBar>(OpennessProperty);
+    }
+
 
     public PendingBar()
     {
@@ -131,6 +149,13 @@ public class PendingBar : TemplatedControl
 
     #region Protected methods
 
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+        _card = e.NameScope.Find<Control>("PART_Card");
+    }
+
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -140,32 +165,56 @@ public class PendingBar : TemplatedControl
         else if (change.Property == IsSavingProperty) PseudoClasses.Set(":saving", IsSaving);
     }
 
+
+    // the room opens with the openness; the card keeps its own height
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var full = base.MeasureOverride(availableSize.WithHeight(double.PositiveInfinity));
+        return new Size(full.Width, full.Height * GetValue(OpennessProperty));
+    }
+
+
+    // the card sits at the bottom of the room, so the table's edge uncovers it as the room opens
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (VisualChildren is [Layoutable root])
+        {
+            var full = root.DesiredSize.Height;
+            root.Arrange(new Rect(0, finalSize.Height - full, finalSize.Width, full));
+        }
+
+        Clip = new RectangleGeometry(new Rect(-RING, -RING, finalSize.Width + 2 * RING, finalSize.Height + 2 * RING));
+        return finalSize;
+    }
+
     #endregion // Protected methods
 
 
     #region Private methods
 
-    // composition motion, so the slide keeps its frames while the table re-lays out under it
+    // a layout glide for the room (the table above gives way), composition motion for the card
     private void Slide(bool open)
     {
         var generation = ++_generation;
         IsHitTestVisible = open;
+        Transitions = MotionTokens.IsFrozen ? null : [new DoubleTransition { Property = OpennessProperty, Duration = MotionTokens.PendingBar, Easing = MotionTokens.PendingBarEasing }];
 
         if (open)
         {
             IsVisible = true;
+            SetValue(OpennessProperty, 1.0);
             Dispatcher.UIThread.Post(() =>
             {
-                if (generation != _generation) return;
+                if (generation != _generation || _card is not { } card) return;
 
-                CompositionMotion.Move(this, new Vector(0, TRAVEL), default, MotionTokens.PendingBar, MotionTokens.PendingBarEasing);
-                CompositionMotion.Fade(this, 0, 1, MotionTokens.PendingBarFade, MotionTokens.PendingBarFadeEasing);
+                CompositionMotion.Move(card, new Vector(0, RISE), default, MotionTokens.PendingBar, MotionTokens.PendingBarEasing);
+                CompositionMotion.Fade(card, 0, 1, MotionTokens.PendingBarFade, MotionTokens.PendingBarFadeEasing);
             }, DispatcherPriority.Render);
             return;
         }
 
-        CompositionMotion.Move(this, default, new Vector(0, TRAVEL), MotionTokens.PendingBar, MotionTokens.PendingBarEasing);
-        CompositionMotion.Fade(this, 1, 0, MotionTokens.PendingBarFade, MotionTokens.PendingBarFadeEasing);
+        SetValue(OpennessProperty, 0.0);
+        if (_card is { } shown) CompositionMotion.Fade(shown, 1, 0, MotionTokens.PendingBarFade, MotionTokens.PendingBarFadeEasing);
         DispatcherTimer.RunOnce(() =>
         {
             if (generation == _generation) IsVisible = false;

@@ -4,31 +4,38 @@
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
 
-  <!--  DS 6.13 / S5 pending bar: Inverse.Bg, radius 20, min 50, padding 6 6 6 14, gap 10; title Medium, subtitle 11 at 70%  -->
+  <!--  DS 6.13 / S5 pending bar as a card under the table (owner at G8): the selected tag card's accent border and ring, radius 18, min 50, padding 6 6 6 14, gap 10; Padding is its gap to the table  -->
   <ControlTheme x:Key="{x:Type ui:PendingBar}" TargetType="ui:PendingBar">
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
-        <ui:SquircleBorder Name="PART_Surface"
+        <ui:SquircleBorder Name="PART_Card"
                            MinHeight="50"
+                           Margin="{TemplateBinding Padding}"
                            Padding="14,6,6,6"
-                           Background="{DynamicResource InverseBgBrush}"
-                           CornerRadius="{StaticResource RadiusMenu}">
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource AccentA35Brush}"
+                           BorderThickness="1"
+                           BoxShadow="{StaticResource ShadowSelectedCard}"
+                           CornerRadius="{StaticResource RadiusPanel}">
           <DockPanel>
             <ui:GlassIcon Width="16"
                           Height="16"
                           Margin="0,0,10,0"
                           VerticalAlignment="Center"
                           DockPanel.Dock="Left"
-                          Foreground="{DynamicResource InverseFgBrush}"
+                          Foreground="{DynamicResource AccentTextBrush}"
                           Icon="{x:Static ui:IconId.Edit}" />
             <StackPanel Margin="10,0,0,0"
                         VerticalAlignment="Center"
                         DockPanel.Dock="Right"
                         Orientation="Horizontal"
-                        Spacing="10">
+                        Spacing="6">
               <ui:GlassButton Name="PART_Discard"
-                              Classes="inverse"
+                              Height="36"
+                              Padding="14,0"
+                              Classes="ghost"
+                              CornerRadius="{StaticResource RadiusControl36}"
                               Command="{TemplateBinding DiscardCommand}"
                               Content="{x:Static eg:UiText.DISCARD}"
                               ToolTip.Tip="{x:Static eg:UiText.DISCARD_TIP}" />
@@ -57,17 +64,15 @@
               <TextBlock Name="PART_Title"
                          FontSize="{StaticResource FontSizeBody}"
                          FontWeight="Medium"
-                         Foreground="{DynamicResource InverseFgBrush}"
                          Text="{TemplateBinding Title}"
                          TextTrimming="CharacterEllipsis" />
               <TextBlock Name="PART_Subtitle"
                          FontSize="{StaticResource FontSizeOverline}"
-                         Foreground="{DynamicResource InverseFgBrush}"
-                         Opacity="0.7"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
                          Text="{TemplateBinding Subtitle}"
                          TextTrimming="CharacterEllipsis"
                          ToolTip.Tip="{TemplateBinding Subtitle}" />
-              <!--  what Save can't do (plan P8: a location in the Content Credentials), in the warning icon's place  -->
+              <!--  what Save can't do (plan P8): a location in the Content Credentials, a tag the AI redaction can't remove  -->
               <DockPanel Name="PART_Note"
                          Margin="0,2,0,0"
                          IsVisible="False">
@@ -76,12 +81,10 @@
                               Margin="0,1,5,0"
                               VerticalAlignment="Top"
                               DockPanel.Dock="Left"
-                              Foreground="{DynamicResource InverseFgBrush}"
-                              Icon="{x:Static ui:IconId.Warning}"
-                              Opacity="0.85" />
+                              Foreground="{DynamicResource WarningIconBrush}"
+                              Icon="{x:Static ui:IconId.Warning}" />
                 <TextBlock FontSize="{StaticResource FontSizeOverline}"
-                           Foreground="{DynamicResource InverseFgBrush}"
-                           Opacity="0.85"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            Text="{TemplateBinding Note}"
                            TextWrapping="Wrap" />
               </DockPanel>

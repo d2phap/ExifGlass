@@ -148,20 +148,6 @@
       <Setter Property="PressBrush" Value="{DynamicResource DangerA12Brush}" />
     </Style>
 
-    <!--  a ghost on Inverse.Bg (the pending bar's Discard): 36 high, its own colour at 14% on hover (S5)  -->
-    <Style Selector="^.inverse">
-      <Setter Property="Height" Value="36" />
-      <Setter Property="Padding" Value="14,0" />
-      <Setter Property="CornerRadius" Value="{StaticResource RadiusControl36}" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Foreground" Value="{DynamicResource InverseFgBrush}" />
-    </Style>
-    <Style Selector="^.inverse /template/ ui|InteractionOverlay#PART_Overlay">
-      <Setter Property="RestBrush" Value="{DynamicResource InverseGhostRestBrush}" />
-      <Setter Property="HoverBrush" Value="{DynamicResource InverseGhostHoverBrush}" />
-      <Setter Property="PressBrush" Value="{DynamicResource InverseGhostPressedBrush}" />
-    </Style>
-
     <!--  text links: Show more, Clear all, Open in OpenStreetMap  -->
     <Style Selector="^.link">
       <Setter Property="Height" Value="{StaticResource ControlHeightTiny}" />

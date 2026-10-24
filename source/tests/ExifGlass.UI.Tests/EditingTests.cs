@@ -61,14 +61,16 @@ public class EditingTests
         await shell.WaitForAsync(() => vm.HasPending);
         shell.Settle();
 
-        // DS 6.13: the bar floats in with what Save writes; the table makes 76 of room under its last row
+        // the bar is a card of its own 8 under the table (owner at G8), which gives up the room it takes
         var bar = shell.Window.Table.PendingBar;
         Assert.True(bar.IsVisible);
         Assert.Equal("1 pending change", bar.Title);
         Assert.Equal("Save writes a.jpg · backup kept as a.jpg_original", bar.Subtitle);
         Assert.Null(bar.Note);
-        Assert.Equal(76, table.BottomInset);
-        Assert.Equal(viewport - 76, table.Scroller.Viewport.Height, 0.5);
+        Assert.Equal(58, bar.Bounds.Height, 0.5);
+        Assert.Equal(viewport - 58, table.Scroller.Viewport.Height, 0.5);
+        var panel = shell.Window.Table.Table.FindAncestorOfType<SquircleBorder>()!;
+        Assert.Equal(panel.Bounds.Bottom, bar.Bounds.Top, 0.5);
 
         var recorder = new RecordingShell();
         vm.Shell = recorder;
@@ -87,7 +89,7 @@ public class EditingTests
         Assert.False(vm.IsSaving);
         shell.Settle(200);
         Assert.False(bar.IsVisible);
-        Assert.Equal(0, table.BottomInset);
+        Assert.Equal(viewport, table.Scroller.Viewport.Height, 0.5);
     }
 
 
@@ -525,6 +527,12 @@ public class EditingTests
             Assert.True(bar.IsVisible);
             Assert.False(Part<DockPanel>(bar, "PART_Note").IsVisible);
             Assert.InRange(bar.Bounds.Height, 50, 50.5);
+
+            // its Padding is the gap above the card, part of the room it opens
+            bar.Padding = new Thickness(0, 8, 0, 0);
+            Dispatcher.UIThread.RunJobs();
+            Assert.InRange(bar.Bounds.Height, 58, 58.5);
+            Assert.Equal(8, Part<SquircleBorder>(bar, "PART_Card").Bounds.Top, 0.5);
 
             bar.Note = "The location in the Content Credentials stays";
             bar.IsSaving = true;

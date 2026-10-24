@@ -79,10 +79,10 @@ public static partial class DesignGalleryCatalog
 
         static SelectedTagCard Tag(SelectedTagView view) => new() { Width = CARD_WIDTH, View = view };
 
-        return new GallerySection("c-editing", "Editing, pending bar, command bar", "DS 6.12, 6.13, 7.3 / S5: the pending bar (Inverse.Bg, radius 20, min 50; Discard ghost at its own colour 14%, Save primary with the turning icon; slides up from +90 in 380 ms with a 220 ms fade; a note line for what Save can't do); the Add-tag card (EXIF, XMP or IPTC; names from ExifTool's tag table; Cancel, Add tag); the command bar (tile, Write chip, token colours; one line collapsed, up to 140 expanded, Copy beside Expand or stacked above it); the selected tag's binary, removed and new states.",
+        return new GallerySection("c-editing", "Editing, pending bar, command bar", "DS 6.12, 6.13, 7.3 / S5: the pending bar, a card under the table styled as the selected tag's (owner at G8: Accent 35% border and a 3 px ring, radius 18, min 50; Discard ghost, Save primary with the turning icon; its room glides open in 380 ms while the card fades in and rises 12 px; a note line for what Save can't do); the Add-tag card (EXIF, XMP or IPTC; names from ExifTool's tag table; Cancel, Add tag); the command bar (tile, Write chip, token colours; one line collapsed, up to 140 expanded, Copy beside Expand or stacked above it); the selected tag's binary, removed and new states.",
         [
-            new("pending bar", Bar(), "DS 6.13"),
-            new("Discard :pointerover", Pin(Bar(), "PART_Discard", c => c.Hover()), "its own colour at 14%"),
+            new("pending bar", Bar(), "a card under the table (owner at G8)"),
+            new("Discard :pointerover", Pin(Bar(), "PART_Discard", c => c.Hover()), "State.Hover"),
             new("Save :focus-visible", Pin(Bar(), "PART_Save", c => c.FocusVisible()), "white ring 2 inside"),
             new("saving", Bar(saving: true), "the save icon turns, 800 ms a turn"),
             new("with a note", Bar("The location in the Content Credentials stays: Strip all metadata removes it with the manifest"), "what Save can't do (plan P8)"),

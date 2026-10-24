@@ -7,322 +7,325 @@
              xmlns:v="using:ExifGlass.Views"
              xmlns:vm="using:ExifGlass.ViewModels"
              x:Class="ExifGlass.Views.TablePanel"
+             ClipToBounds="False"
              x:DataType="vm:MainViewModel">
 
-  <!--  DS 6.9 table panel: Bg.Panel, hairline, radius 18; the toolbar is 50 high with the 2 px load line on its bottom edge  -->
-  <ui:SquircleBorder Background="{DynamicResource BgPanelBrush}"
-                     BorderBrush="{DynamicResource StrokeHairlineBrush}"
-                     BorderThickness="1"
-                     ClipToBounds="True"
-                     CornerRadius="{StaticResource RadiusPanel}">
-    <Grid RowDefinitions="Auto,*">
-      <!--  with no file the surface is one plain section (owner at G4 review)  -->
-      <Panel Name="SummaryBar"
-             Height="{StaticResource TableToolbarHeight}"
-             IsVisible="{Binding !ShowEmptyCard}">
-        <!--  Proto: padding 0 8 0 16, gap 2; the summary or the selection on the left, the table's buttons on the right  -->
-        <Grid Name="ToolbarGrid"
-              Margin="16,0,8,0"
-              ColumnDefinitions="*,Auto">
-          <StackPanel Name="SummaryRow"
-                      VerticalAlignment="Center"
-                      ClipToBounds="True"
-                      IsVisible="{Binding ShowSummaryRow}"
-                      Orientation="Horizontal"
-                      Spacing="8">
-            <TextBlock Name="SummaryText"
-                       tok:Typography.Role="Subtitle"
-                       VerticalAlignment="Center"
-                       FontFeatures="+tnum"
-                       Text="{Binding Summary}"
-                       TextTrimming="CharacterEllipsis" />
-            <TextBlock Name="SummaryDetailText"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource TextSecondaryBrush}"
-                       IsVisible="{Binding ShowSummaryDetail}"
-                       Text="{Binding SummaryDetail}"
-                       TextTrimming="CharacterEllipsis" />
-            <!--  AI fields are counted apart from tags, in Accent2 (AI addendum question 2)  -->
-            <TextBlock Name="AiSummaryText"
-                       Margin="-4,0,0,0"
-                       VerticalAlignment="Center"
-                       Foreground="{DynamicResource Accent2TextBrush}"
-                       IsVisible="{Binding HasAiSummary}"
-                       Text="{Binding AiSummary}"
-                       TextTrimming="CharacterEllipsis" />
-            <ItemsControl Name="Chips"
-                          VerticalAlignment="Center"
-                          IsVisible="{Binding HasFilterChips}"
-                          ItemsSource="{Binding FilterChips}">
-              <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <StackPanel Orientation="Horizontal" Spacing="6" />
-                </ItemsPanelTemplate>
-              </ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:FilterChipItem">
-                  <ui:FilterChip Classes.ai="{Binding IsAi}" Text="{Binding Label}" ToolTip.Tip="{x:Static app:AppText.REMOVE_FILTER}" />
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <ui:GlassButton Name="ClearAllButton"
-                            Classes="ghost tiny"
-                            Command="{Binding ClearFiltersCommand}"
-                            Content="{x:Static app:AppText.CLEAR_ALL}"
-                            IsVisible="{Binding HasFilterChips}" />
-          </StackPanel>
-
-          <!--  DS 6.9: "N selected · Copy · JSON · Clear" while rows are selected  -->
-          <StackPanel Name="SelectionRow"
-                      VerticalAlignment="Center"
-                      IsVisible="{Binding HasRowSelection}"
-                      Orientation="Horizontal"
-                      Spacing="6">
-            <ui:SquircleBorder Name="SelectedBadge"
-                               Height="22"
-                               MinWidth="22"
-                               Padding="7,0"
-                               VerticalAlignment="Center"
-                               Background="{DynamicResource AccentBrush}"
-                               CornerRadius="{StaticResource RadiusControl22}">
-              <TextBlock Name="SelectedCountText"
-                         HorizontalAlignment="Center"
+  <!--  the table panel, and the pending bar as a card of its own under it (owner at G8); Avalonia 12 clips a UserControl, which would cut the bar's ring  -->
+  <Grid RowDefinitions="*,Auto">
+    <!--  DS 6.9 table panel: Bg.Panel, hairline, radius 18; the toolbar is 50 high with the 2 px load line on its bottom edge  -->
+    <ui:SquircleBorder Background="{DynamicResource BgPanelBrush}"
+                       BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                       BorderThickness="1"
+                       ClipToBounds="True"
+                       CornerRadius="{StaticResource RadiusPanel}">
+      <Grid RowDefinitions="Auto,*">
+        <!--  with no file the surface is one plain section (owner at G4 review)  -->
+        <Panel Name="SummaryBar"
+               Height="{StaticResource TableToolbarHeight}"
+               IsVisible="{Binding !ShowEmptyCard}">
+          <!--  Proto: padding 0 8 0 16, gap 2; the summary or the selection on the left, the table's buttons on the right  -->
+          <Grid Name="ToolbarGrid"
+                Margin="16,0,8,0"
+                ColumnDefinitions="*,Auto">
+            <StackPanel Name="SummaryRow"
+                        VerticalAlignment="Center"
+                        ClipToBounds="True"
+                        IsVisible="{Binding ShowSummaryRow}"
+                        Orientation="Horizontal"
+                        Spacing="8">
+              <TextBlock Name="SummaryText"
+                         tok:Typography.Role="Subtitle"
                          VerticalAlignment="Center"
                          FontFeatures="+tnum"
-                         FontSize="{StaticResource FontSizeCaption}"
-                         FontWeight="Medium"
-                         Foreground="{DynamicResource OnAccentBrush}"
-                         Text="{Binding SelectedCount}" />
-            </ui:SquircleBorder>
-            <TextBlock Margin="0,0,4,0"
-                       VerticalAlignment="Center"
-                       FontWeight="Medium"
-                       Text="{x:Static app:AppText.SELECTED}" />
-            <ui:GlassButton Name="CopyRowsButton"
-                            Classes="card"
-                            Command="{Binding CopyRowsTsvCommand}"
-                            Content="{x:Static app:AppText.COPY}"
-                            Icon="{x:Static ui:IconId.Copy}"
-                            IconSize="14"
-                            ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_TIP}" />
-            <ui:GlassButton Name="CopyRowsJsonButton"
-                            Classes="card"
-                            Command="{Binding CopyRowsJsonCommand}"
-                            Content="{x:Static app:AppText.JSON}"
-                            Icon="{x:Static ui:IconId.Braces}"
-                            IconSize="14"
-                            ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_JSON_TIP}" />
-            <ui:GlassButton Name="ClearSelectionButton"
-                            Classes="ghost card"
-                            Command="{Binding ClearSelectionCommand}"
-                            Content="{x:Static app:AppText.CLEAR}"
-                            Foreground="{DynamicResource TextSecondaryBrush}"
-                            ToolTip.Tip="{x:Static app:AppText.CLEAR_SELECTION_TIP}" />
-          </StackPanel>
-
-          <StackPanel Name="TableButtons"
-                      Grid.Column="1"
-                      VerticalAlignment="Center"
-                      Orientation="Horizontal"
-                      Spacing="2">
-            <ui:GlassButton Name="CollapseAllButton"
-                            Classes="ghost"
-                            AutomationProperties.Name="{Binding CollapseAllTip}"
-                            Command="{Binding ToggleCollapseAllCommand}"
-                            Content="{Binding CollapseAllContent}"
-                            Icon="{Binding CollapseAllIcon}"
-                            ToolTip.Tip="{Binding CollapseAllTip}" />
-
-            <!--  S5 Edit menu: each item says what it removes, and turns off once staged or when the file has nothing for it  -->
-            <ui:GlassDropDownButton Name="EditButton"
-                                    AutomationProperties.Name="{x:Static app:AppText.EDIT_TIP}"
-                                    Content="{Binding EditContent}"
-                                    Icon="{x:Static ui:IconId.Edit}"
-                                    IsEnabled="{Binding HasDocument}"
-                                    ToolTip.Tip="{x:Static app:AppText.EDIT_TIP}">
-              <ui:GlassDropDownButton.Flyout>
-                <MenuFlyout Placement="BottomEdgeAlignedRight">
-                  <ui:GlassMenuItem Name="AddTagItem"
-                                    Command="{Binding OpenAddTagCommand}"
-                                    Description="{x:Static app:AppText.EDIT_ADD_DESC}"
-                                    Glyph="{x:Static ui:IconId.Add}"
-                                    Header="{x:Static app:AppText.EDIT_ADD}" />
-                  <ui:GlassMenuItem Name="RemoveGpsItem"
-                                    Command="{Binding RemoveGpsCommand}"
-                                    Description="{Binding GpsDescription}"
-                                    Glyph="{x:Static ui:IconId.LocationOff}"
-                                    Header="{x:Static app:AppText.EDIT_GPS}" />
-                  <ui:GlassMenuItem Name="RemoveAiItem"
-                                    Command="{Binding RemoveAiCommand}"
-                                    Description="{Binding AiRemovalDescription}"
-                                    Glyph="{x:Static ui:IconId.Sparkle}"
-                                    Header="{x:Static app:AppText.EDIT_AI}" />
-                  <ui:GlassMenuItem Name="StripAllItem"
-                                    Classes="danger"
-                                    Command="{Binding StripAllCommand}"
-                                    Description="{Binding StripDescription}"
-                                    Glyph="{x:Static ui:IconId.Eraser}"
-                                    Header="{x:Static app:AppText.EDIT_STRIP}" />
-                </MenuFlyout>
-              </ui:GlassDropDownButton.Flyout>
-            </ui:GlassDropDownButton>
-
-            <ui:GlassDropDownButton Name="ColumnsButton"
-                                    AutomationProperties.Name="{x:Static app:AppText.COLUMNS_TIP}"
-                                    Content="{Binding ColumnsContent}"
-                                    Icon="{x:Static ui:IconId.ColumnTriple}"
-                                    ToolTip.Tip="{x:Static app:AppText.COLUMNS_TIP}">
-              <ui:GlassDropDownButton.Flyout>
-                <MenuFlyout Placement="BottomEdgeAlignedRight">
-                  <ui:GlassMenuHeader Text="{x:Static app:AppText.COLUMNS_HEADER}" />
-                  <ui:GlassMenuItem Name="ColumnIndexItem"
-                                    Command="{Binding ToggleColumnCommand}"
-                                    CommandParameter="{x:Static ex:TableColumns.Index}"
-                                    Header="{x:Static app:AppText.COLUMN_INDEX}"
-                                    ToggleType="CheckBox" />
-                  <ui:GlassMenuItem Name="ColumnIdItem"
-                                    Command="{Binding ToggleColumnCommand}"
-                                    CommandParameter="{x:Static ex:TableColumns.TagId}"
-                                    Header="{x:Static app:AppText.COLUMN_TAG_ID}"
-                                    ToggleType="CheckBox" />
-                  <ui:GlassMenuItem Name="ColumnNameItem"
-                                    Command="{Binding ToggleColumnCommand}"
-                                    CommandParameter="{x:Static ex:TableColumns.TagName}"
-                                    Header="{x:Static app:AppText.COLUMN_TAG_NAME}"
-                                    ToggleType="CheckBox" />
-                  <ui:GlassMenuItem Name="ColumnValueItem"
-                                    Command="{Binding ToggleColumnCommand}"
-                                    CommandParameter="{x:Static ex:TableColumns.Value}"
-                                    Header="{x:Static app:AppText.COLUMN_VALUE}"
-                                    ToggleType="CheckBox" />
-                </MenuFlyout>
-              </ui:GlassDropDownButton.Flyout>
-            </ui:GlassDropDownButton>
-
-            <!--  styled as Columns, not the accent primary (owner after G7)  -->
-            <ui:GlassDropDownButton Name="ExportButton"
-                                    AutomationProperties.Name="{x:Static app:AppText.EXPORT}"
-                                    Content="{Binding ExportContent}"
-                                    Icon="{x:Static ui:IconId.ArrowDownload}"
-                                    IsEnabled="{Binding HasDocument}"
-                                    ToolTip.Tip="{x:Static app:AppText.EXPORT}">
-              <ui:GlassDropDownButton.Flyout>
-                <MenuFlyout Placement="BottomEdgeAlignedRight">
-                  <ui:GlassMenuHeader Text="{Binding ExportHeader}" />
-                  <ui:GlassMenuItem Command="{Binding ExportCommand}"
-                                    CommandParameter="{x:Static ex:ExportFormat.Csv}"
-                                    Description="{x:Static app:AppText.EXPORT_CSV_DESC}"
-                                    Glyph="{x:Static ui:IconId.Table}"
-                                    Header="{x:Static app:AppText.EXPORT_CSV}" />
-                  <ui:GlassMenuItem Command="{Binding ExportCommand}"
-                                    CommandParameter="{x:Static ex:ExportFormat.PlainText}"
-                                    Description="{x:Static app:AppText.EXPORT_TEXT_DESC}"
-                                    Glyph="{x:Static ui:IconId.Document}"
-                                    Header="{x:Static app:AppText.EXPORT_TEXT}" />
-                  <ui:GlassMenuItem Command="{Binding ExportCommand}"
-                                    CommandParameter="{x:Static ex:ExportFormat.Json}"
-                                    Description="{x:Static app:AppText.EXPORT_JSON_DESC}"
-                                    Glyph="{x:Static ui:IconId.Braces}"
-                                    Header="{x:Static app:AppText.EXPORT_JSON}" />
-                  <Separator />
-                  <ui:GlassMenuItem Command="{Binding CopyAsJsonCommand}"
-                                    Description="{x:Static app:AppText.EXPORT_COPY_DESC}"
-                                    Glyph="{x:Static ui:IconId.Copy}"
-                                    Header="{x:Static app:AppText.EXPORT_COPY}" />
-                  <!--  the AI data (P7 Exports): A1111 text, normalized JSON, the workflow as embedded  -->
-                  <Separator IsVisible="{Binding HasAi}" />
-                  <ui:GlassMenuHeader IsVisible="{Binding HasAi}" Text="{x:Static app:AppText.EXPORT_AI_HEADER}" />
-                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
-                                    CommandParameter="{x:Static vm:AiExportKind.Parameters}"
-                                    Description="{x:Static app:AppText.EXPORT_AI_PARAMETERS_DESC}"
-                                    Glyph="{x:Static ui:IconId.Sparkle}"
-                                    Header="{x:Static app:AppText.EXPORT_AI_PARAMETERS}"
-                                    IsVisible="{Binding HasGenerationParameters}" />
-                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
-                                    CommandParameter="{x:Static vm:AiExportKind.Json}"
-                                    Description="{x:Static app:AppText.EXPORT_AI_JSON_DESC}"
-                                    Glyph="{x:Static ui:IconId.Braces}"
-                                    Header="{x:Static app:AppText.EXPORT_AI_JSON}"
-                                    IsVisible="{Binding HasAi}" />
-                  <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
-                                    CommandParameter="{x:Static vm:AiExportKind.Workflow}"
-                                    Description="{x:Static app:AppText.EXPORT_AI_WORKFLOW_DESC}"
-                                    Glyph="{x:Static ui:IconId.AiWorkflow}"
-                                    Header="{x:Static app:AppText.EXPORT_AI_WORKFLOW}"
-                                    IsVisible="{Binding HasWorkflow}" />
-                </MenuFlyout>
-              </ui:GlassDropDownButton.Flyout>
-            </ui:GlassDropDownButton>
-          </StackPanel>
-        </Grid>
-
-        <Border Height="1"
-                VerticalAlignment="Bottom"
-                Background="{DynamicResource EmphasisA07Brush}" />
-        <ui:ProgressLine Name="LoadLine"
-                         VerticalAlignment="Bottom"
-                         IsIndeterminate="True"
-                         IsVisible="{Binding IsLoading}" />
-      </Panel>
-
-      <Panel Grid.Row="1">
-        <ui:MetadataTable Name="Grid"
-                          BottomInset="{Binding TableBottomInset}"
-                          Columns="{Binding Columns}"
-                          HidesIdColumns="{Binding IdColumnsHidden}"
-                          IsLoading="{Binding ShowSkeleton}"
-                          IsNarrow="{Binding IsTableNarrow}"
-                          IsVisible="{Binding !ShowEmptyCard}"
-                          SortColumn="{Binding SortColumn}"
-                          SortDirection="{Binding SortDirection}"
-                          View="{Binding Rows}">
-          <!--  DS 6.9 no-match state: filter-dismiss 32, "No tags match", Clear filters  -->
-          <ui:MetadataTable.Placeholder>
-            <StackPanel Name="NoMatch"
-                        Margin="24,56,24,24"
-                        HorizontalAlignment="Center"
-                        Spacing="6">
-              <ui:GlassIcon Width="32"
-                            Height="32"
-                            HorizontalAlignment="Center"
-                            Foreground="{DynamicResource TextTertiaryBrush}"
-                            Icon="{x:Static ui:IconId.FilterDismiss}" />
-              <TextBlock HorizontalAlignment="Center"
-                         FontSize="{StaticResource FontSizeSubtitle}"
-                         FontWeight="Medium"
-                         Text="{x:Static app:AppText.NO_MATCH_TITLE}" />
-              <TextBlock HorizontalAlignment="Center"
+                         Text="{Binding Summary}"
+                         TextTrimming="CharacterEllipsis" />
+              <TextBlock Name="SummaryDetailText"
+                         VerticalAlignment="Center"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static app:AppText.NO_MATCH_CAPTION}"
-                         TextAlignment="Center"
-                         TextWrapping="Wrap" />
-              <ui:GlassButton Name="ClearFiltersButton"
-                              Margin="0,6,0,0"
-                              HorizontalAlignment="Center"
+                         IsVisible="{Binding ShowSummaryDetail}"
+                         Text="{Binding SummaryDetail}"
+                         TextTrimming="CharacterEllipsis" />
+              <!--  AI fields are counted apart from tags, in Accent2 (AI addendum question 2)  -->
+              <TextBlock Name="AiSummaryText"
+                         Margin="-4,0,0,0"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource Accent2TextBrush}"
+                         IsVisible="{Binding HasAiSummary}"
+                         Text="{Binding AiSummary}"
+                         TextTrimming="CharacterEllipsis" />
+              <ItemsControl Name="Chips"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding HasFilterChips}"
+                            ItemsSource="{Binding FilterChips}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="6" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:FilterChipItem">
+                    <ui:FilterChip Classes.ai="{Binding IsAi}" Text="{Binding Label}" ToolTip.Tip="{x:Static app:AppText.REMOVE_FILTER}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <ui:GlassButton Name="ClearAllButton"
+                              Classes="ghost tiny"
                               Command="{Binding ClearFiltersCommand}"
-                              Content="{x:Static app:AppText.CLEAR_FILTERS}" />
+                              Content="{x:Static app:AppText.CLEAR_ALL}"
+                              IsVisible="{Binding HasFilterChips}" />
             </StackPanel>
-          </ui:MetadataTable.Placeholder>
-        </ui:MetadataTable>
 
-        <!--  a window near its minimum size scales the content down rather than cut it  -->
-        <Viewbox Margin="20" StretchDirection="DownOnly">
-          <v:EmptyState Name="Empty" IsVisible="{Binding ShowEmptyCard}" />
-        </Viewbox>
+            <!--  DS 6.9: "N selected · Copy · JSON · Clear" while rows are selected  -->
+            <StackPanel Name="SelectionRow"
+                        VerticalAlignment="Center"
+                        IsVisible="{Binding HasRowSelection}"
+                        Orientation="Horizontal"
+                        Spacing="6">
+              <ui:SquircleBorder Name="SelectedBadge"
+                                 Height="22"
+                                 MinWidth="22"
+                                 Padding="7,0"
+                                 VerticalAlignment="Center"
+                                 Background="{DynamicResource AccentBrush}"
+                                 CornerRadius="{StaticResource RadiusControl22}">
+                <TextBlock Name="SelectedCountText"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontFeatures="+tnum"
+                           FontSize="{StaticResource FontSizeCaption}"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource OnAccentBrush}"
+                           Text="{Binding SelectedCount}" />
+              </ui:SquircleBorder>
+              <TextBlock Margin="0,0,4,0"
+                         VerticalAlignment="Center"
+                         FontWeight="Medium"
+                         Text="{x:Static app:AppText.SELECTED}" />
+              <ui:GlassButton Name="CopyRowsButton"
+                              Classes="card"
+                              Command="{Binding CopyRowsTsvCommand}"
+                              Content="{x:Static app:AppText.COPY}"
+                              Icon="{x:Static ui:IconId.Copy}"
+                              IconSize="14"
+                              ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_TIP}" />
+              <ui:GlassButton Name="CopyRowsJsonButton"
+                              Classes="card"
+                              Command="{Binding CopyRowsJsonCommand}"
+                              Content="{x:Static app:AppText.JSON}"
+                              Icon="{x:Static ui:IconId.Braces}"
+                              IconSize="14"
+                              ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_JSON_TIP}" />
+              <ui:GlassButton Name="ClearSelectionButton"
+                              Classes="ghost card"
+                              Command="{Binding ClearSelectionCommand}"
+                              Content="{x:Static app:AppText.CLEAR}"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              ToolTip.Tip="{x:Static app:AppText.CLEAR_SELECTION_TIP}" />
+            </StackPanel>
 
-        <!--  DS 6.13: the pending bar floats 12 in from the table panel's edges  -->
-        <ui:PendingBar Name="PendingBar"
-                       Margin="12"
-                       VerticalAlignment="Bottom"
-                       DiscardCommand="{Binding DiscardCommand}"
-                       IsOpen="{Binding HasPending}"
-                       IsSaving="{Binding IsSaving}"
-                       Note="{Binding PendingNote}"
-                       SaveCommand="{Binding SaveCommand}"
-                       Subtitle="{Binding PendingSubtitle}"
-                       Title="{Binding PendingTitle}" />
-      </Panel>
-    </Grid>
-  </ui:SquircleBorder>
+            <StackPanel Name="TableButtons"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="2">
+              <ui:GlassButton Name="CollapseAllButton"
+                              Classes="ghost"
+                              AutomationProperties.Name="{Binding CollapseAllTip}"
+                              Command="{Binding ToggleCollapseAllCommand}"
+                              Content="{Binding CollapseAllContent}"
+                              Icon="{Binding CollapseAllIcon}"
+                              ToolTip.Tip="{Binding CollapseAllTip}" />
+
+              <!--  S5 Edit menu: each item says what it removes, and turns off once staged or when the file has nothing for it  -->
+              <ui:GlassDropDownButton Name="EditButton"
+                                      AutomationProperties.Name="{x:Static app:AppText.EDIT_TIP}"
+                                      Content="{Binding EditContent}"
+                                      Icon="{x:Static ui:IconId.Edit}"
+                                      IsEnabled="{Binding HasDocument}"
+                                      ToolTip.Tip="{x:Static app:AppText.EDIT_TIP}">
+                <ui:GlassDropDownButton.Flyout>
+                  <MenuFlyout Placement="BottomEdgeAlignedRight">
+                    <ui:GlassMenuItem Name="AddTagItem"
+                                      Command="{Binding OpenAddTagCommand}"
+                                      Description="{x:Static app:AppText.EDIT_ADD_DESC}"
+                                      Glyph="{x:Static ui:IconId.Add}"
+                                      Header="{x:Static app:AppText.EDIT_ADD}" />
+                    <ui:GlassMenuItem Name="RemoveGpsItem"
+                                      Command="{Binding RemoveGpsCommand}"
+                                      Description="{Binding GpsDescription}"
+                                      Glyph="{x:Static ui:IconId.LocationOff}"
+                                      Header="{x:Static app:AppText.EDIT_GPS}" />
+                    <ui:GlassMenuItem Name="RemoveAiItem"
+                                      Command="{Binding RemoveAiCommand}"
+                                      Description="{Binding AiRemovalDescription}"
+                                      Glyph="{x:Static ui:IconId.Sparkle}"
+                                      Header="{x:Static app:AppText.EDIT_AI}" />
+                    <ui:GlassMenuItem Name="StripAllItem"
+                                      Classes="danger"
+                                      Command="{Binding StripAllCommand}"
+                                      Description="{Binding StripDescription}"
+                                      Glyph="{x:Static ui:IconId.Eraser}"
+                                      Header="{x:Static app:AppText.EDIT_STRIP}" />
+                  </MenuFlyout>
+                </ui:GlassDropDownButton.Flyout>
+              </ui:GlassDropDownButton>
+
+              <ui:GlassDropDownButton Name="ColumnsButton"
+                                      AutomationProperties.Name="{x:Static app:AppText.COLUMNS_TIP}"
+                                      Content="{Binding ColumnsContent}"
+                                      Icon="{x:Static ui:IconId.ColumnTriple}"
+                                      ToolTip.Tip="{x:Static app:AppText.COLUMNS_TIP}">
+                <ui:GlassDropDownButton.Flyout>
+                  <MenuFlyout Placement="BottomEdgeAlignedRight">
+                    <ui:GlassMenuHeader Text="{x:Static app:AppText.COLUMNS_HEADER}" />
+                    <ui:GlassMenuItem Name="ColumnIndexItem"
+                                      Command="{Binding ToggleColumnCommand}"
+                                      CommandParameter="{x:Static ex:TableColumns.Index}"
+                                      Header="{x:Static app:AppText.COLUMN_INDEX}"
+                                      ToggleType="CheckBox" />
+                    <ui:GlassMenuItem Name="ColumnIdItem"
+                                      Command="{Binding ToggleColumnCommand}"
+                                      CommandParameter="{x:Static ex:TableColumns.TagId}"
+                                      Header="{x:Static app:AppText.COLUMN_TAG_ID}"
+                                      ToggleType="CheckBox" />
+                    <ui:GlassMenuItem Name="ColumnNameItem"
+                                      Command="{Binding ToggleColumnCommand}"
+                                      CommandParameter="{x:Static ex:TableColumns.TagName}"
+                                      Header="{x:Static app:AppText.COLUMN_TAG_NAME}"
+                                      ToggleType="CheckBox" />
+                    <ui:GlassMenuItem Name="ColumnValueItem"
+                                      Command="{Binding ToggleColumnCommand}"
+                                      CommandParameter="{x:Static ex:TableColumns.Value}"
+                                      Header="{x:Static app:AppText.COLUMN_VALUE}"
+                                      ToggleType="CheckBox" />
+                  </MenuFlyout>
+                </ui:GlassDropDownButton.Flyout>
+              </ui:GlassDropDownButton>
+
+              <!--  styled as Columns, not the accent primary (owner after G7)  -->
+              <ui:GlassDropDownButton Name="ExportButton"
+                                      AutomationProperties.Name="{x:Static app:AppText.EXPORT}"
+                                      Content="{Binding ExportContent}"
+                                      Icon="{x:Static ui:IconId.ArrowDownload}"
+                                      IsEnabled="{Binding HasDocument}"
+                                      ToolTip.Tip="{x:Static app:AppText.EXPORT}">
+                <ui:GlassDropDownButton.Flyout>
+                  <MenuFlyout Placement="BottomEdgeAlignedRight">
+                    <ui:GlassMenuHeader Text="{Binding ExportHeader}" />
+                    <ui:GlassMenuItem Command="{Binding ExportCommand}"
+                                      CommandParameter="{x:Static ex:ExportFormat.Csv}"
+                                      Description="{x:Static app:AppText.EXPORT_CSV_DESC}"
+                                      Glyph="{x:Static ui:IconId.Table}"
+                                      Header="{x:Static app:AppText.EXPORT_CSV}" />
+                    <ui:GlassMenuItem Command="{Binding ExportCommand}"
+                                      CommandParameter="{x:Static ex:ExportFormat.PlainText}"
+                                      Description="{x:Static app:AppText.EXPORT_TEXT_DESC}"
+                                      Glyph="{x:Static ui:IconId.Document}"
+                                      Header="{x:Static app:AppText.EXPORT_TEXT}" />
+                    <ui:GlassMenuItem Command="{Binding ExportCommand}"
+                                      CommandParameter="{x:Static ex:ExportFormat.Json}"
+                                      Description="{x:Static app:AppText.EXPORT_JSON_DESC}"
+                                      Glyph="{x:Static ui:IconId.Braces}"
+                                      Header="{x:Static app:AppText.EXPORT_JSON}" />
+                    <Separator />
+                    <ui:GlassMenuItem Command="{Binding CopyAsJsonCommand}"
+                                      Description="{x:Static app:AppText.EXPORT_COPY_DESC}"
+                                      Glyph="{x:Static ui:IconId.Copy}"
+                                      Header="{x:Static app:AppText.EXPORT_COPY}" />
+                    <!--  the AI data (P7 Exports): A1111 text, normalized JSON, the workflow as embedded  -->
+                    <Separator IsVisible="{Binding HasAi}" />
+                    <ui:GlassMenuHeader IsVisible="{Binding HasAi}" Text="{x:Static app:AppText.EXPORT_AI_HEADER}" />
+                    <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                      CommandParameter="{x:Static vm:AiExportKind.Parameters}"
+                                      Description="{x:Static app:AppText.EXPORT_AI_PARAMETERS_DESC}"
+                                      Glyph="{x:Static ui:IconId.Sparkle}"
+                                      Header="{x:Static app:AppText.EXPORT_AI_PARAMETERS}"
+                                      IsVisible="{Binding HasGenerationParameters}" />
+                    <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                      CommandParameter="{x:Static vm:AiExportKind.Json}"
+                                      Description="{x:Static app:AppText.EXPORT_AI_JSON_DESC}"
+                                      Glyph="{x:Static ui:IconId.Braces}"
+                                      Header="{x:Static app:AppText.EXPORT_AI_JSON}"
+                                      IsVisible="{Binding HasAi}" />
+                    <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
+                                      CommandParameter="{x:Static vm:AiExportKind.Workflow}"
+                                      Description="{x:Static app:AppText.EXPORT_AI_WORKFLOW_DESC}"
+                                      Glyph="{x:Static ui:IconId.AiWorkflow}"
+                                      Header="{x:Static app:AppText.EXPORT_AI_WORKFLOW}"
+                                      IsVisible="{Binding HasWorkflow}" />
+                  </MenuFlyout>
+                </ui:GlassDropDownButton.Flyout>
+              </ui:GlassDropDownButton>
+            </StackPanel>
+          </Grid>
+
+          <Border Height="1"
+                  VerticalAlignment="Bottom"
+                  Background="{DynamicResource EmphasisA07Brush}" />
+          <ui:ProgressLine Name="LoadLine"
+                           VerticalAlignment="Bottom"
+                           IsIndeterminate="True"
+                           IsVisible="{Binding IsLoading}" />
+        </Panel>
+
+        <Panel Grid.Row="1">
+          <ui:MetadataTable Name="Grid"
+                            Columns="{Binding Columns}"
+                            HidesIdColumns="{Binding IdColumnsHidden}"
+                            IsLoading="{Binding ShowSkeleton}"
+                            IsNarrow="{Binding IsTableNarrow}"
+                            IsVisible="{Binding !ShowEmptyCard}"
+                            SortColumn="{Binding SortColumn}"
+                            SortDirection="{Binding SortDirection}"
+                            View="{Binding Rows}">
+            <!--  DS 6.9 no-match state: filter-dismiss 32, "No tags match", Clear filters  -->
+            <ui:MetadataTable.Placeholder>
+              <StackPanel Name="NoMatch"
+                          Margin="24,56,24,24"
+                          HorizontalAlignment="Center"
+                          Spacing="6">
+                <ui:GlassIcon Width="32"
+                              Height="32"
+                              HorizontalAlignment="Center"
+                              Foreground="{DynamicResource TextTertiaryBrush}"
+                              Icon="{x:Static ui:IconId.FilterDismiss}" />
+                <TextBlock HorizontalAlignment="Center"
+                           FontSize="{StaticResource FontSizeSubtitle}"
+                           FontWeight="Medium"
+                           Text="{x:Static app:AppText.NO_MATCH_TITLE}" />
+                <TextBlock HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
+                           Text="{x:Static app:AppText.NO_MATCH_CAPTION}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+                <ui:GlassButton Name="ClearFiltersButton"
+                                Margin="0,6,0,0"
+                                HorizontalAlignment="Center"
+                                Command="{Binding ClearFiltersCommand}"
+                                Content="{x:Static app:AppText.CLEAR_FILTERS}" />
+              </StackPanel>
+            </ui:MetadataTable.Placeholder>
+          </ui:MetadataTable>
+
+          <!--  a window near its minimum size scales the content down rather than cut it  -->
+          <Viewbox Margin="20" StretchDirection="DownOnly">
+            <v:EmptyState Name="Empty" IsVisible="{Binding ShowEmptyCard}" />
+          </Viewbox>
+        </Panel>
+      </Grid>
+    </ui:SquircleBorder>
+
+    <!--  8 under the table, the layout's gap, in the room the bar opens  -->
+    <ui:PendingBar Name="PendingBar"
+                   Grid.Row="1"
+                   Padding="0,8,0,0"
+                   DiscardCommand="{Binding DiscardCommand}"
+                   IsOpen="{Binding HasPending}"
+                   IsSaving="{Binding IsSaving}"
+                   Note="{Binding PendingNote}"
+                   SaveCommand="{Binding SaveCommand}"
+                   Subtitle="{Binding PendingSubtitle}"
+                   Title="{Binding PendingTitle}" />
+  </Grid>
 
 </UserControl>

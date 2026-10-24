@@ -160,18 +160,6 @@ public static class TokenKeys
     public const string INVERSE_PRESSED_LAYER_COLOR = "InversePressedLayerColor";
     // Inverse fills pressed (DS brightness 0.9)
     public const string INVERSE_PRESSED_LAYER_BRUSH = "InversePressedLayerBrush";
-    // Ghost button on Inverse.Bg at rest: its hover colour at 0%
-    public const string INVERSE_GHOST_REST_COLOR = "InverseGhostRestColor";
-    // Ghost button on Inverse.Bg at rest: its hover colour at 0%
-    public const string INVERSE_GHOST_REST_BRUSH = "InverseGhostRestBrush";
-    // Ghost button on Inverse.Bg hovered: currentColor 14% (S5 Discard)
-    public const string INVERSE_GHOST_HOVER_COLOR = "InverseGhostHoverColor";
-    // Ghost button on Inverse.Bg hovered: currentColor 14% (S5 Discard)
-    public const string INVERSE_GHOST_HOVER_BRUSH = "InverseGhostHoverBrush";
-    // Ghost button on Inverse.Bg pressed: currentColor 22%
-    public const string INVERSE_GHOST_PRESSED_COLOR = "InverseGhostPressedColor";
-    // Ghost button on Inverse.Bg pressed: currentColor 22%
-    public const string INVERSE_GHOST_PRESSED_BRUSH = "InverseGhostPressedBrush";
     // Scroll bar thumb and arrows
     public const string SCROLL_THUMB_COLOR = "ScrollThumbColor";
     // Scroll bar thumb and arrows

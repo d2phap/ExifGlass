@@ -127,11 +127,14 @@
                            TextWrapping="Wrap" />
               </StackPanel>
             </DockPanel>
-            <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
-              <ui:GlassButton Name="PART_Secondary" Classes="danger" Content="{TemplateBinding SecondaryText}" />
-              <ui:GlassButton Name="PART_Cancel" Content="{TemplateBinding CancelText}" />
-              <ui:GlassButton Name="PART_Primary" Classes="primary" Content="{TemplateBinding PrimaryText}" />
-            </StackPanel>
+            <!--  the second action (Discard) on the left, apart from Cancel and the primary on the right (owner at G8)  -->
+            <DockPanel>
+              <ui:GlassButton Name="PART_Secondary" Classes="danger" Content="{TemplateBinding SecondaryText}" DockPanel.Dock="Left" />
+              <StackPanel Margin="8,0,0,0" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                <ui:GlassButton Name="PART_Cancel" Content="{TemplateBinding CancelText}" />
+                <ui:GlassButton Name="PART_Primary" Classes="primary" Content="{TemplateBinding PrimaryText}" />
+              </StackPanel>
+            </DockPanel>
           </StackPanel>
         </ui:SquircleBorder>
       </ControlTemplate>

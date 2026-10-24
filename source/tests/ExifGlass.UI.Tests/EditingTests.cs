@@ -519,6 +519,65 @@ public class EditingTests
     }
 
 
+    // the selected card opens its room as a sidebar opens its column (owner at G8): the cards below glide down, the card slides down from above
+    [AvaloniaFact]
+    public void ACardSlotPushesTheCardsBelowAsItOpensAndCloses()
+    {
+        var card = new Border { Height = 100 };
+        var slot = new CardSlot { Padding = new Thickness(0, 0, 0, 8), Child = card };
+        var below = new Border { Height = 50 };
+        var stack = new StackPanel { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top, Children = { slot, below } };
+        var window = Show(stack, 300);
+        Assert.Equal(0, below.Bounds.Y);
+        Assert.False(card.IsVisible);
+
+        slot.IsOpen = true;
+        var (opening, cardTops) = Track(below, card, 600);
+        Assert.Equal(108, opening[^1], 0.5);
+        Assert.True(opening.Count(y => y > 2 && y < 106) >= 5, "opening: " + string.Join(", ", opening));
+        Assert.True(opening.Zip(opening.Skip(1)).All(p => p.Second >= p.First - 0.5), "opening: " + string.Join(", ", opening));
+
+        // the card keeps its height at the room's bottom: it comes down from above, ending at the top
+        Assert.True(cardTops[0] < -50, "card tops: " + string.Join(", ", cardTops));
+        Assert.Equal(0, cardTops[^1], 0.5);
+
+        slot.IsOpen = false;
+        var (closing, _) = Track(below, card, 120);
+        Assert.True(card.IsVisible);
+        Assert.True(closing[^1] is > 2 and < 106, "closing: " + string.Join(", ", closing));
+        var (rest, _) = Track(below, card, 500);
+        Assert.Equal(0, rest[^1], 0.5);
+        Assert.True(closing.Concat(rest).Zip(closing.Concat(rest).Skip(1)).All(p => p.Second <= p.First + 0.5));
+        Assert.False(card.IsVisible);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public async Task TheSelectedCardKeepsItsTagUntilItsRoomHasClosed()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
+        var vm = shell.ViewModel;
+        var inspector = Inspector(shell);
+        vm.Selection.SelectCell(KeyOf(vm, "Tag 2"), TableColumns.Value);
+        shell.Settle();
+        Assert.True(inspector.TagSlot.IsOpen);
+        Assert.Equal("Tag 2", inspector.TagCard.View?.Name);
+
+        // another tag changes the open card in place
+        vm.Selection.SelectCell(KeyOf(vm, "Tag 3"), TableColumns.Value);
+        shell.Settle();
+        Assert.Equal("Tag 3", inspector.TagCard.View?.Name);
+        Assert.Equal(1, inspector.TagSlot.Openness);
+
+        vm.CloseFocusCommand.Execute(null);
+        shell.Settle();
+        Assert.False(inspector.TagSlot.IsOpen);
+        Assert.Null(inspector.TagCard.View);
+        Assert.False(inspector.TagCard.IsVisible);
+    }
+
+
     [AvaloniaFact]
     public void TheCommandTypesItselfInWhileAFileIsRead()
     {
@@ -736,6 +795,26 @@ public class EditingTests
     {
         Dispatcher.UIThread.RunJobs();
         return control.GetVisualDescendants().OfType<T>().First(c => c.Name == name);
+    }
+
+
+    // where a control below a slot sits, and the slot's card's top, at every render tick for a while
+    private static (List<double> Below, List<double> CardTops) Track(Control below, Control card, int milliseconds)
+    {
+        var ys = new List<double>();
+        var tops = new List<double>();
+        var frame = new DispatcherFrame();
+        var ticker = new DispatcherTimer(TimeSpan.FromMilliseconds(15), DispatcherPriority.Background, (_, _) =>
+        {
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            ys.Add(below.Bounds.Y);
+            tops.Add(card.Bounds.Y);
+        });
+        ticker.Start();
+        DispatcherTimer.RunOnce(() => frame.Continue = false, TimeSpan.FromMilliseconds(milliseconds));
+        Dispatcher.UIThread.PushFrame(frame);
+        ticker.Stop();
+        return (ys, tops);
     }
 
 

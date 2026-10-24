@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
@@ -406,7 +407,8 @@ public sealed class AiTests
     private static InspectorPanel Inspector(TestShell shell) => (InspectorPanel)shell.Window.InspectorContent.Children[0];
 
 
-    private static Control FirstShownCard(InspectorPanel inspector) => inspector.Cards.Children.Where(c => c.IsVisible).OrderBy(c => c.Bounds.Y).First();
+    private static Control FirstShownCard(InspectorPanel inspector) => new Control[] { inspector.AddTagCard, inspector.AiFieldCard, inspector.TagCard }.Concat(inspector.Cards.Children)
+        .Where(c => c.IsEffectivelyVisible).OrderBy(c => c.TranslatePoint(default, inspector)?.Y ?? 0).First();
 
 
     private static List<string?> Links(TestShell shell) => [.. shell.Window.Table.Table.GetVisualDescendants().OfType<NameCell>()

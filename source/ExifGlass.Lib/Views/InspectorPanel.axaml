@@ -10,64 +10,72 @@
   <ScrollViewer Name="Scroller"
                 Margin="-3,-3,-8,-3"
                 HorizontalScrollBarVisibility="Disabled">
-    <StackPanel Name="Cards"
-                Margin="3,3,8,3"
-                Spacing="8">
-      <ui:AddTagCard Name="AddTagCard"
-                     AddCommand="{Binding AddTagCommand}"
-                     CancelCommand="{Binding CancelAddTagCommand}"
-                     Group="{Binding AddGroup, Mode=TwoWay}"
-                     Groups="{Binding AddGroups}"
-                     Hint="{Binding AddHint}"
-                     IsVisible="{Binding IsAddingTag}"
-                     Suggestions="{Binding AddSuggestions}"
-                     TagName="{Binding AddName, Mode=TwoWay}"
-                     Value="{Binding AddValue, Mode=TwoWay}" />
-      <ui:AiFieldCard Name="AiFieldCard"
-                      ActionCommand="{Binding AiActionCommand}"
-                      CloseCommand="{Binding CloseFocusCommand}"
-                      IsVisible="{Binding HasFocusedAiField}"
-                      View="{Binding FocusedAiField}" />
-      <ui:SelectedTagCard Name="TagCard"
-                          ApplyCommand="{Binding ApplyEditCommand}"
-                          CancelCommand="{Binding CancelEditCommand}"
-                          CloseCommand="{Binding CloseFocusCommand}"
-                          CopyFormatCommand="{Binding CopyFocusFormatCommand}"
-                          CopyKeyCommand="{Binding CopyFocusKeyCommand}"
-                          CopyRawCommand="{Binding CopyFocusRawCommand}"
-                          CopyValueCommand="{Binding CopyFocusValueCommand}"
-                          DeleteCommand="{Binding ToggleDeleteCommand}"
-                          EditCommand="{Binding StartEditCommand}"
-                          EditText="{Binding EditText, Mode=TwoWay}"
-                          GoToAiCommand="{Binding JumpToAiCommand}"
-                          IsEditing="{Binding IsEditing}"
-                          IsVisible="{Binding HasFocusedTag}"
-                          RevertCommand="{Binding RevertFocusCommand}"
-                          SaveBinaryCommand="{Binding SaveBinaryCommand}"
-                          View="{Binding FocusedTag}" />
-      <ui:AiCard Name="AiCard"
-                 ActionCommand="{Binding AiActionCommand}"
-                 ExifToolNote="{Binding ExifToolNote}"
-                 Info="{Binding AiInfo}"
-                 IsLoading="{Binding IsAiLoading}"
-                 IsVisible="{Binding ShowAiCard}" />
-      <ui:CharacterCard Name="CharacterCard"
+    <StackPanel Margin="3,3,8,3">
+      <!--  the cards that come and go on top open their room as a panel opens its column, pushing the cards below (owner at G8); each room holds its 8 gap, and a closing card keeps its tag until it is gone (code)  -->
+      <ui:CardSlot Name="AddTagSlot"
+                   Padding="0,0,0,8"
+                   IsOpen="{Binding IsAddingTag}">
+        <ui:AddTagCard Name="AddTagCard"
+                       AddCommand="{Binding AddTagCommand}"
+                       CancelCommand="{Binding CancelAddTagCommand}"
+                       Group="{Binding AddGroup, Mode=TwoWay}"
+                       Groups="{Binding AddGroups}"
+                       Hint="{Binding AddHint}"
+                       Suggestions="{Binding AddSuggestions}"
+                       TagName="{Binding AddName, Mode=TwoWay}"
+                       Value="{Binding AddValue, Mode=TwoWay}" />
+      </ui:CardSlot>
+      <ui:CardSlot Name="AiFieldSlot"
+                   Padding="0,0,0,8"
+                   IsOpen="{Binding HasFocusedAiField}">
+        <ui:AiFieldCard Name="AiFieldCard"
                         ActionCommand="{Binding AiActionCommand}"
-                        IsVisible="{Binding HasCharacterCard}"
-                        Source="{Binding CharacterSource}" />
-      <ui:FrameCard Name="FrameCard"
-                    Frame="{Binding Frame}"
-                    IsVisible="{Binding ShowPreviewCard}"
-                    Preview="{Binding Preview}" />
-      <ui:ExposureCard Name="ExposureCard"
-                       CopyCommand="{Binding AiActionCommand}"
-                       IsVisible="{Binding ShowExposureCard}"
-                       Items="{Binding Exposure}" />
-      <ui:DetailsCard Name="DetailsCard"
-                      CopyCommand="{Binding AiActionCommand}"
-                      IsVisible="{Binding ShowDetailsCard}"
-                      Items="{Binding Details}"
-                      OpenLinkCommand="{Binding OpenLinkCommand}" />
+                        CloseCommand="{Binding CloseFocusCommand}" />
+      </ui:CardSlot>
+      <ui:CardSlot Name="TagSlot"
+                   Padding="0,0,0,8"
+                   IsOpen="{Binding HasFocusedTag}">
+        <ui:SelectedTagCard Name="TagCard"
+                            ApplyCommand="{Binding ApplyEditCommand}"
+                            CancelCommand="{Binding CancelEditCommand}"
+                            CloseCommand="{Binding CloseFocusCommand}"
+                            CopyFormatCommand="{Binding CopyFocusFormatCommand}"
+                            CopyKeyCommand="{Binding CopyFocusKeyCommand}"
+                            CopyRawCommand="{Binding CopyFocusRawCommand}"
+                            CopyValueCommand="{Binding CopyFocusValueCommand}"
+                            DeleteCommand="{Binding ToggleDeleteCommand}"
+                            EditCommand="{Binding StartEditCommand}"
+                            EditText="{Binding EditText, Mode=TwoWay}"
+                            GoToAiCommand="{Binding JumpToAiCommand}"
+                            IsEditing="{Binding IsEditing}"
+                            RevertCommand="{Binding RevertFocusCommand}"
+                            SaveBinaryCommand="{Binding SaveBinaryCommand}" />
+      </ui:CardSlot>
+      <StackPanel Name="Cards" Spacing="8">
+        <ui:AiCard Name="AiCard"
+                   ActionCommand="{Binding AiActionCommand}"
+                   ExifToolNote="{Binding ExifToolNote}"
+                   Info="{Binding AiInfo}"
+                   IsLoading="{Binding IsAiLoading}"
+                   IsVisible="{Binding ShowAiCard}" />
+        <ui:CharacterCard Name="CharacterCard"
+                          ActionCommand="{Binding AiActionCommand}"
+                          IsVisible="{Binding HasCharacterCard}"
+                          Source="{Binding CharacterSource}" />
+        <ui:FrameCard Name="FrameCard"
+                      Frame="{Binding Frame}"
+                      IsVisible="{Binding ShowPreviewCard}"
+                      Preview="{Binding Preview}" />
+        <ui:ExposureCard Name="ExposureCard"
+                         CopyCommand="{Binding AiActionCommand}"
+                         IsVisible="{Binding ShowExposureCard}"
+                         Items="{Binding Exposure}" />
+        <ui:DetailsCard Name="DetailsCard"
+                        CopyCommand="{Binding AiActionCommand}"
+                        IsVisible="{Binding ShowDetailsCard}"
+                        Items="{Binding Details}"
+                        OpenLinkCommand="{Binding OpenLinkCommand}" />
+      </StackPanel>
     </StackPanel>
   </ScrollViewer>
 

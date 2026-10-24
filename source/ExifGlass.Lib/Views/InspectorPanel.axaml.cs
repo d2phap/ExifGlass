@@ -45,6 +45,16 @@ public partial class InspectorPanel : UserControl
     public InspectorPanel()
     {
         InitializeComponent();
+
+        // a card slides out showing what it showed; it lets go once its room has closed
+        TagSlot.Closed += (_, _) =>
+        {
+            if (_viewModel?.FocusedTag is null) TagCard.View = null;
+        };
+        AiFieldSlot.Closed += (_, _) =>
+        {
+            if (_viewModel?.FocusedAiField is null) AiFieldCard.View = null;
+        };
     }
 
     #endregion // Constructors
@@ -94,6 +104,9 @@ public partial class InspectorPanel : UserControl
         if (_viewModel is not null) _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         _viewModel = DataContext as MainViewModel;
         if (_viewModel is not null) _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+
+        TagCard.View = _viewModel?.FocusedTag;
+        AiFieldCard.View = _viewModel?.FocusedAiField;
     }
 
     #endregion // Protected methods
@@ -107,11 +120,10 @@ public partial class InspectorPanel : UserControl
 
         switch (e.PropertyName)
         {
-            // the Add-tag card rises in on top with the caret in its name field
+            // the Add-tag card opens its room on top with the caret in its name field
             case nameof(MainViewModel.IsAddingTag):
                 if (!_viewModel.IsAddingTag) break;
 
-                AddTagCard.Appear();
                 AddTagCard.FocusName();
                 Dispatcher.UIThread.Post(() => AddTagCard.BringIntoView(), DispatcherPriority.Loaded);
                 break;
@@ -143,15 +155,14 @@ public partial class InspectorPanel : UserControl
             // on top of the cards (owner at G7): the inspector scrolls to it
             case nameof(MainViewModel.FocusedAiField):
                 var aiKey = _viewModel.FocusedAiField?.Key;
-                if (aiKey is not null && _focusedAiKey is null) AiFieldCard.Appear();
+                if (_viewModel.FocusedAiField is { } field) AiFieldCard.View = field;
                 if (aiKey is not null && aiKey != _focusedAiKey) Dispatcher.UIThread.Post(() => AiFieldCard.BringIntoView(), DispatcherPriority.Loaded);
                 _focusedAiKey = aiKey;
                 break;
 
-            // a card that appears rises in; another tag in the card that's already there only scrolls it into view
             case nameof(MainViewModel.FocusedTag):
                 var key = _viewModel.FocusedTag?.Key;
-                if (key is not null && _focusedKey is null) TagCard.Appear();
+                if (_viewModel.FocusedTag is { } tag) TagCard.View = tag;
                 if (key is not null && key != _focusedKey) Dispatcher.UIThread.Post(() => TagCard.BringIntoView(), DispatcherPriority.Loaded);
                 _focusedKey = key;
                 break;

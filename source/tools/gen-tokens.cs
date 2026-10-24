@@ -143,6 +143,9 @@ static class Generator
         new("InverseRestLayer", "#00FFFFFF", "#00000000", "Inverse fills at rest: the hover colour at 0%"),
         new("InverseHoverLayer", "#14FFFFFF", "#0D000000", "Inverse fills hovered (DS brightness 1.15)"),
         new("InversePressedLayer", "#1A000000", "#1A000000", "Inverse fills pressed (DS brightness 0.9)"),
+        new("InverseGhostRest", "#00FFFFFF", "#00212529", "Ghost button on Inverse.Bg at rest: its hover colour at 0%"),
+        new("InverseGhostHover", "#24FFFFFF", "#24212529", "Ghost button on Inverse.Bg hovered: currentColor 14% (S5 Discard)"),
+        new("InverseGhostPressed", "#38FFFFFF", "#38212529", "Ghost button on Inverse.Bg pressed: currentColor 22%"),
 
         // the Fluent 2 scroll bar of v2, which replaces DS 6.16 (owner, 2026-10-21)
         new("ScrollThumb", "#999999", "#BBBBBB", "Scroll bar thumb and arrows"),

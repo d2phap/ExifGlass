@@ -44,7 +44,7 @@ public static partial class DesignGalleryCatalog
     [
         Buttons(), IconButtons(), Dropdowns(), StoreBadges(), Inputs(), TokenFields(), Checks(), Switches(), Segmented(), Combo(),
         Chips(), Badges(), Menus(), ToolTips(), Toasts(), Dialogs(), PushPanels(), Scrollbars(), Cards(), Feedback(),
-        TextControls(), Expanders(), Windows(), Table(), Rail(), Inspector(), Ai(),
+        TextControls(), Expanders(), Windows(), Table(), Rail(), Inspector(), Ai(), Editing(),
     ];
 
 

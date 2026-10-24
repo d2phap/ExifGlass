@@ -72,6 +72,9 @@ public partial class MetadataTable : Panel
     public static readonly StyledProperty<object?> PlaceholderProperty =
         AvaloniaProperty.Register<MetadataTable, object?>(nameof(Placeholder));
 
+    public static readonly StyledProperty<double> BottomInsetProperty =
+        AvaloniaProperty.Register<MetadataTable, double>(nameof(BottomInset));
+
     public static readonly DirectProperty<MetadataTable, string?> ActiveGroupProperty =
         AvaloniaProperty.RegisterDirect<MetadataTable, string?>(nameof(ActiveGroup), t => t.ActiveGroup);
 
@@ -244,6 +247,15 @@ public partial class MetadataTable : Panel
     }
 
     /// <summary>
+    /// Room below the last row, so the pending bar never covers it (DS 6.13: 76 while the bar shows).
+    /// </summary>
+    public double BottomInset
+    {
+        get => GetValue(BottomInsetProperty);
+        set => SetValue(BottomInsetProperty, value);
+    }
+
+    /// <summary>
     /// The items in view, group headers included, in table order.
     /// </summary>
     public IReadOnlyList<TableItem> Items => _items;
@@ -395,6 +407,7 @@ public partial class MetadataTable : Panel
         }
         else if (change.Property == SortColumnProperty || change.Property == SortDirectionProperty) ApplySortGlyphs();
         else if (change.Property == IsLoadingProperty || change.Property == PlaceholderProperty) UpdateStates();
+        else if (change.Property == BottomInsetProperty) ApplyBottomInset();
     }
 
 
@@ -603,6 +616,9 @@ public partial class MetadataTable : Panel
             yield return row;
         }
     }
+
+    // ProDataGrid scrolls logically, so a scroller padding never reaches its extent: the grid itself ends above the bar (G8)
+    private void ApplyBottomInset() => _grid.Margin = new Thickness(0, 0, 0, BottomInset);
 
     #endregion // Private methods
 

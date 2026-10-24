@@ -49,7 +49,8 @@ public sealed record SelectedTagView(
     EditState State = EditState.None,
     string? OriginalValue = null,
     bool IsAi = false,
-    int AiFields = 0)
+    int AiFields = 0,
+    bool IsBinary = false)
 {
     #region Properties
 
@@ -59,6 +60,11 @@ public sealed record SelectedTagView(
     public string AiFieldsText => UiText.ParsedInto(AiFields);
 
     public bool IsDeleted => State == EditState.Deleted;
+
+    /// <summary>
+    /// Gets whether a bulk action (Remove GPS data, Remove AI generation data, Strip all) deletes the tag: struck through, with no Undo of its own.
+    /// </summary>
+    public bool IsRemoved => State == EditState.Removed;
 
     public bool HasFormat => Format != TagIdRule.NONE;
 
@@ -131,8 +137,12 @@ public class SelectedTagCard : TemplatedControl
     public static readonly StyledProperty<ICommand?> GoToAiCommandProperty =
         AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(GoToAiCommand));
 
+    public static readonly StyledProperty<ICommand?> SaveBinaryCommandProperty =
+        AvaloniaProperty.Register<SelectedTagCard, ICommand?>(nameof(SaveBinaryCommand));
+
     private TextBox? _editor;
     private Button? _edit;
+    private Button? _saveBinary;
     private Button? _close;
 
     #endregion // Fields and constants
@@ -240,6 +250,15 @@ public class SelectedTagCard : TemplatedControl
         set => SetValue(GoToAiCommandProperty, value);
     }
 
+    /// <summary>
+    /// Save binary data… for a binary tag (D12).
+    /// </summary>
+    public ICommand? SaveBinaryCommand
+    {
+        get => GetValue(SaveBinaryCommandProperty);
+        set => SetValue(SaveBinaryCommandProperty, value);
+    }
+
     #endregion // Properties
 
 
@@ -252,11 +271,12 @@ public class SelectedTagCard : TemplatedControl
 
 
     /// <summary>
-    /// Moves keyboard focus into the card: Edit when there is one, else Close (Appendix B item 10: Enter focuses the inspector).
+    /// Moves keyboard focus into the card: Edit or Save binary data when there is one, else Close (Appendix B item 10: Enter focuses the inspector).
     /// </summary>
     public bool FocusFirst()
     {
         if (_edit is { IsEffectivelyVisible: true } && _edit.Focus(NavigationMethod.Tab)) return true;
+        if (_saveBinary is { IsEffectivelyVisible: true } && _saveBinary.Focus(NavigationMethod.Tab)) return true;
 
         return _close?.Focus(NavigationMethod.Tab) == true;
     }
@@ -275,6 +295,7 @@ public class SelectedTagCard : TemplatedControl
         _editor = e.NameScope.Find<TextBox>("PART_Editor");
         _editor?.AddHandler(KeyDownEvent, Editor_KeyDown, RoutingStrategies.Tunnel);
         _edit = e.NameScope.Find<Button>("PART_Edit");
+        _saveBinary = e.NameScope.Find<Button>("PART_SaveBinary");
         _close = e.NameScope.Find<Button>("PART_Close");
     }
 
@@ -308,6 +329,8 @@ public class SelectedTagCard : TemplatedControl
         var tag = View;
         PseudoClasses.Set(":readonly", tag?.IsReadOnly ?? true);
         PseudoClasses.Set(":deleted", tag?.IsDeleted ?? false);
+        PseudoClasses.Set(":removed", tag?.IsRemoved ?? false);
+        PseudoClasses.Set(":binary", tag?.IsBinary ?? false);
         PseudoClasses.Set(":edited", tag?.IsEdited ?? false);
         PseudoClasses.Set(":ai", tag?.IsAi ?? false);
         PseudoClasses.Set(":ai-source", tag?.AiFields > 0);

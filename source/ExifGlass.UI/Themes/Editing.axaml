@@ -1,0 +1,361 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
+                    xmlns:tok="using:ExifGlass.UI.Tokens"
+                    xmlns:ui="using:ExifGlass.UI.Controls">
+
+  <!--  DS 6.13 / S5 pending bar: Inverse.Bg, radius 20, min 50, padding 6 6 6 14, gap 10; title Medium, subtitle 11 at 70%  -->
+  <ControlTheme x:Key="{x:Type ui:PendingBar}" TargetType="ui:PendingBar">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Name="PART_Surface"
+                           MinHeight="50"
+                           Padding="14,6,6,6"
+                           Background="{DynamicResource InverseBgBrush}"
+                           CornerRadius="{StaticResource RadiusMenu}">
+          <DockPanel>
+            <ui:GlassIcon Width="16"
+                          Height="16"
+                          Margin="0,0,10,0"
+                          VerticalAlignment="Center"
+                          DockPanel.Dock="Left"
+                          Foreground="{DynamicResource InverseFgBrush}"
+                          Icon="{x:Static ui:IconId.Edit}" />
+            <StackPanel Margin="10,0,0,0"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Right"
+                        Orientation="Horizontal"
+                        Spacing="10">
+              <ui:GlassButton Name="PART_Discard"
+                              Classes="inverse"
+                              Command="{TemplateBinding DiscardCommand}"
+                              Content="{x:Static eg:UiText.DISCARD}"
+                              ToolTip.Tip="{x:Static eg:UiText.DISCARD_TIP}" />
+              <ui:GlassButton Name="PART_Save"
+                              Height="36"
+                              Padding="12,0,16,0"
+                              Classes="primary"
+                              CornerRadius="{StaticResource RadiusControl36}"
+                              Command="{TemplateBinding SaveCommand}">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <ui:SpinningIcon Width="15"
+                                   Height="15"
+                                   VerticalAlignment="Center"
+                                   Icon="{x:Static ui:IconId.Save}"
+                                   IsSpinning="{TemplateBinding IsSaving}" />
+                  <Panel VerticalAlignment="Center">
+                    <TextBlock Name="PART_SaveText" Text="{x:Static eg:UiText.SAVE}" />
+                    <TextBlock Name="PART_SavingText"
+                               IsVisible="False"
+                               Text="{x:Static eg:UiText.SAVING}" />
+                  </Panel>
+                </StackPanel>
+              </ui:GlassButton>
+            </StackPanel>
+            <StackPanel VerticalAlignment="Center" Spacing="1">
+              <TextBlock Name="PART_Title"
+                         FontSize="{StaticResource FontSizeBody}"
+                         FontWeight="Medium"
+                         Foreground="{DynamicResource InverseFgBrush}"
+                         Text="{TemplateBinding Title}"
+                         TextTrimming="CharacterEllipsis" />
+              <TextBlock Name="PART_Subtitle"
+                         FontSize="{StaticResource FontSizeOverline}"
+                         Foreground="{DynamicResource InverseFgBrush}"
+                         Opacity="0.7"
+                         Text="{TemplateBinding Subtitle}"
+                         TextTrimming="CharacterEllipsis"
+                         ToolTip.Tip="{TemplateBinding Subtitle}" />
+              <!--  what Save can't do (plan P8: a location in the Content Credentials), in the warning icon's place  -->
+              <DockPanel Name="PART_Note"
+                         Margin="0,2,0,0"
+                         IsVisible="False">
+                <ui:GlassIcon Width="12"
+                              Height="12"
+                              Margin="0,1,5,0"
+                              VerticalAlignment="Top"
+                              DockPanel.Dock="Left"
+                              Foreground="{DynamicResource InverseFgBrush}"
+                              Icon="{x:Static ui:IconId.Warning}"
+                              Opacity="0.85" />
+                <TextBlock FontSize="{StaticResource FontSizeOverline}"
+                           Foreground="{DynamicResource InverseFgBrush}"
+                           Opacity="0.85"
+                           Text="{TemplateBinding Note}"
+                           TextWrapping="Wrap" />
+              </DockPanel>
+            </StackPanel>
+          </DockPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:note /template/ DockPanel#PART_Note">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:saving /template/ TextBlock#PART_SaveText">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:saving /template/ TextBlock#PART_SavingText">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the Add-tag card (S5, Proto): Accent 35% border, padding 14, gap 10; group 92 beside the name, the value under them, Cancel and Add tag on the right  -->
+  <ControlTheme x:Key="{x:Type ui:AddTagCard}" TargetType="ui:AddTagCard">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="14"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource AccentA35Brush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <StackPanel Spacing="10">
+            <DockPanel Height="24">
+              <ui:GlassButton Name="PART_Close"
+                              Margin="2,-2,-8,-2"
+                              Classes="ghost small"
+                              Command="{TemplateBinding CancelCommand}"
+                              DockPanel.Dock="Right"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Dismiss}"
+                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+              <TextBlock VerticalAlignment="Center"
+                         tok:Typography.Role="Overline"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static eg:UiText.ADD_TAG_OVERLINE}" />
+            </DockPanel>
+
+            <Grid ColumnDefinitions="92,8,*">
+              <ComboBox Name="PART_Group"
+                        Width="92"
+                        MinWidth="0"
+                        AutomationProperties.Name="{x:Static eg:UiText.TAG_GROUP}"
+                        ItemsSource="{TemplateBinding Groups}"
+                        SelectedItem="{TemplateBinding Group, Mode=TwoWay}" />
+              <TextBox Name="PART_Name"
+                       Grid.Column="2"
+                       PlaceholderText="{x:Static eg:UiText.TAG_NAME_PLACEHOLDER}"
+                       Text="{TemplateBinding TagName, Mode=TwoWay}" />
+              <!--  the menu surface of the ComboBox list: the shadow room as the child's margin, the 2 px gap as a band (plan 5.5)  -->
+              <Popup Name="PART_Suggestions"
+                     Grid.Column="2"
+                     InheritsTransform="True"
+                     IsLightDismissEnabled="False"
+                     Placement="BottomEdgeAlignedLeft"
+                     PlacementTarget="{Binding #PART_Name}">
+                <Panel Margin="40,18,40,58">
+                  <ui:SquircleBorder MinWidth="{Binding #PART_Name.Bounds.Width}"
+                                     Margin="0,2"
+                                     Padding="6"
+                                     Background="{DynamicResource BgElevatedBrush}"
+                                     BorderBrush="{DynamicResource EmphasisA12Brush}"
+                                     BorderThickness="1"
+                                     BoxShadow="{StaticResource Elevation1}"
+                                     CornerRadius="{StaticResource RadiusMenu}">
+                    <ListBox Name="PART_SuggestionList" MaxHeight="240" />
+                  </ui:SquircleBorder>
+                </Panel>
+              </Popup>
+            </Grid>
+
+            <TextBox Name="PART_Value"
+                     Classes="multiline"
+                     PlaceholderText="{x:Static eg:UiText.VALUE_PLACEHOLDER}"
+                     Text="{TemplateBinding Value, Mode=TwoWay}" />
+
+            <TextBlock Name="PART_Hint"
+                       tok:Typography.Role="Caption"
+                       Foreground="{DynamicResource DangerTextBrush}"
+                       IsVisible="False"
+                       Text="{TemplateBinding Hint}"
+                       TextWrapping="Wrap" />
+
+            <StackPanel HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="6">
+              <ui:GlassButton Name="PART_Cancel"
+                              Classes="card"
+                              Command="{TemplateBinding CancelCommand}"
+                              Content="{x:Static eg:UiText.CANCEL}"
+                              ToolTip.Tip="{x:Static eg:UiText.CANCEL_TIP}" />
+              <ui:GlassButton Name="PART_Add"
+                              Classes="card primary"
+                              Command="{TemplateBinding AddCommand}"
+                              Content="{x:Static eg:UiText.ADD_TAG}"
+                              Icon="{x:Static ui:IconId.Add}"
+                              IconSize="14"
+                              ToolTip.Tip="{x:Static eg:UiText.AddTagTip}" />
+            </StackPanel>
+          </StackPanel>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:hint /template/ TextBlock#PART_Hint">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!--  the command bar's Expand: a ghost icon button 32 whose chevron turns 180 degrees while expanded (300 ms)  -->
+  <ControlTheme x:Key="CommandToggle" TargetType="ToggleButton">
+    <Setter Property="Width" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedBrush}"
+                                 PressScale="0.96"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ui:GlassIcon Name="PART_Chevron"
+                        Width="14"
+                        Height="14"
+                        Icon="{x:Static ui:IconId.ChevronDown}"
+                        RenderTransformOrigin="50%,50%">
+            <ui:GlassIcon.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.GroupChevronEasing}" Property="RenderTransform" Duration="0:0:0.3" />
+              </Transitions>
+            </ui:GlassIcon.Transitions>
+          </ui:GlassIcon>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:checked /template/ ui|GlassIcon#PART_Chevron">
+      <Setter Property="RenderTransform" Value="rotate(180deg)" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="{x:Static tok:MotionTokens.DISABLED_OPACITY}" />
+    </Style>
+  </ControlTheme>
+
+  <!--  DS 6.12 command bar: 40 collapsed (padding 4 with the border), Bg.Panel, radius 18; tile 28; the Write chip; mono 11.5 on 20 px lines; Copy beside Expand, stacked above it when expanded  -->
+  <ControlTheme x:Key="{x:Type ui:CommandPanel}" TargetType="ui:CommandPanel">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder MinHeight="{StaticResource CommandBarHeight}"
+                           Padding="5,3,3,3"
+                           Background="{DynamicResource BgPanelBrush}"
+                           BorderBrush="{DynamicResource StrokeHairlineBrush}"
+                           BorderThickness="1"
+                           CornerRadius="{StaticResource RadiusPanel}">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+            <ui:SquircleBorder Width="28"
+                               Height="28"
+                               Margin="0,2,10,0"
+                               VerticalAlignment="Top"
+                               Background="{DynamicResource BgTerminalTileBrush}"
+                               CornerRadius="{StaticResource RadiusIconTile}">
+              <ui:GlassIcon Width="15"
+                            Height="15"
+                            Foreground="{DynamicResource FgTerminalTileBrush}"
+                            Icon="{x:Static ui:IconId.WindowConsole}" />
+            </ui:SquircleBorder>
+            <ui:Badge Name="PART_Write"
+                      Grid.Column="1"
+                      Margin="0,6,10,0"
+                      VerticalAlignment="Top"
+                      IsVisible="False"
+                      Kind="Edited"
+                      Text="{x:Static eg:UiText.WRITE}"
+                      ToolTip.Tip="{x:Static eg:UiText.WRITE_TIP}" />
+            <!--  its height glides 20 to the wrapped text, at most 140 (code)  -->
+            <Panel Name="PART_TextHost"
+                   Grid.Column="2"
+                   Margin="0,6"
+                   VerticalAlignment="Top">
+              <ScrollViewer Name="PART_Scroller"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Disabled">
+                <SelectableTextBlock Name="PART_Text"
+                                     tok:Typography.Role="Mono"
+                                     FocusAdorner="{x:Null}"
+                                     ToolTip.Tip="{TemplateBinding CommandLine}" />
+              </ScrollViewer>
+            </Panel>
+            <!--  Expand stays at the bottom right; Copy slides from its left to above it (Proto: right 34 to 0, bottom 0 to 34)  -->
+            <Panel Name="PART_Buttons"
+                   Grid.Column="3"
+                   Width="66"
+                   MinHeight="32"
+                   Margin="10,0,0,0">
+              <Panel.Transitions>
+                <Transitions>
+                  <DoubleTransition Easing="{x:Static tok:MotionTokens.CommandBarEasing}" Property="Width" Duration="0:0:0.36" />
+                  <DoubleTransition Easing="{x:Static tok:MotionTokens.CommandBarEasing}" Property="MinHeight" Duration="0:0:0.36" />
+                </Transitions>
+              </Panel.Transitions>
+              <ui:GlassButton Name="PART_Copy"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Bottom"
+                              Classes="ghost"
+                              AutomationProperties.Name="{x:Static eg:UiText.COPY_COMMAND}"
+                              Command="{TemplateBinding CopyCommand}"
+                              Foreground="{DynamicResource TextSecondaryBrush}"
+                              Icon="{x:Static ui:IconId.Copy}"
+                              IconSize="15"
+                              RenderTransform="translate(-34px, 0px)"
+                              ToolTip.Tip="{x:Static eg:UiText.COPY_COMMAND}">
+                <ui:GlassButton.Transitions>
+                  <Transitions>
+                    <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />
+                    <DoubleTransition Easing="{x:Static tok:MotionTokens.DisabledEasing}" Property="Opacity" Duration="0:0:0.16" />
+                    <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.CommandBarEasing}" Property="RenderTransform" Duration="0:0:0.36" />
+                  </Transitions>
+                </ui:GlassButton.Transitions>
+              </ui:GlassButton>
+              <ToggleButton Name="PART_Toggle"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            AutomationProperties.Name="{Binding ToggleTip, RelativeSource={RelativeSource TemplatedParent}}"
+                            IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+                            Theme="{StaticResource CommandToggle}"
+                            ToolTip.Tip="{Binding ToggleTip, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Panel>
+          </Grid>
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:write /template/ ui|Badge#PART_Write">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:expanded:scrolls /template/ ScrollViewer#PART_Scroller">
+      <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style Selector="^:expanded /template/ Panel#PART_Buttons">
+      <Setter Property="Width" Value="32" />
+      <Setter Property="MinHeight" Value="66" />
+    </Style>
+    <Style Selector="^:expanded /template/ ui|GlassButton#PART_Copy">
+      <Setter Property="RenderTransform" Value="translate(0px, -34px)" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

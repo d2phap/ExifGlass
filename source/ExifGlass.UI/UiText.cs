@@ -84,6 +84,24 @@ public static class UiText
     public const string DETAIL_CAPTURED = "Captured";
     public const string DETAIL_LOCATION = "Location";
 
+    // editing (DS 6.11-6.13, S5)
+    public const string SAVE_BINARY = "Save binary data…";
+    public const string SAVE_BINARY_TIP = "Save the tag's bytes as a file";
+    public const string ADD_TAG_OVERLINE = "ADD TAG";
+    public const string ADD_TAG = "Add tag";
+    public const string TAG_NAME_PLACEHOLDER = "Tag name, e.g. Artist";
+    public const string VALUE_PLACEHOLDER = "Value";
+    public const string TAG_GROUP = "Tag group";
+    public const string DISCARD = "Discard";
+    public const string DISCARD_TIP = "Drop every pending change";
+    public const string SAVE = "Save";
+    public const string SAVING = "Saving…";
+    public const string WRITE = "Write";
+    public const string WRITE_TIP = "Save runs this command";
+    public const string COPY_COMMAND = "Copy command";
+    public const string EXPAND_COMMAND = "Show the whole command";
+    public const string COLLAPSE_COMMAND = "Show one line";
+
     // the AI surfaces (AI addendum): sentence case, no em dashes (owner at G4)
     public const string PROMPT = "Prompt";
     public const string NEGATIVE_PROMPT = "Negative prompt";
@@ -184,6 +202,12 @@ public static class UiText
 
 
     public static string ApplyTip => $"{APPLY} ({Shortcut("Enter")})";
+
+
+    /// <summary>
+    /// The Add-tag card's button tooltip: "Add tag (Ctrl+Enter)".
+    /// </summary>
+    public static string AddTagTip => $"{ADD_TAG} ({Shortcut("Enter")})";
 
 
     /// <summary>

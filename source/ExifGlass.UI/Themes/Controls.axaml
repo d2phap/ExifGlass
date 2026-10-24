@@ -13,6 +13,7 @@
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/Surfaces.axaml" />
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/Panels.axaml" />
     <ResourceInclude Source="avares://ExifGlass.UI/Themes/AiCards.axaml" />
+    <ResourceInclude Source="avares://ExifGlass.UI/Themes/Editing.axaml" />
   </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

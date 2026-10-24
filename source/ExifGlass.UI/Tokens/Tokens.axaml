@@ -73,6 +73,12 @@
       <SolidColorBrush x:Key="InverseHoverLayerBrush" Color="#14FFFFFF" />
       <Color x:Key="InversePressedLayerColor">#1A000000</Color>
       <SolidColorBrush x:Key="InversePressedLayerBrush" Color="#1A000000" />
+      <Color x:Key="InverseGhostRestColor">#00FFFFFF</Color>
+      <SolidColorBrush x:Key="InverseGhostRestBrush" Color="#00FFFFFF" />
+      <Color x:Key="InverseGhostHoverColor">#24FFFFFF</Color>
+      <SolidColorBrush x:Key="InverseGhostHoverBrush" Color="#24FFFFFF" />
+      <Color x:Key="InverseGhostPressedColor">#38FFFFFF</Color>
+      <SolidColorBrush x:Key="InverseGhostPressedBrush" Color="#38FFFFFF" />
       <Color x:Key="ScrollThumbColor">#999999</Color>
       <SolidColorBrush x:Key="ScrollThumbBrush" Color="#999999" />
       <Color x:Key="ScrollThumbHoverColor">#888888</Color>
@@ -201,6 +207,12 @@
       <SolidColorBrush x:Key="InverseHoverLayerBrush" Color="#0D000000" />
       <Color x:Key="InversePressedLayerColor">#1A000000</Color>
       <SolidColorBrush x:Key="InversePressedLayerBrush" Color="#1A000000" />
+      <Color x:Key="InverseGhostRestColor">#00212529</Color>
+      <SolidColorBrush x:Key="InverseGhostRestBrush" Color="#00212529" />
+      <Color x:Key="InverseGhostHoverColor">#24212529</Color>
+      <SolidColorBrush x:Key="InverseGhostHoverBrush" Color="#24212529" />
+      <Color x:Key="InverseGhostPressedColor">#38212529</Color>
+      <SolidColorBrush x:Key="InverseGhostPressedBrush" Color="#38212529" />
       <Color x:Key="ScrollThumbColor">#BBBBBB</Color>
       <SolidColorBrush x:Key="ScrollThumbBrush" Color="#BBBBBB" />
       <Color x:Key="ScrollThumbHoverColor">#CCCCCC</Color>

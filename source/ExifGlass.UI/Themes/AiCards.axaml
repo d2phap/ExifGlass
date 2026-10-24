@@ -782,29 +782,46 @@
             </DockPanel>
 
             <!--  the value: a prompt in the UI font with its tints (question 14), anything else in mono; up to 240 high, then it scrolls, its bar at the well's edge  -->
-            <ui:SquircleBorder MinHeight="40"
-                               Background="{DynamicResource BgSubtleBrush}"
-                               ClipToBounds="True"
-                               CornerRadius="{StaticResource RadiusWell}">
-              <ScrollViewer MaxHeight="228"
-                            Margin="0,6,2,6"
-                            Padding="12,4,16,4"
-                            HorizontalScrollBarVisibility="Disabled">
-                <Panel>
-                  <ui:PromptText Name="PART_Prompt"
-                                 ClampLines="0"
-                                 Embeddings="{Binding Embeddings}"
-                                 FontSize="13"
-                                 IsVisible="False"
-                                 LineHeight="19"
-                                 Prompt="{Binding ShownValue}" />
-                  <SelectableTextBlock Name="PART_Value"
-                                       tok:Typography.Role="MonoValue"
-                                       Text="{Binding ShownValue}"
-                                       TextWrapping="Wrap" />
-                </Panel>
-              </ScrollViewer>
-            </ui:SquircleBorder>
+            <Panel Name="PART_Well">
+              <ui:SquircleBorder MinHeight="40"
+                                 Background="{DynamicResource BgSubtleBrush}"
+                                 ClipToBounds="True"
+                                 CornerRadius="{StaticResource RadiusWell}">
+                <ScrollViewer MaxHeight="228"
+                              Margin="0,6,2,6"
+                              Padding="12,4,16,4"
+                              HorizontalScrollBarVisibility="Disabled">
+                  <Panel>
+                    <ui:PromptText Name="PART_Prompt"
+                                   ClampLines="0"
+                                   Embeddings="{Binding Embeddings}"
+                                   FocusAdorner="{x:Null}"
+                                   FontSize="13"
+                                   IsVisible="False"
+                                   LineHeight="19"
+                                   Prompt="{Binding ShownValue}" />
+                    <SelectableTextBlock Name="PART_Value"
+                                         tok:Typography.Role="MonoValue"
+                                         FocusAdorner="{x:Null}"
+                                         Text="{Binding ShownValue}"
+                                         TextWrapping="Wrap" />
+                  </Panel>
+                </ScrollViewer>
+              </ui:SquircleBorder>
+              <!--  the ring while the text has focus (owner at G7, finding 12), in place of Avalonia's dotted rectangle  -->
+              <ui:SquircleBorder Name="PART_WellRing"
+                                 BorderBrush="{DynamicResource AccentBrush}"
+                                 BorderThickness="2"
+                                 CornerRadius="{StaticResource RadiusWell}"
+                                 IsHitTestVisible="False"
+                                 Opacity="0">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
+              </ui:SquircleBorder>
+            </Panel>
 
             <!--  Source tag, Parsed as, Length: label 70, gap 12, rows 6 apart  -->
             <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,6,Auto,6,Auto">
@@ -864,6 +881,9 @@
       </ControlTemplate>
     </Setter>
 
+    <Style Selector="^ /template/ Panel#PART_Well:focus-within Border#PART_WellRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
     <Style Selector="^:prompt /template/ SelectableTextBlock#PART_Prompt">
       <Setter Property="IsVisible" Value="True" />
     </Style>

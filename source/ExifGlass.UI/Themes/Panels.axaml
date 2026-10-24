@@ -427,6 +427,7 @@
                               HorizontalScrollBarVisibility="Disabled">
                   <SelectableTextBlock Name="PART_Value"
                                        tok:Typography.Role="MonoValue"
+                                       FocusAdorner="{x:Null}"
                                        Text="{Binding ShownValue}"
                                        TextWrapping="Wrap">
                     <SelectableTextBlock.Transitions>
@@ -436,6 +437,19 @@
                     </SelectableTextBlock.Transitions>
                   </SelectableTextBlock>
                 </ScrollViewer>
+              </ui:SquircleBorder>
+              <!--  the ring while the text has focus (owner at G7, finding 12), in place of Avalonia's dotted rectangle  -->
+              <ui:SquircleBorder Name="PART_WellRing"
+                                 BorderBrush="{DynamicResource AccentBrush}"
+                                 BorderThickness="2"
+                                 CornerRadius="{StaticResource RadiusWell}"
+                                 IsHitTestVisible="False"
+                                 Opacity="0">
+                <ui:SquircleBorder.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  </Transitions>
+                </ui:SquircleBorder.Transitions>
               </ui:SquircleBorder>
             </Panel>
 
@@ -572,14 +586,26 @@
               </DockPanel>
             </ui:SquircleBorder>
 
-            <ui:GlassButton Name="PART_Edit"
-                            HorizontalAlignment="Right"
-                            Classes="primary"
-                            Command="{TemplateBinding EditCommand}"
-                            Content="{x:Static eg:UiText.EDIT}"
-                            Icon="{x:Static ui:IconId.Edit}"
-                            IconSize="15"
-                            ToolTip.Tip="{x:Static eg:UiText.EDIT_VALUE}" />
+            <!--  Save binary data (D12) for a binary tag, which has no Edit; Edit for the rest  -->
+            <StackPanel Name="PART_Actions"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="6">
+              <ui:GlassButton Name="PART_SaveBinary"
+                              Command="{TemplateBinding SaveBinaryCommand}"
+                              Content="{x:Static eg:UiText.SAVE_BINARY}"
+                              Icon="{x:Static ui:IconId.ArrowDownload}"
+                              IconSize="15"
+                              IsVisible="False"
+                              ToolTip.Tip="{x:Static eg:UiText.SAVE_BINARY_TIP}" />
+              <ui:GlassButton Name="PART_Edit"
+                              Classes="primary"
+                              Command="{TemplateBinding EditCommand}"
+                              Content="{x:Static eg:UiText.EDIT}"
+                              Icon="{x:Static ui:IconId.Edit}"
+                              IconSize="15"
+                              ToolTip.Tip="{x:Static eg:UiText.EDIT_VALUE}" />
+            </StackPanel>
           </StackPanel>
         </ui:SquircleBorder>
       </ControlTemplate>
@@ -604,6 +630,30 @@
     <Style Selector="^:deleted /template/ SelectableTextBlock#PART_Value">
       <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
       <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <!--  removed by a bulk action: struck through, no Delete or Undo of its own; an edit still writes it back after the bulk delete  -->
+    <Style Selector="^:removed /template/ SelectableTextBlock#PART_Value">
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+      <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+    <Style Selector="^:removed /template/ ui|GlassButton#PART_Delete">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:removed /template/ Border#PART_Divider">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:binary /template/ ui|GlassButton#PART_SaveBinary">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <!--  with neither button the row goes too, or the card's spacing would still count it  -->
+    <Style Selector="^:readonly:not(:binary) /template/ StackPanel#PART_Actions">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:editing:not(:binary) /template/ StackPanel#PART_Actions">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^ /template/ Panel#PART_Well:focus-within Border#PART_WellRing">
+      <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^:edited /template/ DockPanel#PART_Was">
       <Setter Property="IsVisible" Value="True" />

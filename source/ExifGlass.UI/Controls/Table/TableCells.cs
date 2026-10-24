@@ -527,7 +527,7 @@ public sealed class ValueCell : Panel
         }
 
         Classes.Set("edited", state is EditState.Edited or EditState.Added);
-        Classes.Set("deleted", state == EditState.Deleted);
+        Classes.Set("deleted", state is EditState.Deleted or EditState.Removed);
 
         if (state == EditState.None)
         {
@@ -545,11 +545,10 @@ public sealed class ValueCell : Panel
             (_badge.Kind, _badge.Text) = state switch
             {
                 EditState.Edited => (BadgeKind.Edited, UiText.BADGE_EDITED),
-                EditState.Deleted => (BadgeKind.Delete, UiText.BADGE_DELETE),
+                EditState.Deleted or EditState.Removed => (BadgeKind.Delete, UiText.BADGE_DELETE),
                 _ => (BadgeKind.New, UiText.BADGE_NEW),
             };
         }
-
     }
 
     #endregion // Public methods

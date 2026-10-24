@@ -249,7 +249,9 @@ public static class AppText
     /// <summary>
     /// A copied AI value's toast: "Copied seed", "Copied character 1"; "Copied value" without a label.
     /// </summary>
-    public static string CopiedField(string? label) => string.IsNullOrEmpty(label) ? TOAST_COPIED_VALUE : "Copied " + char.ToLowerInvariant(label[0]) + label[1..];
+    public static string CopiedField(string? label) => string.IsNullOrEmpty(label) ? TOAST_COPIED_VALUE
+        : label.Length > 1 && char.IsUpper(label[1]) ? "Copied " + label
+        : "Copied " + char.ToLowerInvariant(label[0]) + label[1..];
 
     /// <summary>
     /// R19 in the AI card: "Your ExifTool 12.40 can't read every AI field. C2PA Content Credentials in every container need 12.75."

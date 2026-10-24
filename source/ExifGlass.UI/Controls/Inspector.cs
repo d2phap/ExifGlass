@@ -702,16 +702,29 @@ public sealed record ExposureCellView(string Label, double Value, CountUpFormat 
 
     public bool HasValue => double.IsFinite(Value);
 
+    /// <summary>
+    /// Gets "Aperture", the name its copy toast says.
+    /// </summary>
+    public string Name { get; init; } = Label;
+
+    /// <summary>
+    /// Gets the readout as shown once it has counted up, "f/1.5" or "1/5882": what its copy button copies.
+    /// </summary>
+    public string? Text => HasValue ? string.Concat(Prefix, CountUpText.FormatValue(Value, Format), Suffix) : null;
+
     #endregion // Properties
 }
 
 
 /// <summary>
-/// The Exposure card (DS 6.11): Aperture, Shutter, ISO and Focal in a 2 x 2 grid, Display 22 Medium, counting up over 1100 ms.
+/// The Exposure card (DS 6.11): Aperture, Shutter, ISO and Focal in a 2 x 2 grid, Display 22 Medium, counting up over 1100 ms; each readout copies on hover, as the AI card's tiles (owner after G7).
 /// </summary>
 public class ExposureCard : TemplatedControl
 {
     #region Fields and constants
+
+    public static readonly StyledProperty<ICommand?> CopyCommandProperty =
+        AvaloniaProperty.Register<ExposureCard, ICommand?>(nameof(CopyCommand));
 
     private static readonly string[] LABELS = ["Aperture", "Shutter", "ISO", "Focal"];
 
@@ -732,6 +745,15 @@ public class ExposureCard : TemplatedControl
     {
         get => GetValue(ItemsProperty);
         set => SetValue(ItemsProperty, value);
+    }
+
+    /// <summary>
+    /// Copies a readout and toasts it, with an AiActionRequest of CopyText.
+    /// </summary>
+    public ICommand? CopyCommand
+    {
+        get => GetValue(CopyCommandProperty);
+        set => SetValue(CopyCommandProperty, value);
     }
 
     /// <summary>
@@ -763,14 +785,14 @@ public class ExposureCard : TemplatedControl
             var item = items?.FirstOrDefault(x => x.Label == LABELS[i]);
             if (item is null || !double.IsFinite(item.Number))
             {
-                cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), double.NaN, CountUpFormat.Integer, null, null, item?.Sub ?? string.Empty);
+                cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), double.NaN, CountUpFormat.Integer, null, null, item?.Sub ?? string.Empty) { Name = LABELS[i] };
                 continue;
             }
 
             // DerivedInfo writes a shutter as "1/" and a whole denominator, which counts as 1/N
             var format = item.Prefix == "1/" ? CountUpFormat.Shutter : item.Decimals > 0 ? CountUpFormat.OneDecimal : CountUpFormat.Integer;
             var prefix = format == CountUpFormat.Shutter ? null : item.Prefix;
-            cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), item.Number, format, prefix, item.Suffix, item.Sub);
+            cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), item.Number, format, prefix, item.Suffix, item.Sub) { Name = LABELS[i] };
         }
 
         return cells;
@@ -786,6 +808,13 @@ public class ExposureCard : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == ItemsProperty) Cells = BuildCells(Items);
+    }
+
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        CopyHost.Route(this, () => CopyCommand);
     }
 
     #endregion // Protected methods
@@ -808,11 +837,14 @@ public sealed record DetailRowView(IconId Icon, string Label, string Value, stri
 
 
 /// <summary>
-/// The Details card (DS 6.11): Camera, Lens, Captured, Location (+ Open in OpenStreetMap) and Software; skeleton rows without a file; hidden when the file has none (owner at G7).
+/// The Details card (DS 6.11): Camera, Lens, Captured, Location (+ Open in OpenStreetMap) and Software; skeleton rows without a file; hidden when the file has none (owner at G7); each row copies on hover (owner after G7).
 /// </summary>
 public class DetailsCard : TemplatedControl
 {
     #region Fields and constants
+
+    public static readonly StyledProperty<ICommand?> CopyCommandProperty =
+        AvaloniaProperty.Register<DetailsCard, ICommand?>(nameof(CopyCommand));
 
     private static readonly (string Label, IconId Icon)[] ROWS =
     [
@@ -839,6 +871,7 @@ public class DetailsCard : TemplatedControl
     public DetailsCard()
     {
         UpdatePseudoClasses();
+        CopyHost.Route(this, () => CopyCommand);
     }
 
     #endregion // Constructors
@@ -868,6 +901,12 @@ public class DetailsCard : TemplatedControl
     {
         get => _rows;
         private set => SetAndRaise(RowsProperty, ref _rows, value);
+    }
+
+    public ICommand? CopyCommand
+    {
+        get => GetValue(CopyCommandProperty);
+        set => SetValue(CopyCommandProperty, value);
     }
 
     #endregion // Properties

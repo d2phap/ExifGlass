@@ -50,7 +50,9 @@
                       Text="{Binding GroupCountLabel}" />
           </StackPanel>
         </DockPanel>
-        <ItemsControl Name="GroupList" ItemsSource="{Binding RailGroups}">
+        <ItemsControl Name="GroupList"
+                      Grid.IsSharedSizeScope="True"
+                      ItemsSource="{Binding RailGroups}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <StackPanel Spacing="4" />

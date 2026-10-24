@@ -95,10 +95,12 @@
     </Style>
   </ControlTheme>
 
-  <!--  the group row's two parts (owner at the P6 review: each action hovers on its own, replacing DS 6.10's one layer per row): the checkbox's 28 x 32 area and the name; hover Emphasis 5%, radius 14  -->
+  <!--  the group row's two parts (owner after G7, replacing the P6 review's checkbox and name parts): the checkbox, dot and name show or hide the group; the count jumps to it; hover Emphasis 5%, radius 14  -->
   <ControlTheme x:Key="RailCheckButton" TargetType="Button">
-    <Setter Property="Width" Value="28" />
     <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="6,0,8,0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="ClipToBounds" Value="False" />
@@ -123,35 +125,29 @@
             </ui:SquircleBorder.Transitions>
           </ui:SquircleBorder>
           <ContentPresenter Name="PART_ContentPresenter"
-                            HorizontalAlignment="Center"
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="Center"
-                            Content="{TemplateBinding Content}"
-                            RenderTransformOrigin="50%,50%">
-            <ContentPresenter.Transitions>
-              <Transitions>
-                <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.PressInEasing}" Property="RenderTransform" Duration="0:0:0.14" />
-              </Transitions>
-            </ContentPresenter.Transitions>
-          </ContentPresenter>
+                            Content="{TemplateBinding Content}" />
         </Panel>
       </ControlTemplate>
     </Setter>
 
-    <!--  the box presses in as the checkbox's does (DS 6.3)  -->
-    <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="RenderTransform" Value="scale(0.96)" />
-    </Style>
     <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
       <Setter Property="Opacity" Value="1" />
+    </Style>
+    <!--  the row is hovered: either part lights both (owner after G7)  -->
+    <Style Selector="^.row-hover /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
     </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="RailJumpButton" TargetType="Button">
     <Setter Property="Height" Value="{StaticResource ControlHeight}" />
+    <Setter Property="MinWidth" Value="36" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
-    <Setter Property="HorizontalAlignment" Value="Stretch" />
-    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Right" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
@@ -186,54 +182,66 @@
     <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
       <Setter Property="Opacity" Value="1" />
     </Style>
+    <!--  the row is hovered: either part lights both (owner after G7)  -->
+    <Style Selector="^.row-hover /template/ ui|InteractionOverlay#PART_Overlay">
+      <Setter Property="IsHeld" Value="True" />
+    </Style>
   </ControlTheme>
 
-  <!--  group row: 32 high; the checkbox's area shows or hides the group, the name jumps to it, 2 apart; the box 12 from the dot and 10 in, under the overline (owner at G7: was 20 from the dot); hidden groups in TextTertiary with the dot at 35%  -->
+  <!--  group row: 32 high; two parts 2 apart (owner after G7): the checkbox, dot and name show or hide the group, the count jumps to it; hovering either lights both, a press only its own; the box 10 in, under the overline, 12 from the dot; the counts share one width down the list; hidden groups in TextTertiary with the dot at 35%  -->
   <ControlTheme x:Key="{x:Type ui:RailGroupRow}" TargetType="ui:RailGroupRow">
     <Setter Property="Height" Value="{StaticResource ControlHeight}" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
       <ControlTemplate>
-        <DockPanel Margin="4,0,0,0">
+        <Grid Margin="4,0,0,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="2" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="RailCount" />
+          </Grid.ColumnDefinitions>
           <Button Name="PART_Check"
-                  Margin="0,0,2,0"
-                  DockPanel.Dock="Left"
                   Theme="{StaticResource RailCheckButton}"
                   ToolTip.Tip="{TemplateBinding ToggleTip}">
-            <Panel Width="16" Height="16">
-              <ui:SquircleBorder Name="PART_BoxFill"
-                                 Background="{DynamicResource AccentA00Brush}"
-                                 BorderBrush="{DynamicResource EmphasisA40Brush}"
-                                 BorderThickness="1"
-                                 CornerRadius="{StaticResource RadiusCheckBox}">
-                <ui:SquircleBorder.Transitions>
-                  <Transitions>
-                    <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="Background" Duration="0:0:0.15" />
-                    <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="BorderBrush" Duration="0:0:0.15" />
-                  </Transitions>
-                </ui:SquircleBorder.Transitions>
-              </ui:SquircleBorder>
-              <ui:GlassIcon Name="PART_Glyph"
-                            Width="12"
-                            Height="12"
-                            Foreground="{DynamicResource OnAccentBrush}"
-                            Icon="{x:Static ui:IconId.CheckmarkFilled}"
-                            RenderTransform="scale(0)"
-                            RenderTransformOrigin="50%,50%">
-                <ui:GlassIcon.Transitions>
-                  <Transitions>
-                    <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.CheckGlyphEasing}" Property="RenderTransform" Duration="0:0:0.26" />
-                  </Transitions>
-                </ui:GlassIcon.Transitions>
-              </ui:GlassIcon>
-            </Panel>
-          </Button>
-          <Button Name="PART_Jump"
-                  Padding="4,0,8,0"
-                  Theme="{StaticResource RailJumpButton}"
-                  ToolTip.Tip="{TemplateBinding JumpTip}">
             <DockPanel>
+                        <Panel Name="PART_Box"
+                     Width="16"
+                     Height="16"
+                     Margin="0,0,12,0"
+                     DockPanel.Dock="Left"
+                     RenderTransformOrigin="50%,50%">
+                <Panel.Transitions>
+                  <Transitions>
+                    <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.PressInEasing}" Property="RenderTransform" Duration="0:0:0.14" />
+                  </Transitions>
+                </Panel.Transitions>
+                <ui:SquircleBorder Name="PART_BoxFill"
+                                   Background="{DynamicResource AccentA00Brush}"
+                                   BorderBrush="{DynamicResource EmphasisA40Brush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusCheckBox}">
+                  <ui:SquircleBorder.Transitions>
+                    <Transitions>
+                      <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="Background" Duration="0:0:0.15" />
+                      <BrushTransition Easing="{x:Static tok:MotionTokens.CheckFillEasing}" Property="BorderBrush" Duration="0:0:0.15" />
+                    </Transitions>
+                  </ui:SquircleBorder.Transitions>
+                </ui:SquircleBorder>
+                <ui:GlassIcon Name="PART_Glyph"
+                              Width="12"
+                              Height="12"
+                              Foreground="{DynamicResource OnAccentBrush}"
+                              Icon="{x:Static ui:IconId.CheckmarkFilled}"
+                              RenderTransform="scale(0)"
+                              RenderTransformOrigin="50%,50%">
+                  <ui:GlassIcon.Transitions>
+                    <Transitions>
+                      <TransformOperationsTransition Easing="{x:Static tok:MotionTokens.CheckGlyphEasing}" Property="RenderTransform" Duration="0:0:0.26" />
+                    </Transitions>
+                  </ui:GlassIcon.Transitions>
+                </ui:GlassIcon>
+              </Panel>
               <!--  the sparkle is wider than the dot; it overhangs so every name starts at one x  -->
               <Panel Width="8"
                      Margin="0,0,8,0"
@@ -254,13 +262,6 @@
                               Icon="{x:Static ui:IconId.Sparkle}"
                               IsVisible="False" />
               </Panel>
-              <TextBlock Name="PART_Count"
-                         Margin="8,0,0,0"
-                         VerticalAlignment="Center"
-                         tok:Typography.Role="MonoSmall"
-                         DockPanel.Dock="Right"
-                         Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{TemplateBinding Count}" />
               <TextBlock Name="PART_Name"
                          VerticalAlignment="Center"
                          Foreground="{TemplateBinding Foreground}"
@@ -268,7 +269,17 @@
                          TextTrimming="CharacterEllipsis" />
             </DockPanel>
           </Button>
-        </DockPanel>
+          <Button Name="PART_Jump"
+                  Grid.Column="2"
+                  Theme="{StaticResource RailJumpButton}"
+                  ToolTip.Tip="{TemplateBinding JumpTip}">
+            <TextBlock Name="PART_Count"
+                       VerticalAlignment="Center"
+                       tok:Typography.Role="MonoSmall"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="{TemplateBinding Count}" />
+          </Button>
+        </Grid>
       </ControlTemplate>
     </Setter>
     <Setter Property="Transitions">
@@ -277,6 +288,9 @@
       </Transitions>
     </Setter>
 
+    <Style Selector="^ /template/ Button#PART_Check:pressed Panel#PART_Box">
+      <Setter Property="RenderTransform" Value="scale(0.96)" />
+    </Style>
     <Style Selector="^:shown /template/ Border#PART_BoxFill">
       <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
@@ -783,32 +797,34 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="ui:ExposureCellView">
-                  <ui:SquircleBorder Padding="14,12" Background="{DynamicResource BgPanelBrush}">
-                    <StackPanel Spacing="2">
-                      <TextBlock tok:Typography.Role="Overline"
-                                 Foreground="{DynamicResource TextSecondaryBrush}"
-                                 Text="{Binding Label}" />
-                      <Panel Height="28">
-                        <ui:CountUpText VerticalAlignment="Center"
-                                        tok:Typography.Role="Readout"
-                                        Format="{Binding Format}"
-                                        IsVisible="{Binding HasValue}"
-                                        Prefix="{Binding Prefix}"
-                                        Suffix="{Binding Suffix}"
-                                        Value="{Binding Value}" />
-                        <TextBlock VerticalAlignment="Center"
-                                   tok:Typography.Role="Readout"
-                                   Foreground="{DynamicResource TextTertiaryBrush}"
-                                   IsVisible="{Binding !HasValue}"
-                                   Text="—" />
-                      </Panel>
-                      <TextBlock MinHeight="16"
-                                 tok:Typography.Role="Meta"
-                                 Foreground="{DynamicResource TextSecondaryBrush}"
-                                 Text="{Binding Sub}"
-                                 TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                  </ui:SquircleBorder>
+                  <ui:CopyHost CopyLabel="{Binding Name}" CopyText="{Binding Text}">
+                    <ui:SquircleBorder Padding="14,12" Background="{DynamicResource BgPanelBrush}">
+                      <StackPanel Spacing="2">
+                        <TextBlock tok:Typography.Role="Overline"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{Binding Label}" />
+                        <Panel Height="28">
+                          <ui:CountUpText VerticalAlignment="Center"
+                                          tok:Typography.Role="Readout"
+                                          Format="{Binding Format}"
+                                          IsVisible="{Binding HasValue}"
+                                          Prefix="{Binding Prefix}"
+                                          Suffix="{Binding Suffix}"
+                                          Value="{Binding Value}" />
+                          <TextBlock VerticalAlignment="Center"
+                                     tok:Typography.Role="Readout"
+                                     Foreground="{DynamicResource TextTertiaryBrush}"
+                                     IsVisible="{Binding !HasValue}"
+                                     Text="—" />
+                        </Panel>
+                        <TextBlock MinHeight="16"
+                                   tok:Typography.Role="Meta"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Text="{Binding Sub}"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </ui:SquircleBorder>
+                  </ui:CopyHost>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -831,48 +847,50 @@
             <ItemsControl Name="PART_Rows" ItemsSource="{TemplateBinding Rows}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="ui:DetailRowView">
-                  <StackPanel>
-                    <ui:SquircleBorder Height="1"
-                                       Background="{DynamicResource EmphasisA07Brush}"
-                                       IsVisible="{Binding !IsFirst}" />
-                    <DockPanel Margin="0,10">
-                      <ui:GlassIcon Width="16"
-                                    Height="16"
-                                    Margin="0,1,10,0"
-                                    VerticalAlignment="Top"
-                                    DockPanel.Dock="Left"
-                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                    Icon="{Binding Icon}" />
-                      <StackPanel Margin="6,0,0,0" Spacing="1">
-                        <TextBlock FontSize="{StaticResource FontSizeOverline}"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{Binding Label}" />
-                        <SelectableTextBlock FontWeight="Medium"
-                                             Text="{Binding Value}"
-                                             TextWrapping="Wrap" />
-                        <TextBlock tok:Typography.Role="Meta"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                   IsVisible="{Binding HasSub}"
-                                   Text="{Binding Sub}"
-                                   TextWrapping="Wrap" />
-                        <ui:GlassButton Margin="-6,2,0,0"
-                                        HorizontalAlignment="Left"
-                                        Classes="link"
-                                        Command="{Binding $parent[ui:DetailsCard].OpenLinkCommand}"
-                                        CommandParameter="{Binding Link}"
-                                        IsVisible="{Binding HasLink}"
-                                        ToolTip.Tip="{Binding Link}">
-                          <StackPanel Orientation="Horizontal" Spacing="4">
-                            <TextBlock VerticalAlignment="Center" Text="{x:Static eg:UiText.OPEN_IN_OSM}" />
-                            <ui:GlassIcon Width="11"
-                                          Height="11"
-                                          VerticalAlignment="Center"
-                                          Icon="{x:Static ui:IconId.Open}" />
-                          </StackPanel>
-                        </ui:GlassButton>
-                      </StackPanel>
-                    </DockPanel>
-                  </StackPanel>
+                  <ui:CopyHost CopyLabel="{Binding Label}" CopyText="{Binding Value}">
+                    <StackPanel>
+                      <ui:SquircleBorder Height="1"
+                                         Background="{DynamicResource EmphasisA07Brush}"
+                                         IsVisible="{Binding !IsFirst}" />
+                      <DockPanel Margin="0,10">
+                        <ui:GlassIcon Width="16"
+                                      Height="16"
+                                      Margin="0,1,10,0"
+                                      VerticalAlignment="Top"
+                                      DockPanel.Dock="Left"
+                                      Foreground="{DynamicResource TextSecondaryBrush}"
+                                      Icon="{Binding Icon}" />
+                        <StackPanel Margin="6,0,0,0" Spacing="1">
+                          <TextBlock FontSize="{StaticResource FontSizeOverline}"
+                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                     Text="{Binding Label}" />
+                          <SelectableTextBlock FontWeight="Medium"
+                                               Text="{Binding Value}"
+                                               TextWrapping="Wrap" />
+                          <TextBlock tok:Typography.Role="Meta"
+                                     Foreground="{DynamicResource TextSecondaryBrush}"
+                                     IsVisible="{Binding HasSub}"
+                                     Text="{Binding Sub}"
+                                     TextWrapping="Wrap" />
+                          <ui:GlassButton Margin="-6,2,0,0"
+                                          HorizontalAlignment="Left"
+                                          Classes="link"
+                                          Command="{Binding $parent[ui:DetailsCard].OpenLinkCommand}"
+                                          CommandParameter="{Binding Link}"
+                                          IsVisible="{Binding HasLink}"
+                                          ToolTip.Tip="{Binding Link}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                              <TextBlock VerticalAlignment="Center" Text="{x:Static eg:UiText.OPEN_IN_OSM}" />
+                              <ui:GlassIcon Width="11"
+                                            Height="11"
+                                            VerticalAlignment="Center"
+                                            Icon="{x:Static ui:IconId.Open}" />
+                            </StackPanel>
+                          </ui:GlassButton>
+                        </StackPanel>
+                      </DockPanel>
+                    </StackPanel>
+                  </ui:CopyHost>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -46,8 +46,12 @@
                     Frame="{Binding Frame}"
                     IsVisible="{Binding ShowPreviewCard}"
                     Preview="{Binding Preview}" />
-      <ui:ExposureCard Name="ExposureCard" IsVisible="{Binding ShowExposureCard}" Items="{Binding Exposure}" />
+      <ui:ExposureCard Name="ExposureCard"
+                       CopyCommand="{Binding AiActionCommand}"
+                       IsVisible="{Binding ShowExposureCard}"
+                       Items="{Binding Exposure}" />
       <ui:DetailsCard Name="DetailsCard"
+                      CopyCommand="{Binding AiActionCommand}"
                       IsVisible="{Binding ShowDetailsCard}"
                       Items="{Binding Details}"
                       OpenLinkCommand="{Binding OpenLinkCommand}" />

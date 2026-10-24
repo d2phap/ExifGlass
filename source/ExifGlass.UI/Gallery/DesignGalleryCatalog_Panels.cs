@@ -73,7 +73,7 @@ public static partial class DesignGalleryCatalog
             IsAi = ai,
         };
 
-        // a row's state lives on one of its two buttons (owner at the P6 review: each part hovers on its own)
+        // a row's state lives on its two buttons: a hover on both, a press on one (owner after G7)
         static RailGroupRow Part(RailGroupRow row, string part, Func<Button, Button> state)
         {
             row.TemplateApplied += (_, e) =>
@@ -98,7 +98,7 @@ public static partial class DesignGalleryCatalog
 
         DropTarget Drop() => new() { Width = RAIL_CONTENT, Content = "Open a file, or drop one here to view", Icon = IconId.ArrowUpload };
 
-        return new GallerySection("c-rail", "Rail", "DS 6.10 / S2: file card (Emphasis 3.5%, radius 12; thumbnail 38 radius 10 with the preview, the extension, or a dashed outline; composition bar 6 px, 2 px gaps, square segments clipped to radius 2, growing 1100 ms); group rows 32: the checkbox's 36 x 32 area shows or hides, the name jumps, each with its own state layer (owner at the P6 review; hover Emphasis 5%, radius 14); hidden in TextTertiary with the dot at 35%; dashed drop target, radius 12.",
+        return new GallerySection("c-rail", "Rail", "DS 6.10 / S2: file card (Emphasis 3.5%, radius 12; thumbnail 38 radius 10 with the preview, the extension, or a dashed outline; composition bar 6 px, 2 px gaps, square segments clipped to radius 2, growing 1100 ms); group rows 32 in two parts 2 apart (owner after G7): the checkbox, dot and name show or hide, the count jumps; hovering either lights both, a press only its own (hover Emphasis 5%, radius 14); hidden in TextTertiary with the dot at 35%; dashed drop target, radius 12.",
         [
             new("file card", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS), "the extension until the preview comes"),
             new("file card :preview", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS, preview: true), "preview as cover, radius 10"),
@@ -106,15 +106,14 @@ public static partial class DesignGalleryCatalog
             new("reading", File("Reading…", "ExifTool is parsing the file", null), "dashed thumbnail (Proto)"),
             new("groups header", header, "count 5/7 while some are hidden"),
             new("row", Row("EXIF", "57"), "count mono 11, TextSecondary"),
-            new("checkbox :pointerover", Part(Row("MakerNotes", "23"), "PART_Check", b => b.Hover()), "the checkbox's area alone, Emphasis 5%"),
-            new("checkbox :pressed", Part(Row("MakerNotes", "23"), "PART_Check", b => b.Pressed()), "Emphasis 12%, the box at 0.96"),
-            new("name :pointerover", Part(Row("File", "17"), "PART_Jump", b => b.Hover()), "the name alone, Emphasis 5%"),
-            new("name :pressed", Part(Row("File", "17"), "PART_Jump", b => b.Pressed()), "wide press, no scale"),
+            new(":pointerover", Part(Part(Row("File", "17"), "PART_Check", b => b.Hover()), "PART_Jump", b => b.Hover()), "both parts, Emphasis 5%"),
+            new("name :pressed", Part(Part(Row("File", "17"), "PART_Check", b => b.Pressed()), "PART_Jump", b => b.Hover()), "Emphasis 12% on its part, the box at 0.96"),
+            new("count :pressed", Part(Part(Row("File", "17"), "PART_Check", b => b.Hover()), "PART_Jump", b => b.Pressed()), "wide press on the count's part"),
             new("row hidden", Row("ICC_Profile", "9", shown: false), "TextTertiary, dot 35%"),
             new("row filtering", Row("EXIF", "12/57"), "while a search or quick filter runs"),
             new("row AI group", Row("AI", "23", ai: true), "the sparkle in Accent2 (D22)"),
-            new("checkbox :focus-visible", Part(Row("XMP", "4"), "PART_Check", b => b.FocusVisible()), "Space shows or hides"),
-            new("name :focus-visible", Part(Row("XMP", "4"), "PART_Jump", b => b.FocusVisible()), "Enter or Space jumps"),
+            new("name :focus-visible", Part(Row("XMP", "4"), "PART_Check", b => b.FocusVisible()), "Space shows or hides"),
+            new("count :focus-visible", Part(Row("XMP", "4"), "PART_Jump", b => b.FocusVisible()), "Enter or Space jumps"),
             new("drop target", Drop()),
             new("drop target :pointerover", Drop().Hover(), "Accent border, TextPrimary"),
             new("drop target :pressed", Drop().Pressed()),

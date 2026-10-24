@@ -26,6 +26,7 @@ using Avalonia.Media;
 using ExifGlass.Core.Ai;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
+using System.Windows.Input;
 
 namespace ExifGlass.UI.Controls;
 
@@ -494,6 +495,70 @@ internal sealed class HoverCopy
         _button.IsHitTestVisible = true;
         _button.Opacity = 1;
     }
+
+    #endregion // Public methods
+}
+
+
+/// <summary>
+/// A panel that shows a copy button on hover for one value (owner after G7: the camera cards copy as the AI card's tiles do); its card routes the click to its copy command.
+/// </summary>
+public sealed class CopyHost : Panel
+{
+    #region Fields and constants
+
+    public static readonly StyledProperty<string?> CopyTextProperty =
+        AvaloniaProperty.Register<CopyHost, string?>(nameof(CopyText));
+
+    public static readonly StyledProperty<string?> CopyLabelProperty =
+        AvaloniaProperty.Register<CopyHost, string?>(nameof(CopyLabel));
+
+    #endregion // Fields and constants
+
+
+    #region Constructors
+
+    public CopyHost()
+    {
+        Background = Brushes.Transparent;
+        _ = new HoverCopy(this, UiText.COPY_VALUE, () => CopyText is { Length: > 0 } text ? new AiActionRequest(AiAction.CopyText, text, CopyLabel) : null);
+    }
+
+    #endregion // Constructors
+
+
+    #region Properties
+
+    public string? CopyText
+    {
+        get => GetValue(CopyTextProperty);
+        set => SetValue(CopyTextProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the value's name, for its toast: "Copied lens".
+    /// </summary>
+    public string? CopyLabel
+    {
+        get => GetValue(CopyLabelProperty);
+        set => SetValue(CopyLabelProperty, value);
+    }
+
+    #endregion // Properties
+
+
+    #region Public methods
+
+    /// <summary>
+    /// Runs a card's command for the copy buttons inside it.
+    /// </summary>
+    public static void Route(Control card, Func<ICommand?> command) => card.AddHandler(Button.ClickEvent, (_, e) =>
+    {
+        if (e.Source is not Button { Tag: AiActionRequest request } || command() is not { } run || !run.CanExecute(request)) return;
+
+        run.Execute(request);
+        e.Handled = true;
+    });
 
     #endregion // Public methods
 }

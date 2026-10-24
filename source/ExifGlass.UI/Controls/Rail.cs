@@ -422,6 +422,8 @@ public class RailGroupRow : TemplatedControl
 {
     #region Fields and constants
 
+    private const string ROW_HOVER = "row-hover";
+
     public static readonly StyledProperty<string?> GroupProperty =
         AvaloniaProperty.Register<RailGroupRow, string?>(nameof(Group));
 
@@ -539,6 +541,7 @@ public class RailGroupRow : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == IsShownProperty || change.Property == IsAiProperty) UpdatePseudoClasses();
+        else if (change.Property == IsPointerOverProperty) UpdateHover();
     }
 
 
@@ -553,12 +556,21 @@ public class RailGroupRow : TemplatedControl
         _jump = e.NameScope.Find<Button>("PART_Jump");
         if (_check is not null) _check.Click += Check_Click;
         if (_jump is not null) _jump.Click += Jump_Click;
+        UpdateHover();
     }
 
     #endregion // Protected methods
 
 
     #region Private methods
+
+    // either part hovered lights both; a press stays on its own part (owner after G7)
+    private void UpdateHover()
+    {
+        _check?.Classes.Set(ROW_HOVER, IsPointerOver);
+        _jump?.Classes.Set(ROW_HOVER, IsPointerOver);
+    }
+
 
     private void UpdatePseudoClasses()
     {

@@ -67,8 +67,9 @@ public class PanelTests
 
     [AvaloniaTheory]
     [InlineData(10, true, false)]
-    [InlineData(80, false, true)]
-    public void AGroupRowTogglesFromItsCheckboxAndJumpsFromTheRest(double x, bool toggles, bool jumps)
+    [InlineData(80, true, false)]
+    [InlineData(205, false, true)]
+    public void AGroupRowTogglesFromItsNameAndJumpsFromItsCount(double x, bool toggles, bool jumps)
     {
         var row = new RailGroupRow { Width = 220, Group = "EXIF", Text = "EXIF", Count = "57" };
         var window = Show(row);
@@ -87,20 +88,26 @@ public class PanelTests
 
 
     [AvaloniaFact]
-    public void EachPartOfAGroupRowHoversOnItsOwn()
+    public void HoveringEitherPartOfAGroupRowLightsBoth()
     {
         var row = new RailGroupRow { Width = 220, Group = "EXIF", Text = "EXIF", Count = "57" };
         var window = Show(row);
         var (check, jump) = (Part<Button>(row, "PART_Check"), Part<Button>(row, "PART_Jump"));
+        bool Held(Button b) => Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(b).OfType<InteractionOverlay>().Single().IsHeld;
 
-        window.MouseMove(row.TranslatePoint(new Point(10, 16), window)!.Value);
+        Assert.False(Held(check) || Held(jump));
+        window.MouseMove(row.TranslatePoint(new Point(80, 16), window)!.Value);
         Assert.True(check.IsPointerOver);
-        Assert.False(jump.IsPointerOver);
+        Assert.True(Held(check) && Held(jump));
 
-        window.MouseMove(row.TranslatePoint(new Point(120, 16), window)!.Value);
-        Assert.False(check.IsPointerOver);
+        window.MouseMove(row.TranslatePoint(new Point(205, 16), window)!.Value);
         Assert.True(jump.IsPointerOver);
-        Assert.Equal(34, jump.TranslatePoint(default, row)!.Value.X, 1);
+        Assert.True(Held(check) && Held(jump));
+
+        // the count's part sits at the row's end, 2 after the name's
+        var jumpX = jump.TranslatePoint(default, row)!.Value.X;
+        Assert.Equal(220, jumpX + jump.Bounds.Width, 1);
+        Assert.Equal(jumpX - 2, check.TranslatePoint(default, row)!.Value.X + check.Bounds.Width, 1);
 
         // the box sits 10 in, under the overline, and 12 from the dot (owner at G7: was 20)
         var box = Part<Control>(row, "PART_BoxFill").TranslatePoint(default, row)!.Value.X;
@@ -119,18 +126,47 @@ public class PanelTests
         row.ToggleRequested += (_, _) => toggled++;
         row.JumpRequested += (_, _) => jumped++;
 
-        // pressed on the checkbox, released over the name: neither, as a button dragged off
-        window.MouseDown(row.TranslatePoint(new Point(10, 16), window)!.Value, MouseButton.Left);
-        window.MouseUp(row.TranslatePoint(new Point(120, 16), window)!.Value, MouseButton.Left);
+        // pressed on the name, released over the count: neither, as a button dragged off
+        window.MouseDown(row.TranslatePoint(new Point(80, 16), window)!.Value, MouseButton.Left);
+        window.MouseUp(row.TranslatePoint(new Point(205, 16), window)!.Value, MouseButton.Left);
         Assert.Equal((0, 0), (toggled, jumped));
 
-        // two tab stops: Space on the checkbox, Enter on the name
+        // two tab stops: Space on the name's part, Enter on the count
         Part<Button>(row, "PART_Check").Focus();
         window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
         window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
         Part<Button>(row, "PART_Jump").Focus();
         window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
         Assert.Equal((1, 1), (toggled, jumped));
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void TheCameraCardsCopyEachValueOnHover()
+    {
+        var requests = new List<AiActionRequest>();
+        var copy = new CommunityToolkit.Mvvm.Input.RelayCommand<AiActionRequest>(r => requests.Add(r!));
+        var exposure = new ExposureCard { Items = [new("Aperture", 1.5, 1, "f/", "", ""), new("Shutter", 5882, 0, "1/", "", "Program AE")], CopyCommand = copy };
+        var details = new DetailsCard { Items = [new("Lens", "iPhone 13 Pro back triple camera 5.7mm f/1.5")], CopyCommand = copy };
+        var cards = new StackPanel { Children = { exposure, details } };
+        var window = Show(cards);
+
+        // the button comes with the first hover and copies the value as shown, named for its toast
+        foreach (var label in new[] { "Shutter", "Lens" })
+        {
+            var host = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(cards).OfType<CopyHost>().Single(h => h.CopyLabel == label);
+            window.MouseMove(host.TranslatePoint(new Point(40, 20), window)!.Value);
+            var button = host.Children.OfType<GlassButton>().Single();
+            Dispatcher.UIThread.RunJobs();
+            var at = button.TranslatePoint(new Point(11, 11), window)!.Value;
+            window.MouseDown(at, MouseButton.Left);
+            window.MouseUp(at, MouseButton.Left);
+        }
+
+        Assert.Equal([("1/5882", "Shutter"), ("iPhone 13 Pro back triple camera 5.7mm f/1.5", "Lens")], requests.Select(r => (r.Text, r.Label)));
+        Assert.Equal("Copied ISO", AppText.CopiedField("ISO"));
+        Assert.Equal("Copied lens", AppText.CopiedField("Lens"));
         window.Close();
     }
 

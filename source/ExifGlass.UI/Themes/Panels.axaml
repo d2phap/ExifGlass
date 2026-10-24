@@ -95,13 +95,13 @@
     </Style>
   </ControlTheme>
 
-  <!--  the group row's two parts (owner after G7, replacing the P6 review's checkbox and name parts): the checkbox, dot and name show or hide the group; the count jumps to it; hover Emphasis 5%, radius 14  -->
+  <!--  the group row's two parts (owner after G7, replacing the P6 review's checkbox and name parts): the checkbox, dot and name show or hide the group; the count jumps to it; hover Emphasis 5%, radius 14 on the row's outer corners only, square where they meet (owner after G7)  -->
   <ControlTheme x:Key="RailCheckButton" TargetType="Button">
     <Setter Property="Height" Value="{StaticResource ControlHeight}" />
     <Setter Property="Padding" Value="6,0,8,0" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="CornerRadius" Value="14,0,0,14" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
@@ -146,7 +146,7 @@
     <Setter Property="Height" Value="{StaticResource ControlHeight}" />
     <Setter Property="MinWidth" Value="36" />
     <Setter Property="Padding" Value="8,0" />
-    <Setter Property="CornerRadius" Value="{StaticResource RadiusControl32}" />
+    <Setter Property="CornerRadius" Value="0,14,14,0" />
     <Setter Property="HorizontalContentAlignment" Value="Right" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="ClipToBounds" Value="False" />

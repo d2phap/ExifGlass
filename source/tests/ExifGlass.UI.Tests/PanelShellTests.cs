@@ -102,9 +102,15 @@ public class PanelShellTests
         var exif = vm.Rows.Groups.Single(g => g.Name == "EXIF");
         Assert.Equal($"{exif.Visible}/{exif.Total}", vm.RailGroups.Single(g => g.Name == "EXIF").Count);
 
+        // with a chip on, a chip that would empty the view is off (owner after G7); the test file has no dates or GPS
+        var gps = vm.QuickFilters.Single(f => f.Filter == QuickFilter.Gps);
+        Assert.Equal("0", gps.Count);
+        Assert.False(gps.IsAvailable);
+
         vm.ToggleQuickFilterCommand.Execute(ids);
         await shell.WaitForAsync(() => !ids.IsOn);
         Assert.Equal(exif.Total.ToString(), vm.RailGroups.Single(g => g.Name == "EXIF").Count);
+        Assert.True(gps.IsAvailable);
     }
 
 

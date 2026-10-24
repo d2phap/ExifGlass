@@ -276,10 +276,11 @@ public sealed partial class MainViewModel
         var hasAi = Rows.AiTotal > 0;
         foreach (var chip in AiQuickFilters.Concat(QuickFilters))
         {
-            var count = Rows.FilterCounts.GetValueOrDefault(chip.Filter);
+            // with a chip on, the others count within it, and one that would empty the view is off (owner after G7)
+            var count = Rows.ChipCounts.GetValueOrDefault(chip.Filter);
             chip.IsOn = filters.Contains(chip.Filter);
             chip.Count = Document is null ? null : count.ToString(CultureInfo.InvariantCulture);
-            chip.IsAvailable = Document is not null && (!chip.IsOnlyForAi || count > 0 || chip.IsOn);
+            chip.IsAvailable = Document is not null && (chip.IsOn || count > 0 || (filters.Count == 0 && !chip.IsOnlyForAi));
         }
 
         var aiChips = hasAi ? AiQuickFilters.Count : 1;

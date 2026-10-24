@@ -97,6 +97,14 @@ public class QueryEngineTests
 
         var both = QueryEngine.Run(doc, ViewQuery.Default with { Filters = new HashSet<QuickFilter> { QuickFilter.Gps, QuickFilter.Converted } }, TestContext.Current.CancellationToken);
         Assert.Equal(["GPSAltitude", "GPSPosition"], both.RowsInView.Select(x => x.TagName));
+
+        // with chips on, each chip counts within them; the document's counts stay for the Edit menu
+        Assert.Equal(r.FilterCounts, r.ChipCounts);
+        var gps = QueryEngine.Run(doc, ViewQuery.Default with { Filters = new HashSet<QuickFilter> { QuickFilter.Gps } }, TestContext.Current.CancellationToken);
+        Assert.Equal(2, gps.ChipCounts[QuickFilter.Gps]);
+        Assert.Equal(2, gps.ChipCounts[QuickFilter.Converted]);
+        Assert.Equal(0, gps.ChipCounts[QuickFilter.DateTime]);
+        Assert.Equal(10, gps.FilterCounts[QuickFilter.Converted]);
     }
 
 

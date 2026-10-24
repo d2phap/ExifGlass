@@ -120,6 +120,7 @@ public static class QueryEngine
             GroupCount = groupOrder.Count,
             IsFiltering = filtering,
             FilterCounts = filterCounts,
+            ChipCounts = query.Filters.Count == 0 ? filterCounts : ChipCounts(rows, query.Filters),
         };
     }
 
@@ -250,6 +251,25 @@ public static class QueryEngine
         }
 
         return rows;
+    }
+
+
+    // each chip's count among the rows the chips already on let through (AND)
+    private static Dictionary<QuickFilter, int> ChipCounts(List<ViewRow> rows, IReadOnlySet<QuickFilter> active)
+    {
+        var filters = Enum.GetValues<QuickFilter>();
+        var counts = filters.ToDictionary(f => f, _ => 0);
+        foreach (var row in rows)
+        {
+            if (!Matches(row, active)) continue;
+
+            foreach (var f in filters)
+            {
+                if (Passes(row, f)) counts[f]++;
+            }
+        }
+
+        return counts;
     }
 
 

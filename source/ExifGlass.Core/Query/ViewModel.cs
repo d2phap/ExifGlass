@@ -262,6 +262,11 @@ public sealed class ViewResult
     public IReadOnlyDictionary<QuickFilter, int> FilterCounts { get; init; } = new Dictionary<QuickFilter, int>();
 
     /// <summary>
+    /// Each chip's count within the chips already on, which combine with AND: a chip at 0 would empty the view, so the rail disables it (owner after G7).
+    /// </summary>
+    public IReadOnlyDictionary<QuickFilter, int> ChipCounts { get; init; } = new Dictionary<QuickFilter, int>();
+
+    /// <summary>
     /// "128 tags" or "42 of 128 tags".
     /// </summary>
     public string Summary => IsFiltering ? $"{TagsInView} of {Total} tags" : Total == 1 ? "1 tag" : $"{Total} tags";

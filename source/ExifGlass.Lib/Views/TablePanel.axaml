@@ -195,8 +195,8 @@
               </ui:GlassDropDownButton.Flyout>
             </ui:GlassDropDownButton>
 
+            <!--  styled as Columns, not the accent primary (owner after G7)  -->
             <ui:GlassDropDownButton Name="ExportButton"
-                                    Classes="primary"
                                     AutomationProperties.Name="{x:Static app:AppText.EXPORT}"
                                     Content="{Binding ExportContent}"
                                     Icon="{x:Static ui:IconId.ArrowDownload}"

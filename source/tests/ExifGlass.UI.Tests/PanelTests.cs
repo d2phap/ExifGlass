@@ -100,7 +100,12 @@ public class PanelTests
         window.MouseMove(row.TranslatePoint(new Point(120, 16), window)!.Value);
         Assert.False(check.IsPointerOver);
         Assert.True(jump.IsPointerOver);
-        Assert.Equal(38, jump.TranslatePoint(default, row)!.Value.X, 1);
+        Assert.Equal(34, jump.TranslatePoint(default, row)!.Value.X, 1);
+
+        // the box sits 10 in, under the overline, and 12 from the dot (owner at G7: was 20)
+        var box = Part<Control>(row, "PART_BoxFill").TranslatePoint(default, row)!.Value.X;
+        Assert.Equal(10, box, 1);
+        Assert.Equal(box + 16 + 12, Part<Control>(row, "PART_Dot").TranslatePoint(default, row)!.Value.X, 1);
         window.Close();
     }
 

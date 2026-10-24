@@ -468,17 +468,14 @@ internal sealed class HoverCopy
 
         if (_button is null)
         {
+            // the selected tag card's copy size, so every copy in the inspector matches (owner after G7)
             _button = new GlassButton
             {
                 Icon = IconId.Copy,
-                IconSize = 12,
-                Width = 22,
-                Height = 22,
-                MinWidth = 22,
-                Margin = _centred ? new Thickness(0, 0, 6, 0) : new Thickness(0, 4, 4, 0),
+                Margin = _centred ? new Thickness(0, 0, 4, 0) : new Thickness(0, 4, 4, 0),
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = _centred ? VerticalAlignment.Center : VerticalAlignment.Top,
-                Classes = { "ghost", "tiny" },
+                Classes = { "ghost", "small" },
                 Focusable = false,
                 Opacity = 0,
                 Transitions = [new DoubleTransition { Property = Visual.OpacityProperty, Duration = MotionTokens.Hover, Easing = MotionTokens.HoverEasing }],

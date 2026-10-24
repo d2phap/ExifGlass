@@ -177,6 +177,7 @@ public class PanelTests
             window.MouseMove(host.TranslatePoint(new Point(40, 20), window)!.Value);
             var button = host.Children.OfType<GlassButton>().Single();
             Dispatcher.UIThread.RunJobs();
+            Assert.Equal((28, 28), (button.Bounds.Width, button.Bounds.Height));
             var at = button.TranslatePoint(new Point(11, 11), window)!.Value;
             window.MouseDown(at, MouseButton.Left);
             window.MouseUp(at, MouseButton.Left);

@@ -29,20 +29,26 @@ using ExifGlass.UI.Tokens;
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
+/// What a chip of a TokenField says about itself: its hover description, why it's refused, whether the app owns it.
+/// </summary>
+public readonly record struct TokenNote(string? Description, string? Error = null, bool IsLocked = false);
+
+
+/// <summary>
 /// The argument token field (DS 6.15, D1): a chip per argument, Enter or Space adds, Backspace removes the last, hover shows the description, locked chips for app-owned flags, dashed suggestions.
 /// </summary>
 public class TokenField : TemplatedControl
 {
     #region Fields and constants
 
-    public static readonly StyledProperty<IList<string>?> LockedTokensProperty =
-        AvaloniaProperty.Register<TokenField, IList<string>?>(nameof(LockedTokens));
-
     public static readonly StyledProperty<IList<string>?> SuggestionsProperty =
         AvaloniaProperty.Register<TokenField, IList<string>?>(nameof(Suggestions));
 
     public static readonly StyledProperty<string?> PlaceholderProperty =
         AvaloniaProperty.Register<TokenField, string?>(nameof(Placeholder), UiText.ADD_ARGUMENT);
+
+    public static readonly StyledProperty<object?> NoteProperty =
+        AvaloniaProperty.Register<TokenField, object?>(nameof(Note));
 
     private static readonly TransformOperations POP_FROM = TransformOperations.Parse("scale(0.6)");
     private static readonly TransformOperations POP_TO = TransformOperations.Parse("scale(1)");
@@ -51,6 +57,7 @@ public class TokenField : TemplatedControl
     private WrapPanel? _suggestionPanel;
     private TextBox? _input;
     private bool _rebuilding;
+    private TokenNote[] _notes = [];
 
     #endregion // Fields and constants
 
@@ -61,15 +68,6 @@ public class TokenField : TemplatedControl
     /// Gets the arguments in order; edit it to change the chips.
     /// </summary>
     public AvaloniaList<string> Tokens { get; } = [];
-
-    /// <summary>
-    /// Arguments the app owns: shown with a lock and never removed (D1).
-    /// </summary>
-    public IList<string>? LockedTokens
-    {
-        get => GetValue(LockedTokensProperty);
-        set => SetValue(LockedTokensProperty, value);
-    }
 
     public IList<string>? Suggestions
     {
@@ -84,14 +82,23 @@ public class TokenField : TemplatedControl
     }
 
     /// <summary>
-    /// Gets or sets the hover description of an argument.
+    /// What shows between the field and its suggestions: Settings' hint or a refused argument (Proto).
     /// </summary>
-    public Func<string, string?>? DescriptionProvider { get; set; }
+    public object? Note
+    {
+        get => GetValue(NoteProperty);
+        set => SetValue(NoteProperty, value);
+    }
 
     /// <summary>
-    /// Gets or sets why an argument is refused; null accepts it.
+    /// Gets or sets what each chip says, from all the tokens and its index, so a value can belong to the flag before it (D1).
     /// </summary>
-    public Func<string, string?>? Validator { get; set; }
+    public Func<IReadOnlyList<string>, int, TokenNote>? NoteProvider { get; set; }
+
+    /// <summary>
+    /// Gets or sets a suggestion's short label after its text, such as "raw values" (Proto).
+    /// </summary>
+    public Func<string, string?>? SuggestionHint { get; set; }
 
     #endregion // Properties
 
@@ -131,15 +138,29 @@ public class TokenField : TemplatedControl
     /// </summary>
     public bool RemoveLast()
     {
+        var notes = Notes();
         for (var i = Tokens.Count - 1; i >= 0; i--)
         {
-            if (IsLocked(Tokens[i])) continue;
+            if (notes[i].IsLocked) continue;
 
             Tokens.RemoveAt(i);
             return true;
         }
 
         return false;
+    }
+
+
+    /// <summary>
+    /// Replaces every argument at once, without the chips' spring.
+    /// </summary>
+    public void SetTokens(IEnumerable<string> tokens)
+    {
+        _rebuilding = true;
+        Tokens.Clear();
+        Tokens.AddRange(tokens);
+        _rebuilding = false;
+        Rebuild(popLast: false);
     }
 
     #endregion // Public methods
@@ -166,7 +187,7 @@ public class TokenField : TemplatedControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == LockedTokensProperty || change.Property == SuggestionsProperty) Rebuild(popLast: false);
+        if (change.Property == SuggestionsProperty) Rebuild(popLast: false);
     }
 
 
@@ -181,11 +202,19 @@ public class TokenField : TemplatedControl
 
     #region Private methods
 
-    private bool IsLocked(string token) => LockedTokens?.Contains(token) == true;
+    private TokenNote[] Notes()
+    {
+        var notes = new TokenNote[Tokens.Count];
+        if (NoteProvider is not { } provider) return notes;
+
+        for (var i = 0; i < notes.Length; i++) notes[i] = provider(Tokens, i);
+        return notes;
+    }
 
 
     private void Rebuild(bool popLast)
     {
+        _notes = Notes();
         if (_panel is null || _input is null) return;
 
         // the input stays put, so it keeps the keyboard focus while chips come and go
@@ -199,17 +228,18 @@ public class TokenField : TemplatedControl
         for (var i = 0; i < Tokens.Count; i++)
         {
             var token = Tokens[i];
+            var note = _notes[i];
             var chip = new TokenChip
             {
                 Text = token,
-                IsLocked = IsLocked(token),
-                Error = Validator?.Invoke(token),
+                IsLocked = note.IsLocked,
+                Error = note.Error,
                 Index = i,
             };
             chip.Classes.Set("value", !token.StartsWith('-'));
 
-            var tip = chip.IsLocked ? UiText.LOCKED_ARGUMENT : chip.Error ?? DescriptionProvider?.Invoke(token);
-            if (tip is not null) ToolTip.SetTip(chip, tip);
+            var tip = chip.IsLocked ? UiText.LOCKED_ARGUMENT : note.Error ?? note.Description;
+            if (!string.IsNullOrEmpty(tip)) ToolTip.SetTip(chip, tip);
 
             chip.RemoveRequested += Chip_RemoveRequested;
             if (popLast && i == Tokens.Count - 1) Pop(chip);
@@ -225,9 +255,9 @@ public class TokenField : TemplatedControl
         {
             if (Tokens.Contains(suggestion)) continue;
 
-            var chip = new TokenChip { Text = suggestion, IsSuggestion = true };
+            var chip = new TokenChip { Text = suggestion, Hint = SuggestionHint?.Invoke(suggestion), IsSuggestion = true };
             chip.Classes.Add("suggestion");
-            if (DescriptionProvider?.Invoke(suggestion) is { } tip) ToolTip.SetTip(chip, tip);
+            if (NoteProvider?.Invoke([suggestion], 0).Description is { Length: > 0 } tip) ToolTip.SetTip(chip, tip);
             chip.Click += Suggestion_Click;
             _suggestionPanel.Children.Add(chip);
         }
@@ -318,6 +348,9 @@ public class TokenChip : Button
     public static readonly StyledProperty<bool> IsSuggestionProperty =
         AvaloniaProperty.Register<TokenChip, bool>(nameof(IsSuggestion));
 
+    public static readonly StyledProperty<string?> HintProperty =
+        AvaloniaProperty.Register<TokenChip, string?>(nameof(Hint));
+
     private Button? _remove;
 
     #endregion // Fields and constants
@@ -350,6 +383,15 @@ public class TokenChip : Button
     {
         get => GetValue(IsSuggestionProperty);
         set => SetValue(IsSuggestionProperty, value);
+    }
+
+    /// <summary>
+    /// A suggestion's short label in TextSecondary after its text (Proto: "-n raw values").
+    /// </summary>
+    public string? Hint
+    {
+        get => GetValue(HintProperty);
+        set => SetValue(HintProperty, value);
     }
 
     public int Index { get; init; } = -1;

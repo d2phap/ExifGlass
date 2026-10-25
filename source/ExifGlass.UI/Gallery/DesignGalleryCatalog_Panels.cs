@@ -168,7 +168,7 @@ public static partial class DesignGalleryCatalog
 
     #region Helpers
 
-    private static Bitmap PreviewSample() => _previewSample ??= new Bitmap(AssetLoader.Open(new Uri(string.Format(System.Globalization.CultureInfo.InvariantCulture, LOGO, 312))));
+    private static Bitmap PreviewSample() => _previewSample ??= new Bitmap(AssetLoader.Open(new Uri(string.Format(System.Globalization.CultureInfo.InvariantCulture, LOGO, 384))));
 
     #endregion // Helpers
 }

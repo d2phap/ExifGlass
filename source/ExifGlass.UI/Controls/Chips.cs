@@ -167,6 +167,11 @@ public enum BadgeKind
     New,
     Ai,
     Neutral,
+
+    /// <summary>
+    /// A credit's licence in About: mono 11 on Emphasis 7% (FewerPhotos).
+    /// </summary>
+    Licence,
 }
 
 
@@ -245,6 +250,7 @@ public class Badge : TemplatedControl
         PseudoClasses.Set(":new", kind == BadgeKind.New);
         PseudoClasses.Set(":ai", kind == BadgeKind.Ai);
         PseudoClasses.Set(":neutral", kind == BadgeKind.Neutral);
+        PseudoClasses.Set(":licence", kind == BadgeKind.Licence);
         PseudoClasses.Set(":icon", Icon is not null);
     }
 

@@ -154,7 +154,7 @@ public class ControlTests
     [AvaloniaFact]
     public void TokenFieldAddsAndRemovesWithTheKeyboard()
     {
-        var field = new TokenField { Width = 400, LockedTokens = ["-G"] };
+        var field = new TokenField { Width = 400, NoteProvider = (tokens, i) => new TokenNote(null, IsLocked: tokens[i] == "-G" && !tokens.Take(i).Contains("-G")) };
         field.Tokens.Add("-G");
         var window = Show(field);
 

@@ -258,6 +258,31 @@
     </Style>
   </ControlTheme>
 
+  <!--  DS 6.15 command preview: a mono 11.5 well, padding 12 / 14, radius 12, Emphasis 8% hairline; the terminal tile's fill (Light Emphasis, Dark #212529)  -->
+  <ControlTheme x:Key="{x:Type ui:CommandPreview}" TargetType="ui:CommandPreview">
+    <Setter Property="Padding" Value="14,12" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusWell}" />
+    <Setter Property="Background" Value="{DynamicResource BgTerminalTileBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA08Brush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ui:SquircleBorder Padding="{TemplateBinding Padding}"
+                           Background="{TemplateBinding Background}"
+                           BorderBrush="{TemplateBinding BorderBrush}"
+                           BorderThickness="{TemplateBinding BorderThickness}"
+                           CornerRadius="{TemplateBinding CornerRadius}">
+          <TextBlock Name="PART_Text"
+                     FontFamily="{DynamicResource FontMono}"
+                     FontSize="{StaticResource FontSizeMono}"
+                     FontFeatures="+tnum"
+                     TextWrapping="Wrap" />
+        </ui:SquircleBorder>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+
   <!--  DS 6.12 command bar: 40 collapsed (padding 4 with the border), Bg.Panel, radius 18; tile 28; the Write chip; mono 11.5 on 20 px lines; Copy beside Expand, stacked above it when expanded  -->
   <ControlTheme x:Key="{x:Type ui:CommandPanel}" TargetType="ui:CommandPanel">
     <Setter Property="Template">

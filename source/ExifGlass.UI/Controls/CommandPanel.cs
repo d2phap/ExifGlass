@@ -36,7 +36,7 @@ public class CommandPanel : TemplatedControl
 {
     #region Fields and constants
 
-    private const string PLACEHOLDER = "<file>";
+    internal const string PLACEHOLDER = "<file>";
 
     // DS 6.12: one 20 px line collapsed, at most 140 expanded
     private const double LINE = 20;
@@ -364,7 +364,7 @@ public class CommandPanel : TemplatedControl
     }
 
 
-    private static string KeyOf(CommandToken token) => token.Kind switch
+    internal static string KeyOf(CommandToken token) => token.Kind switch
     {
         CommandTokenKind.Executable => TokenKeys.TEXT_SECONDARY_BRUSH,
         CommandTokenKind.Flag or CommandTokenKind.Write => TokenKeys.ACCENT_TEXT_BRUSH,

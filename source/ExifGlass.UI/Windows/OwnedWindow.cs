@@ -35,6 +35,10 @@ public class OwnedWindow : Window
 
     private const double OPEN_SCALE = 0.94;
 
+    // the title bar and borders around the client area, before the window knows its own (S4)
+    private const double FRAME_ALLOWANCE = 40;
+    private const double WORK_AREA_GAP = 10;
+
     private readonly ScaleTransform _scale = new(1, 1);
     private Choreo? _motion;
     private bool _closingAnimated;
@@ -74,12 +78,26 @@ public class OwnedWindow : Window
     #region Public methods
 
     /// <summary>
-    /// Restores the saved placement under a key (Settings, About) before showing, centred on the owner the first time.
+    /// Restores the saved placement under a key (Settings, About) before showing; the first time, centred on the owner, and as tall as the content allows when <paramref name="fitHeight"/> (DS 6.15).
     /// </summary>
-    public string UsePlacement(string key, Size firstSize, IWindowPlacementStore store, Window owner)
+    public string UsePlacement(string key, Size firstSize, IWindowPlacementStore store, Window owner, bool fitHeight = false)
     {
         MinWidth = firstSize.Width;
-        return WindowPlacement.Attach(this, key, firstSize, store, owner);
+        var first = store.Get(key) is null;
+        var decision = WindowPlacement.Attach(this, key, firstSize, store, owner);
+        if (first && fitHeight) FitContentHeight(owner);
+
+        return decision;
+    }
+
+
+    /// <summary>
+    /// Shows the window owned by <paramref name="owner"/> and above it, also when another tool keeps the owner on top: a plain owned window would open under it.
+    /// </summary>
+    public void ShowAbove(Window owner)
+    {
+        Topmost = owner.Topmost || (owner.TryGetPlatformHandle()?.Handle is { } handle && PlatformServices.Shell?.IsTopmost(handle) == true);
+        Show(owner);
     }
 
     #endregion // Public methods
@@ -131,4 +149,26 @@ public class OwnedWindow : Window
     }
 
     #endregion // Protected methods
+
+
+    #region Private methods
+
+    // DS 6.15: no taller than the work area less 10; once open it keeps that height, so the saved size is what the user saw
+    private void FitContentHeight(Window owner)
+    {
+        if (owner.Screens.ScreenFromWindow(owner) is { } screen)
+        {
+            MaxHeight = Math.Max(MinHeight, screen.WorkingArea.Height / screen.Scaling - FRAME_ALLOWANCE - WORK_AREA_GAP);
+        }
+
+        ClearValue(HeightProperty);
+        SizeToContent = SizeToContent.Height;
+        Opened += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            SizeToContent = SizeToContent.Manual;
+            ClearValue(MaxHeightProperty);
+        }, Avalonia.Threading.DispatcherPriority.Background);
+    }
+
+    #endregion // Private methods
 }

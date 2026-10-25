@@ -548,6 +548,14 @@
       <Setter Property="CornerRadius" Value="{StaticResource RadiusControl22}" />
       <Setter Property="FontSize" Value="{StaticResource FontSizeMeta}" />
     </Style>
+    <!--  About's credits (FewerPhotos): the licence in mono 11 on Emphasis 7%  -->
+    <Style Selector="^:licence">
+      <Setter Property="Padding" Value="8,0" />
+      <Setter Property="FontFamily" Value="{DynamicResource FontMono}" />
+      <Setter Property="FontSize" Value="{StaticResource FontSizeMonoSmall}" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Background" Value="{DynamicResource EmphasisA07Brush}" />
+    </Style>
     <!--  a kind chip (AI addendum): the icon sits closer to the edge  -->
     <Style Selector="^:ai:icon, ^:neutral:icon">
       <Setter Property="Padding" Value="6,0,8,0" />

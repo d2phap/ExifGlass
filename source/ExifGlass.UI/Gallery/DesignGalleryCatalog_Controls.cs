@@ -168,25 +168,38 @@ public static partial class DesignGalleryCatalog
 
     private static GallerySection TokenFields()
     {
-        var field = new TokenField { Width = 460, LockedTokens = ["-G", "-t", "-H"], Suggestions = ["-n", "-a", "-u", "-ee", "-s"] };
-        foreach (var t in new[] { "-fast", "-G", "-t", "-m", "-q", "-H", "-charset", "UTF8" }) field.Tokens.Add(t);
-        field.DescriptionProvider = t => t switch
+        static TokenNote Note(IReadOnlyList<string> tokens, int i) => tokens[i] switch
         {
-            "-fast" => "Skip the trailer and maker notes scan",
-            "-m" => "Ignore minor errors",
-            "-q" => "Quiet",
-            "-charset" => "Character set of the output",
-            _ => null,
+            "-G" or "-t" or "-H" => new(null, IsLocked: true),
+            "-fast" => new("Skip scanning for trailers, for faster reads"),
+            "-m" => new("Ignore minor errors and warnings"),
+            "-q" => new("Quiet: suppress informational messages"),
+            "-charset" => new("Character set for output"),
+            "-o" => new(null, "Writes or changes files"),
+            _ when i > 0 && tokens[i - 1] == "-o" => new(null, "Writes or changes files"),
+            _ when i > 0 && tokens[i - 1] == "-charset" => new("Value for -charset"),
+            _ => default,
         };
 
-        var invalid = new TokenField { Width = 460, LockedTokens = ["-G"] };
-        foreach (var t in new[] { "-G", "-fast", "-o", "out.txt" }) invalid.Tokens.Add(t);
-        invalid.Validator = t => t == "-o" ? "Refused: -o writes files (D1)" : null;
+        string?[] hints = ["raw values", "duplicates", "unknown tags", "embedded", "short names"];
+        string[] suggestions = ["-n", "-a", "-u", "-ee", "-s"];
+        var field = new TokenField { Width = 460, Suggestions = suggestions, NoteProvider = Note, SuggestionHint = t => hints[Array.IndexOf(suggestions, t)] };
+        field.SetTokens(["-fast", "-G", "-t", "-m", "-q", "-H", "-charset", "UTF8"]);
 
-        return new GallerySection("c-token-field", "Argument token field", "DS 6.15, D1: chips 26 high, radius 12, mono 11.5; flags Accent 10% in AccentText, values Accent2 10%; Enter or Space adds, Backspace removes the last; locked chips for app-owned flags; dashed suggestions.",
+        var invalid = new TokenField { Width = 460, NoteProvider = Note };
+        invalid.SetTokens(["-G", "-fast", "-o", "out.txt"]);
+
+        var preview = new CommandPreview
+        {
+            Width = 460,
+            Tokens = Core.Editing.WritePlan.ReadTokens(@"C:\Program Files\ExifGlass\exiftool.exe", @"C:\Program Files\ExifGlass\exifglass.config", ["-fast", "-G", "-t", "-m", "-q", "-H", "-charset", "UTF8"], null),
+        };
+
+        return new GallerySection("c-token-field", "Argument token field", "DS 6.15, D1: chips 26 high, radius 12, mono 11.5; flags Accent 10% in AccentText, values Accent2 10%; Enter or Space adds, Backspace removes the last; locked chips for app-owned flags; dashed suggestions with a + and their short label (Proto).",
         [
             new("rest", field),
-            new("refused", invalid, "a refused argument turns red; the tooltip says why"),
+            new("refused", invalid, "a refused argument and its value turn red; the tooltip says why"),
+            new("command preview", preview, "Settings' mono well: the command bar's colours, wrapping at path separators"),
         ]);
     }
 
@@ -327,6 +340,7 @@ public static partial class DesignGalleryCatalog
                 new Badge { Text = "Composite", Kind = BadgeKind.Ai, Icon = IconId.AiComposite },
                 new Badge { Text = "Unknown AI", Kind = BadgeKind.Neutral, Icon = IconId.AiQuestion },
                 new Badge { Text = "Not verified", Kind = BadgeKind.Neutral, Icon = IconId.AiShieldQuestion },
+                new Badge { Text = "MIT", Kind = BadgeKind.Licence },
                 new Kbd { Text = UiText.Shortcut("K") },
             },
         };

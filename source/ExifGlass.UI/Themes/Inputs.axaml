@@ -289,6 +289,10 @@
               <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" PlaceholderText="{TemplateBinding Placeholder}" />
             </WrapPanel>
           </Panel>
+          <ContentPresenter Name="PART_Note"
+                            Content="{TemplateBinding Note}"
+                            Cursor="Arrow"
+                            IsVisible="{TemplateBinding Note, Converter={x:Static ObjectConverters.IsNotNull}}" />
           <WrapPanel Name="PART_Suggestions" ItemSpacing="6" LineSpacing="6" Orientation="Horizontal" />
         </StackPanel>
       </ControlTemplate>
@@ -351,7 +355,15 @@
                                  RestBrush="{DynamicResource StateRestBrush}" />
           <StackPanel Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
             <ui:GlassIcon Name="PART_Lock" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.LockClosed}" IsVisible="False" />
+            <ui:GlassIcon Name="PART_Add" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.Add}" IsVisible="False" />
             <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Text}" />
+            <TextBlock Name="PART_Hint"
+                       VerticalAlignment="Center"
+                       FontFamily="{DynamicResource FontUi}"
+                       FontSize="{StaticResource FontSizeCaption}"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       IsVisible="{TemplateBinding Hint, Converter={x:Static ObjectConverters.IsNotNull}}"
+                       Text="{TemplateBinding Hint}" />
             <!--  Proto: 20 square, radius 9, 3 from the chip's end; MinWidth 0 or the Button theme's 32 widens it  -->
             <Button Name="PART_Remove"
                     Width="20"
@@ -403,9 +415,11 @@
       <Setter Property="Background" Value="{DynamicResource DangerA12Brush}" />
       <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
     </Style>
+    <!--  Proto: + 12, the flag, then its short label; 7 in from the dashed edge, 10 at the end  -->
     <Style Selector="^.suggestion">
+      <Setter Property="Padding" Value="7,0,10,0" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource EmphasisA24Brush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
@@ -414,6 +428,9 @@
     </Style>
     <Style Selector="^.suggestion /template/ Button#PART_Remove">
       <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.suggestion /template/ ui|GlassIcon#PART_Add">
+      <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>
 

@@ -234,4 +234,8 @@ public static partial class MotionTokens
     // Empty-card logo: 4 px up and back, looped: 4000 ms, EaseInOut
     public static readonly TimeSpan LogoFloat = TimeSpan.FromMilliseconds(4000);
     public static readonly Easing LogoFloatEasing = EaseInOutEasing;
+
+    // About's logo: scale 0.6 and -10 degrees to rest, after 60 ms (Proto): 900 ms, Spring
+    public static readonly TimeSpan LogoSpringIn = TimeSpan.FromMilliseconds(900);
+    public static readonly Easing LogoSpringInEasing = SpringEasing;
 }

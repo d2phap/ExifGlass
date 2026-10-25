@@ -307,6 +307,7 @@ static class Generator
         ("Dialog", 260, "Emphasized", "In-window dialog in"),
         ("DragRing", 1400, "EaseOut", "Drag-over logo ring: scale 0.94 to 1.5 while it fades, looped"),
         ("LogoFloat", 4000, "EaseInOut", "Empty-card logo: 4 px up and back, looped"),
+        ("LogoSpringIn", 900, "Spring", "About's logo: scale 0.6 and -10 degrees to rest, after 60 ms (Proto)"),
     ];
 
     static readonly (string Name, string Value, string Css)[] Easings =

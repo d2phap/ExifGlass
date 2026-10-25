@@ -1,0 +1,7 @@
+ExifTool Copyright 2003-2026, Phil Harvey
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl itself (either the Perl Artistic License or GPL).
+
+ExifTool home page: https://exiftool.org
+
+On Windows, ExifTool runs on the Strawberry Perl it comes with; the licences of Perl and its libraries ship beside it, in exiftool_files. On macOS it runs on the system Perl; on Linux, as one self-contained program.

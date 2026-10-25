@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!--  About's third-party notices (__assets/notices/gen-notices.py)  -->
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" />
     <PackageReference Include="Avalonia.Skia" />
     <PackageReference Include="Avalonia.Themes.Simple" />

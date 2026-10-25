@@ -110,7 +110,10 @@ public static partial class ArgumentPolicy
     /// The dashed suggestions under the Settings argument field (DS 6.15) with their short labels (Proto).
     /// </summary>
     public static readonly IReadOnlyList<(string Flag, string Label)> SUGGESTIONS =
-        [("-n", "raw values"), ("-a", "duplicates"), ("-u", "unknown tags"), ("-ee", "embedded"), ("-s", "short names")];
+    [
+        ("-n", "raw values"), ("-a", "duplicates"), ("-u", "unknown tags"), ("-U", "unknown binary"), ("-ee", "embedded"), ("-ee3", "all embedded"),
+        ("-s", "short names"), ("-e", "no composite"), ("-fast", "faster"), ("-fast2", "fastest"), ("-m", "minor errors"), ("-q", "quiet"),
+    ];
 
     private const string REASON_OUTPUT = "Changes the output format the app reads";
     private const string REASON_WRITE = "Writes or changes files";

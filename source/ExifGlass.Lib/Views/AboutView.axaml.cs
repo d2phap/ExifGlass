@@ -23,6 +23,7 @@ using Avalonia.Media.Transformation;
 using Avalonia.Threading;
 using ExifGlass.UI.Tokens;
 using ExifGlass.ViewModels;
+using System.ComponentModel;
 
 namespace ExifGlass.Views;
 
@@ -56,9 +57,17 @@ public partial class AboutView : UserControl
     {
         base.OnDataContextChanged(e);
 
-        if (_viewModel is not null) _viewModel.ToastRequested -= ViewModel_ToastRequested;
+        if (_viewModel is not null)
+        {
+            _viewModel.ToastRequested -= ViewModel_ToastRequested;
+            _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        }
+
         _viewModel = DataContext as AboutViewModel;
-        if (_viewModel is not null) _viewModel.ToastRequested += ViewModel_ToastRequested;
+        if (_viewModel is null) return;
+
+        _viewModel.ToastRequested += ViewModel_ToastRequested;
+        _viewModel.PropertyChanged += ViewModel_PropertyChanged;
     }
 
 
@@ -95,6 +104,16 @@ public partial class AboutView : UserControl
     #region Event handlers
 
     private void ViewModel_ToastRequested(object? sender, string message) => Toasts.Show(message);
+
+
+    // each notice starts at its top with Back focused, as the row that opened it hides with its page
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(AboutViewModel.OpenNotice) || _viewModel is not { IsNoticeOpen: true }) return;
+
+        NoticeScroller.Offset = default;
+        Dispatcher.UIThread.Post(() => NoticeBack.Focus(), DispatcherPriority.Loaded);
+    }
 
     #endregion // Event handlers
 }

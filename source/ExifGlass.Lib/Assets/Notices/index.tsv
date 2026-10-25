@@ -1,0 +1,13 @@
+dotnet	.NET	MIT
+avalonia	Avalonia UI	MIT
+exiftool	ExifTool	Artistic-1.0-Perl or GPL-1.0+
+prodatagrid	ProDataGrid	MIT
+skiasharp	SkiaSharp and Skia	MIT, BSD-3-Clause
+harfbuzzsharp	HarfBuzzSharp	MIT, Old MIT
+angle	ANGLE (Windows)	BSD-3-Clause
+communitytoolkit-mvvm	CommunityToolkit.Mvvm	MIT
+microcom	MicroCom.Runtime	MIT
+tmds-dbus	Tmds.DBus.Protocol (Linux)	MIT
+inter	Inter (macOS and Linux)	OFL-1.1
+imageglass-sdk	ImageGlass.SDK	MIT
+imageglass-tools	ImageGlass.Tools (Windows)	MIT

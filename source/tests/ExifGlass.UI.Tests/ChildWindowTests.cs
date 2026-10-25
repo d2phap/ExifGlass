@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
@@ -152,6 +153,23 @@ public class ChildWindowTests
 
 
     [AvaloniaFact]
+    public async Task ThePreviewsCopyGivesTheCommandAsTyped()
+    {
+        var shell = new RecordingShell();
+        var vm = new SettingsViewModel(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()) { Shell = shell });
+        (string Title, string? Subtitle)? toast = null;
+        vm.ToastRequested += (_, t) => toast = t;
+
+        await vm.CopyCommandLineCommand.ExecuteAsync(null);
+
+        var copied = Assert.Single(shell.Copied);
+        Assert.EndsWith("-fast -G -t -m -q -H -charset UTF8 <file>", copied, StringComparison.Ordinal);
+        Assert.DoesNotContain(char.ConvertFromUtf32(0x200B), copied, StringComparison.Ordinal);
+        Assert.Equal(AppText.TOAST_COMMAND_COPIED, toast?.Title);
+    }
+
+
+    [AvaloniaFact]
     public void AValueChipSaysWhichFlagItBelongsTo()
     {
         Assert.Equal("Value for -charset", SettingsViewModel.NoteFor(["-charset", "UTF8"], 1).Description);
@@ -235,7 +253,7 @@ public class ChildWindowTests
     #region About
 
     [AvaloniaFact]
-    public void AboutShowsTheVersionAndFiveCreditsUntilShowAll()
+    public void AboutShowsTheVersionAndFiveNoticesUntilShowAll()
     {
         using var shell = TestShell.Open(1400);
         shell.Window.ShowAbout();
@@ -247,16 +265,109 @@ public class ChildWindowTests
         Assert.Contains(AboutViewModel.OsName, vm.VersionLine, StringComparison.Ordinal);
         Assert.Equal(AboutWindow.FirstSize.Width, window.ClientSize.Width);
 
-        var all = AppText.Credits(!OperatingSystem.IsWindows(), shell.ViewModel.Channel.ImageGlass10, shell.ViewModel.Channel.ImageGlass9).Count;
-        Assert.Equal(Math.Min(all, AboutViewModel.CREDITS_SHOWN), vm.ShownCredits.Count);
-        Assert.Equal(AppText.SHOW_ALL, vm.CreditsToggleText);
+        var all = AboutViewModel.Notices.Count;
+        Assert.Equal(13, all);
+        Assert.Equal(["ExifTool", "ProDataGrid"], AboutViewModel.Notices.Skip(2).Take(2).Select(n => n.Name));
+        Assert.Equal(AboutViewModel.NOTICES_SHOWN, vm.ShownNotices.Count);
+        Assert.Equal(AppText.SHOW_ALL, vm.NoticesToggleText);
 
-        vm.ToggleCreditsCommand.Execute(null);
+        vm.ToggleNoticesCommand.Execute(null);
         shell.Settle();
-        Assert.Equal(all, vm.ShownCredits.Count);
+        Assert.Equal(all, vm.ShownNotices.Count);
         Assert.Equal(all, window.GetVisualDescendants().OfType<Badge>().Count(b => b.Kind == BadgeKind.Licence));
-        Assert.Equal(AppText.SHOW_FEWER, vm.CreditsToggleText);
+        Assert.Equal(AppText.SHOW_FEWER, vm.NoticesToggleText);
         window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void ANoticeOpensItsTextAndEscGoesBack()
+    {
+        using var shell = TestShell.Open(1400);
+        shell.Window.ShowAbout();
+        shell.Settle();
+        var window = shell.Window.OwnedWindows.OfType<AboutWindow>().Single(w => w.IsVisible);
+        var view = (Views.AboutView)window.Content!;
+
+        // a click on the row, as the user opens it
+        var row = view.FindControl<ItemsControl>("NoticeList")!.GetVisualDescendants().OfType<Button>().First(b => AutomationProperties.GetName(b) == "ExifTool");
+        row.BringIntoView();
+        shell.Settle();
+        var centre = row.TranslatePoint(new Point(row.Bounds.Width / 2, row.Bounds.Height / 2), window)!.Value;
+        window.MouseMove(centre);
+        window.MouseDown(centre, MouseButton.Left);
+        window.MouseUp(centre, MouseButton.Left);
+        shell.Settle();
+
+        Assert.Equal("ExifTool", window.ViewModel.OpenNotice?.Name);
+        Assert.False(view.FindControl<DockPanel>("MainPage")!.IsVisible);
+        Assert.True(view.FindControl<DockPanel>("NoticePage")!.IsVisible);
+        Assert.Contains(window.ViewModel.NoticeParagraphs, p => p.Contains("Phil Harvey", StringComparison.Ordinal));
+
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        shell.Settle();
+        Assert.True(window.IsVisible);
+        Assert.Null(window.ViewModel.OpenNotice);
+        Assert.True(view.FindControl<DockPanel>("MainPage")!.IsVisible);
+
+        window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+        shell.Settle();
+        Assert.False(window.IsVisible);
+    }
+
+
+    [AvaloniaFact]
+    public void EveryNoticeHasItsText()
+    {
+        var vm = new AboutViewModel(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()));
+        foreach (var notice in AboutViewModel.Notices)
+        {
+            vm.ShowNoticeCommand.Execute(notice);
+            Assert.True(vm.NoticeParagraphs.Count > 0, notice.Name);
+            Assert.Contains(vm.NoticeParagraphs, p => p.Contains("Copyright", StringComparison.OrdinalIgnoreCase) || p.Contains('©'));
+        }
+    }
+
+
+    [AvaloniaFact]
+    public async Task CheckNowLeavesTheRowWhereItIs()
+    {
+        var folder = Directory.CreateTempSubdirectory("eg-about-").FullName;
+        try
+        {
+            var held = new TaskCompletionSource<string>();
+            UpdateService? updates = null;
+            using var shell = TestShell.Open(1400, create: (s, r) =>
+            {
+                updates = new UpdateService(s, new ChannelPolicy(AppChannel.WindowsZip), "3.0.0", _ => held.Task, () => NOW);
+                return new MainViewModel(s, r) { Channel = updates.Channel, Updates = updates };
+            });
+            shell.Window.ShowAbout();
+            shell.Settle();
+            var window = shell.Window.OwnedWindows.OfType<AboutWindow>().Single(w => w.IsVisible);
+            var view = (Views.AboutView)window.Content!;
+            var caption = view.FindControl<TextBlock>("UpdateCaption")!;
+            var website = view.FindControl<Border>("WebsiteRow")!;
+            Rect Place(Control c) => new(c.TranslatePoint(default, window)!.Value, c.Bounds.Size);
+            var before = (Place(caption), Place(website));
+
+            var check = updates!.CheckNowAsync();
+            shell.Settle();
+            Assert.Equal(before, (Place(caption), Place(website)));
+
+            held.SetResult("""{ "Version": "3.1.0", "PublishedDate": "2026-11-02T10:00:00" }""");
+            await check;
+            shell.Settle();
+            Assert.Equal(before, (Place(caption), Place(website)));
+            Assert.True(view.FindControl<GlassButton>("DownloadButton")!.IsHitTestVisible);
+            Assert.False(view.FindControl<GlassButton>("CheckButton")!.IsHitTestVisible);
+            window.Close();
+            await shell.Settings.FlushAsync();
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
     }
 
 
@@ -475,10 +586,14 @@ public class ChildWindowTests
         Check(about, variant, "window-about", theme, failures);
 
         await updates!.CheckNowAsync();
-        about.ViewModel.ToggleCreditsCommand.Execute(null);
+        about.ViewModel.ToggleNoticesCommand.Execute(null);
         shell.Settle(200);
         ((Views.AboutView)about.Content!).FindControl<ScrollViewer>("Scroller")!.ScrollToEnd();
         Check(about, variant, "window-about-update", theme, failures);
+
+        about.ViewModel.ShowNoticeCommand.Execute(AboutViewModel.Notices.First(n => n.Name == "ExifTool"));
+        shell.Settle(200);
+        Check(about, variant, "window-about-notice", theme, failures);
         about.Close();
         await shell.Settings.FlushAsync();
 

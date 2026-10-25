@@ -164,6 +164,11 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// </summary>
     public event EventHandler? CloseRequested;
 
+    /// <summary>
+    /// Occurs when Settings says something in its own toast: "Command copied".
+    /// </summary>
+    public event EventHandler<(string Title, string? Subtitle)>? ToastRequested;
+
     #endregion // Events
 
 
@@ -237,6 +242,16 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [RelayCommand]
     private void OpenAbout() => _main.OpenAboutCommand.Execute(null);
+
+
+    [RelayCommand]
+    private async Task CopyCommandLineAsync()
+    {
+        if (_main.Shell is not { } shell) return;
+
+        await shell.CopyTextAsync(WritePlan.ToCommandLine(PreviewTokens));
+        ToastRequested?.Invoke(this, (AppText.TOAST_COMMAND_COPIED, AppText.TOAST_COMMAND_COPIED_SUB));
+    }
 
     #endregion // Commands
 

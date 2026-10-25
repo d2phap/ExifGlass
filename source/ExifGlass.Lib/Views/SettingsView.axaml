@@ -142,10 +142,21 @@
           </ui:TokenField>
         </StackPanel>
 
-        <TextBlock Margin="0,18,0,6"
-                   tok:Typography.Role="Overline"
-                   Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.PREVIEW_OVERLINE}" />
+        <!--  owner at the P9 review: Copy at the top right, above the command  -->
+        <Grid Margin="0,12,0,0" ColumnDefinitions="*,Auto">
+          <TextBlock VerticalAlignment="Center"
+                     tok:Typography.Role="Overline"
+                     Foreground="{DynamicResource TextSecondaryBrush}"
+                     Text="{x:Static app:AppText.PREVIEW_OVERLINE}" />
+          <ui:GlassButton Name="CopyPreviewButton"
+                          Grid.Column="1"
+                          Margin="0,0,-6,0"
+                          AutomationProperties.Name="{x:Static app:AppText.COPY_COMMAND}"
+                          Classes="ghost small"
+                          Command="{Binding CopyCommandLineCommand}"
+                          Icon="{x:Static ui:IconId.Copy}"
+                          ToolTip.Tip="{x:Static app:AppText.COPY_COMMAND}" />
+        </Grid>
         <ui:CommandPreview Name="Preview" Tokens="{Binding PreviewTokens}" />
       </StackPanel>
     </ScrollViewer>
@@ -185,6 +196,8 @@
                         Content="{x:Static app:AppText.CANCEL}" />
       </Grid>
     </Border>
+
+    <ui:ToastHost Name="Toasts" Grid.RowSpan="2" />
   </Grid>
 
 </UserControl>

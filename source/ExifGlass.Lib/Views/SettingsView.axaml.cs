@@ -61,11 +61,17 @@ public partial class SettingsView : UserControl
     {
         base.OnDataContextChanged(e);
 
-        if (_viewModel is not null) _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+        if (_viewModel is not null)
+        {
+            _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+            _viewModel.ToastRequested -= ViewModel_ToastRequested;
+        }
+
         _viewModel = DataContext as SettingsViewModel;
         if (_viewModel is null) return;
 
         _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+        _viewModel.ToastRequested += ViewModel_ToastRequested;
         ArgumentField.Suggestions = [.. _viewModel.Suggestions];
         ShowArguments();
     }
@@ -94,6 +100,9 @@ public partial class SettingsView : UserControl
     {
         if (e.PropertyName == nameof(SettingsViewModel.Arguments) && !_syncing) ShowArguments();
     }
+
+
+    private void ViewModel_ToastRequested(object? sender, (string Title, string? Subtitle) toast) => Toasts.Show(toast.Title, toast.Subtitle);
 
 
     private async void BrowseButton_Click(object? sender, RoutedEventArgs e)

@@ -18,11 +18,17 @@
     <Style Selector="TextBlock.caption.error">
       <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
     </Style>
+    <!--  Check now and Download share one cell as wide as the wider, so neither changes the caption's width  -->
+    <Style Selector="ui|GlassButton.gone">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+      <Setter Property="Focusable" Value="False" />
+    </Style>
   </UserControl.Styles>
 
-  <!--  FewerPhotos's About (owner at the P9 review): header, hairline rows, credits; the copyright stays in sight under the scrolling content  -->
+  <!--  FewerPhotos's About (owner at the P9 review): header, hairline rows, third-party notices; the copyright stays in sight under the scrolling content  -->
   <Panel>
-    <DockPanel>
+    <DockPanel Name="MainPage" IsVisible="{Binding IsMainPage}">
       <Border BorderBrush="{DynamicResource EmphasisA07Brush}"
               BorderThickness="0,1,0,0"
               DockPanel.Dock="Bottom">
@@ -38,10 +44,11 @@
       <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="32,4,32,8">
           <StackPanel Margin="0,0,0,22" HorizontalAlignment="Center">
+            <!--  FewerPhotos's 128 icon draws its art in about 103; this logo fills its box  -->
             <ui:ScaledImage Name="Logo"
-                            Width="128"
-                            Height="128"
-                            Margin="0,8,0,6"
+                            Width="104"
+                            Height="104"
+                            Margin="0,6,0,14"
                             HorizontalAlignment="Center"
                             RenderTransformOrigin="50%,50%"
                             Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
@@ -79,36 +86,26 @@
               <Panel Margin="16,0,0,0"
                      VerticalAlignment="Center"
                      DockPanel.Dock="Right">
-                <ui:SquircleBorder Name="CheckingPill"
-                                   Height="32"
-                                   Padding="10,0,13,0"
-                                   BorderBrush="{DynamicResource StrokeControlBrush}"
-                                   BorderThickness="1"
-                                   CornerRadius="{StaticResource RadiusControl32}"
-                                   IsVisible="{Binding IsChecking}">
-                  <StackPanel Orientation="Horizontal" Spacing="8">
-                    <ui:SpinningIcon Width="12"
-                                     Height="12"
+                <ui:GlassButton Name="CheckButton"
+                                HorizontalAlignment="Right"
+                                Classes.gone="{Binding IsUpdateAvailable}"
+                                Command="{Binding CheckCommand}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <ui:SpinningIcon Width="16"
+                                     Height="16"
                                      VerticalAlignment="Center"
-                                     Icon="{x:Static ui:IconId.SpinnerArc}"
+                                     Icon="{x:Static ui:IconId.ArrowSync}"
                                      IsSpinning="{Binding IsChecking}" />
-                    <TextBlock VerticalAlignment="Center"
-                               tok:Typography.Role="Control"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               Text="{x:Static app:AppText.CHECKING_UPDATES}" />
+                    <TextBlock VerticalAlignment="Center" Text="{x:Static app:AppText.CHECK_NOW}" />
                   </StackPanel>
-                </ui:SquircleBorder>
+                </ui:GlassButton>
                 <ui:GlassButton Name="DownloadButton"
+                                HorizontalAlignment="Right"
                                 Classes="primary"
+                                Classes.gone="{Binding !IsUpdateAvailable}"
                                 Command="{Binding DownloadCommand}"
                                 Content="{x:Static app:AppText.DOWNLOAD}"
-                                Icon="{x:Static ui:IconId.Open}"
-                                IsVisible="{Binding IsUpdateAvailable}" />
-                <ui:GlassButton Name="CheckButton"
-                                Command="{Binding CheckCommand}"
-                                Content="{x:Static app:AppText.CHECK_NOW}"
-                                Icon="{x:Static ui:IconId.ArrowSync}"
-                                IsVisible="{Binding CanCheck}" />
+                                Icon="{x:Static ui:IconId.Open}" />
               </Panel>
               <StackPanel VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -119,6 +116,7 @@
                             Text="{x:Static app:AppText.NEW_BADGE}" />
                 </StackPanel>
                 <TextBlock Name="UpdateCaption"
+                           MinHeight="40"
                            tok:Typography.Role="Body"
                            Classes="caption"
                            Classes.error="{Binding IsUpdateError}"
@@ -183,40 +181,90 @@
           <Border Height="1" Background="{DynamicResource EmphasisA07Brush}" />
 
           <DockPanel Margin="0,22,0,4">
-            <ui:GlassButton Name="CreditsToggle"
+            <ui:GlassButton Name="NoticesToggle"
                             Margin="0,0,-8,0"
                             Classes="link"
-                            Command="{Binding ToggleCreditsCommand}"
-                            Content="{Binding CreditsToggleText}"
+                            Command="{Binding ToggleNoticesCommand}"
+                            Content="{Binding NoticesToggleText}"
                             DockPanel.Dock="Right"
-                            IsVisible="{Binding ShowsCreditsToggle}" />
+                            IsVisible="{Binding ShowsNoticesToggle}" />
             <TextBlock VerticalAlignment="Center"
                        tok:Typography.Role="Overline"
                        Foreground="{DynamicResource TextTertiaryBrush}"
-                       Text="{x:Static app:AppText.CREDITS_OVERLINE}" />
+                       Text="{x:Static app:AppText.NOTICES_OVERLINE}" />
           </DockPanel>
-          <ItemsControl Name="CreditList" ItemsSource="{Binding ShownCredits}">
+          <!--  a row's hover reaches past the text column and stops above its hairline (FewerPhotos)  -->
+          <ItemsControl Name="NoticeList" ItemsSource="{Binding ShownNotices}">
             <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:CreditView">
-                <Border Padding="0,9"
-                        BorderBrush="{DynamicResource EmphasisA05Brush}"
-                        BorderThickness="0,0,0,1">
-                  <DockPanel>
-                    <ui:Badge Margin="16,0,0,0"
-                              VerticalAlignment="Center"
-                              DockPanel.Dock="Right"
-                              Kind="Licence"
-                              Text="{Binding Licence}" />
-                    <TextBlock VerticalAlignment="Center"
-                               tok:Typography.Role="BodyStrong"
-                               Text="{Binding Name}"
-                               TextTrimming="CharacterEllipsis" />
-                  </DockPanel>
-                </Border>
+              <DataTemplate x:DataType="vm:NoticeView">
+                <Panel>
+                  <Button Margin="-12,0,-12,1"
+                          AutomationProperties.Name="{Binding Name}"
+                          Command="{Binding $parent[UserControl].((vm:AboutViewModel)DataContext).ShowNoticeCommand}"
+                          CommandParameter="{Binding}"
+                          Theme="{StaticResource ListRowButton}">
+                    <DockPanel>
+                      <ui:Badge Margin="16,0,0,0"
+                                VerticalAlignment="Center"
+                                DockPanel.Dock="Right"
+                                Kind="Licence"
+                                Text="{Binding Licence}" />
+                      <TextBlock VerticalAlignment="Center"
+                                 tok:Typography.Role="BodyStrong"
+                                 Text="{Binding Name}"
+                                 TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                  </Button>
+                  <Border Height="1"
+                          VerticalAlignment="Bottom"
+                          Background="{DynamicResource EmphasisA05Brush}"
+                          IsHitTestVisible="False" />
+                </Panel>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </StackPanel>
+      </ScrollViewer>
+    </DockPanel>
+
+    <!--  a notice's full text in place of the page; its list runs to the window's edge, so the scroll bar sits at the far right  -->
+    <DockPanel Name="NoticePage"
+               Margin="0,16,0,0"
+               IsVisible="{Binding IsNoticeOpen}">
+      <StackPanel Margin="32,0"
+                  DockPanel.Dock="Top"
+                  Spacing="10">
+        <ui:GlassButton Name="NoticeBack"
+                        Margin="-10,-4,0,-4"
+                        HorizontalAlignment="Left"
+                        Classes="link"
+                        Command="{Binding CloseNoticeCommand}"
+                        Content="{x:Static app:AppText.BACK}"
+                        Icon="{x:Static ui:IconId.ChevronLeft}"
+                        ToolTip.Tip="{x:Static app:AppText.BACK_TIP}" />
+        <TextBlock tok:Typography.Role="Title" Text="{Binding OpenNotice.Name, FallbackValue=''}" />
+      </StackPanel>
+      <ScrollViewer Name="NoticeScroller"
+                    Margin="0,12,0,0"
+                    HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl Name="NoticeText"
+                      Margin="32,0,32,24"
+                      ItemsSource="{Binding NoticeParagraphs}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="x:String">
+              <TextBlock Margin="0,0,0,20"
+                         tok:Typography.Role="MonoValue"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{Binding}"
+                         TextWrapping="Wrap" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
       </ScrollViewer>
     </DockPanel>
 

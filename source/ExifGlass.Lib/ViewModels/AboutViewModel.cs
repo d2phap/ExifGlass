@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Common;
@@ -28,24 +29,27 @@ using System.Runtime.InteropServices;
 namespace ExifGlass.ViewModels;
 
 /// <summary>
-/// One credit row in About: the library and its licence.
+/// One third-party notice in About: its text file, the component and its licence (__assets/notices/gen-notices.py).
 /// </summary>
-public sealed record CreditView(string Name, string Licence);
+public sealed record NoticeView(string File, string Name, string Licence);
 
 
 /// <summary>
-/// The About window, laid out as FewerPhotos's (owner at the P9 review): the version, Updates (D10), Website, the store row (D11), the credits.
+/// The About window, laid out as FewerPhotos's (owner at the P9 review): the version, Updates (D10), Website, the store row (D11), the third-party notices and their texts.
 /// </summary>
 public sealed partial class AboutViewModel : ObservableObject
 {
     #region Fields and constants
 
     // FewerPhotos shows five notices before Show all
-    public const int CREDITS_SHOWN = 5;
+    public const int NOTICES_SHOWN = 5;
+
+    private const string NOTICES = "avares://ExifGlass.Lib/Assets/Notices/";
+
+    private static readonly Lazy<IReadOnlyList<NoticeView>> _notices = new(ReadNotices);
 
     private readonly MainViewModel _main;
     private readonly UpdateService? _updates;
-    private readonly IReadOnlyList<CreditView> _credits;
 
     #endregion // Fields and constants
 
@@ -57,9 +61,6 @@ public sealed partial class AboutViewModel : ObservableObject
         _main = main;
         _updates = main.Updates;
         if (_updates is not null) _updates.PropertyChanged += Updates_PropertyChanged;
-
-        var channel = main.Channel;
-        _credits = [.. AppText.Credits(inter: !OperatingSystem.IsWindows(), channel.ImageGlass10, channel.ImageGlass9).Select(c => new CreditView(c.Name, c.Licence))];
     }
 
     #endregion // Constructors
@@ -134,14 +135,32 @@ public sealed partial class AboutViewModel : ObservableObject
     public string StoreText => IsMicrosoftStore ? AppText.STORE_SUB : AppText.RELEASES_SUB;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShownCredits), nameof(CreditsToggleText))]
-    public partial bool AllCreditsShown { get; set; }
+    [NotifyPropertyChangedFor(nameof(ShownNotices), nameof(NoticesToggleText))]
+    public partial bool AllNoticesShown { get; set; }
 
-    public IReadOnlyList<CreditView> ShownCredits => AllCreditsShown ? _credits : [.. _credits.Take(CREDITS_SHOWN)];
+    public static IReadOnlyList<NoticeView> Notices => _notices.Value;
 
-    public bool ShowsCreditsToggle => _credits.Count > CREDITS_SHOWN;
+    public IReadOnlyList<NoticeView> ShownNotices => AllNoticesShown ? Notices : [.. Notices.Take(NOTICES_SHOWN)];
 
-    public string CreditsToggleText => AllCreditsShown ? AppText.SHOW_FEWER : AppText.SHOW_ALL;
+    public bool ShowsNoticesToggle => Notices.Count > NOTICES_SHOWN;
+
+    public string NoticesToggleText => AllNoticesShown ? AppText.SHOW_FEWER : AppText.SHOW_ALL;
+
+    /// <summary>
+    /// The notice whose full text shows in place of the main page, with Back (FewerPhotos).
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNoticeOpen), nameof(IsMainPage), nameof(NoticeParagraphs))]
+    public partial NoticeView? OpenNotice { get; private set; }
+
+    public bool IsNoticeOpen => OpenNotice is not null;
+
+    public bool IsMainPage => OpenNotice is null;
+
+    /// <summary>
+    /// The open notice's paragraphs, read when it opens; the list virtualizes them (.NET's runs to 900 lines).
+    /// </summary>
+    public IReadOnlyList<string> NoticeParagraphs => OpenNotice is { } notice ? Read(notice.File + ".txt").Split("\n\n", StringSplitOptions.RemoveEmptyEntries) : [];
 
     #endregion // Properties
 
@@ -199,7 +218,15 @@ public sealed partial class AboutViewModel : ObservableObject
 
 
     [RelayCommand]
-    private void ToggleCredits() => AllCreditsShown = !AllCreditsShown;
+    private void ToggleNotices() => AllNoticesShown = !AllNoticesShown;
+
+
+    [RelayCommand]
+    private void ShowNotice(NoticeView? notice) => OpenNotice = notice;
+
+
+    [RelayCommand]
+    private void CloseNotice() => OpenNotice = null;
 
     #endregion // Commands
 
@@ -207,6 +234,19 @@ public sealed partial class AboutViewModel : ObservableObject
     #region Private methods
 
     private Task Open(string url) => _main.Shell?.OpenUriAsync(url) ?? Task.CompletedTask;
+
+
+    private static IReadOnlyList<NoticeView> ReadNotices() => [.. Read("index.tsv").Split('\n', StringSplitOptions.RemoveEmptyEntries)
+        .Select(line => line.Split('\t'))
+        .Where(parts => parts.Length == 3)
+        .Select(parts => new NoticeView(parts[0], parts[1], parts[2]))];
+
+
+    private static string Read(string file)
+    {
+        using var reader = new StreamReader(AssetLoader.Open(new Uri(NOTICES + file)));
+        return reader.ReadToEnd().Replace("\r\n", "\n", StringComparison.Ordinal);
+    }
 
 
     private static string Released(UpdateInfo? info) =>

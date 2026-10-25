@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI.Windows;
 using ExifGlass.ViewModels;
@@ -95,4 +96,22 @@ public sealed class AboutWindow : OwnedWindow
     public AboutViewModel ViewModel { get; }
 
     #endregion // Properties
+
+
+    #region Protected methods
+
+    // Esc on a notice goes back to the page before it closes the window
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && e.KeyModifiers == KeyModifiers.None && ViewModel.IsNoticeOpen)
+        {
+            ViewModel.CloseNoticeCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
+        base.OnKeyDown(e);
+    }
+
+    #endregion // Protected methods
 }

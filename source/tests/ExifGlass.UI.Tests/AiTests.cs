@@ -276,9 +276,16 @@ public sealed class AiTests
         shell.Reader.Maker = TestDocuments.MakeAi;
         shell.Reader.AiHold = hold;
 
+        // taken as the rows arrive: the test's polling can come later than the 150 ms the pulse waits
+        bool? loadingWhenShown = null;
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(vm.HasDocument) && vm.HasDocument) loadingWhenShown ??= vm.IsAiLoading;
+        };
+
         _ = vm.OpenFileAsync("slow.png");
         await shell.WaitForAsync(() => vm.HasDocument);
-        Assert.False(vm.IsAiLoading);
+        Assert.False(loadingWhenShown);
         await shell.WaitForAsync(() => vm.IsAiLoading);
         shell.Settle();
         Assert.True(Inspector(shell).AiCard.IsVisible);

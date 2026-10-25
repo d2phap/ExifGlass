@@ -227,7 +227,9 @@ public static class AppText
     public const string TOAST_SETTINGS_SAVED = "Settings saved";
 
     // About (FewerPhotos's About, owner at the P9 review; D10, D11)
-    public const string CREDITS_OVERLINE = "CREDITS";
+    public const string NOTICES_OVERLINE = "THIRD-PARTY NOTICES";
+    public const string BACK = "Back";
+    public const string BACK_TIP = "Back (Esc)";
     public const string COPYRIGHT = "Copyright © 2023 - 2026 Duong Dieu Phap";
     public const string COPY_VERSION_INFO = "Copy version info";
     public const string TOAST_VERSION_COPIED = "Version info copied";
@@ -425,26 +427,6 @@ public static class AppText
     /// D10's startup toast: "ExifGlass 3.0.1 is available".
     /// </summary>
     public static string UpdateAvailable(string version) => $"{AppInfo.PRODUCT_NAME} {version} is available";
-
-    /// <summary>
-    /// About's credits (plan P9): Inter where it is the UI font, the ImageGlass libraries where their hosts are built in; no Cascadia Mono, which isn't shipped (owner, 2026-10-21).
-    /// </summary>
-    public static IReadOnlyList<(string Name, string Licence)> Credits(bool inter, bool imageGlass10, bool imageGlass9)
-    {
-        var list = new List<(string, string)>
-        {
-            ("Avalonia", "MIT"),
-            ("ExifTool", "Artistic"),
-            ("ProDataGrid", "MIT"),
-            ("SkiaSharp", "MIT"),
-            ("CommunityToolkit.Mvvm", "MIT"),
-        };
-
-        if (inter) list.Add(("Inter", "OFL-1.1"));
-        if (imageGlass10) list.Add(("ImageGlass.SDK", "MIT"));
-        if (imageGlass9) list.Add(("ImageGlass.Tools", "MIT"));
-        return list;
-    }
 
     public static string ThemeName(AppTheme theme) => theme switch
     {

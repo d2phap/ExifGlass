@@ -276,6 +276,13 @@ public class ChildWindowTests
         Assert.Equal(all, vm.ShownNotices.Count);
         Assert.Equal(all, window.GetVisualDescendants().OfType<Badge>().Count(b => b.Kind == BadgeKind.Licence));
         Assert.Equal(AppText.SHOW_FEWER, vm.NoticesToggleText);
+
+        // the hover reaches 12 past the text column on both sides, not cut at the list's edge (FewerPhotos)
+        var list = ((Views.AboutView)window.Content!).FindControl<ItemsControl>("NoticeList")!;
+        var row = list.GetVisualDescendants().OfType<Button>().First();
+        Assert.False(list.ClipToBounds);
+        Assert.Equal(-12, row.TranslatePoint(default, list)!.Value.X, 0.5);
+        Assert.Equal(list.Bounds.Width + 24, row.Bounds.Width, 0.5);
         window.Close();
     }
 
@@ -359,6 +366,7 @@ public class ChildWindowTests
             await check;
             shell.Settle();
             Assert.Equal(before, (Place(caption), Place(website)));
+            Assert.Equal(caption.LineHeight, caption.Bounds.Height, 1);
             Assert.True(view.FindControl<GlassButton>("DownloadButton")!.IsHitTestVisible);
             Assert.False(view.FindControl<GlassButton>("CheckButton")!.IsHitTestVisible);
             window.Close();
@@ -418,7 +426,7 @@ public class ChildWindowTests
 
             feed = """{ "Version": "2.0.0.0" }""";
             await updates.CheckNowAsync();
-            Assert.Equal(AppText.UpToDate(AboutViewModel.AppVersion, NOW.ToLocalTime().ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)), vm.UpdateText);
+            Assert.Equal(AppText.UpToDate(NOW.ToLocalTime().ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture)), vm.UpdateText);
 
             failure = new HttpRequestException("offline");
             await vm.CheckCommand.ExecuteAsync(null);
@@ -589,6 +597,12 @@ public class ChildWindowTests
         about.ViewModel.ToggleNoticesCommand.Execute(null);
         shell.Settle(200);
         ((Views.AboutView)about.Content!).FindControl<ScrollViewer>("Scroller")!.ScrollToEnd();
+        shell.Settle(200);
+
+        // the pointer on a notice, so the render shows its hover
+        var hovered = ((Views.AboutView)about.Content!).FindControl<ItemsControl>("NoticeList")!.GetVisualDescendants().OfType<Button>().First(b => AutomationProperties.GetName(b) == "ExifTool");
+        about.MouseMove(hovered.TranslatePoint(new Point(hovered.Bounds.Width / 2, hovered.Bounds.Height / 2), about)!.Value);
+        shell.Settle(250);
         Check(about, variant, "window-about-update", theme, failures);
 
         about.ViewModel.ShowNoticeCommand.Execute(AboutViewModel.Notices.First(n => n.Name == "ExifTool"));

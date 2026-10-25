@@ -115,7 +115,7 @@ public sealed partial class AboutViewModel : ObservableObject
     public string UpdateText => UpdateState switch
     {
         UpdateState.Checking => AppText.CHECKING_UPDATES,
-        UpdateState.UpToDate => AppText.UpToDate(AppVersion, (_updates?.CheckedAt ?? DateTimeOffset.Now).ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture)),
+        UpdateState.UpToDate => AppText.UpToDate((_updates?.CheckedAt ?? DateTimeOffset.Now).ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture)),
         UpdateState.Available => AppText.UpdateReady(_updates?.Latest?.Version ?? string.Empty, Released(_updates?.Latest)),
         UpdateState.Failed => AppText.UPDATE_ERROR,
         _ => AppText.NOT_CHECKED,

@@ -238,7 +238,7 @@ public static class AppText
     public const string CHECK_NOW = "Check now";
     public const string NOT_CHECKED = "Not checked yet";
     public const string CHECKING_UPDATES = "Checking for updates…";
-    public const string UPDATE_ERROR = "Couldn't check for updates. Check your connection and try again.";
+    public const string UPDATE_ERROR = "Couldn't check. Check your connection.";
     public const string DOWNLOAD = "Download";
     public const string WEBSITE = "Website";
     public const string VISIT = "Visit";
@@ -418,10 +418,13 @@ public static class AppText
     /// </summary>
     public static string VersionLine(string version, string buildDate, string os, string architecture) => $"Version {version} ({buildDate}) · {os} · {architecture}";
 
-    public static string UpToDate(string version, string time) => $"You're up to date. Version {version} is the latest · checked at {time}.";
+    /// <summary>
+    /// The Updates row's line, kept to one (owner at the P9 review): "You're up to date · checked at 12:17".
+    /// </summary>
+    public static string UpToDate(string time) => $"You're up to date · checked at {time}";
 
     public static string UpdateReady(string version, string released) =>
-        string.IsNullOrEmpty(released) ? $"Version {version} is available. Download it from its page when you're ready." : $"Version {version} is available (released {released}). Download it from its page when you're ready.";
+        string.IsNullOrEmpty(released) ? $"Version {version} is available" : $"Version {version} is available ({released})";
 
     /// <summary>
     /// D10's startup toast: "ExifGlass 3.0.1 is available".

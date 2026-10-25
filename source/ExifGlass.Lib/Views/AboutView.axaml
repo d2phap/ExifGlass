@@ -116,7 +116,6 @@
                             Text="{x:Static app:AppText.NEW_BADGE}" />
                 </StackPanel>
                 <TextBlock Name="UpdateCaption"
-                           MinHeight="40"
                            tok:Typography.Role="Body"
                            Classes="caption"
                            Classes.error="{Binding IsUpdateError}"
@@ -193,8 +192,10 @@
                        Foreground="{DynamicResource TextTertiaryBrush}"
                        Text="{x:Static app:AppText.NOTICES_OVERLINE}" />
           </DockPanel>
-          <!--  a row's hover reaches past the text column and stops above its hairline (FewerPhotos)  -->
-          <ItemsControl Name="NoticeList" ItemsSource="{Binding ShownNotices}">
+          <!--  a row's hover reaches 12 past the text column and stops above its hairline (FewerPhotos); a templated control clips to itself, which cut that off  -->
+          <ItemsControl Name="NoticeList"
+                        ClipToBounds="False"
+                        ItemsSource="{Binding ShownNotices}">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:NoticeView">
                 <Panel>

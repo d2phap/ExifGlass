@@ -30,6 +30,11 @@ public interface IShellProvider
     /// </summary>
     bool AnimatesOwnedWindows => false;
 
+    /// <summary>
+    /// Gets the MSIX package family the app runs from, which tells the Store build from the sideload one; null without a package (the ZIP, macOS, Linux).
+    /// </summary>
+    string? PackageFamilyName => null;
+
     #endregion // Properties
 
 
@@ -39,6 +44,11 @@ public interface IShellProvider
     /// Gives the window the native Mica backdrop; false when the OS can't.
     /// </summary>
     bool TrySetMicaBackdrop(nint windowHandle);
+
+    /// <summary>
+    /// Whether the OS keeps a window above all others, whoever set it (the app's Pin, or a tool such as PowerToys Always On Top).
+    /// </summary>
+    bool IsTopmost(nint windowHandle) => false;
 
     #endregion // Methods
 }

@@ -27,6 +27,9 @@ internal static partial class User32
     // "Animation effects" in Settings; off also turns off DWM's window transitions
     public const uint SPI_GETCLIENTAREAANIMATION = 0x1042;
 
+    public const int GWL_EXSTYLE = -20;
+    public const long WS_EX_TOPMOST = 0x8;
+
     #endregion // Constants
 
 
@@ -35,6 +38,9 @@ internal static partial class User32
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SystemParametersInfoW(uint action, uint param, out int value, uint winIni);
+
+    [LibraryImport("user32.dll")]
+    public static partial nint GetWindowLongPtrW(nint windowHandle, int index);
 
     #endregion // Native methods
 }

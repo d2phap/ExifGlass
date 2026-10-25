@@ -198,5 +198,50 @@ public class ArgumentPolicyTests
         Assert.Throws<ArgumentException>(() => ArgFile.AppendLine(sb, "-Title=@home\nx"));
     }
 
+    [Fact]
+    public void AValueChipBelongsToTheFlagBeforeItAndSharesItsReason()
+    {
+        var chips = ArgumentPolicy.Chips(["-fast", "-charset", "UTF8", "-o", "out.txt"]);
+
+        Assert.Equal(5, chips.Count);
+        Assert.Equal("Value for -charset", chips[2].Description);
+        Assert.Null(chips[2].Reason);
+        Assert.Equal("Writes or changes files", chips[3].Reason);
+        Assert.Equal("A file name: the app passes the file itself", chips[4].Reason);
+        Assert.Equal("The API option Filter isn't allowed here", ArgumentPolicy.Chips(["-api", "Filter=1"])[1].Reason);
+    }
+
+
+    [Fact]
+    public void OnlyTheFirstOfARepeatedAppFlagIsLocked()
+    {
+        var chips = ArgumentPolicy.Chips(["-G", "-t", "-G", "-G1"]);
+
+        Assert.True(chips[0].IsLocked);
+        Assert.True(chips[1].IsLocked);
+        Assert.False(chips[2].IsLocked);
+        Assert.True(chips[3].IsLocked);
+    }
+
+
+    [Theory]
+    [InlineData(new[] { "-fast", "-charset", "UTF8" }, "-fast -charset UTF8")]
+    [InlineData(new[] { "-d", "%Y %m" }, "-d \"%Y %m\"")]
+    [InlineData(new[] { "-fast", "", "-m" }, "-fast -m")]
+    public void JoinQuotesWhatSplitReadsBack(string[] args, string expected)
+    {
+        var text = ArgumentPolicy.Join(args);
+
+        Assert.Equal(expected, text);
+        Assert.Equal(args.Where(a => a.Length > 0), ArgumentPolicy.Split(text));
+    }
+
+
+    [Fact]
+    public void EverySuggestionHasADescription()
+    {
+        Assert.All(ArgumentPolicy.SUGGESTIONS, s => Assert.NotEmpty(ArgumentPolicy.Describe(s.Flag)));
+    }
+
     #endregion // Tests
 }

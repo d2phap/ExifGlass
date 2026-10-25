@@ -58,8 +58,19 @@ public sealed record ArgumentToken(string Flag, string? Value, ArgumentClass Cla
 
     public string Text => Value is null ? Flag : Flag + " " + Value;
 
+    /// <summary>
+    /// Where the flag sits in the arguments it was read from; its value, if any, follows it.
+    /// </summary>
+    public int Index { get; init; } = -1;
+
     #endregion // Properties
 }
+
+
+/// <summary>
+/// One chip of the Settings argument field, in the field's order: what it does, why it's refused, whether the app owns it (D1).
+/// </summary>
+public readonly record struct ArgumentChip(string Description, string? Reason, bool IsLocked);
 
 
 /// <summary>
@@ -94,6 +105,12 @@ public static partial class ArgumentPolicy
     /// The defaults v2 used, shown as the terminal-equivalent command.
     /// </summary>
     public const string DEFAULT_ARGUMENTS = "-fast -G -t -m -q -H -charset UTF8";
+
+    /// <summary>
+    /// The dashed suggestions under the Settings argument field (DS 6.15) with their short labels (Proto).
+    /// </summary>
+    public static readonly IReadOnlyList<(string Flag, string Label)> SUGGESTIONS =
+        [("-n", "raw values"), ("-a", "duplicates"), ("-u", "unknown tags"), ("-ee", "embedded"), ("-s", "short names")];
 
     private const string REASON_OUTPUT = "Changes the output format the app reads";
     private const string REASON_WRITE = "Writes or changes files";
@@ -239,11 +256,12 @@ public static partial class ArgumentPolicy
         for (var i = 0; i < args.Count; i++)
         {
             var arg = args[i];
+            var start = i;
             if (arg.Length == 0) continue;
 
             if (TryGet(LOCKED, arg, out var lockedDesc) || IsGroupFlag(arg))
             {
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Locked, lockedDesc ?? LOCKED["-G"]));
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Locked, lockedDesc ?? LOCKED["-G"]) { Index = start });
                 continue;
             }
 
@@ -253,14 +271,14 @@ public static partial class ArgumentPolicy
                 else if (arg == "-a") dups = true;
                 else names = true;
 
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Display, displayDesc ?? DISPLAY["-s"]));
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Display, displayDesc ?? DISPLAY["-s"]) { Index = start });
                 continue;
             }
 
             if (TryGet(FLAGS, arg, out var flagDesc))
             {
                 if (arg is "-fast2" or "-fast3") warnings.Add($"{arg} can hide AI data in the table: late PNG text and MP4 keys aren't read (the AI card still shows it)");
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, flagDesc));
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, flagDesc) { Index = start });
                 pass.Add(arg);
                 continue;
             }
@@ -275,7 +293,7 @@ public static partial class ArgumentPolicy
                 }
 
                 var reason = ValueReason(arg, value);
-                tokens.Add(new ArgumentToken(arg, value, reason is null ? ArgumentClass.PassThrough : ArgumentClass.Refused, valueDesc, reason));
+                tokens.Add(new ArgumentToken(arg, value, reason is null ? ArgumentClass.PassThrough : ArgumentClass.Refused, valueDesc, reason) { Index = start });
                 if (reason is null)
                 {
                     pass.Add(arg);
@@ -288,12 +306,12 @@ public static partial class ArgumentPolicy
             var refused = RefusedReason(arg);
             if (refused is not null)
             {
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Refused, string.Empty, refused));
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Refused, string.Empty, refused) { Index = start });
                 continue;
             }
 
             var exclude = arg.StartsWith("--", StringComparison.Ordinal);
-            tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, exclude ? "Exclude tags" : "Read only these tags"));
+            tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, exclude ? "Exclude tags" : "Read only these tags") { Index = start });
             pass.Add(arg);
         }
 
@@ -306,6 +324,32 @@ public static partial class ArgumentPolicy
     /// </summary>
     public static string Describe(string flag) =>
         LOCKED.GetValueOrDefault(flag) ?? DISPLAY.GetValueOrDefault(flag) ?? FLAGS.GetValueOrDefault(flag) ?? WITH_VALUE.GetValueOrDefault(flag) ?? string.Empty;
+
+
+    /// <summary>
+    /// A chip for every argument, in order: a value says which flag it belongs to and shares its reason; only the first of a repeated app-owned flag is locked, so a typed repeat can go.
+    /// </summary>
+    public static IReadOnlyList<ArgumentChip> Chips(IReadOnlyList<string> args)
+    {
+        var chips = new ArgumentChip[args.Count];
+        var locked = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var token in Analyze(args).Tokens)
+        {
+            var isLocked = token.Class == ArgumentClass.Locked && locked.Add(token.Flag);
+            chips[token.Index] = new ArgumentChip(token.Description, token.Reason, isLocked);
+            if (token.Value is not null) chips[token.Index + 1] = new ArgumentChip($"Value for {token.Flag}", token.Reason, false);
+        }
+
+        return chips;
+    }
+
+
+    /// <summary>
+    /// The field's arguments as the settings keep them; one with a space is quoted, as Split reads it back.
+    /// </summary>
+    public static string Join(IEnumerable<string> args) =>
+        string.Join(' ', args.Where(a => a.Length > 0).Select(a => a.AsSpan().IndexOfAny(' ', '\t') >= 0 ? $"\"{a}\"" : a));
 
     #endregion // Public methods
 

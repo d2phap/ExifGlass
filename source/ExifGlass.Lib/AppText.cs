@@ -194,6 +194,79 @@ public static class AppText
     public const string PLUS_DATA_MINING = "PLUS DataMining";
     public const string EXIF_OPT_OUT = "Exif 3.1 LearningOptOutIn";
 
+    // Settings (DS 6.15, Proto)
+    public const string GENERAL_OVERLINE = "GENERAL";
+    public const string EXIFTOOL_OVERLINE = "EXIFTOOL";
+    public const string PREVIEW_OVERLINE = "COMMAND PREVIEW";
+    public const string APP_THEME = "App theme";
+    public const string THEME_SYSTEM = "System";
+    public const string THEME_LIGHT = "Light";
+    public const string THEME_DARK = "Dark";
+    public const string APP_THEME_DESC = "System follows your OS light or dark setting.";
+    public const string ALWAYS_ON_TOP = "Keep window always on top";
+    public const string ALWAYS_ON_TOP_DESC = "Float above other apps while you compare files.";
+    public const string CHECK_UPDATES = "Check for updates on startup";
+    public const string CHECK_UPDATES_DESC = "A quiet check against GitHub releases.";
+    public const string EXECUTABLE_PATH = "Executable path";
+    public const string BROWSE = "Browse…";
+    public const string BROWSE_TIP = "Choose the exiftool to run";
+    public const string ARGUMENTS = "Arguments";
+    public const string ARGUMENTS_KEYS = "Enter to add · Backspace to remove";
+    public const string ARGUMENTS_HINT = "Hover an argument to see what it does.";
+    public const string RESET = "Reset";
+    public const string RESET_TIP = "Back to the default settings";
+    public const string OK = "OK";
+    public const string CANCEL = "Cancel";
+    public const string BUNDLED_EXIFTOOL = "Bundled ExifTool";
+    public const string PATH_NOT_FOUND = "No file at this path. ExifGlass uses its bundled ExifTool instead.";
+    public const string NO_EXIFTOOL = "No ExifTool was found. Choose the exiftool to run.";
+    public const string USE_BUNDLED = "Clear the path to use the bundled ExifTool.";
+    public const string SANDBOX_NOTE = "This version runs its bundled ExifTool and keeps the _original backups in its own container.";
+    public const string PICKER_EXIFTOOL = "Choose ExifTool";
+    public const string PICKER_PROGRAMS = "Programs";
+    public const string TOAST_SETTINGS_SAVED = "Settings saved";
+
+    // About (FewerPhotos's About, owner at the P9 review; D10, D11)
+    public const string CREDITS_OVERLINE = "CREDITS";
+    public const string COPYRIGHT = "Copyright © 2023 - 2026 Duong Dieu Phap";
+    public const string COPY_VERSION_INFO = "Copy version info";
+    public const string TOAST_VERSION_COPIED = "Version info copied";
+    public const string UPDATES = "Updates";
+    public const string NEW_BADGE = "NEW";
+    public const string CHECK_NOW = "Check now";
+    public const string NOT_CHECKED = "Not checked yet";
+    public const string CHECKING_UPDATES = "Checking for updates…";
+    public const string UPDATE_ERROR = "Couldn't check for updates. Check your connection and try again.";
+    public const string DOWNLOAD = "Download";
+    public const string WEBSITE = "Website";
+    public const string VISIT = "Visit";
+    public const string HOMEPAGE_TEXT = "github.com/d2phap/ExifGlass";
+    public const string STORE_TITLE = "Microsoft Store";
+    public const string STORE_SUB = "Support development · automatic updates";
+    public const string STORE_GET = "Get ExifGlass";
+    public const string RELEASES_TITLE = "Downloads";
+    public const string RELEASES_SUB = "Every release on GitHub";
+    public const string SHOW_FEWER = "Show fewer";
+    public const string STORE_URL = "https://apps.microsoft.com/detail/9MX8S9HZ57W8";
+    public const string TOAST_UPDATE_SUB = "Download it from About";
+
+    // the macOS menu bar (Appendix B item 5)
+    public const string MENU_FILE = "File";
+    public const string MENU_EDIT = "Edit";
+    public const string MENU_VIEW = "View";
+    public const string MENU_WINDOW = "Window";
+    public const string MENU_SETTINGS = "Settings…";
+    public const string MENU_QUIT = "Quit ExifGlass";
+    public const string MENU_OPEN = "Open…";
+    public const string MENU_COPY = "Copy";
+    public const string MENU_SELECT_ALL = "Select All";
+    public const string MENU_FIND = "Find";
+    public const string MENU_GROUPS = "Groups Panel";
+    public const string MENU_INSPECTOR = "Inspector";
+    public const string MENU_COMMAND_BAR = "Command Bar";
+    public const string MENU_MINIMIZE = "Minimize";
+    public const string MENU_ZOOM = "Zoom";
+
     #endregion // Constants
 
 
@@ -317,11 +390,67 @@ public static class AppText
     public static string OldExifTool(string version, IReadOnlyList<Core.ExifTool.ExifToolFeature> missing) =>
         $"Your ExifTool {version} can't read every AI field. " + string.Join(" ", missing.Select(f => string.Create(CultureInfo.InvariantCulture, $"{f.Name} need {f.MinVersion:0.00}.")));
 
+    /// <summary>
+    /// The "Settings saved" toast's line (Proto): "8 arguments · bundled ExifTool".
+    /// </summary>
+    public static string SettingsSavedSub(int arguments, bool custom) =>
+        string.Create(CultureInfo.InvariantCulture, $"{arguments:N0} {(arguments == 1 ? "argument" : "arguments")} · {(custom ? "custom" : "bundled")} ExifTool");
+
+    /// <summary>
+    /// The path field's placeholder (plan 4.4): "Bundled · exiftool 13.59".
+    /// </summary>
+    public static string ExifToolPlaceholder(Core.ExifTool.ExifToolSource? source, string? version) => (source, version) switch
+    {
+        (Core.ExifTool.ExifToolSource.SystemPath, { } v) => $"On PATH · exiftool {v}",
+        (_, { } v) => $"Bundled · exiftool {v}",
+        _ => BUNDLED_EXIFTOOL,
+    };
+
+    /// <summary>
+    /// A refused argument under the field: "-o: Writes or changes files".
+    /// </summary>
+    public static string Refused(string argument, string reason) => $"{argument}: {reason}";
+
+    /// <summary>
+    /// About's version line (FewerPhotos): "Version 3.0.0.1020-alpha (2026.10.25) · Windows · x64".
+    /// </summary>
+    public static string VersionLine(string version, string buildDate, string os, string architecture) => $"Version {version} ({buildDate}) · {os} · {architecture}";
+
+    public static string UpToDate(string version, string time) => $"You're up to date. Version {version} is the latest · checked at {time}.";
+
+    public static string UpdateReady(string version, string released) =>
+        string.IsNullOrEmpty(released) ? $"Version {version} is available. Download it from its page when you're ready." : $"Version {version} is available (released {released}). Download it from its page when you're ready.";
+
+    /// <summary>
+    /// D10's startup toast: "ExifGlass 3.0.1 is available".
+    /// </summary>
+    public static string UpdateAvailable(string version) => $"{AppInfo.PRODUCT_NAME} {version} is available";
+
+    /// <summary>
+    /// About's credits (plan P9): Inter where it is the UI font, the ImageGlass libraries where their hosts are built in; no Cascadia Mono, which isn't shipped (owner, 2026-10-21).
+    /// </summary>
+    public static IReadOnlyList<(string Name, string Licence)> Credits(bool inter, bool imageGlass10, bool imageGlass9)
+    {
+        var list = new List<(string, string)>
+        {
+            ("Avalonia", "MIT"),
+            ("ExifTool", "Artistic"),
+            ("ProDataGrid", "MIT"),
+            ("SkiaSharp", "MIT"),
+            ("CommunityToolkit.Mvvm", "MIT"),
+        };
+
+        if (inter) list.Add(("Inter", "OFL-1.1"));
+        if (imageGlass10) list.Add(("ImageGlass.SDK", "MIT"));
+        if (imageGlass9) list.Add(("ImageGlass.Tools", "MIT"));
+        return list;
+    }
+
     public static string ThemeName(AppTheme theme) => theme switch
     {
-        AppTheme.Light => "Light",
-        AppTheme.Dark => "Dark",
-        _ => "System",
+        AppTheme.Light => THEME_LIGHT,
+        AppTheme.Dark => THEME_DARK,
+        _ => THEME_SYSTEM,
     };
 
 

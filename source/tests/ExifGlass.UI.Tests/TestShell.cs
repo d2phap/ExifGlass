@@ -21,6 +21,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.Settings;
+using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
 using ExifGlass.UI.Windows;
@@ -44,12 +45,12 @@ public sealed class TestShell : IDisposable
 
     #region Constructors
 
-    private TestShell(double width, IWindowPlacementStore? placements, ThemeVariant? theme)
+    private TestShell(double width, IWindowPlacementStore? placements, ThemeVariant? theme, Func<SettingsStore, IMetadataReader, MainViewModel>? create)
     {
         MotionTokens.IsFrozen = true;
         Folder = Directory.CreateTempSubdirectory("eg-shell-").FullName;
         Settings = new SettingsStore(Folder);
-        ViewModel = new MainViewModel(Settings, Reader);
+        ViewModel = create?.Invoke(Settings, Reader) ?? new MainViewModel(Settings, Reader);
         Window = new MainWindow(ViewModel, placements ?? new MemoryPlacementStore()) { Width = width, Height = HEIGHT, RequestedThemeVariant = theme };
         Window.Show();
         Settle();
@@ -78,7 +79,11 @@ public sealed class TestShell : IDisposable
 
     #region Public methods
 
-    public static TestShell Open(double width, IWindowPlacementStore? placements = null, ThemeVariant? theme = null) => new(width, placements, theme);
+    /// <summary>
+    /// Opens a shell; <paramref name="create"/> makes the view model when a test needs its channel or update check.
+    /// </summary>
+    public static TestShell Open(double width, IWindowPlacementStore? placements = null, ThemeVariant? theme = null, Func<SettingsStore, IMetadataReader, MainViewModel>? create = null) =>
+        new(width, placements, theme, create);
 
 
     /// <summary>
@@ -196,6 +201,14 @@ internal sealed class RecordingShell : IShellView
     {
         Asked.Add(request);
         return Task.FromResult(Answer);
+    }
+
+    public List<string> Opened { get; } = [];
+
+    public Task OpenUriAsync(string uri)
+    {
+        Opened.Add(uri);
+        return Task.CompletedTask;
     }
 
     // the export disposes its stream; the test still reads it

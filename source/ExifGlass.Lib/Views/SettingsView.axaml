@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:tok="using:ExifGlass.UI.Tokens"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             Background="{DynamicResource BgPanelBrush}">
+
+  <!--  DS 6.15 / Spec 6: General and ExifTool rows on the panel, the command preview, then the footer; rows 56 with a hairline  -->
+  <Grid RowDefinitions="*,Auto">
+    <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="24,8,24,20">
+        <TextBlock Margin="0,10,0,4"
+                   tok:Typography.Role="Overline"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.GENERAL_OVERLINE}" />
+
+        <Border MinHeight="56"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.APP_THEME}" />
+              <TextBlock tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static app:AppText.APP_THEME_DESC}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ui:SegmentedControl Name="ThemeChoice"
+                                 Grid.Column="1"
+                                 Width="246"
+                                 VerticalAlignment="Center"
+                                 AutomationProperties.Name="{x:Static app:AppText.APP_THEME}"
+                                 SelectedIndex="{Binding ThemeIndex}">
+              <ui:SegmentedControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+              </ui:SegmentedControl.ItemsPanel>
+              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_SYSTEM}" Icon="{x:Static ui:IconId.DarkTheme}" />
+              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_LIGHT}" Icon="{x:Static ui:IconId.WeatherSunny}" />
+              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_DARK}" Icon="{x:Static ui:IconId.WeatherMoon}" />
+            </ui:SegmentedControl>
+          </Grid>
+        </Border>
+
+        <Border MinHeight="56"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.ALWAYS_ON_TOP}" />
+              <TextBlock tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static app:AppText.ALWAYS_ON_TOP_DESC}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="OnTopSwitch"
+                          Grid.Column="1"
+                          VerticalAlignment="Center"
+                          AutomationProperties.Name="{x:Static app:AppText.ALWAYS_ON_TOP}"
+                          IsChecked="{Binding AlwaysOnTop}" />
+          </Grid>
+        </Border>
+
+        <Border MinHeight="56"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1"
+                IsVisible="{Binding ShowsUpdates}">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.CHECK_UPDATES}" />
+              <TextBlock tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static app:AppText.CHECK_UPDATES_DESC}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="UpdatesSwitch"
+                          Grid.Column="1"
+                          VerticalAlignment="Center"
+                          AutomationProperties.Name="{x:Static app:AppText.CHECK_UPDATES}"
+                          IsChecked="{Binding CheckForUpdates}" />
+          </Grid>
+        </Border>
+
+        <TextBlock Margin="0,18,0,6"
+                   tok:Typography.Role="Overline"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.EXIFTOOL_OVERLINE}" />
+
+        <StackPanel Margin="0,0,0,14"
+                    IsVisible="{Binding ShowsExifToolPath}"
+                    Spacing="6">
+          <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.EXECUTABLE_PATH}" />
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBox Name="PathBox"
+                     AutomationProperties.Name="{x:Static app:AppText.EXECUTABLE_PATH}"
+                     FontFamily="{DynamicResource FontMono}"
+                     FontSize="{StaticResource FontSizeMono}"
+                     PlaceholderText="{Binding ExifToolPlaceholder}"
+                     Text="{Binding ExifToolPath}" />
+            <ui:GlassButton Name="BrowseButton"
+                            Grid.Column="1"
+                            Click="BrowseButton_Click"
+                            Content="{x:Static app:AppText.BROWSE}"
+                            Icon="{x:Static ui:IconId.FolderOpen}"
+                            ToolTip.Tip="{x:Static app:AppText.BROWSE_TIP}" />
+          </Grid>
+          <ui:InlineNote Name="PathNote"
+                         Icon="{Binding PathHintIcon}"
+                         IsVisible="{Binding HasPathHint}"
+                         Kind="{Binding PathHintKind}"
+                         Text="{Binding PathHint}" />
+        </StackPanel>
+
+        <ui:InlineNote Margin="0,0,0,14"
+                       Icon="{x:Static ui:IconId.LockClosed}"
+                       IsVisible="{Binding ShowsSandboxNote}"
+                       Kind="Info"
+                       Text="{x:Static app:AppText.SANDBOX_NOTE}" />
+
+        <StackPanel Spacing="6">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <TextBlock VerticalAlignment="Bottom"
+                       tok:Typography.Role="BodyStrong"
+                       Text="{x:Static app:AppText.ARGUMENTS}" />
+            <TextBlock Grid.Column="1"
+                       VerticalAlignment="Bottom"
+                       tok:Typography.Role="Meta"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="{x:Static app:AppText.ARGUMENTS_KEYS}" />
+          </Grid>
+          <ui:TokenField Name="ArgumentField" AutomationProperties.Name="{x:Static app:AppText.ARGUMENTS}">
+            <ui:TokenField.Note>
+              <ui:InlineNote Name="ArgumentNote"
+                             Icon="{Binding ArgumentHintIcon}"
+                             Kind="{Binding ArgumentHintKind}"
+                             Text="{Binding ArgumentHint}" />
+            </ui:TokenField.Note>
+          </ui:TokenField>
+        </StackPanel>
+
+        <TextBlock Margin="0,18,0,6"
+                   tok:Typography.Role="Overline"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   Text="{x:Static app:AppText.PREVIEW_OVERLINE}" />
+        <ui:CommandPreview Name="Preview" Tokens="{Binding PreviewTokens}" />
+      </StackPanel>
+    </ScrollViewer>
+
+    <!--  Proto: 64 high, a hairline above, Emphasis 2.5%; Reset alone on the left, OK then Cancel on the right (owner's footer order, Appendix A item 73)  -->
+    <Border Grid.Row="1"
+            Height="64"
+            Padding="24,0"
+            Background="{DynamicResource EmphasisA03Brush}"
+            BorderBrush="{DynamicResource EmphasisA07Brush}"
+            BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="8">
+        <ui:GlassButton Name="ResetButton"
+                        Classes="ghost"
+                        Command="{Binding ResetCommand}"
+                        Content="{x:Static app:AppText.RESET}"
+                        Foreground="{DynamicResource TextSecondaryBrush}"
+                        Icon="{x:Static ui:IconId.ArrowReset}"
+                        ToolTip.Tip="{x:Static app:AppText.RESET_TIP}" />
+        <ui:GlassButton Name="AboutLink"
+                        Grid.Column="1"
+                        Classes="link"
+                        Command="{Binding OpenAboutCommand}"
+                        Content="{x:Static app:AppText.ABOUT}"
+                        IsVisible="{Binding ShowsAboutLink}"
+                        ToolTip.Tip="{x:Static app:AppText.AboutTooltip}" />
+        <ui:GlassButton Name="OkButton"
+                        Grid.Column="3"
+                        MinWidth="80"
+                        Classes="primary"
+                        Command="{Binding OkCommand}"
+                        Content="{x:Static app:AppText.OK}" />
+        <ui:GlassButton Name="CancelButton"
+                        Grid.Column="4"
+                        MinWidth="80"
+                        Command="{Binding CancelCommand}"
+                        Content="{x:Static app:AppText.CANCEL}" />
+      </Grid>
+    </Border>
+  </Grid>
+
+</UserControl>

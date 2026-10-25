@@ -108,7 +108,7 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly SettingsStore _settings;
     private readonly IMetadataReader _reader;
     private readonly MetadataService? _metadata;
-    private readonly ArgumentAnalysis _arguments;
+    private ArgumentAnalysis _arguments;
     private int _queryGeneration;
     private double _windowWidth;
 

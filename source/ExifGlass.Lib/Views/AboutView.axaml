@@ -1,0 +1,226 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:ExifGlass"
+             xmlns:tok="using:ExifGlass.UI.Tokens"
+             xmlns:ui="using:ExifGlass.UI.Controls"
+             xmlns:vm="using:ExifGlass.ViewModels"
+             x:Class="ExifGlass.Views.AboutView"
+             x:DataType="vm:AboutViewModel"
+             Background="{DynamicResource BgPanelBrush}">
+
+  <!--  held by About alone: the captions under the rows, red when the check failed  -->
+  <UserControl.Styles>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="Margin" Value="0,3,0,0" />
+      <Setter Property="Foreground" Value="{DynamicResource TextTertiaryBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.caption.error">
+      <Setter Property="Foreground" Value="{DynamicResource DangerTextBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <!--  FewerPhotos's About (owner at the P9 review): header, hairline rows, credits; the copyright stays in sight under the scrolling content  -->
+  <Panel>
+    <DockPanel>
+      <Border BorderBrush="{DynamicResource EmphasisA07Brush}"
+              BorderThickness="0,1,0,0"
+              DockPanel.Dock="Bottom">
+        <TextBlock Name="CopyrightText"
+                   Margin="32,11,32,14"
+                   HorizontalAlignment="Center"
+                   tok:Typography.Role="Body"
+                   Foreground="{DynamicResource TextTertiaryBrush}"
+                   Text="{Binding Copyright}"
+                   TextTrimming="CharacterEllipsis" />
+      </Border>
+
+      <ScrollViewer Name="Scroller" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="32,4,32,8">
+          <StackPanel Margin="0,0,0,22" HorizontalAlignment="Center">
+            <ui:ScaledImage Name="Logo"
+                            Width="128"
+                            Height="128"
+                            Margin="0,8,0,6"
+                            HorizontalAlignment="Center"
+                            RenderTransformOrigin="50%,50%"
+                            Source="avares://ExifGlass.UI/Assets/Logo/logo-{0}.png" />
+            <!--  one word: no whitespace between the runs  -->
+            <TextBlock Name="Wordmark"
+                       HorizontalAlignment="Center"
+                       FontSize="30"
+                       LetterSpacing="-0.9"><Run FontWeight="SemiBold" Text="Exif" /><Run Foreground="{DynamicResource TextSecondaryBrush}" Text="Glass" /></TextBlock>
+            <TextBlock Name="VersionText"
+                       Margin="0,10,0,0"
+                       HorizontalAlignment="Center"
+                       tok:Typography.Role="MonoValue"
+                       Foreground="{DynamicResource TextTertiaryBrush}"
+                       Text="{Binding VersionLine}" />
+            <TextBlock Margin="0,6,0,0"
+                       HorizontalAlignment="Center"
+                       tok:Typography.Role="Body"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       Text="{Binding Tagline}" />
+            <ui:GlassButton Name="CopyInfoButton"
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            Command="{Binding CopyInfoCommand}"
+                            Content="{x:Static app:AppText.COPY_VERSION_INFO}"
+                            Icon="{x:Static ui:IconId.Copy}" />
+          </StackPanel>
+
+          <!--  Updates (D10): Check now, the check turning, or Download once a newer release is out  -->
+          <Border Name="UpdatesRow"
+                  Padding="0,14"
+                  BorderBrush="{DynamicResource EmphasisA07Brush}"
+                  BorderThickness="0,1,0,0"
+                  IsVisible="{Binding ShowsUpdates}">
+            <DockPanel>
+              <Panel Margin="16,0,0,0"
+                     VerticalAlignment="Center"
+                     DockPanel.Dock="Right">
+                <ui:SquircleBorder Name="CheckingPill"
+                                   Height="32"
+                                   Padding="10,0,13,0"
+                                   BorderBrush="{DynamicResource StrokeControlBrush}"
+                                   BorderThickness="1"
+                                   CornerRadius="{StaticResource RadiusControl32}"
+                                   IsVisible="{Binding IsChecking}">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ui:SpinningIcon Width="12"
+                                     Height="12"
+                                     VerticalAlignment="Center"
+                                     Icon="{x:Static ui:IconId.SpinnerArc}"
+                                     IsSpinning="{Binding IsChecking}" />
+                    <TextBlock VerticalAlignment="Center"
+                               tok:Typography.Role="Control"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Text="{x:Static app:AppText.CHECKING_UPDATES}" />
+                  </StackPanel>
+                </ui:SquircleBorder>
+                <ui:GlassButton Name="DownloadButton"
+                                Classes="primary"
+                                Command="{Binding DownloadCommand}"
+                                Content="{x:Static app:AppText.DOWNLOAD}"
+                                Icon="{x:Static ui:IconId.Open}"
+                                IsVisible="{Binding IsUpdateAvailable}" />
+                <ui:GlassButton Name="CheckButton"
+                                Command="{Binding CheckCommand}"
+                                Content="{x:Static app:AppText.CHECK_NOW}"
+                                Icon="{x:Static ui:IconId.ArrowSync}"
+                                IsVisible="{Binding CanCheck}" />
+              </Panel>
+              <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.UPDATES}" />
+                  <ui:Badge VerticalAlignment="Center"
+                            IsVisible="{Binding IsUpdateAvailable}"
+                            Kind="Edited"
+                            Text="{x:Static app:AppText.NEW_BADGE}" />
+                </StackPanel>
+                <TextBlock Name="UpdateCaption"
+                           tok:Typography.Role="Body"
+                           Classes="caption"
+                           Classes.error="{Binding IsUpdateError}"
+                           Text="{Binding UpdateText}" />
+              </StackPanel>
+            </DockPanel>
+          </Border>
+
+          <Border Name="WebsiteRow"
+                  Padding="0,14"
+                  BorderBrush="{DynamicResource EmphasisA07Brush}"
+                  BorderThickness="0,1,0,0">
+            <DockPanel>
+              <ui:GlassButton Name="VisitButton"
+                              Margin="16,0,0,0"
+                              VerticalAlignment="Center"
+                              Command="{Binding OpenHomepageCommand}"
+                              Content="{x:Static app:AppText.VISIT}"
+                              DockPanel.Dock="Right"
+                              Icon="{x:Static ui:IconId.Open}" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.WEBSITE}" />
+                <TextBlock tok:Typography.Role="Body"
+                           Classes="caption"
+                           Text="{x:Static app:AppText.HOMEPAGE_TEXT}" />
+              </StackPanel>
+            </DockPanel>
+          </Border>
+
+          <!--  D11: the Microsoft Store in the Windows direct builds, GitHub's releases in the direct macOS and AppImage builds  -->
+          <Border Name="StoreRow"
+                  Padding="0,14"
+                  BorderBrush="{DynamicResource EmphasisA07Brush}"
+                  BorderThickness="0,1,0,0"
+                  IsVisible="{Binding ShowsStore}">
+            <DockPanel>
+              <Panel Margin="16,0,0,0"
+                     VerticalAlignment="Center"
+                     DockPanel.Dock="Right">
+                <ui:GlassButton Name="StoreButton"
+                                Classes="primary"
+                                Command="{Binding OpenStoreCommand}"
+                                Content="{x:Static app:AppText.STORE_GET}"
+                                Icon="{x:Static ui:IconId.BrandMicrosoftStore}"
+                                IsVisible="{Binding IsMicrosoftStore}" />
+                <ui:GlassButton Name="ReleasesButton"
+                                Command="{Binding OpenStoreCommand}"
+                                Content="{x:Static app:AppText.VISIT}"
+                                Icon="{x:Static ui:IconId.Open}"
+                                IsVisible="{Binding IsReleases}" />
+              </Panel>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock tok:Typography.Role="BodyStrong" Text="{Binding StoreTitle}" />
+                <TextBlock tok:Typography.Role="Body"
+                           Classes="caption"
+                           Text="{Binding StoreText}" />
+              </StackPanel>
+            </DockPanel>
+          </Border>
+
+          <!--  closes whichever row is last: Updates and the store row hide in some builds  -->
+          <Border Height="1" Background="{DynamicResource EmphasisA07Brush}" />
+
+          <DockPanel Margin="0,22,0,4">
+            <ui:GlassButton Name="CreditsToggle"
+                            Margin="0,0,-8,0"
+                            Classes="link"
+                            Command="{Binding ToggleCreditsCommand}"
+                            Content="{Binding CreditsToggleText}"
+                            DockPanel.Dock="Right"
+                            IsVisible="{Binding ShowsCreditsToggle}" />
+            <TextBlock VerticalAlignment="Center"
+                       tok:Typography.Role="Overline"
+                       Foreground="{DynamicResource TextTertiaryBrush}"
+                       Text="{x:Static app:AppText.CREDITS_OVERLINE}" />
+          </DockPanel>
+          <ItemsControl Name="CreditList" ItemsSource="{Binding ShownCredits}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:CreditView">
+                <Border Padding="0,9"
+                        BorderBrush="{DynamicResource EmphasisA05Brush}"
+                        BorderThickness="0,0,0,1">
+                  <DockPanel>
+                    <ui:Badge Margin="16,0,0,0"
+                              VerticalAlignment="Center"
+                              DockPanel.Dock="Right"
+                              Kind="Licence"
+                              Text="{Binding Licence}" />
+                    <TextBlock VerticalAlignment="Center"
+                               tok:Typography.Role="BodyStrong"
+                               Text="{Binding Name}"
+                               TextTrimming="CharacterEllipsis" />
+                  </DockPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </DockPanel>
+
+    <ui:ToastHost Name="Toasts" />
+  </Panel>
+
+</UserControl>

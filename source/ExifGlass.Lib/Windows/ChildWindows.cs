@@ -20,11 +20,13 @@ using Avalonia;
 using Avalonia.Controls;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI.Windows;
+using ExifGlass.ViewModels;
+using ExifGlass.Views;
 
 namespace ExifGlass.Windows;
 
 /// <summary>
-/// The Settings window (DS 6.15): 560 wide at least, owned by the main window, placement saved; P9 builds its rows.
+/// The Settings window (DS 6.15): 560 wide at least, owned by the main window, placement saved; OK saves, Cancel, Esc or the close button restores the theme.
 /// </summary>
 public sealed class SettingsWindow : OwnedWindow
 {
@@ -37,35 +39,60 @@ public sealed class SettingsWindow : OwnedWindow
 
     #region Constructors
 
-    public SettingsWindow(IWindowPlacementStore placements, Window owner)
+    public SettingsWindow(IWindowPlacementStore placements, Window owner, SettingsViewModel viewModel)
     {
         Title = AppText.SETTINGS;
-        UsePlacement(AppSettings.WINDOW_SETTINGS, FirstSize, placements, owner);
+        MinHeight = 320;
+        UsePlacement(AppSettings.WINDOW_SETTINGS, FirstSize, placements, owner, fitHeight: true);
+
+        ViewModel = viewModel;
+        Content = new SettingsView { DataContext = viewModel };
+        viewModel.CloseRequested += (_, _) => Close();
+        Closed += (_, _) => viewModel.Close();
     }
 
     #endregion // Constructors
+
+
+    #region Properties
+
+    public SettingsViewModel ViewModel { get; }
+
+    #endregion // Properties
 }
 
 
 /// <summary>
-/// The About window (DS 6.15): 420 wide at least, owned by the main window, placement saved; P9 builds its content.
+/// The About window, sized as FewerPhotos's (owner at the P9 review): 520 wide at least, owned by the main window, placement saved.
 /// </summary>
 public sealed class AboutWindow : OwnedWindow
 {
     #region Fields and constants
 
-    public static readonly Size FirstSize = new(420, 600);
+    public static readonly Size FirstSize = new(520, 612);
 
     #endregion // Fields and constants
 
 
     #region Constructors
 
-    public AboutWindow(IWindowPlacementStore placements, Window owner)
+    public AboutWindow(IWindowPlacementStore placements, Window owner, AboutViewModel viewModel)
     {
         Title = AppText.ABOUT;
+        MinHeight = 320;
         UsePlacement(AppSettings.WINDOW_ABOUT, FirstSize, placements, owner);
+
+        ViewModel = viewModel;
+        Content = new AboutView { DataContext = viewModel };
+        Closed += (_, _) => viewModel.Close();
     }
 
     #endregion // Constructors
+
+
+    #region Properties
+
+    public AboutViewModel ViewModel { get; }
+
+    #endregion // Properties
 }

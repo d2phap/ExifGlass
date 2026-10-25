@@ -17,7 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Common;
+using ExifGlass.Core.Platform;
 using ExifGlass.Core.Settings;
+using ExifGlass.Core.Update;
 using ExifGlass.Services;
 using ExifGlass.ViewModels;
 using ExifGlass.Windows;
@@ -25,7 +27,7 @@ using ExifGlass.Windows;
 namespace ExifGlass;
 
 /// <summary>
-/// The composition root (plan 4.1): the command line, the settings, the one ExifTool and the main window's view model.
+/// The composition root (plan 4.1): the command line, the settings, the channel, the one ExifTool, the update check and the main window's view model.
 /// </summary>
 public sealed class AppServices
 {
@@ -41,13 +43,15 @@ public sealed class AppServices
 
     #region Constructors
 
-    private AppServices(StartupOptions options, SettingsStore settings, MetadataService metadata)
+    private AppServices(StartupOptions options, SettingsStore settings, MetadataService metadata, ChannelPolicy channel)
     {
         Options = options;
         Settings = settings;
         Metadata = metadata;
+        Channel = channel;
         Placements = new SettingsPlacementStore(settings);
-        ViewModel = new MainViewModel(settings, metadata, metadata);
+        Updates = new UpdateService(settings, channel, AppInfo.BuildInfo?.Version ?? "0.0.0");
+        ViewModel = new MainViewModel(settings, metadata, metadata) { Channel = channel, Updates = Updates };
     }
 
     #endregion // Constructors
@@ -60,6 +64,10 @@ public sealed class AppServices
     public SettingsStore Settings { get; }
 
     public MetadataService Metadata { get; }
+
+    public ChannelPolicy Channel { get; }
+
+    public UpdateService Updates { get; }
 
     public SettingsPlacementStore Placements { get; }
 
@@ -88,11 +96,35 @@ public sealed class AppServices
         var metadata = new MetadataService(() => settings.Current);
         metadata.Start();
 
-        return new AppServices(options, settings, metadata);
+        return new AppServices(options, settings, metadata, DetectChannel());
+    }
+
+
+    /// <summary>
+    /// The channel this build came from (plan 4.5): the build flavor, the package identity, the environment.
+    /// </summary>
+    public static ChannelPolicy DetectChannel()
+    {
+        var build = AppInfo.BuildInfo;
+        var platform = build?.PlatformId ?? (OperatingSystem.IsWindows() ? "win" : OperatingSystem.IsMacOS() ? "mac" : "linux");
+        return ChannelPolicy.Detect(platform, build?.Channel ?? "Direct", PlatformServices.Shell?.PackageFamilyName);
     }
 
 
     public MainWindow CreateMainWindow() => new(ViewModel, Placements);
+
+
+    /// <summary>
+    /// The startup update check (D10), a moment after the window shows; says so with a toast when a newer release is out.
+    /// </summary>
+    public async Task CheckForUpdateOnStartupAsync()
+    {
+        if (!Updates.IsAvailable || !Settings.Current.CheckForUpdates) return;
+
+        await Task.Delay(UpdateService.StartupDelay);
+        var result = await Updates.CheckOnStartupAsync();
+        if (result.Status == UpdateStatus.Available && result.Info is { } info) ViewModel.ShowUpdateToast(info.Version);
+    }
 
 
     /// <summary>

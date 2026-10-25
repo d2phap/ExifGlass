@@ -117,10 +117,10 @@ public partial class MainWindow : Window, IShellView
     public void FocusSearch() => Toolbar.FocusSearch();
 
 
-    public void ShowSettings() => ShowChild(ref _settingsWindow, () => new SettingsWindow(_placements, this));
+    public void ShowSettings() => ShowChild(ref _settingsWindow, () => new SettingsWindow(_placements, this, new SettingsViewModel(ViewModel)));
 
 
-    public void ShowAbout() => ShowChild(ref _aboutWindow, () => new AboutWindow(_placements, this));
+    public void ShowAbout() => ShowChild(ref _aboutWindow, () => new AboutWindow(_placements, this, new AboutViewModel(ViewModel)));
 
 
     public async Task CopyTextAsync(string text)
@@ -202,7 +202,7 @@ public partial class MainWindow : Window, IShellView
             if (ReferenceEquals(_settingsWindow, created)) _settingsWindow = null;
             if (ReferenceEquals(_aboutWindow, created)) _aboutWindow = null;
         };
-        created.Show(this);
+        created.ShowAbove(this);
     }
 
     #endregion // Private methods

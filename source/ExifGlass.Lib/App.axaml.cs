@@ -96,6 +96,7 @@ public partial class App : Application
         var window = services.CreateMainWindow();
         var probe = perf ? new FrameProbe(window) : null;
         desktop.MainWindow = window;
+        if (OperatingSystem.IsMacOS()) Windows.MacMenuBar.Attach(this, window);
         window.Show();
         StartupClock.Mark("main window shown");
 
@@ -113,6 +114,7 @@ public partial class App : Application
 #endif
 
         if (services.Options.File is { } file) _ = services.ViewModel.OpenFileAsync(file);
+        _ = services.CheckForUpdateOnStartupAsync();
     }
 
     #endregion // Public methods

@@ -51,6 +51,54 @@ public partial class MainWindow
     #endregion // Properties
 
 
+    #region Public methods
+
+    /// <summary>
+    /// The macOS menu's Copy, which takes Cmd+C before any control: the focused text's selection, else the table's (DS 7.6).
+    /// </summary>
+    public void CopyFromMenu()
+    {
+        switch (FocusManager?.GetFocusedElement())
+        {
+            case TextBox box:
+                box.Copy();
+                break;
+
+            case SelectableTextBlock text:
+                text.Copy();
+                break;
+
+            default:
+                ViewModel.CopySelection();
+                break;
+        }
+    }
+
+
+    /// <summary>
+    /// The macOS menu's Select All: the focused text, else every row in view.
+    /// </summary>
+    public void SelectAllFromMenu()
+    {
+        switch (FocusManager?.GetFocusedElement())
+        {
+            case TextBox box:
+                box.SelectAll();
+                break;
+
+            case SelectableTextBlock text:
+                text.SelectAll();
+                break;
+
+            default:
+                ViewModel.SelectAllRows();
+                break;
+        }
+    }
+
+    #endregion // Public methods
+
+
     #region Private methods
 
     private void InitializeInput()

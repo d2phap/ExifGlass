@@ -20,13 +20,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using ExifGlass.Core.Editing;
 
 namespace ExifGlass.UI.Controls;
 
 /// <summary>
-/// Settings' command preview (DS 6.15): the read command in a mono well that adapts to the theme, wrapped, its tokens coloured as in the command bar.
+/// Settings' command preview (DS 6.15): the read command in a mono well that adapts to the theme, wrapped, its tokens coloured as in the command bar, selectable (owner at the P9 review).
 /// </summary>
 public class CommandPreview : TemplatedControl
 {
@@ -37,9 +39,9 @@ public class CommandPreview : TemplatedControl
 
     private const double LINE_HEIGHT = 1.7;
 
-    private static readonly string ZERO_WIDTH_SPACE = char.ConvertFromUtf32(0x200B);
+    internal static readonly string ZERO_WIDTH_SPACE = char.ConvertFromUtf32(0x200B);
 
-    private TextBlock? _text;
+    private CommandText? _text;
 
     #endregion // Fields and constants
 
@@ -76,7 +78,7 @@ public class CommandPreview : TemplatedControl
     {
         base.OnApplyTemplate(e);
 
-        _text = e.NameScope.Find<TextBlock>("PART_Text");
+        _text = e.NameScope.Find<CommandText>("PART_Text");
 
         // Proto: line-height 1.7 of the mono size, whichever size this OS's mono token has
         if (_text is not null) _text.LineHeight = Math.Round(_text.FontSize * LINE_HEIGHT * 2) / 2;
@@ -118,6 +120,64 @@ public class CommandPreview : TemplatedControl
 
     // a path wraps at its separators (Proto: overflow-wrap anywhere), not after "D:" with the rest overflowing
     private static string Breakable(string path) => path.Replace("\\", "\\" + ZERO_WIDTH_SPACE, StringComparison.Ordinal).Replace("/", "/" + ZERO_WIDTH_SPACE, StringComparison.Ordinal);
+
+    #endregion // Private methods
+}
+
+
+/// <summary>
+/// The preview's text: a copy of the selection drops the zero-width spaces that let paths wrap, so it pastes into a terminal as typed.
+/// </summary>
+public sealed class CommandText : SelectableTextBlock
+{
+    #region Properties
+
+    protected override Type StyleKeyOverride => typeof(SelectableTextBlock);
+
+    #endregion // Properties
+
+
+    #region Constructors
+
+    public CommandText()
+    {
+        // the theme's menu calls the base Copy, which would keep them
+        var copy = new GlassMenuItem { Header = UiText.COPY, Glyph = IconId.Copy, InputGesture = TextBox.CopyGesture };
+        copy.Click += (_, _) => CopyClean();
+        var menu = new MenuFlyout { Items = { copy } };
+        MenuMotion.Attach(menu);
+        ContextFlyout = menu;
+    }
+
+    #endregion // Constructors
+
+
+    #region Protected methods
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (Application.Current?.PlatformSettings?.HotkeyConfiguration.Copy.Any(g => g.Matches(e)) == true)
+        {
+            CopyClean();
+            e.Handled = true;
+            return;
+        }
+
+        base.OnKeyDown(e);
+    }
+
+    #endregion // Protected methods
+
+
+    #region Private methods
+
+    private async void CopyClean()
+    {
+        var text = SelectedText;
+        if (string.IsNullOrEmpty(text) || TopLevel.GetTopLevel(this)?.Clipboard is not { } clipboard) return;
+
+        await clipboard.SetTextAsync(text.Replace(CommandPreview.ZERO_WIDTH_SPACE, string.Empty, StringComparison.Ordinal));
+    }
 
     #endregion // Private methods
 }

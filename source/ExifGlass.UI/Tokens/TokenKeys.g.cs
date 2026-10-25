@@ -528,7 +528,7 @@ public static class TokenKeys
     public const string FONT_SIZE_SUBTITLE = "FontSizeSubtitle";
     // 17
     public const string FONT_SIZE_EMPTY_TITLE = "FontSizeEmptyTitle";
-    // 13
+    // 14
     public const string FONT_SIZE_BODY = "FontSizeBody";
     // 12.5
     public const string FONT_SIZE_CONTROL = "FontSizeControl";

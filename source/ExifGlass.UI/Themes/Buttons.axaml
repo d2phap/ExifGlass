@@ -292,6 +292,54 @@
     </Style>
   </ControlTheme>
 
+  <!--  a full-width list row that opens something (About's notices, as FewerPhotos's): no border, content stretched, the wide press (plan 5.5)  -->
+  <ControlTheme x:Key="ListRowButton" TargetType="Button">
+    <Setter Property="MinHeight" Value="{StaticResource ControlHeight}" />
+    <Setter Property="Padding" Value="12,9" />
+    <Setter Property="CornerRadius" Value="{StaticResource RadiusMenuItem}" />
+    <Setter Property="FontSize" Value="{StaticResource FontSizeBody}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Name="PART_Root" Background="Transparent" RenderTransformOrigin="50%,50%">
+          <ui:InteractionOverlay Name="PART_Overlay"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 HoverBrush="{DynamicResource StateHoverBrush}"
+                                 PressBrush="{DynamicResource StatePressedWideBrush}"
+                                 PressScale="{x:Static tok:MotionTokens.PRESS_SCALE_WIDE}"
+                                 RestBrush="{DynamicResource StateRestBrush}" />
+          <ui:SquircleBorder Name="PART_FocusRing"
+                             BorderBrush="{DynamicResource AccentBrush}"
+                             BorderThickness="2"
+                             CornerRadius="{TemplateBinding CornerRadius}"
+                             IsHitTestVisible="False"
+                             Opacity="0">
+            <ui:SquircleBorder.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+              </Transitions>
+            </ui:SquircleBorder.Transitions>
+          </ui:SquircleBorder>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:focus-visible /template/ Border#PART_FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
   <!--  DS 6.1 toggle: off = Regular icon, on = Filled icon + Accent 10% + AccentText  -->
   <ControlTheme x:Key="{x:Type ui:GlassToggleButton}" TargetType="ui:GlassToggleButton">
     <Setter Property="Width" Value="{StaticResource ControlHeight}" />

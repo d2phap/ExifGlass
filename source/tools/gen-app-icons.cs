@@ -27,8 +27,8 @@ var logo = Path.Combine(sourceDir, "__assets", "__app", "logo.svg");
 var outDir = Path.Combine(sourceDir, "ExifGlass.UI", "Assets", "Logo");
 var resvg = FindResvg(sourceDir);
 
-// the boxes the UI draws the logo in (DS 6.9 empty card 60, drag scrim 80, About 128 as FewerPhotos, small cards 48)
-int[] boxes = [48, 60, 80, 128];
+// the boxes the UI draws the logo in (DS 6.9 empty card 60, drag scrim 80, About 104: FewerPhotos's 128 icon draws its art in about 103, small cards 48)
+int[] boxes = [48, 60, 80, 104];
 var sizes = new SortedSet<int> { 256 };
 foreach (var box in boxes)
 {

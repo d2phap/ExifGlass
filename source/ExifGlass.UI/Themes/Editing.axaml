@@ -272,11 +272,11 @@
                            BorderBrush="{TemplateBinding BorderBrush}"
                            BorderThickness="{TemplateBinding BorderThickness}"
                            CornerRadius="{TemplateBinding CornerRadius}">
-          <TextBlock Name="PART_Text"
-                     FontFamily="{DynamicResource FontMono}"
-                     FontSize="{StaticResource FontSizeMono}"
-                     FontFeatures="+tnum"
-                     TextWrapping="Wrap" />
+          <ui:CommandText Name="PART_Text"
+                          FontFamily="{DynamicResource FontMono}"
+                          FontSize="{StaticResource FontSizeMono}"
+                          FontFeatures="+tnum"
+                          TextWrapping="Wrap" />
         </ui:SquircleBorder>
       </ControlTemplate>
     </Setter>

@@ -188,8 +188,8 @@ static class Generator
         new("title", 16, 600, false, 22, 0, false, "Selected-tag name, section titles"),
         new("subtitle", 14, 500, false, 20, 0, false, "Table toolbar summary"),
         new("empty-title", 17, 500, false, null, 0, false, "Empty-state title (plan Appendix A item 23)"),
-        new("body", 13, 400, false, 19, 0, false, "Default text, table cells"),
-        new("body-strong", 13, 500, false, 19, 0, false, "Menu labels, group names"),
+        new("body", 14, 400, false, 20, 0, false, "Default text, table cells"),
+        new("body-strong", 14, 500, false, 20, 0, false, "Menu labels, group names"),
         new("control", 12.5, 500, false, null, 0, false, "Button labels, segmented options"),
         new("caption", 12, 400, false, 16, 0, false, "Field descriptions, helper text"),
         new("meta", 11.5, 400, false, 16, 0, false, "Secondary meta, sub-labels, chip text"),
@@ -205,7 +205,7 @@ static class Generator
     static readonly (string Key, double Size, bool Mono)[] FontSizes =
     [
         ("FontSizeDisplay", 22, false), ("FontSizeTitle", 16, false), ("FontSizeSubtitle", 14, false), ("FontSizeEmptyTitle", 17, false),
-        ("FontSizeBody", 13, false), ("FontSizeControl", 12.5, false), ("FontSizeCaption", 12, false), ("FontSizeMeta", 11.5, false),
+        ("FontSizeBody", 14, false), ("FontSizeControl", 12.5, false), ("FontSizeCaption", 12, false), ("FontSizeMeta", 11.5, false),
         ("FontSizeOverline", 11, false), ("FontSizeBadge", 10.5, false), ("FontSizeStoreTitle", 16, false),
         ("FontSizeMono", 11.5, true), ("FontSizeMonoValue", 12.5, true), ("FontSizeMonoSmall", 11, true), ("FontSizeMonoBadge", 10.5, true),
     ];

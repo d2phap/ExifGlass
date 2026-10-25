@@ -354,7 +354,6 @@
                                  PressBrush="{DynamicResource StatePressedBrush}"
                                  RestBrush="{DynamicResource StateRestBrush}" />
           <StackPanel Margin="{TemplateBinding Padding}" VerticalAlignment="Center" Orientation="Horizontal" Spacing="4">
-            <ui:GlassIcon Name="PART_Lock" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.LockClosed}" IsVisible="False" />
             <ui:GlassIcon Name="PART_Add" Width="12" Height="12" VerticalAlignment="Center" Icon="{x:Static ui:IconId.Add}" IsVisible="False" />
             <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Text}" />
             <TextBlock Name="PART_Hint"
@@ -405,8 +404,10 @@
     <Style Selector="^:pointerover /template/ Button#PART_Remove">
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="^:locked /template/ ui|GlassIcon#PART_Lock">
-      <Setter Property="IsVisible" Value="True" />
+    <!--  an app-owned flag (D1): gray, no remove button (owner at the P9 review: no lock icon)  -->
+    <Style Selector="^:locked">
+      <Setter Property="Background" Value="{DynamicResource EmphasisA07Brush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
     </Style>
     <Style Selector="^:locked /template/ Button#PART_Remove">
       <Setter Property="IsVisible" Value="False" />

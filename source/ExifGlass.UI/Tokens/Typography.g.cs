@@ -37,9 +37,9 @@ public enum TextRole
     Subtitle,
     // 17 Medium: Empty-state title (plan Appendix A item 23)
     EmptyTitle,
-    // 13/19 Normal: Default text, table cells
+    // 14/20 Normal: Default text, table cells
     Body,
-    // 13/19 Medium: Menu labels, group names
+    // 14/20 Medium: Menu labels, group names
     BodyStrong,
     // 12.5 Medium: Button labels, segmented options
     Control,
@@ -74,8 +74,8 @@ public static partial class Typography
         TextRole.Title => new(16, FontWeight.SemiBold, false, 22, 0, false),
         TextRole.Subtitle => new(14, FontWeight.Medium, false, 20, 0, false),
         TextRole.EmptyTitle => new(17, FontWeight.Medium, false, double.NaN, 0, false),
-        TextRole.Body => new(13, FontWeight.Normal, false, 19, 0, false),
-        TextRole.BodyStrong => new(13, FontWeight.Medium, false, 19, 0, false),
+        TextRole.Body => new(14, FontWeight.Normal, false, 20, 0, false),
+        TextRole.BodyStrong => new(14, FontWeight.Medium, false, 20, 0, false),
         TextRole.Control => new(12.5, FontWeight.Medium, false, double.NaN, 0, false),
         TextRole.Caption => new(12, FontWeight.Normal, false, 16, 0, false),
         TextRole.Meta => new(11.5, FontWeight.Normal, false, 16, 0, false),

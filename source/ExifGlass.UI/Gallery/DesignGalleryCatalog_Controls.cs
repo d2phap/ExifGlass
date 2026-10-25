@@ -21,6 +21,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Styling;
+using ExifGlass.Core.ExifTool;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
 using ExifGlass.UI.Windows;
@@ -68,6 +70,7 @@ public static partial class DesignGalleryCatalog
             new(":pressed", Row(b => b.Pressed()), "State.Pressed + scale 0.96, 140 ms Emphasized"),
             new(":focus-visible", Row(b => b.FocusVisible()), "2 px inset ring, no glow, 120 ms"),
             new(":disabled", Row(b => b.Disabled()), "opacity 0.45"),
+            new("list row", ListRows(), "ListRowButton (About's notices, as FewerPhotos's): full width, the hover past the text column, the wide press: Black 8% and scale 0.98"),
             new("card 30 · small 28 · tiny 24", new StackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -138,6 +141,29 @@ public static partial class DesignGalleryCatalog
     }
 
 
+    private static Control ListRows()
+    {
+        static Button Row(string name, string licence) => new()
+        {
+            Theme = Application.Current?.FindResource("ListRowButton") as ControlTheme,
+            Content = new DockPanel
+            {
+                Children =
+                {
+                    new Badge { Text = licence, Kind = BadgeKind.Licence, Margin = new Thickness(16, 0, 0, 0), [DockPanel.DockProperty] = Dock.Right },
+                    DesignGallery.Text(name, TextRole.BodyStrong, TokenKeys.TEXT_PRIMARY_BRUSH),
+                },
+            },
+        };
+
+        return new StackPanel
+        {
+            Width = 420,
+            Children = { Row("Avalonia UI", "MIT"), Row("ExifTool", "Artistic-1.0-Perl or GPL-1.0+").Hover(), Row("SkiaSharp and Skia", "MIT, BSD-3-Clause").Pressed() },
+        };
+    }
+
+
     private static GallerySection StoreBadges() => new("c-store", "Store badge", "DS 6.15: inverse fill, no shadow, radius 16, 52 high, the official Store mark 24; hover brightness 1.15, pressed 0.9 and scale 0.97.",
     [
         new("rest", new StoreBadge().Left()),
@@ -181,9 +207,14 @@ public static partial class DesignGalleryCatalog
             _ => default,
         };
 
-        string?[] hints = ["raw values", "duplicates", "unknown tags", "embedded", "short names"];
-        string[] suggestions = ["-n", "-a", "-u", "-ee", "-s"];
-        var field = new TokenField { Width = 460, Suggestions = suggestions, NoteProvider = Note, SuggestionHint = t => hints[Array.IndexOf(suggestions, t)] };
+        var suggestions = ArgumentPolicy.SUGGESTIONS;
+        var field = new TokenField
+        {
+            Width = 460,
+            Suggestions = [.. suggestions.Select(x => x.Flag)],
+            NoteProvider = Note,
+            SuggestionHint = t => suggestions.FirstOrDefault(x => x.Flag == t).Label,
+        };
         field.SetTokens(["-fast", "-G", "-t", "-m", "-q", "-H", "-charset", "UTF8"]);
 
         var invalid = new TokenField { Width = 460, NoteProvider = Note };

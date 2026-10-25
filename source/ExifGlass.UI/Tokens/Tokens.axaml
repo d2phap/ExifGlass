@@ -414,7 +414,7 @@
   <x:Double x:Key="FontSizeTitle">16</x:Double>
   <x:Double x:Key="FontSizeSubtitle">14</x:Double>
   <x:Double x:Key="FontSizeEmptyTitle">17</x:Double>
-  <x:Double x:Key="FontSizeBody">13</x:Double>
+  <x:Double x:Key="FontSizeBody">14</x:Double>
   <x:Double x:Key="FontSizeControl">12.5</x:Double>
   <x:Double x:Key="FontSizeCaption">12</x:Double>
   <x:Double x:Key="FontSizeMeta">11.5</x:Double>

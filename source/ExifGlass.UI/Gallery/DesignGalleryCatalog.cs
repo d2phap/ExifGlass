@@ -272,7 +272,7 @@ public static partial class DesignGalleryCatalog
                 {
                     new ScaledImage { Source = LOGO, Width = 48, Height = 48, VerticalAlignment = VerticalAlignment.Bottom },
                     new ScaledImage { Source = LOGO, Width = 60, Height = 60, VerticalAlignment = VerticalAlignment.Bottom },
-                    new ScaledImage { Source = LOGO, Width = 128, Height = 128, VerticalAlignment = VerticalAlignment.Bottom },
+                    new ScaledImage { Source = LOGO, Width = 104, Height = 104, VerticalAlignment = VerticalAlignment.Bottom },
                 },
             }, "ScaledImage picks the 1x, 2x or 3x render (gen-app-icons)"),
         ]);

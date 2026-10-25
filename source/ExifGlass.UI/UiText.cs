@@ -33,7 +33,6 @@ public static class UiText
     public const string REMOVE = "Remove";
     public const string SHOW_MORE = "Show more";
     public const string SHOW_LESS = "Show less";
-    public const string LOCKED_ARGUMENT = "Always on: ExifGlass needs it to read the file";
     public const string ADD_ARGUMENT = "Add an argument";
     public const string STORE_CAPTION = "Get it from";
     public const string STORE_TARGET = "Microsoft Store";

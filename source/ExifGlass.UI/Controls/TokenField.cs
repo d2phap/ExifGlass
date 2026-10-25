@@ -238,7 +238,7 @@ public class TokenField : TemplatedControl
             };
             chip.Classes.Set("value", !token.StartsWith('-'));
 
-            var tip = chip.IsLocked ? UiText.LOCKED_ARGUMENT : note.Error ?? note.Description;
+            var tip = note.Error ?? note.Description;
             if (!string.IsNullOrEmpty(tip)) ToolTip.SetTip(chip, tip);
 
             chip.RemoveRequested += Chip_RemoveRequested;

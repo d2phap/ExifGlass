@@ -148,6 +148,11 @@ public class ChildWindowTests
         field.RemoveLast();
         field.RemoveLast();
         Assert.True(vm.OkCommand.CanExecute(null));
+
+        // an app-owned flag says what it does, as every chip
+        var g = window.GetVisualDescendants().OfType<TokenChip>().First(c => c.Text == "-G");
+        Assert.True(g.IsLocked);
+        Assert.Equal("Print the group name for each tag", ToolTip.GetTip(g));
         window.Close();
     }
 

@@ -194,18 +194,11 @@ public static partial class DesignGalleryCatalog
 
     private static GallerySection TokenFields()
     {
-        static TokenNote Note(IReadOnlyList<string> tokens, int i) => tokens[i] switch
+        static TokenNote Note(IReadOnlyList<string> tokens, int i)
         {
-            "-G" or "-t" or "-H" => new(null, IsLocked: true),
-            "-fast" => new("Skip scanning for trailers, for faster reads"),
-            "-m" => new("Ignore minor errors and warnings"),
-            "-q" => new("Quiet: suppress informational messages"),
-            "-charset" => new("Character set for output"),
-            "-o" => new(null, "Writes or changes files"),
-            _ when i > 0 && tokens[i - 1] == "-o" => new(null, "Writes or changes files"),
-            _ when i > 0 && tokens[i - 1] == "-charset" => new("Value for -charset"),
-            _ => default,
-        };
+            var chip = ArgumentPolicy.Chips(tokens)[i];
+            return new TokenNote(chip.Description, chip.Reason, chip.IsLocked);
+        }
 
         var suggestions = ArgumentPolicy.SUGGESTIONS;
         var field = new TokenField

@@ -186,6 +186,18 @@ public sealed class SettingsTests : IDisposable
         Assert.EndsWith("ExifGlass", SettingsStore.DefaultDirectory());
     }
 
+
+    [Fact]
+    public void ThePortableMarkerKeepsTheSettingsNextToTheApp()
+    {
+        Assert.False(SettingsStore.IsPortable(_dir));
+        Assert.NotEqual(_dir, SettingsStore.DefaultDirectory(_dir));
+
+        File.WriteAllBytes(Path.Combine(_dir, SettingsStore.PORTABLE_MARKER), []);
+        Assert.True(SettingsStore.IsPortable(_dir));
+        Assert.Equal(Path.GetFullPath(_dir), SettingsStore.DefaultDirectory(_dir + Path.DirectorySeparatorChar));
+    }
+
     #endregion // Tests
 
 

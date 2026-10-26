@@ -34,6 +34,11 @@ public sealed class SettingsStore : IAsyncDisposable
     /// </summary>
     public const string V2_FILE_NAME = "exifglass.config.json";
 
+    /// <summary>
+    /// D19: an empty file of this name next to the executable keeps the settings in that folder (the portable ZIP).
+    /// </summary>
+    public const string PORTABLE_MARKER = ".egportable";
+
     private static readonly TimeSpan DEBOUNCE = TimeSpan.FromMilliseconds(400);
 
     private readonly Lock _lock = new();
@@ -79,14 +84,23 @@ public sealed class SettingsStore : IAsyncDisposable
     #region Public methods
 
     /// <summary>
-    /// The per-user settings folder: %LOCALAPPDATA%\ExifGlass, ~/.config/ExifGlass, ~/Library/Application Support/ExifGlass.
+    /// The app's own folder when it carries the portable marker (D19), else the per-user folder: %LOCALAPPDATA%\ExifGlass, ~/.config/ExifGlass, ~/Library/Application Support/ExifGlass.
     /// </summary>
-    public static string DefaultDirectory()
+    public static string DefaultDirectory(string? appDirectory = null)
     {
+        appDirectory ??= AppContext.BaseDirectory;
+        if (IsPortable(appDirectory)) return Path.TrimEndingDirectorySeparator(Path.GetFullPath(appDirectory));
+
         var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         if (string.IsNullOrEmpty(baseDir)) baseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
         return Path.Combine(baseDir, Common.AppInfo.PRODUCT_NAME);
     }
+
+
+    /// <summary>
+    /// True when the portable marker sits next to the executable (D19). A read-only folder keeps the settings for the run only.
+    /// </summary>
+    public static bool IsPortable(string? appDirectory = null) => File.Exists(Path.Combine(appDirectory ?? AppContext.BaseDirectory, PORTABLE_MARKER));
 
 
     /// <summary>

@@ -133,6 +133,16 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
 
     public string? Version => _exifTool?.Version;
 
+    /// <summary>
+    /// D7: the Mac App Store build's container copies, which ExifTool reads and writes instead of the user's file; null elsewhere.
+    /// </summary>
+    public SandboxStaging? Staging { get; init; }
+
+    /// <summary>
+    /// False in the Mac App Store build: an ExifTool the user picked can't run from the sandbox (S7).
+    /// </summary>
+    public bool CustomExifTool { get; init; } = true;
+
     #endregion // Properties
 
 
@@ -179,36 +189,67 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
         var tagDb = await load.ConfigureAwait(false);
         var arguments = ArgumentPolicy.Analyze(_settings().ExifToolArguments).PassThrough;
 
-        return await service.ReadAsync(path, arguments, tagDb, cancellationToken).ConfigureAwait(false);
+        var exifToolPath = await ExifToolPathAsync(path, cancellationToken).ConfigureAwait(false);
+        return await service.ReadAsync(exifToolPath, path, arguments, tagDb, cancellationToken).ConfigureAwait(false);
     }
 
 
     public async Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken)
     {
         var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
-        return await service.ReadAiAsync(path, cancellationToken).ConfigureAwait(false);
+        var exifToolPath = await ExifToolPathAsync(path, cancellationToken).ConfigureAwait(false);
+        return await service.ReadAiAsync(exifToolPath, path, cancellationToken).ConfigureAwait(false);
     }
 
 
     public async Task<byte[]?> ReadPreviewAsync(string path, CancellationToken cancellationToken)
     {
         var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
-        return await service.ReadPreviewAsync(path, cancellationToken).ConfigureAwait(false);
+        var exifToolPath = await ExifToolPathAsync(path, cancellationToken).ConfigureAwait(false);
+        return await service.ReadPreviewAsync(exifToolPath, cancellationToken).ConfigureAwait(false);
     }
 
 
     public async Task<SaveResult> WriteAsync(string path, EditSet edits, CancellationToken cancellationToken)
     {
         var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
-        using var plan = WritePlan.Build(path, edits);
-        return await service.WriteAsync(plan, cancellationToken).ConfigureAwait(false);
+        if (Staging is not { } staging)
+        {
+            using var plan = WritePlan.Build(path, edits);
+            return await service.WriteAsync(plan, cancellationToken).ConfigureAwait(false);
+        }
+
+        // D7: ExifTool writes a fresh copy in the container, which then goes over the user's file
+        var staged = await staging.StageAsync(path, cancellationToken).ConfigureAwait(false);
+        SaveResult result;
+        using (var plan = WritePlan.Build(staged, edits))
+        {
+            result = await service.WriteAsync(plan, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (result.Outcome != SaveOutcome.Updated)
+        {
+            staging.Forget(path);
+            return result;
+        }
+
+        try
+        {
+            var backup = await Task.Run(() => staging.Commit(path), CancellationToken.None).ConfigureAwait(false);
+            return result with { BackupPath = backup };
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return new SaveResult(SaveOutcome.Failed, [ex.Message], result.Warnings, null);
+        }
     }
 
 
     public async Task<byte[]?> ReadBinaryAsync(string path, string writeName, CancellationToken cancellationToken)
     {
         var service = await ReadyAsync(cancellationToken).ConfigureAwait(false);
-        return await service.ReadBinaryAsync(path, writeName, cancellationToken).ConfigureAwait(false);
+        var exifToolPath = await ExifToolPathAsync(path, cancellationToken).ConfigureAwait(false);
+        return await service.ReadBinaryAsync(exifToolPath, writeName, cancellationToken).ConfigureAwait(false);
     }
 
 
@@ -241,6 +282,7 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
         var service = _exifTool;
         _exifTool = null;
         if (service is not null) await service.DisposeAsync().ConfigureAwait(false);
+        Staging?.Dispose();
     }
 
     #endregion // Public methods
@@ -250,7 +292,7 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
 
     private async Task StartCoreAsync()
     {
-        var location = ExifToolLocator.Locate(_settings().ExifToolPath);
+        var location = ExifToolLocator.Locate(CustomExifTool ? _settings().ExifToolPath : null);
         if (location is null)
         {
             SetStatus(ExifToolStatus.Missing, "No ExifTool was found");
@@ -273,6 +315,10 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
             SetStatus(ExifToolStatus.Failed, ex.Message);
         }
     }
+
+
+    private Task<string> ExifToolPathAsync(string path, CancellationToken cancellationToken) =>
+        Staging?.StageAsync(path, cancellationToken) ?? Task.FromResult(path);
 
 
     private static string Executable(ExifToolLocation? location) => location?.Path ?? (OperatingSystem.IsWindows() ? "exiftool.exe" : "exiftool");

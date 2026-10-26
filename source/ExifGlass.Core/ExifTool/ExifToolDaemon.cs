@@ -54,6 +54,11 @@ public sealed class ExifToolDaemonOptions
     public required string ExePath { get; init; }
 
     /// <summary>
+    /// The Perl to start with the script as its first argument; null runs the script or exe itself.
+    /// </summary>
+    public string? InterpreterPath { get; init; }
+
+    /// <summary>
     /// ExifGlass's ExifTool config; it only works as the very first argument of the process (S5).
     /// </summary>
     public string? ConfigPath { get; init; }
@@ -393,7 +398,7 @@ public sealed class ExifToolDaemon : IAsyncDisposable
 
         var psi = new ProcessStartInfo
         {
-            FileName = _options.ExePath,
+            FileName = _options.InterpreterPath ?? _options.ExePath,
             UseShellExecute = false,
             CreateNoWindow = true,
             RedirectStandardInput = true,
@@ -402,6 +407,7 @@ public sealed class ExifToolDaemon : IAsyncDisposable
             StandardErrorEncoding = UTF8_NO_BOM,
         };
 
+        if (_options.InterpreterPath is not null) psi.ArgumentList.Add(_options.ExePath);
         if (_options.ConfigPath is { } config && File.Exists(config))
         {
             psi.ArgumentList.Add("-config");

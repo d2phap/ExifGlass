@@ -79,7 +79,7 @@ public sealed partial class MainViewModel
 
     public string PendingTitle => AppText.PendingChanges(PendingCount);
 
-    public string PendingSubtitle => Document is null ? string.Empty : AppText.SaveWrites(Document.FileName);
+    public string PendingSubtitle => Document is null ? string.Empty : Channel.BackupInContainer ? AppText.SaveWritesInContainer(Document.FileName) : AppText.SaveWrites(Document.FileName);
 
     /// <summary>
     /// What Save can't do: a location in the Content Credentials, a tag the AI redaction can't remove (plan P8); null when nothing.
@@ -343,7 +343,7 @@ public sealed partial class MainViewModel
             }
 
             if (result.Outcome == SaveOutcome.Unchanged) Shell?.ShowToast(AppText.TOAST_NOTHING_SAVED, AppText.TOAST_NOTHING_SAVED_SUB, ToastKind.Info);
-            else Shell?.ShowToast(AppText.Saved(edits.PendingCount), SaveNote(result) ?? AppText.BackupKept(doc.FileName));
+            else Shell?.ShowToast(AppText.Saved(edits.PendingCount), SaveNote(result) ?? (Channel.BackupInContainer ? AppText.BACKUP_KEPT_IN_CONTAINER : AppText.BackupKept(doc.FileName)));
 
             // the read that follows keeps the groups, filters and selection, and drops what was staged
             if (reload)

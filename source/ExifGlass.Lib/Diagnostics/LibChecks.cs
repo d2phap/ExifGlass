@@ -17,24 +17,36 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Diagnostics;
+using ExifGlass.Core.Settings;
 using SkiaSharp;
 
 namespace ExifGlass.Diagnostics;
 
 /// <summary>
-/// Self-test checks for what the UI layer brings: the pinned SkiaSharp and its native library.
+/// Self-test checks for what the app layer brings: the pinned SkiaSharp and its native library, the channel the package gave the run.
 /// </summary>
 public static class LibChecks
 {
     #region Public methods
 
     public static SelfTest AddLibChecks(this SelfTest test) => test
-        .Add("skia", _ => Task.FromResult(CheckSkia()));
+        .Add("skia", _ => Task.FromResult(CheckSkia()))
+        .Add("channel", _ => Task.FromResult(CheckChannel()));
 
     #endregion // Public methods
 
 
     #region Private methods
+
+    // what the package gave this run (plan 4.5) and where its settings go (D19): G11 checks each package by it
+    private static string CheckChannel()
+    {
+        var policy = AppServices.DetectChannel();
+        var settings = Environment.GetEnvironmentVariable(AppServices.SETTINGS_DIR_VARIABLE) is { Length: > 0 } dir ? dir : SettingsStore.DefaultDirectory();
+        var portable = SettingsStore.IsPortable() ? " (portable)" : string.Empty;
+        return $"{policy.Channel}{portable}, update check {(policy.UpdateCheck ? "on" : "off")}, ImageGlass 10 {(policy.ImageGlass10 ? "on" : "off")}; settings in {settings}";
+    }
+
 
     private static string CheckSkia()
     {

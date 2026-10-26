@@ -730,6 +730,54 @@ public class EditingTests
         }
     }
 
+
+    // D7: the Mac App Store build's ExifTool touches only container copies; the save lands on the user's file and the backup stays in the container
+    [AvaloniaFact]
+    public async Task TheMacAppStoreBuildSavesThroughAContainerCopy()
+    {
+        var exe = Path.Combine(Render.SourceDir, "__assets", "exiftool", OperatingSystem.IsWindows() ? Path.Combine("win", "exiftool.exe") : Path.Combine("unix", "exiftool"));
+        Assert.SkipUnless(File.Exists(exe), "no bundled ExifTool");
+
+        var root = Directory.CreateTempSubdirectory("eg-mas-").FullName;
+        var userFolder = Directory.CreateDirectory(Path.Combine(root, "Pictures")).FullName;
+        var file = Path.Combine(userFolder, "camera.jpg");
+        File.Copy(Path.Combine(Render.SourceDir, "tests", "fixtures", "ai", "negative_camera.jpg"), file);
+        var settings = new Core.Settings.SettingsStore(Path.Combine(root, "container"));
+        settings.Update(s => s.ExifToolPath = exe);
+        var staging = new SandboxStaging(Path.Combine(root, "container", "stage"), Path.Combine(root, "container", SandboxStaging.BACKUP_FOLDER));
+        var metadata = new Services.MetadataService(() => settings.Current) { Staging = staging };
+        try
+        {
+            metadata.Start();
+            var recorder = new RecordingShell();
+            var vm = new MainViewModel(settings, metadata, metadata) { Shell = recorder, Channel = new Core.Update.ChannelPolicy(Core.Update.AppChannel.MacAppStore) };
+            await vm.OpenFileAsync(file);
+            await Until(() => vm.HasDocument && !vm.IsLoading);
+            Assert.Equal(userFolder, vm.Document!.Find("File", "Directory")!.Value);
+
+            var make = vm.Rows.RowsInView.Single(r => r.TagName == "Make" && r.Group == "EXIF");
+            vm.Selection.SelectCell(make.Key, TableColumns.Value);
+            vm.StartEditCommand.Execute(null);
+            vm.EditText = "Fujifilm";
+            vm.ApplyEditCommand.Execute(null);
+            await Until(() => vm.PendingCount == 1);
+            Assert.Equal("Save writes camera.jpg · backup kept in ExifGlass's container", vm.PendingSubtitle);
+
+            Assert.True(await vm.SaveAsync());
+            await Until(() => vm.Document?.Find("EXIF", "Make")?.Value == "Fujifilm");
+            Assert.Equal(("Saved 1 change", "Backup kept in ExifGlass's container"), recorder.Toasts[^1]);
+            Assert.Empty(Directory.GetFiles(userFolder, "*_original"));
+            Assert.Single(Directory.GetFiles(staging.BackupDirectory, "camera.jpg_original", SearchOption.AllDirectories));
+            Assert.Equal(file, vm.Document!.SourcePath);
+        }
+        finally
+        {
+            await metadata.DisposeAsync();
+            await settings.FlushAsync();
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
     #endregion // Tests
 
 

@@ -154,7 +154,23 @@ public sealed class TagRecord
     /// <summary>
     /// Returns a copy with other flags.
     /// </summary>
-    public TagRecord WithFlags(TagRecordFlags flags) => new()
+    public TagRecord WithFlags(TagRecordFlags flags) => With(flags, Value);
+
+
+    /// <summary>
+    /// Returns a copy with another shown value.
+    /// </summary>
+    public TagRecord WithValue(string value) => With(Flags, value);
+
+
+    public override string ToString() => $"{Key} = {Value}";
+
+    #endregion // Public methods
+
+
+    #region Private methods
+
+    private TagRecord With(TagRecordFlags flags, string value) => new()
     {
         Key = Key,
         Group0 = Group0,
@@ -164,15 +180,12 @@ public sealed class TagRecord
         Description = Description,
         IdText = IdText,
         DisplayId = DisplayId,
-        Value = Value,
+        Value = value,
         Raw = Raw,
         Kind = Kind,
         FileOrder = FileOrder,
         Flags = flags,
     };
 
-
-    public override string ToString() => $"{Key} = {Value}";
-
-    #endregion // Public methods
+    #endregion // Private methods
 }

@@ -41,6 +41,11 @@ public sealed record ExifToolLocation(string Path, ExifToolSource Source, string
     /// </summary>
     public bool CustomPathMissing { get; init; }
 
+    /// <summary>
+    /// The Perl that runs the script, when the app carries its own (the Mac App Store build); else the script runs by itself.
+    /// </summary>
+    public string? Interpreter { get; init; }
+
     #endregion // Properties
 }
 
@@ -79,7 +84,7 @@ public static class ExifToolLocator
         BundledExifTool.EnsureExecutable(baseDirectory);
         if (BundledExifTool.FindPath(baseDirectory) is { } bundled)
         {
-            return new ExifToolLocation(bundled, ExifToolSource.Bundled, configPath) { CustomPathMissing = customMissing };
+            return new ExifToolLocation(bundled, ExifToolSource.Bundled, configPath) { CustomPathMissing = customMissing, Interpreter = BundledPerl(baseDirectory) };
         }
 
         if (FindOnPath(pathVariable ?? Environment.GetEnvironmentVariable("PATH")) is { } onPath)
@@ -88,6 +93,16 @@ public static class ExifToolLocator
         }
 
         return null;
+    }
+
+
+    /// <summary>
+    /// The Perl in Contents/Resources/perl of a Mac App Store bundle: App Review takes /usr/bin/perl for a deprecated technology (plan 3, S7).
+    /// </summary>
+    public static string? BundledPerl(string baseDirectory)
+    {
+        var perl = Path.GetFullPath(Path.Combine(baseDirectory, "..", "Resources", "perl", "bin", "perl"));
+        return File.Exists(perl) ? perl : null;
     }
 
 

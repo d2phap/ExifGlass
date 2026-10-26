@@ -325,11 +325,18 @@ public static class AppText
     /// </summary>
     public static string SaveWrites(string file) => $"Save writes {file} · backup kept as {file}_original";
 
+    /// <summary>
+    /// The Mac App Store build's pending bar line (D7): the backup stays in the app's container.
+    /// </summary>
+    public static string SaveWritesInContainer(string file) => $"Save writes {file} · backup kept in ExifGlass's container";
+
     public static string TagStaged(string group, string name) => $"{group}:{name}";
 
     public static string Saved(int count) => count == 1 ? "Saved 1 change" : string.Create(CultureInfo.InvariantCulture, $"Saved {count:N0} changes");
 
     public static string BackupKept(string file) => $"Backup kept as {file}_original";
+
+    public const string BACKUP_KEPT_IN_CONTAINER = "Backup kept in ExifGlass's container";
 
     public static string SaveFailed(string file) => $"Couldn't save {file}";
 

@@ -49,6 +49,7 @@ public sealed class ExifToolService : IAsyncDisposable
         _daemon = new ExifToolDaemon(new ExifToolDaemonOptions
         {
             ExePath = location.Path,
+            InterpreterPath = location.Interpreter,
             ConfigPath = location.ConfigPath,
             Timeout = timeout ?? TimeSpan.FromSeconds(30),
             PrimingFiles = PrimingFiles.Ensure(),
@@ -87,24 +88,38 @@ public sealed class ExifToolService : IAsyncDisposable
     /// <summary>
     /// The table read: one JSON read with the allowlisted user flags, parsed straight from the pipe.
     /// </summary>
-    public async Task<MetadataDocument> ReadAsync(string path, IReadOnlyList<string> passThrough, TagDb? tagDb = null, CancellationToken cancellationToken = default)
+    public Task<MetadataDocument> ReadAsync(string path, IReadOnlyList<string> passThrough, TagDb? tagDb = null, CancellationToken cancellationToken = default) =>
+        ReadAsync(path, path, passThrough, tagDb, cancellationToken);
+
+
+    /// <summary>
+    /// The table read of <paramref name="exifToolPath"/>, a container copy (D7), shown as <paramref name="shownPath"/>: the document and its File:Directory name the user's file.
+    /// </summary>
+    public async Task<MetadataDocument> ReadAsync(string exifToolPath, string shownPath, IReadOnlyList<string> passThrough, TagDb? tagDb, CancellationToken cancellationToken)
     {
         var watch = Stopwatch.StartNew();
         var pool = _pool;
-        var read = await _daemon.ExecuteAsync(ExifToolCommands.TableRead(path, passThrough),
+        var read = await _daemon.ExecuteAsync(ExifToolCommands.TableRead(exifToolPath, passThrough),
             (in ExifToolOutput o, CancellationToken ct) => ReadTable(o, pool, ct), cancellationToken).ConfigureAwait(false);
 
-        return MetadataDocument.Create(path, read, tagDb, watch.Elapsed);
+        if (!string.Equals(exifToolPath, shownPath, StringComparison.Ordinal)) ShowAs(read, shownPath);
+        return MetadataDocument.Create(shownPath, read, tagDb, watch.Elapsed);
     }
 
 
     /// <summary>
     /// The AI read and parse; null when the file has no AI data or provenance.
     /// </summary>
-    public async Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken = default)
+    public Task<AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken = default) => ReadAiAsync(path, path, cancellationToken);
+
+
+    /// <summary>
+    /// The AI read of a container copy (D7); the sidecar is looked for next to the user's file.
+    /// </summary>
+    public async Task<AiGenerationInfo?> ReadAiAsync(string exifToolPath, string shownPath, CancellationToken cancellationToken)
     {
-        using var tags = await ReadAiTagsAsync(path, cancellationToken).ConfigureAwait(false);
-        var sidecar = AiEngine.ReadSidecar(path);
+        using var tags = await ReadAiTagsAsync(exifToolPath, cancellationToken).ConfigureAwait(false);
+        var sidecar = AiEngine.ReadSidecar(shownPath);
 
         // multi-megabyte workflows parse off the daemon's thread so the next read isn't held up
         return await Task.Run(() => AiEngine.Parse(tags, sidecar, cancellationToken), cancellationToken).ConfigureAwait(false);
@@ -196,6 +211,19 @@ public sealed class ExifToolService : IAsyncDisposable
         }
 
         return result;
+    }
+
+
+    // the copy's folder is the container's stage; the table shows the folder the user opened
+    private static void ShowAs(TableReadResult read, string shownPath)
+    {
+        read.SourceFile = shownPath;
+        var directory = Path.GetDirectoryName(Path.GetFullPath(shownPath)) ?? string.Empty;
+        for (var i = 0; i < read.Tags.Count; i++)
+        {
+            var tag = read.Tags[i];
+            if (tag.Group0 == "File" && tag.Name == "Directory") read.Tags[i] = tag.WithValue(directory);
+        }
     }
 
 

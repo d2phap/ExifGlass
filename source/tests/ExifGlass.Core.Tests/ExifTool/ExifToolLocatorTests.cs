@@ -61,6 +61,24 @@ public sealed class ExifToolLocatorTests : IDisposable
 
 
     [Fact]
+    public void RunsTheBundledScriptWithTheBundlesOwnPerl()
+    {
+        var macOs = Directory.CreateDirectory(Path.Combine(_app, "Contents", "MacOS")).FullName;
+        File.WriteAllText(Path.Combine(macOs, _name), "#!/usr/bin/perl");
+        Assert.Null(ExifToolLocator.Locate(null, macOs, _path)!.Interpreter);
+
+        var perl = Path.Combine(Directory.CreateDirectory(Path.Combine(_app, "Contents", "Resources", "perl", "bin")).FullName, "perl");
+        File.WriteAllText(perl, string.Empty);
+        Assert.Equal(perl, ExifToolLocator.Locate(null, macOs, _path)!.Interpreter);
+
+        // a custom ExifTool runs by itself
+        var custom = Path.Combine(_path, _name);
+        File.WriteAllText(custom, "#!/usr/bin/perl");
+        Assert.Null(ExifToolLocator.Locate(custom, macOs, _path)!.Interpreter);
+    }
+
+
+    [Fact]
     public void ToleratesEmptyAndBrokenPathEntries()
     {
         Assert.Null(ExifToolLocator.FindOnPath(null));

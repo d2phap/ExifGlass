@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Common;
+using ExifGlass.Core.Editing;
 using ExifGlass.Core.Platform;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
@@ -105,10 +106,15 @@ public sealed class AppServices
         var settings = new SettingsStore(settingsDirectory);
         settings.Load(overrides);
 
-        var metadata = new MetadataService(() => settings.Current);
+        var channel = DetectChannel();
+        var metadata = new MetadataService(() => settings.Current)
+        {
+            Staging = channel.BackupInContainer ? new SandboxStaging(SandboxStaging.DefaultStageDirectory(), Path.Combine(settings.DirectoryPath, SandboxStaging.BACKUP_FOLDER)) : null,
+            CustomExifTool = channel.CustomExifTool,
+        };
         metadata.Start();
 
-        return new AppServices(options, settings, metadata, DetectChannel());
+        return new AppServices(options, settings, metadata, channel);
     }
 
 

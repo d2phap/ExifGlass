@@ -63,6 +63,18 @@ public class Skeleton : TemplatedControl
     #endregion // Properties
 
 
+    #region Public methods
+
+    // a render writes the visual's opacity, which ends a running opacity animation, so the pulse starts again in the same batch
+    public override void Render(DrawingContext context)
+    {
+        base.Render(context);
+        if (IsPulsing && ElementComposition.GetElementVisual(this) is { } visual) StartPulse(visual);
+    }
+
+    #endregion // Public methods
+
+
     #region Protected methods
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -84,10 +96,11 @@ public class Skeleton : TemplatedControl
 
     #region Private methods
 
-    private void UpdatePulse()
-    {
-        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+    private void UpdatePulse() => CompositionMotion.WhenReady(this, StartPulse);
 
+
+    private void StartPulse(CompositionVisual visual)
+    {
         var animation = visual.Compositor.CreateScalarKeyFrameAnimation();
         if (IsPulsing && !MotionTokens.IsFrozen)
         {
@@ -275,10 +288,11 @@ public class SpinningIcon : GlassIcon
 
     #region Private methods
 
-    private void UpdateSpin()
-    {
-        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+    private void UpdateSpin() => CompositionMotion.WhenReady(this, StartSpin);
 
+
+    private void StartSpin(CompositionVisual visual)
+    {
         visual.CenterPoint = new Vector3D(Bounds.Width / 2, Bounds.Height / 2, 0);
         var animation = visual.Compositor.CreateScalarKeyFrameAnimation();
         if (IsSpinning && !MotionTokens.IsFrozen)
@@ -485,6 +499,18 @@ public class PulseRing : SquircleBorder
     #endregion // Properties
 
 
+    #region Public methods
+
+    // a render writes the visual's opacity, which ends a running opacity animation, so the pulse starts again in the same batch
+    public override void Render(DrawingContext context)
+    {
+        base.Render(context);
+        if (IsPulsing && ElementComposition.GetElementVisual(this) is { } visual) StartPulse(visual);
+    }
+
+    #endregion // Public methods
+
+
     #region Protected methods
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -506,10 +532,11 @@ public class PulseRing : SquircleBorder
 
     #region Private methods
 
-    private void UpdatePulse()
-    {
-        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+    private void UpdatePulse() => CompositionMotion.WhenReady(this, StartPulse);
 
+
+    private void StartPulse(CompositionVisual visual)
+    {
         visual.CenterPoint = new Vector3D(Bounds.Width / 2, Bounds.Height / 2, 0);
         var scale = visual.Compositor.CreateVector3DKeyFrameAnimation();
         var fade = visual.Compositor.CreateScalarKeyFrameAnimation();
@@ -584,10 +611,11 @@ public class FloatingPanel : Decorator
 
     #region Private methods
 
-    private void UpdateFloat()
-    {
-        if (ElementComposition.GetElementVisual(this) is not { } visual) return;
+    private void UpdateFloat() => CompositionMotion.WhenReady(this, StartFloat);
 
+
+    private void StartFloat(CompositionVisual visual)
+    {
         var animation = visual.Compositor.CreateVector3DKeyFrameAnimation();
         if (IsFloating && !MotionTokens.IsFrozen)
         {

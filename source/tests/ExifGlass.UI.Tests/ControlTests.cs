@@ -241,6 +241,33 @@ public class ControlTests
     }
 
 
+    // a hidden UserControl applies its template only once it shows, so its content has no composition visual until it renders: its motion waits for that frame (the drop scrim's ring)
+    [AvaloniaFact]
+    public void MotionWaitsForTheVisualOfAControlThatWasHidden()
+    {
+        var ring = new Border { Width = 40, Height = 40 };
+        var host = new UserControl { IsVisible = false, Content = new Panel { Children = { ring } } };
+        var window = Show(host);
+        Assert.Null(Avalonia.Rendering.Composition.ElementComposition.GetElementVisual(ring));
+
+        var started = 0;
+        host.IsVisible = true;
+        CompositionMotion.WhenReady(ring, _ => started++);
+        Assert.Equal(0, started);
+
+        for (var i = 0; i < 3; i++)
+        {
+            AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.Equal(1, started);
+        CompositionMotion.WhenReady(ring, _ => started++);
+        Assert.Equal(2, started);
+        window.Close();
+    }
+
+
     [AvaloniaFact]
     public void TheStateLayerFollowsAForcedState()
     {

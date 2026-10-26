@@ -54,6 +54,8 @@ public sealed class SettingsStore : IAsyncDisposable
 
     #region Properties
 
+    public string DirectoryPath => _directory;
+
     public string FilePath => Path.Combine(_directory, FILE_NAME);
 
     /// <summary>

@@ -152,6 +152,47 @@ public class ExifToolDaemonTests
 
 
     [Fact]
+    public async Task StopsInsideImageGlassBudgetWhileAReadRuns()
+    {
+        var daemon = New();
+        var ct = TestContext.Current.CancellationToken;
+        await daemon.StartAsync(ct);
+        var pid = daemon.ProcessId;
+
+        // -if runs Perl per file: a read that takes 5 s, and one queued behind it
+        var slow = daemon.RunTextAsync(["-if", "sleep(5) || 1", "-FileName", TestEnvironment.Fixture("a1111.png")], ct);
+        var queued = daemon.RunTextAsync(["-ver"], ct);
+        await Task.Delay(300, ct);
+
+        var watch = Stopwatch.StartNew();
+        await daemon.DisposeAsync();
+        watch.Stop();
+
+        Assert.InRange(watch.ElapsedMilliseconds, 0, 1500);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => queued);
+        await Assert.ThrowsAnyAsync<Exception>(() => slow);
+        Assert.Throws<ArgumentException>(() => Process.GetProcessById(pid).WaitForExit(0));
+    }
+
+
+    [Fact]
+    public async Task LetsAWriteFinishBeforeItStops()
+    {
+        var daemon = New();
+        var ct = TestContext.Current.CancellationToken;
+        await daemon.StartAsync(ct);
+
+        // a 1 s command marked as a write outlasts a read's 500 ms but not a write's 1.5 s
+        var write = daemon.ExecuteAsync(["-if", "sleep(1) || 1", "-FileName", TestEnvironment.Fixture("a1111.png")],
+            static (in ExifToolOutput o, CancellationToken _) => o.StdoutText, ct, writes: true);
+        await Task.Delay(200, ct);
+        await daemon.DisposeAsync();
+
+        Assert.Contains("a1111.png", await write);
+    }
+
+
+    [Fact]
     public async Task FailsClearlyWhenExifToolIsMissing()
     {
         await using var daemon = new ExifToolDaemon(new ExifToolDaemonOptions { ExePath = Path.Combine(Path.GetTempPath(), "no-exiftool-" + Guid.NewGuid() + ".exe") });

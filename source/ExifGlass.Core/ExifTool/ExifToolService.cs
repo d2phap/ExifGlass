@@ -66,6 +66,8 @@ public sealed class ExifToolService : IAsyncDisposable
 
     public string? Version => _daemon.Version;
 
+    public int ProcessId => _daemon.ProcessId;
+
     /// <summary>
     /// What this ExifTool is too old to read for the AI card (R19); empty for the bundled one.
     /// </summary>
@@ -127,7 +129,7 @@ public sealed class ExifToolService : IAsyncDisposable
     {
         var path = plan.SourcePath;
         return _daemon.ExecuteAsync(ExifToolCommands.Write(path, plan.Arguments),
-            (in ExifToolOutput o, CancellationToken _) => SaveResult.Parse(o.StdoutText, o.Stderr, o.Status, path), cancellationToken);
+            (in ExifToolOutput o, CancellationToken _) => SaveResult.Parse(o.StdoutText, o.Stderr, o.Status, path), cancellationToken, writes: true);
     }
 
 

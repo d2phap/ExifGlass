@@ -87,6 +87,11 @@ public sealed class ExifToolDaemon : IAsyncDisposable
     // four 64 KB segments cover a typical reply; a 2 MB workflow's other segments go back to the GC
     private static readonly BoundedMemoryPool PIPE_POOL = new(64 * 1024, 4);
 
+    // ImageGlass kills its tools 3 s after SHUTDOWN (R21): the running command gets this long, then -stay_open False gets EXIT_GRACE
+    private static readonly TimeSpan READ_GRACE = TimeSpan.FromMilliseconds(500);
+    private static readonly TimeSpan WRITE_GRACE = TimeSpan.FromMilliseconds(1500);
+    private static readonly TimeSpan EXIT_GRACE = TimeSpan.FromMilliseconds(500);
+
     private readonly ExifToolDaemonOptions _options;
     private readonly Channel<WorkItem> _queue = Channel.CreateUnbounded<WorkItem>(new UnboundedChannelOptions { SingleReader = true });
     private readonly Task _worker;
@@ -97,7 +102,8 @@ public sealed class ExifToolDaemon : IAsyncDisposable
     private Channel<StderrBlock>? _stderrBlocks;
     private string _nonce = string.Empty;
     private int _sequence;
-    private bool _disposed;
+    private volatile WorkItem? _running;
+    private volatile bool _disposed;
 
     #endregion // Fields and constants
 
@@ -135,9 +141,9 @@ public sealed class ExifToolDaemon : IAsyncDisposable
     #region Public methods
 
     /// <summary>
-    /// Queues one command; the parser runs on the worker thread while the bytes are still in the pipe.
+    /// Queues one command; the parser runs on the worker thread while the bytes are still in the pipe. A write gets longer to finish when the daemon stops.
     /// </summary>
-    public Task<T> ExecuteAsync<T>(IReadOnlyList<string> args, ExifToolParser<T> parser, CancellationToken cancellationToken = default)
+    public Task<T> ExecuteAsync<T>(IReadOnlyList<string> args, ExifToolParser<T> parser, CancellationToken cancellationToken = default, bool writes = false)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -146,7 +152,7 @@ public sealed class ExifToolDaemon : IAsyncDisposable
             if (!ArgFile.CanEncode(arg)) throw new ArgumentException($"Argument can't be sent to ExifTool: {arg}", nameof(args));
         }
 
-        var item = new WorkItem<T>(args, parser, cancellationToken);
+        var item = new WorkItem<T>(args, parser, cancellationToken, writes);
         if (!_queue.Writer.TryWrite(item)) throw new ObjectDisposedException(nameof(ExifToolDaemon));
 
         return item.Task;
@@ -180,17 +186,22 @@ public sealed class ExifToolDaemon : IAsyncDisposable
 
 
     /// <summary>
-    /// Asks ExifTool to exit with -stay_open False and kills it after the grace period.
+    /// Stops within ImageGlass's budget (S6): queued commands are dropped, the running one may finish, then -stay_open False, and a kill when either takes too long.
     /// </summary>
     public async ValueTask DisposeAsync()
     {
         if (_disposed) return;
         _disposed = true;
-
         _queue.Writer.TryComplete();
+
+        var finished = true;
         try
         {
-            await _worker.ConfigureAwait(false);
+            await _worker.WaitAsync(_running?.Writes == true ? WRITE_GRACE : READ_GRACE).ConfigureAwait(false);
+        }
+        catch (TimeoutException)
+        {
+            finished = false;
         }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         {
@@ -200,14 +211,15 @@ public sealed class ExifToolDaemon : IAsyncDisposable
         var process = _process;
         if (process is null) return;
 
+        // the stream belongs to the running command until it ends, so only an idle ExifTool is asked to exit
         try
         {
-            if (!process.HasExited && _stdin is not null)
+            if (finished && !process.HasExited && _stdin is not null)
             {
                 await _stdin.WriteAsync("-stay_open\nFalse\n"u8.ToArray()).ConfigureAwait(false);
                 await _stdin.FlushAsync().ConfigureAwait(false);
 
-                using var grace = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
+                using var grace = new CancellationTokenSource(EXIT_GRACE);
                 await process.WaitForExitAsync(grace.Token).ConfigureAwait(false);
             }
         }
@@ -241,11 +253,16 @@ public sealed class ExifToolDaemon : IAsyncDisposable
 
     private Task? RunNext()
     {
+        _running = null;
         if (!_queue.Reader.TryRead(out var item)) return null;
-        if (!item.Token.IsCancellationRequested) return item.RunAsync(this);
+        if (_disposed || item.Token.IsCancellationRequested)
+        {
+            item.Cancel();
+            return Task.CompletedTask;
+        }
 
-        item.Cancel();
-        return Task.CompletedTask;
+        _running = item;
+        return item.RunAsync(this);
     }
 
 
@@ -371,6 +388,9 @@ public sealed class ExifToolDaemon : IAsyncDisposable
         if (_process is { HasExited: false }) return;
         Kill();
 
+        // a command cut short by DisposeAsync must not start a new ExifTool that nothing would stop (R11)
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         var psi = new ProcessStartInfo
         {
             FileName = _options.ExePath,
@@ -441,8 +461,8 @@ public sealed class ExifToolDaemon : IAsyncDisposable
 
     private void Kill()
     {
-        var process = _process;
-        _process = null;
+        // DisposeAsync and a command cut short by it may both get here
+        var process = Interlocked.Exchange(ref _process, null);
         if (process is null) return;
 
         try
@@ -480,9 +500,11 @@ public sealed class ExifToolDaemon : IAsyncDisposable
     private readonly record struct StderrBlock(string Id, int? Status, string Text);
 
 
-    private abstract class WorkItem(CancellationToken token)
+    private abstract class WorkItem(CancellationToken token, bool writes)
     {
         public CancellationToken Token { get; } = token;
+
+        public bool Writes { get; } = writes;
 
         public abstract Task RunAsync(ExifToolDaemon daemon);
 
@@ -497,7 +519,7 @@ public sealed class ExifToolDaemon : IAsyncDisposable
         private readonly TaskCompletionSource<T> _tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private readonly CancellationTokenRegistration _registration;
 
-        public WorkItem(IReadOnlyList<string> args, ExifToolParser<T> parser, CancellationToken token) : base(token)
+        public WorkItem(IReadOnlyList<string> args, ExifToolParser<T> parser, CancellationToken token, bool writes) : base(token, writes)
         {
             _args = args;
             _parser = parser;
@@ -529,7 +551,7 @@ public sealed class ExifToolDaemon : IAsyncDisposable
                     catch (Exception ex) when (IsRestartable(ex))
                     {
                         daemon.Kill();
-                        if (attempt >= 2)
+                        if (attempt >= 2 || daemon._disposed)
                         {
                             _tcs.TrySetException(ex);
                             return;

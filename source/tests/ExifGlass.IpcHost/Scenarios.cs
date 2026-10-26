@@ -423,6 +423,18 @@ public static class Scenarios
             }
         }
 
+        // the shared ArrayPool keeps big read buffers until they go unused for about 60 s; a gen-2 GC after that trims them
+        await Task.Delay(65_000);
+        var small = s.Fx.Unicode[1];
+        var idle = Stopwatch.GetTimestamp();
+        host.PhotoChanged(small);
+        if (await run.App.WaitForAsync("SETTLED", e => e.Str("path") == small, 15000, idle) is { } trimmed)
+        {
+            memory.Add($"after 65 s idle: ws {MB(trimmed.Long("ws"))} MB, heap {MB(trimmed.Long("heap"))} MB");
+            run.M["wsIdle"] = MB(trimmed.Long("ws"));
+            run.M["heapIdle"] = MB(trimmed.Long("heap"));
+        }
+
         run.M["reads"] = run.App.Count("LOAD_START");
         run.M["changes"] = run.App.Count("PHOTO_CHANGED");
         await File.WriteAllLinesAsync(Path.Combine(run.Dir, "memory.txt"), memory);

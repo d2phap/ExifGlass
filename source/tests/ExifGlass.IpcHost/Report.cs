@@ -90,8 +90,9 @@ public static class Report
             if (m.GetValueOrDefault("loaded") is string loaded && loaded.Split('/') is [var a, var b] && a != b) problems.Add($"{run}: loaded {loaded}");
             if (m.GetValueOrDefault("steps") is int steps && steps != 10) problems.Add($"{run}: {steps} of 10 steps loaded");
 
-            // plan 8: repeated loads may add 5 MB of live heap per 100
-            if (m.GetValueOrDefault("heap1") is double heap1 && m.GetValueOrDefault("heap20") is double heap20 && heap20 - heap1 > 5) problems.Add($"{run}: live heap grew {heap20 - heap1:0.0} MB over 20 bursts");
+            // plan 8: repeated loads may add 5 MB of live heap per 100, judged once the ArrayPool's idle trim has run
+            if (m.GetValueOrDefault("heap1") is double heap1 && m.GetValueOrDefault("heapIdle") is double heapIdle && heapIdle - heap1 > 5) problems.Add($"{run}: live heap grew {heapIdle - heap1:0.0} MB over the session");
+            if (name.EndsWith("long", StringComparison.Ordinal) && !m.ContainsKey("heapIdle") && !m.ContainsKey("error")) problems.Add($"{run}: no sample after the idle trim");
             if (name.EndsWith("host-close", StringComparison.Ordinal) && name.StartsWith("ig9", StringComparison.Ordinal) && m.GetValueOrDefault("closing") is not "pipe-closed") problems.Add($"{run}: didn't close with the pipe");
         }
 

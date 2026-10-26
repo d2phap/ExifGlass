@@ -21,6 +21,7 @@ using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
+using ExifGlass.Core.Settings;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 
@@ -395,6 +396,32 @@ public sealed partial class MainViewModel
         }
 
         return names;
+    }
+
+
+    private void RestoreViewChoices(AppSettings settings)
+    {
+        _hiddenGroups.UnionWith(settings.HiddenGroups);
+        foreach (var name in settings.QuickFilters)
+        {
+            if (Enum.TryParse<QuickFilter>(name, ignoreCase: true, out var filter) && Enum.IsDefined(filter)) _filters.Add(filter);
+        }
+    }
+
+
+    // every change of the rail's groups or filters goes through a query, so the settings follow here, and only when they differ
+    private void RememberViewChoices()
+    {
+        var groups = _hiddenGroups.Order(StringComparer.Ordinal).ToList();
+        var filters = _filters.Order().Select(f => f.ToString()).ToList();
+        var current = _settings.Current;
+        if (current.HiddenGroups.SequenceEqual(groups, StringComparer.Ordinal) && current.QuickFilters.SequenceEqual(filters, StringComparer.Ordinal)) return;
+
+        _settings.Update(s =>
+        {
+            s.HiddenGroups = groups;
+            s.QuickFilters = filters;
+        });
     }
 
 

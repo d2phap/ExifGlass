@@ -25,6 +25,7 @@ using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.Query;
+using ExifGlass.Core.Settings;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 using ExifGlass.ViewModels;
@@ -111,6 +112,37 @@ public class PanelShellTests
         await shell.WaitForAsync(() => !ids.IsOn);
         Assert.Equal(exif.Total.ToString(), vm.RailGroups.Single(g => g.Name == "EXIF").Count);
         Assert.True(gps.IsAvailable);
+    }
+
+
+    [AvaloniaFact]
+    public async Task HiddenGroupsAndQuickFiltersStayForTheNextLaunch()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
+        var vm = shell.ViewModel;
+        vm.SetGroupHidden("XMP", true);
+        vm.ToggleFilter(QuickFilter.HasTagId);
+        await shell.WaitForAsync(() => vm.Rows.Query.Filters.Contains(QuickFilter.HasTagId) && vm.Rows.Query.HiddenGroups.Contains("XMP"));
+        await shell.Settings.FlushAsync();
+
+        var reloaded = new SettingsStore(shell.Folder);
+        reloaded.Load();
+        Assert.Equal(["XMP"], reloaded.Current.HiddenGroups);
+        Assert.Equal(["HasTagId"], reloaded.Current.QuickFilters);
+
+        var next = new MainViewModel(reloaded, shell.Reader);
+        await next.OpenFileAsync("a.jpg");
+        await shell.WaitForAsync(() => next.HasDocument);
+        Assert.Contains("XMP", next.Rows.Query.HiddenGroups);
+        Assert.True(next.QuickFilters.Single(f => f.Filter == QuickFilter.HasTagId).IsOn);
+        Assert.False(next.RailGroups.Single(g => g.Name == "XMP").IsShown);
+
+        // Clear forgets them too
+        next.ClearFiltersCommand.Execute(null);
+        await shell.WaitForAsync(() => next.Rows.Query.Filters.Count == 0);
+        Assert.Empty(reloaded.Current.HiddenGroups);
+        Assert.Empty(reloaded.Current.QuickFilters);
+        await reloaded.FlushAsync();
     }
 
 

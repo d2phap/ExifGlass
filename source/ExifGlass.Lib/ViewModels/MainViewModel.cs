@@ -138,6 +138,7 @@ public sealed partial class MainViewModel : ObservableObject
         InspectorOpen = settings.Current.InspectorOpen;
         RestorePanelWidths(settings.Current);
         Columns = ParseColumns(settings.Current.VisibleColumns);
+        RestoreViewChoices(settings.Current);
         IsCommandExpanded = settings.Current.CommandBarExpanded;
         Selection.Changed += Selection_Changed;
 
@@ -527,6 +528,7 @@ public sealed partial class MainViewModel : ObservableObject
             IsEditing = false;
         }
 
+        RememberViewChoices();
         var query = BuildQuery();
         var result = document is null ? ViewResult.Empty : await Task.Run(() => QueryEngine.Run(document, query));
         if (generation != _queryGeneration) return;

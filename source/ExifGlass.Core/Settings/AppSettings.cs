@@ -128,6 +128,16 @@ public sealed class AppSettings
     /// </summary>
     public List<string> VisibleColumns { get; set; } = ["TagId", "TagName", "Value"];
 
+    /// <summary>
+    /// The groups hidden in the rail; they stay hidden for every file and after a relaunch (Appendix A item 81).
+    /// </summary>
+    public List<string> HiddenGroups { get; set; } = [];
+
+    /// <summary>
+    /// The quick filters turned on, by QuickFilter name (Appendix A item 81).
+    /// </summary>
+    public List<string> QuickFilters { get; set; } = [];
+
     public bool RailOpen { get; set; } = true;
 
     public bool InspectorOpen { get; set; } = true;
@@ -160,6 +170,8 @@ public sealed class AppSettings
     {
         var copy = (AppSettings)MemberwiseClone();
         copy.VisibleColumns = [.. VisibleColumns];
+        copy.HiddenGroups = [.. HiddenGroups];
+        copy.QuickFilters = [.. QuickFilters];
         copy.Windows = Windows.ToDictionary(kv => kv.Key, kv => kv.Value.Clone(), StringComparer.Ordinal);
         return copy;
     }

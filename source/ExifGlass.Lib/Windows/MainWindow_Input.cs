@@ -160,12 +160,13 @@ public partial class MainWindow
     }
 
 
-    // DS 7.6 Esc chain after the focused control's own use: close a pushed panel, clear the search, then the selection; Esc never closes the window
+    // DS 7.6 Esc chain after the focused control's own use: close a pushed panel, clear the search, then the selection; then Esc closes the window (Appendix A item 82), and staged edits ask first (D8)
     private void Window_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape && e.KeyModifiers == KeyModifiers.None)
         {
-            e.Handled = ViewModel.Escape();
+            if (!ViewModel.Escape()) Close();
+            e.Handled = true;
             return;
         }
 

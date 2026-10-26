@@ -348,15 +348,20 @@ public class MainWindowTests
         Assert.Equal("tag 1", shell.ViewModel.SearchText);
         Assert.StartsWith("11 of 24", shell.ViewModel.Summary, StringComparison.Ordinal);
 
-        // the search box's own Esc clears it; the next leaves it; the window's chain never closes the window
+        // the search box's own Esc clears it; the next ones leave it and clear the selection; with nothing left, Esc closes the window
         shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
         shell.Settle();
         Assert.Equal(string.Empty, shell.ViewModel.SearchText);
-
-        shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
-        shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
-        shell.Settle();
         Assert.True(shell.Window.IsVisible);
+
+        for (var i = 0; i < 6 && shell.Window.IsVisible; i++)
+        {
+            shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+            shell.Settle();
+        }
+
+        Assert.False(shell.Window.IsVisible);
+        Assert.False(shell.ViewModel.Selection.HasCell);
     }
 
 

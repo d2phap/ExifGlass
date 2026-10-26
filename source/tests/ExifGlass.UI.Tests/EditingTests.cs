@@ -154,6 +154,33 @@ public class EditingTests
 
 
     [AvaloniaFact]
+    public async Task EscClosingTheWindowAsksAboutStagedEditsFirst()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
+        var vm = shell.ViewModel;
+        var recorder = new RecordingShell();
+        vm.Shell = recorder;
+        Delete(vm, "Tag 2");
+        await shell.WaitForAsync(() => vm.HasPending);
+
+        for (var i = 0; i < 6 && recorder.Asked.Count == 0; i++)
+        {
+            shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+            shell.Settle();
+        }
+
+        Assert.Equal("Save changes to a.jpg?", Assert.Single(recorder.Asked).Title);
+        Assert.True(shell.Window.IsVisible);
+        Assert.True(vm.HasPending);
+
+        recorder.Answer = DialogAnswer.Secondary;
+        shell.Window.KeyPress(Key.Escape, RawInputModifiers.None, PhysicalKey.Escape, null);
+        shell.Settle();
+        Assert.False(shell.Window.IsVisible);
+    }
+
+
+    [AvaloniaFact]
     public async Task AFailedSaveInTheDialogKeepsTheWindowOnTheFile()
     {
         using var shell = await TestShell.OpenWithFileAsync(1400);

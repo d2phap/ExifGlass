@@ -21,7 +21,9 @@ using ExifGlass.Core.Editing;
 using ExifGlass.Core.ExifTool;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Settings;
+using ExifGlass.Diagnostics;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace ExifGlass.Services;
 
@@ -261,7 +263,9 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
 
         try
         {
+            var watch = Stopwatch.StartNew();
             await service.StartAsync().ConfigureAwait(false);
+            IpcLog.Write("EXIFTOOL_READY", ("pid", service.ProcessId), ("warmMs", watch.Elapsed.TotalMilliseconds));
             SetStatus(ExifToolStatus.Ready, location.CustomPathMissing ? "The ExifTool set in Settings wasn't found" : null);
         }
         catch (Exception ex) when (ex is ExifToolException or IOException or TimeoutException or Win32Exception or InvalidOperationException)

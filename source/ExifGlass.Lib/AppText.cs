@@ -185,6 +185,12 @@ public static class AppText
     public const string TOAST_BINARY_FAILED = "Couldn't read the binary data";
     public const string SAVE = "Save";
     public const string DISCARD = "Discard";
+
+    // D29: the edits ImageGlass's SHUTDOWN kept for the next start
+    public const string RESTORE = "Restore";
+    public const string NOT_NOW = "Not now";
+    public const string RESTORED_SUB = "Nothing is written until you save";
+    public const string TOAST_RECOVERY_GONE = "Couldn't restore unsaved changes";
     public const string SAVE_UNAVAILABLE = "ExifTool isn't available";
     public const string BINARY_FILES = "Binary data";
 
@@ -333,6 +339,25 @@ public static class AppText
     public static string UnsavedTitle(string file) => $"Save changes to {file}?";
 
     public static string UnsavedBody(int count) => $"{PendingChanges(count)} not written yet. Discard drops them.";
+
+    /// <summary>
+    /// D29's question at the start after ImageGlass closed the app with edits staged.
+    /// </summary>
+    public static string RecoveryTitle(string file) => $"Restore changes to {file}?";
+
+    public static string RecoveryBody(int count, bool fileChanged)
+    {
+        var kept = count == 1 ? "1 change wasn't saved" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes weren't saved");
+        return fileChanged
+            ? $"{kept} when ImageGlass closed ExifGlass, and the file has changed since. Discard drops them."
+            : $"{kept} when ImageGlass closed ExifGlass. Discard drops them.";
+    }
+
+    public static string RecoveryGone(string file) => $"{file} was moved or deleted";
+
+    public static string Restored(int count) => count == 1 ? "Restored 1 change" : string.Create(CultureInfo.InvariantCulture, $"Restored {count:N0} changes");
+
+    public static string RestoreDropped(int count) => count == 1 ? "1 change no longer applies to the file" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes no longer apply to the file");
 
     /// <summary>
     /// The Add-tag card's hint for a name ExifTool has no writable tag for: "ExifTool has no EXIF tag it can write named Foo".

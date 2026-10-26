@@ -206,6 +206,16 @@ public sealed class DocumentLoader(IMetadataReader reader)
         await ApplyPreviewAsync(preview ?? PreviewService.LoadAsync(document, reader, PreviewScaling, token), generation, token);
     }
 
+
+    /// <summary>
+    /// Drops the read in progress before the app ends, so ExifTool isn't left with queued work; the window shows nothing new after it.
+    /// </summary>
+    public void Cancel()
+    {
+        _generation++;
+        _cts?.Cancel();
+    }
+
     #endregion // Public methods
 
 

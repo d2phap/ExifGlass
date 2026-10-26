@@ -21,7 +21,8 @@
     <PackageReference Include="Avalonia.Themes.Simple" />
     <PackageReference Include="ProDataGrid" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
-    <PackageReference Include="ImageGlass.SDK" />
+    <!-- No ImageGlass IPC in the sandboxed Mac App Store build (EG_MAS) -->
+    <PackageReference Include="ImageGlass.SDK" Condition="'$(ExifGlassChannel)' != 'MacAppStore'" />
   </ItemGroup>
 
   <ItemGroup>

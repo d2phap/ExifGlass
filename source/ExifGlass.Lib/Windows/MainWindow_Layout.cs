@@ -42,14 +42,6 @@ public partial class MainWindow
 
     #region Protected methods
 
-    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
-    {
-        base.OnPropertyChanged(change);
-
-        if (change.Property == ClientSizeProperty && DataContext is MainViewModel viewModel) viewModel.UpdateWindowWidth(ClientSize.Width, fresh: !_layoutSettled);
-    }
-
-
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);

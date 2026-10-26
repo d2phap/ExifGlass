@@ -20,6 +20,7 @@ using Avalonia;
 using ExifGlass.Core.Common;
 using ExifGlass.Diagnostics;
 using ExifGlass.Core.Platform;
+using ExifGlass.Integration;
 using ExifGlass.Win32.Common;
 
 namespace ExifGlass;
@@ -35,6 +36,7 @@ internal static class Program
         StartupClock.Start();
         AppInfo.BuildInfo = new AppBuildInfo();
         PlatformServices.Shell = new Win32ShellProvider();
+        AppServices.HostFactory = static options => options.Mode == AppMode.ImageGlass9 ? new ImageGlass9Host(options.File) : null;
 
         if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
 

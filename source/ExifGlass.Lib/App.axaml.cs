@@ -82,6 +82,7 @@ public partial class App : Application
 
         StartupClock.Mark("framework initialized");
         var services = Services = AppServices.Create(args);
+        IpcLog.Write("START", ("pid", Environment.ProcessId), ("mode", services.Options.Mode.ToString()), ("args", string.Join(" | ", args)));
         desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
         desktop.Exit += (_, _) => services.Shutdown();
         this.TryGetFeature<IActivatableLifetime>()?.Activated += App_Activated;
@@ -113,7 +114,10 @@ public partial class App : Application
         _watchdog = new UiWatchdog();
 #endif
 
-        if (services.Options.File is { } file) _ = services.ViewModel.OpenFileAsync(file);
+        // the restore question goes up first, so the host's first request waits for its answer (D29)
+        var session = services.CreateSession(window);
+        _ = session.OfferRecoveryAsync();
+        session.Start();
         _ = services.CheckForUpdateOnStartupAsync();
     }
 

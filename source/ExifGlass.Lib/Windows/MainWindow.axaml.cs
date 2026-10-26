@@ -22,6 +22,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.Settings;
+using ExifGlass.Integration;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Windows;
@@ -32,7 +33,7 @@ namespace ExifGlass.Windows;
 /// <summary>
 /// The main window (P4): native title bar, the DS 2 layout, placement restored (O15), no single instance (D16).
 /// </summary>
-public partial class MainWindow : Window, IShellView
+public partial class MainWindow : Window, IShellView, IHostWindow
 {
     #region Fields and constants
 
@@ -58,6 +59,7 @@ public partial class MainWindow : Window, IShellView
     private SettingsWindow? _settingsWindow;
     private AboutWindow? _aboutWindow;
     private bool _closeConfirmed;
+    private WindowState _beforeMinimized = WindowState.Normal;
 
     #endregion // Fields and constants
 
@@ -161,7 +163,35 @@ public partial class MainWindow : Window, IShellView
     #endregion // IShellView
 
 
+    #region IHostWindow
+
+    // ImageGlass's EXECUTE: a minimized window comes back as it was, maximized included
+    public void ActivateFromHost()
+    {
+        if (WindowState == WindowState.Minimized) WindowState = _beforeMinimized;
+        Activate();
+    }
+
+
+    public void CloseForHost()
+    {
+        _closeConfirmed = true;
+        Close();
+    }
+
+    #endregion // IHostWindow
+
+
     #region Protected methods
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == WindowStateProperty && change.GetNewValue<WindowState>() == WindowState.Minimized) _beforeMinimized = change.GetOldValue<WindowState>();
+        else if (change.Property == ClientSizeProperty && DataContext is MainViewModel viewModel) viewModel.UpdateWindowWidth(ClientSize.Width, fresh: !_layoutSettled);
+    }
+
 
     // D8: with edits staged the window asks before it closes; a shutdown of the OS isn't held up by a dialog
     protected override void OnClosing(WindowClosingEventArgs e)

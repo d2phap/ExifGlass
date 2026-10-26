@@ -20,6 +20,8 @@ using ExifGlass.Core.Common;
 using ExifGlass.Core.Platform;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
+using ExifGlass.Diagnostics;
+using ExifGlass.Integration;
 using ExifGlass.Services;
 using ExifGlass.ViewModels;
 using ExifGlass.Windows;
@@ -59,6 +61,11 @@ public sealed class AppServices
 
     #region Properties
 
+    /// <summary>
+    /// A head's own host for a mode only it knows (the Windows head: ImageGlass 9); null leaves the choice to the Lib.
+    /// </summary>
+    public static Func<StartupOptions, IImageSourceHost?>? HostFactory { get; set; }
+
     public StartupOptions Options { get; }
 
     public SettingsStore Settings { get; }
@@ -72,6 +79,11 @@ public sealed class AppServices
     public SettingsPlacementStore Placements { get; }
 
     public MainViewModel ViewModel { get; }
+
+    /// <summary>
+    /// Where file requests come from, once the main window shows.
+    /// </summary>
+    public HostSession? Session { get; private set; }
 
     #endregion // Properties
 
@@ -115,6 +127,12 @@ public sealed class AppServices
 
 
     /// <summary>
+    /// The session for this run's host (P10): the command line, ImageGlass 10, or the head's ImageGlass 9. Not started yet.
+    /// </summary>
+    public HostSession CreateSession(MainWindow window) => Session = new HostSession(CreateHost(), ViewModel, window, Metadata.DisposeAsync);
+
+
+    /// <summary>
     /// The startup update check (D10), a moment after the window shows; says so with a toast when a newer release is out.
     /// </summary>
     public async Task CheckForUpdateOnStartupAsync()
@@ -128,13 +146,28 @@ public sealed class AppServices
 
 
     /// <summary>
-    /// At exit: writes pending settings and stops ExifTool (-stay_open False, killed after 500 ms; R11).
+    /// At exit: lets go of the host, writes pending settings and stops ExifTool (-stay_open False, killed after 500 ms; R11).
     /// </summary>
     public void Shutdown()
     {
+        Session?.Dispose();
         Settings.FlushAsync().GetAwaiter().GetResult();
         Metadata.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        IpcLog.Write("EXIT");
     }
 
     #endregion // Public methods
+
+
+    #region Private methods
+
+    private IImageSourceHost CreateHost() => HostFactory?.Invoke(Options) ?? Options switch
+    {
+#if !EG_MAS
+        { Mode: AppMode.ImageGlass10, PipeName: { } pipe } => new ImageGlass10Host(pipe),
+#endif
+        _ => new StandaloneHost(Options.File),
+    };
+
+    #endregion // Private methods
 }

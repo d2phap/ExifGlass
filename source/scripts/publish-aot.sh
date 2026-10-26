@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # Publishes a trimmed NativeAOT build into __artifacts/publish/<rid>; trim and AOT warnings are errors.
-# Usage: scripts/publish-aot.sh [osx-arm64|linux-x64] [--runtime-async off]
+# Usage: scripts/publish-aot.sh [osx-arm64|linux-x64] [--runtime-async off] [--channel MacAppStore]
+# The Mac App Store flavor (EG_MAS) goes to __artifacts/publish/<rid>-mas.
 . "$(dirname "$0")/_common.sh"
 
 RID=""
 ASYNC="on"
+CHANNEL="Direct"
 while [ $# -gt 0 ]; do
   case "$1" in
     --runtime-async) ASYNC="$2"; shift 2 ;;
+    --channel) CHANNEL="$2"; shift 2 ;;
     *) RID="$1"; shift ;;
   esac
 done
@@ -16,15 +19,20 @@ rid_info "$RID"
 
 ASYNC_FLAG="true"
 [ "$ASYNC" = "off" ] && ASYNC_FLAG="false"
-OUT_DIR="$ARTIFACTS_DIR/publish/$RID"
-new_report "publish-aot-$RID"
+case "$CHANNEL" in
+  Direct) SUFFIX="" ;;
+  MacAppStore) SUFFIX="-mas" ;;
+  *) echo "Unsupported channel: $CHANNEL (Direct or MacAppStore)" >&2; exit 2 ;;
+esac
+OUT_DIR="$ARTIFACTS_DIR/publish/$RID$SUFFIX"
+new_report "publish-aot-$RID$SUFFIX"
 
-report "Publishing $RID_HEAD for $RID (Platform=$RID_PLATFORM, RuntimeAsync=$ASYNC)"
+report "Publishing $RID_HEAD for $RID (Platform=$RID_PLATFORM, RuntimeAsync=$ASYNC, Channel=$CHANNEL)"
 rm -rf "$OUT_DIR"
 
 START=$(date +%s)
 set +e
-OUTPUT="$(dotnet publish "$SOURCE_DIR/$RID_HEAD/$RID_HEAD.csproj" -c Release -r "$RID" -p:Platform="$RID_PLATFORM" -p:ExifGlassRuntimeAsync="$ASYNC_FLAG" -o "$OUT_DIR" 2>&1)"
+OUTPUT="$(dotnet publish "$SOURCE_DIR/$RID_HEAD/$RID_HEAD.csproj" -c Release -r "$RID" -p:Platform="$RID_PLATFORM" -p:ExifGlassRuntimeAsync="$ASYNC_FLAG" -p:ExifGlassChannel="$CHANNEL" -o "$OUT_DIR" 2>&1)"
 CODE=$?
 set -e
 echo "$OUTPUT" | grep -E 'error|warning|->' | while IFS= read -r line; do report "  $line"; done || true

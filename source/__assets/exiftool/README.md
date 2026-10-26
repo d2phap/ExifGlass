@@ -70,9 +70,14 @@ as-is and runs it on the **system Perl** (macOS always has Perl).
 > It deliberately does *not* use a PAR-compiled binary like Linux: `pp` staples its
 > archive past the Mach-O's `__LINKEDIT`, which `codesign` rejects — so a PAR binary
 > can't be notarized. This matches ExifTool's own official
-> macOS distribution. `pack-app.sh` relocates the script + `lib/` into
+> macOS distribution. `pack-mac-app.sh` relocates the script + `lib/` into
 > `Contents/Resources/` (codesign rejects non-Mach-O under `Contents/MacOS/`) and
 > symlinks `exiftool` back so the resolver finds it.
+>
+> The Mac App Store build is the exception: App Review takes `/usr/bin/perl` for a
+> deprecated technology, so it carries its own Perl, built by
+> [`../mac/build-perl.sh`](../mac/build-perl.sh) and bundled in `Contents/Resources/perl`
+> by `pack-mac-pkg-appstore.sh`; `ExifToolLocator.BundledPerl` runs the script on it.
 
 ### Linux
 

@@ -90,6 +90,61 @@ if (!System.IO.File.Exists(OutputPath) || System.IO.File.ReadAllText(OutputPath)
   </Target>
 
 
+  <!-- One notices file for the packages, from the texts About shows (gen-notices.py) -->
+  <UsingTask TaskName="_EgWriteNotices"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <NoticesDir ParameterType="System.String" Required="true" />
+      <OutputPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs">
+      <![CDATA[
+var text = new System.Text.StringBuilder();
+text.Append("ExifGlass third-party notices\n\n");
+text.Append("ExifGlass is free software under the GNU General Public License v3 or later (LICENSE.txt).\n");
+text.Append("It ships the components below, each under its own licence.\n");
+
+foreach (var line in System.IO.File.ReadAllLines(System.IO.Path.Combine(NoticesDir, "index.tsv")))
+{
+    var parts = line.Split('\t');
+    if (parts.Length < 3) continue;
+
+    var body = System.IO.File.ReadAllText(System.IO.Path.Combine(NoticesDir, parts[0] + ".txt")).Replace("\r\n", "\n").TrimEnd();
+    text.Append("\n\n").Append(new string('=', 78)).Append('\n');
+    text.Append(parts[1]).Append(" (").Append(parts[2]).Append(")\n");
+    text.Append(new string('=', 78)).Append("\n\n").Append(body).Append('\n');
+}
+
+var code = text.ToString();
+var dir = System.IO.Path.GetDirectoryName(OutputPath);
+if (!string.IsNullOrEmpty(dir))
+    System.IO.Directory.CreateDirectory(dir);
+
+if (!System.IO.File.Exists(OutputPath) || System.IO.File.ReadAllText(OutputPath) != code)
+    System.IO.File.WriteAllText(OutputPath, code);
+]]></Code>
+    </Task>
+  </UsingTask>
+
+
+  <!-- LICENSE and the notices next to every app head's executable, so each package carries them -->
+  <Target Name="EgThirdPartyNotices"
+          BeforeTargets="AssignTargetPaths"
+          Condition="'$(ExifGlassPlatformId)' != ''">
+    <PropertyGroup>
+      <_EgNoticesDir>$(MSBuildThisFileDirectory)ExifGlass.Lib\Assets\Notices\</_EgNoticesDir>
+      <_EgNoticesFile>$(IntermediateOutputPath)THIRD-PARTY-NOTICES.txt</_EgNoticesFile>
+    </PropertyGroup>
+    <_EgWriteNotices NoticesDir="$(_EgNoticesDir)" OutputPath="$(_EgNoticesFile)" />
+    <ItemGroup>
+      <None Include="$(_EgNoticesFile)" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Link="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+
   <!-- Single-warn only the reviewed third-party assemblies; everything else keeps detailed warnings as errors -->
   <Target Name="EgSingleWarnThirdParty" BeforeTargets="_ComputeIlcCompileInputs;PrepareForILLink" Condition="'$(ExifGlassSingleWarnAssemblies)' != ''">
     <ItemGroup>

@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   AppxManifest template for the ExifGlass Windows head (ExifGlass.Win32).
 
-  The {{...}} placeholders are filled in at pack time by pack-msix.ps1 (which uses
+  The {{...}} placeholders are filled in at pack time by pack-win-msix.ps1 (which uses
   either the sideload identity or, with -MsStore, the Microsoft Store identity):
     {{IDENTITY_NAME}}          package identity name (e.g. DuongDieuPhap.ExifGlass,
                                or 9662DuongDieuPhap.ExifGlass for the Store)
@@ -14,8 +14,8 @@
 
   The unqualified logo names below (e.g. Assets\EXIFGLASS-Square150x150Logo.png)
   resolve to the scale/targetsize-qualified files in Assets\ via resources.pri,
-  which makepri builds from that folder at pack time. Regenerate the Assets\ set
-  from the app logo with generate-msix-assets.ps1.
+  which makepri builds from that folder at pack time. The Assets\ set is rendered
+  from __assets/__app/logo.svg by tools/gen-app-icons.cs.
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -30,7 +30,7 @@
   <Properties>
     <DisplayName>ExifGlass</DisplayName>
     <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
-    <Description>EXIF Metadata Viewing Tool</Description>
+    <Description>AI &amp; EXIF metadata viewer</Description>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -49,7 +49,7 @@
         DisplayName="ExifGlass"
         Square150x150Logo="Assets\EXIFGLASS-Square150x150Logo.png"
         Square44x44Logo="Assets\EXIFGLASS-Square44x44Logo.png"
-        Description="EXIF Metadata Viewing Tool">
+        Description="AI &amp; EXIF metadata viewer">
         <uap:DefaultTile
           Wide310x150Logo="Assets\EXIFGLASS-Wide310x150Logo.png"
           Square310x310Logo="Assets\EXIFGLASS-Square310x310Logo.png"
@@ -145,7 +145,6 @@
             </uap:SupportedFileTypes>
           </uap:FileTypeAssociation>
         </uap:Extension>
-        <desktop:Extension Category="windows.fullTrustProcess" Executable="ExifGlass\ExifGlass.exe" />
         <uap3:Extension Category="windows.appExecutionAlias" EntryPoint="Windows.FullTrustApplication" Executable="ExifGlass\ExifGlass.exe">
           <uap3:AppExecutionAlias>
             <desktop:ExecutionAlias Alias="ExifGlass.exe" />
@@ -155,8 +154,8 @@
     </Application>
   </Applications>
 
+  <!-- A full-trust desktop app reads and writes files without broadFileSystemAccess, which only the UWP storage APIs use -->
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <rescap:Capability Name="broadFileSystemAccess" />
   </Capabilities>
 </Package>

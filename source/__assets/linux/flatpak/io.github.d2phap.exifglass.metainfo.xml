@@ -5,18 +5,23 @@
   <project_license>GPL-3.0-or-later</project_license>
 
   <name>ExifGlass</name>
-  <summary>EXIF Metadata Viewing Tool</summary>
+  <summary>AI &amp; EXIF metadata viewer</summary>
 
   <description>
     <p>
-      ExifGlass is a fast, open-source EXIF metadata viewer. It reads the technical
-      details embedded in your photos - camera settings, lens, exposure, GPS location,
-      timestamps, and more - by wrapping the powerful ExifTool by Phil Harvey.
+      ExifGlass shows the metadata inside your images, AI generations first. Open a picture made with
+      Stable Diffusion, ComfyUI, InvokeAI, NovelAI, Fooocus, Midjourney and many more, and ExifGlass shows
+      its prompt, negative prompt, models, LoRAs, sampler settings and seed, a summary of its workflow, and
+      the provenance it carries (C2PA Content Credentials, marked as not verified, and IPTC digital source type).
     </p>
     <p>
-      Use it standalone via drag-and-drop, the file picker, or a command-line path, or
-      plug it into ImageGlass as an integrated tool that live-updates as you navigate
-      images. Metadata can be copied to the clipboard or exported to a file.
+      Every other tag ExifTool reads is in one searchable table: camera settings, lens, exposure, GPS location,
+      timestamps, and more. Edit or delete tags, remove the location or the AI generation data before you share
+      a file, export to CSV, text or JSON, and copy the exact ExifTool command.
+    </p>
+    <p>
+      Everything stays on your computer: nothing is looked up online. ExifGlass also works as an ImageGlass tool
+      that follows the photo you browse.
     </p>
   </description>
 
@@ -24,10 +29,10 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>ExifGlass - EXIF Metadata Viewing Tool</caption>
+      <caption>ExifGlass - AI &amp; EXIF metadata viewer</caption>
       <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_1.png</image>
     </screenshot>
-    <screenshot type="default">
+    <screenshot>
       <caption>ExifGlass - Works seamlessly with ImageGlass</caption>
       <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_2.png</image>
     </screenshot>
@@ -44,13 +49,18 @@
   <categories>
     <category>Graphics</category>
     <category>Viewer</category>
+    <category>Photography</category>
   </categories>
 
   <keywords>
     <keyword>exif</keyword>
     <keyword>metadata</keyword>
     <keyword>exiftool</keyword>
-    <keyword>image</keyword>
+    <keyword>ai</keyword>
+    <keyword>prompt</keyword>
+    <keyword>comfyui</keyword>
+    <keyword>stable diffusion</keyword>
+    <keyword>c2pa</keyword>
     <keyword>photo</keyword>
   </keywords>
 
@@ -65,6 +75,9 @@
   </supports>
 
   <releases>
+    <release version="3.0.0.1020-alpha" date="2026-10-26" type="development">
+      <url type="details">https://github.com/d2phap/ExifGlass/releases</url>
+    </release>
     <release version="2.0.2" date="2026-07-11">
       <url>https://github.com/d2phap/ExifGlass/releases</url>
     </release>

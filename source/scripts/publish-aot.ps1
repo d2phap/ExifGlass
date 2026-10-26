@@ -1,16 +1,19 @@
 # Publishes a trimmed NativeAOT build into __artifacts/publish/<rid>; trim and AOT warnings are errors.
-# Usage: scripts/publish-aot.ps1 [win-x64|win-arm64|osx-arm64|linux-x64] [-RuntimeAsync off]
+# Usage: scripts/publish-aot.ps1 [win-x64|win-arm64|osx-arm64|linux-x64] [-RuntimeAsync off] [-Channel MacAppStore]
+# The Mac App Store flavor (EG_MAS) goes to __artifacts/publish/<rid>-mas.
 param(
     [string]$Rid = '',
-    [ValidateSet('on', 'off')][string]$RuntimeAsync = 'on'
+    [ValidateSet('on', 'off')][string]$RuntimeAsync = 'on',
+    [ValidateSet('Direct', 'MacAppStore')][string]$Channel = 'Direct'
 )
 
 . (Join-Path $PSScriptRoot '_common.ps1')
 
 if (-not $Rid) { $Rid = Get-HostRid }
 $info = Get-RidInfo $Rid
-$outDir = Join-Path $ArtifactsDir "publish/$Rid"
-$report = New-ReportFile "publish-aot-$Rid"
+$suffix = if ($Channel -eq 'MacAppStore') { '-mas' } else { '' }
+$outDir = Join-Path $ArtifactsDir "publish/$Rid$suffix"
+$report = New-ReportFile "publish-aot-$Rid$suffix"
 $asyncFlag = if ($RuntimeAsync -eq 'off') { 'false' } else { 'true' }
 
 # ILC finds the MSVC linker through vswhere, which isn't on PATH by default
@@ -19,13 +22,13 @@ if ($IsWindows) {
     if ((Test-Path $vsInstaller) -and ($env:PATH -notlike "*$vsInstaller*")) { $env:PATH = "$vsInstaller;$env:PATH" }
 }
 
-Write-Report $report "Publishing $($info.Head) for $Rid (Platform=$($info.Platform), RuntimeAsync=$RuntimeAsync)"
+Write-Report $report "Publishing $($info.Head) for $Rid (Platform=$($info.Platform), RuntimeAsync=$RuntimeAsync, Channel=$Channel)"
 Get-Process -Name ExifGlass -ErrorAction SilentlyContinue | Where-Object { $_.Path -and $_.Path.StartsWith($outDir) } | Stop-Process -Force -Confirm:$false
 Remove-Item $outDir -Recurse -Force -ErrorAction SilentlyContinue
 
 $project = Join-Path $SourceDir "$($info.Head)/$($info.Head).csproj"
 $watch = [System.Diagnostics.Stopwatch]::StartNew()
-$output = & dotnet publish $project -c Release -r $Rid "-p:Platform=$($info.Platform)" "-p:ExifGlassRuntimeAsync=$asyncFlag" -o $outDir 2>&1
+$output = & dotnet publish $project -c Release -r $Rid "-p:Platform=$($info.Platform)" "-p:ExifGlassRuntimeAsync=$asyncFlag" "-p:ExifGlassChannel=$Channel" -o $outDir 2>&1
 $code = $LASTEXITCODE
 $output | Where-Object { $_ -match 'error|warning|->' } | ForEach-Object { Write-Report $report "  $($_.ToString().Trim())" }
 

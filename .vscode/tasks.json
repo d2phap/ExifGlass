@@ -89,45 +89,23 @@
       "problemMatcher": [],
       "group": "build"
     },
+    // The Mac App Store build's own Perl for ExifTool (plan 3); once per Perl version.
+    {
+      "label": "build-perl-mac-arm64",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/mac/build-perl.sh"],
+      "problemMatcher": [],
+      "group": "build"
+    },
 
 
-    // Packing scripts carried over from v2; they publish the same head projects.
-    {
-      "label": "pack-mac-arm64-app",
-      "type": "process",
-      "command": "bash",
-      "args": ["${workspaceFolder}/source/__assets/mac/pack-app.sh"],
-      "problemMatcher": [],
-      "dependsOn": ["publish-aot-mac-arm64"],
-      "dependsOrder": "sequence",
-      "group": "build"
-    },
-    {
-      "label": "pack-mac-arm64-dmg",
-      "type": "process",
-      "command": "bash",
-      "args": ["${workspaceFolder}/source/__assets/mac/pack-dmg.sh"],
-      "problemMatcher": [],
-      "dependsOn": ["pack-mac-arm64-app"],
-      "dependsOrder": "sequence",
-      "group": "build"
-    },
-    {
-      "label": "pack-linux-x64-flatpak",
-      "type": "process",
-      "command": "bash",
-      "args": ["${workspaceFolder}/source/__assets/linux/pack-flatpak.sh"],
-      "options": { "env": { "GPG_KEY": "${input:gpgKey}" } },
-      "problemMatcher": [],
-      "dependsOn": ["build-exiftool-linux-x64"],
-      "dependsOrder": "sequence",
-      "group": "build"
-    },
+    // Packages (plan 3): each packer publishes a fresh build first, since the version is compiled in.
     {
       "label": "pack-win-x64-msix",
       "type": "process",
       "command": "pwsh",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-Platform", "x64", "-Sign"],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-msix.ps1", "-Platform", "x64", "-Sign"],
       "problemMatcher": [],
       "group": "build"
     },
@@ -135,7 +113,7 @@
       "label": "pack-win-arm64-msix",
       "type": "process",
       "command": "pwsh",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-Platform", "arm64", "-Sign"],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-msix.ps1", "-Platform", "arm64", "-Sign"],
       "problemMatcher": [],
       "group": "build"
     },
@@ -143,7 +121,103 @@
       "label": "pack-win-msstore-msixbundle",
       "type": "process",
       "command": "pwsh",
-      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-msix.ps1", "-MsStore"],
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-msix.ps1", "-MsStore"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-win-x64-zip",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-zip.ps1", "-Platform", "x64", "-Sign"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-win-arm64-zip",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-zip.ps1", "-Platform", "arm64", "-Sign"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-win-all",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/__assets/win/pack-win-all.ps1", "-Sign"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-mac-arm64-app",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-mac-app.sh"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-mac-arm64-dmg",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-mac-dmg.sh"],
+      "problemMatcher": [],
+      "dependsOn": ["pack-mac-arm64-app"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "pack-mac-arm64-app-mas",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-mac-app.sh", "--channel", "MacAppStore"],
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-mac-arm64-pkg",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/mac/pack-mac-pkg-appstore.sh"],
+      "problemMatcher": [],
+      "dependsOn": ["pack-mac-arm64-app-mas"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "pack-mac-arm64-all",
+      "dependsOn": ["pack-mac-arm64-dmg", "pack-mac-arm64-pkg"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "pack-linux-x64-flatpak",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/linux/pack-linux-flatpak.sh"],
+      "options": { "env": { "GPG_KEY": "${input:gpgKey}" } },
+      "problemMatcher": [],
+      "dependsOn": ["build-exiftool-linux-x64"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "pack-linux-x64-appimage",
+      "type": "process",
+      "command": "bash",
+      "args": ["${workspaceFolder}/source/__assets/linux/pack-linux-appimage.sh"],
+      "options": { "env": { "GPG_KEY": "${input:gpgKey}" } },
+      "problemMatcher": [],
+      "dependsOn": ["build-exiftool-linux-x64"],
+      "dependsOrder": "sequence",
+      "group": "build"
+    },
+    {
+      "label": "pack-linux-x64-all",
+      "dependsOn": ["pack-linux-x64-flatpak", "pack-linux-x64-appimage"],
+      "dependsOrder": "sequence",
       "problemMatcher": [],
       "group": "build"
     }
@@ -152,7 +226,7 @@
     {
       "id": "gpgKey",
       "type": "promptString",
-      "description": "GPG key (email or key ID) to sign the .flatpak bundle. Leave blank for an unsigned bundle.",
+      "description": "GPG key (email or key ID) to sign the Flatpak bundle or the AppImage. Leave blank for an unsigned one.",
       "default": ""
     }
   ]

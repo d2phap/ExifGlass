@@ -6,16 +6,17 @@ Files used to build and distribute ExifGlass as a Flatpak (linux-x64 only).
 |---|---|
 | `io.github.d2phap.exifglass.yaml` | Flatpak manifest (submitted to Flathub). |
 | `io.github.d2phap.exifglass.metainfo.xml` | AppStream metadata (required by Flathub). |
-| `io.github.d2phap.exifglass.desktop` | Desktop launcher entry. |
-| `io.github.d2phap.exifglass.svg` / `.png` | Icons, generated from `__assets/__app/logo.*` by the pack script. |
+| `io.github.d2phap.exifglass.desktop` | Desktop launcher entry (the AppImage uses it too). |
+| `io.github.d2phap.exifglass.svg` / `.png` | Icons, rendered from `__assets/__app/logo.svg` by `tools/gen-app-icons.cs`. |
 
-Build script: [`../pack-flatpak.sh`](../pack-flatpak.sh) (VS Code task: `pack-linux-x64-flatpak`).
+Build script: [`../pack-linux-flatpak.sh`](../pack-linux-flatpak.sh) (VS Code task: `pack-linux-x64-flatpak`).
 
-The manifest installs the prebuilt `publish-linux-x64` binary instead of compiling
-from source. Building .NET 10 AOT (trimming + SkiaSharp/HarfBuzz native interop)
+The manifest installs the prebuilt `scripts/publish-aot.sh linux-x64` payload instead of compiling
+from source. Building .NET 11 AOT (trimming + SkiaSharp/HarfBuzz native interop)
 offline on Flathub's builders isn't practical, so the manifest downloads a release
-tarball with a pinned sha256. The bundle also embeds the self-contained `exiftool`
-(Perl compiled in via PAR::Packer) because the freedesktop runtime has no system Perl.
+tarball with a pinned sha256 into `payload/` and copies it whole to `/app/exifglass`.
+The payload embeds the self-contained `exiftool` (Perl compiled in via PAR::Packer)
+because the freedesktop runtime has no system Perl.
 
 ## Build
 
@@ -27,16 +28,18 @@ flatpak install -y flathub org.freedesktop.Platform//25.08 org.freedesktop.Sdk//
 # then, from the source/ directory (or via the "pack-linux-x64-flatpak" VS Code task,
 # which compiles the self-contained ExifTool first):
 bash __assets/linux/build-exiftool.sh x64     # once, or when bumping ExifTool
-bash __assets/linux/pack-flatpak.sh
+bash __assets/linux/pack-linux-flatpak.sh
 ```
 
-The pack script re-publishes a fresh AOT build every run, so you don't need to run
-`publish-linux-x64` beforehand.
+The pack script re-publishes a fresh AOT build every run (the version is compiled in);
+`SKIP_PUBLISH=1` reuses the last one, for local iteration only.
 
 Outputs to `__artifacts/bundle/`:
 
-- `ExifGlass_<version>_linux_x64.tar.gz` — payload the Flathub manifest points at.
-- `ExifGlass_<version>_linux-x64.flatpak` — single-file bundle for direct install.
+- `ExifGlass_<label>_linux-x64.tar.gz`: the payload the Flathub manifest points at.
+- `ExifGlass_<label>_linux-x64.flatpak`: a single-file bundle for direct install.
+
+`<label>` is `<ExifGlassVersion>[-<ExifGlassReleaseType>]`, the GitHub tag too.
 
 The script also installs the build for your user, so you can test it:
 
@@ -47,11 +50,11 @@ flatpak run io.github.d2phap.exifglass ~/Pictures/some-image.jpg
 ## Distribute on GitHub Releases
 
 Self-hosted, no review, available immediately. Upload both output files to the
-release matching the tag (default `<ExifGlassVersion>`; override with `RELEASE_TAG=<tag>`).
+release matching the tag (default: the label; override with `RELEASE_TAG=<tag>`).
 Users install the bundle directly:
 
 ```bash
-flatpak install --user ExifGlass_<version>_linux-x64.flatpak
+flatpak install --user ExifGlass_<label>_linux-x64.flatpak
 ```
 
 To sign the bundle, generate a key once and pass it via `GPG_KEY` (the VS Code task
@@ -59,7 +62,7 @@ prompts for it):
 
 ```bash
 gpg --quick-generate-key "ExifGlass Release Signing" default default never
-GPG_KEY="<your-key-id-or-email>" bash __assets/linux/pack-flatpak.sh
+GPG_KEY="<your-key-id-or-email>" bash __assets/linux/pack-linux-flatpak.sh
 ```
 
 Signing is optional for a single-file bundle; users can install it either way.
@@ -82,11 +85,11 @@ Signing is optional for a single-file bundle; users can install it either way.
 
 ## Sandbox permissions
 
-`finish-args` grants X11 (`--socket=x11` + `--share=ipc`), GPU (`--device=dri`),
-network (`--share=network`, for the update check), and full filesystem
-(`--filesystem=host`, for opening images and exporting metadata / extracted binary
-tags anywhere). Flathub reviewers may ask to narrow `--filesystem=host` to
-`--filesystem=home`.
+`finish-args` grants X11 (`--socket=x11` + `--share=ipc`), GPU (`--device=dri`) and
+full filesystem (`--filesystem=host`, D7: opening and saving any file, exports and
+saved binary tags anywhere). No network: the Flatpak checks for no update (Flathub
+updates it), nothing is looked up online (D27), and links open through the portal.
+Flathub reviewers may ask to narrow `--filesystem=host` to `--filesystem=home`.
 
 `--filesystem=host` (or `home`) also covers ImageGlass 10's tool socket: ImageGlass
 passes `--pipe ~/.cache/ImageGlass/tools/ig_<hex>`, an absolute path in the real

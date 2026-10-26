@@ -7,8 +7,8 @@ command: exifglass
 finish-args:
   - --socket=x11
   - --share=ipc
-  - --share=network
   - --device=dri
+  # D7: open and save any file, and reach ImageGlass 10's tool socket in ~/.cache/ImageGlass/tools (P10)
   - --filesystem=host
   # The bundled ExifTool (PAR::Packer/Perl) loads libcrypt.so.1 from here (see build-commands).
   - --env=LD_LIBRARY_PATH=/app/lib
@@ -17,9 +17,9 @@ modules:
   - name: exifglass
     buildsystem: simple
     build-commands:
+      # the whole payload: a file list would drop what a later version adds (exifglass.config, the notices)
       - install -d ${FLATPAK_DEST}/exifglass
-      - cp -a ExifGlass exiftool libSkiaSharp.so libHarfBuzzSharp.so ${FLATPAK_DEST}/exifglass/
-      - cp -a exiftool.LICENSE.txt ${FLATPAK_DEST}/exifglass/ 2>/dev/null || true
+      - cp -a payload/. ${FLATPAK_DEST}/exifglass/
       - chmod +x ${FLATPAK_DEST}/exifglass/ExifGlass ${FLATPAK_DEST}/exifglass/exiftool
       # Bundled ExifTool (PAR/Perl) needs libcrypt.so.1 (crypt@XCRYPT_2.0); the runtime ships only
       # libcrypt.so.2, so bridge the SONAME in /app/lib (on the loader path; see LD_LIBRARY_PATH).
@@ -36,6 +36,7 @@ modules:
         url: https://github.com/d2phap/ExifGlass/releases/download/2.0.0/ExifGlass_2.0.0_linux_x64.tar.gz
         sha256: dfc5602bcc24e26c0fe057adb5ed875067ae1531c95cd56a28e64b067e6d0acb
         strip-components: 1
+        dest: payload
       - type: file
         path: io.github.d2phap.exifglass.desktop
       - type: file

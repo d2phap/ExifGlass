@@ -13,11 +13,11 @@
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
-	<string>12.0</string>
+	<string>14.0</string>
 	<key>NSRequiresAquaSystemAppearance</key>
 	<false/>
 	<key>NSSupportsAutomaticTermination</key>
-	<true/>
+	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
 	<key>CFBundleSupportedPlatforms</key>
@@ -35,13 +35,15 @@
 	<key>CFBundleExecutable</key>
 	<string>ExifGlass</string>
 	<key>CFBundleVersion</key>
-	<string>${EG_BUILD}</string>
+	<string>1</string>
 	<key>CFBundleShortVersionString</key>
-	<string>${EG_SHORT_VERSION}</string>
+	<string>3.0.0</string>
 	<key>CFBundleIconFile</key>
 	<string>logo.icns</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2023 - 2026 Duong Dieu Phap</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 
 	<key>CFBundleDocumentTypes</key>
 	<array>

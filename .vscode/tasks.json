@@ -31,6 +31,16 @@
       "problemMatcher": [],
       "group": "test"
     },
+    {
+      "label": "ipc",
+      "type": "process",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/source/scripts/ipc.ps1"],
+      "osx": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/ipc.sh"] },
+      "linux": { "command": "bash", "args": ["${workspaceFolder}/source/scripts/ipc.sh"] },
+      "problemMatcher": [],
+      "group": "test"
+    },
 
 
     // NativeAOT can't cross-compile between operating systems: publish each head on its own OS.

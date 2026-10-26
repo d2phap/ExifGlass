@@ -88,6 +88,14 @@ network (`--share=network`, for the update check), and full filesystem
 tags anywhere). Flathub reviewers may ask to narrow `--filesystem=host` to
 `--filesystem=home`.
 
+`--filesystem=host` (or `home`) also covers ImageGlass 10's tool socket: ImageGlass
+passes `--pipe ~/.cache/ImageGlass/tools/ig_<hex>`, an absolute path in the real
+home. The narrowest grant that keeps the ImageGlass integration is
+`--filesystem=~/.cache/ImageGlass/tools:ro`; never the `xdg-cache/ImageGlass/tools`
+form, which follows the host's `XDG_CACHE_HOME` while ImageGlass always uses
+`~/.cache`. Without either, ExifGlass opens, can't connect, and ImageGlass ends it
+10 s later.
+
 ## ExifTool / libcrypt note
 
 The bundled `exiftool` is a PAR::Packer binary with Perl embedded; its `libperl`

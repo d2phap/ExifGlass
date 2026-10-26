@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ExifGlass.IpcHost</RootNamespace>
+    <IsPackable>false</IsPackable>
+
+    <!-- ImageGlass.Tools (the ImageGlass 9 protocol) ships only -windows assets -->
+    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Windows'))">net11.0-windows</TargetFramework>
+    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Windows'))">net11.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ImageGlass.SDK" />
+    <PackageReference Include="ImageGlass.Tools" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
+  </ItemGroup>
+</Project>

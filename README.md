@@ -33,37 +33,32 @@ You can download ExifGlass for free. To support the development of ExifGlass and
 | .NET self-contained | ✅ | ✅ |
 
 
-## Register ExifGlass as external tool in ImageGlass
-> [!TIP]
-> For ImageGlass 9, please refer to [ImageGlass Docs / ImageGlass tools](https://imageglass.org/docs/imageglass-tools#add-your-tool-to-imageglass).
+## Use ExifGlass with ImageGlass
+ExifGlass follows the photo ImageGlass shows: as you browse in ImageGlass, the metadata table, the AI card and the inspector follow each photo. It works with ImageGlass 10 on Windows, macOS and Linux, and with ImageGlass 9 on Windows. The Mac App Store version can't connect to ImageGlass, because the App Sandbox doesn't allow it.
 
-Launch ImageGlass 10, open Settings > Tools, and click "Add" button. In the "Add external tool" window, fill in the below information:
+### ImageGlass 10
+ImageGlass 10 comes with an ExifGlass tool already set up (ID `Tool_ExifGlass`, hotkey <kbd>X</kbd>). Press <kbd>X</kbd> to open ExifGlass beside the photo; it closes when ImageGlass closes. If the tool was removed, or ExifGlass is installed somewhere else, open Settings > Tools in ImageGlass, click "Add" and fill in:
 
-### 🪟 Windows 10/11
-- ID: `Tool_ExifGlass` (you can change the ID)
-- Name: `ExifGlass 2` (you can change the tool name)
-- Integrated with ImageGlass.SDK: check the box
-- Executable: `exifglass` (or the full path of `ExifGlass.exe`)
-- Argument: `<file>`
-- Hotkeys: optional
+| | Windows | macOS | Linux (Flatpak) | Linux (AppImage) |
+| -- | -- | -- | -- | -- |
+| ID | `Tool_ExifGlass` | `Tool_ExifGlass` | `Tool_ExifGlass` | `Tool_ExifGlass` |
+| Integrated with ImageGlass.SDK | checked | checked | checked | checked |
+| Executable | `exifglass` (the Store and MSIX versions add it to PATH; for the ZIP, the full path of `ExifGlass.exe`) | `/Applications/ExifGlass.app` | `flatpak` | the full path of the `.AppImage` file |
+| Argument | `<file>` | `<file>` | `run io.github.d2phap.exifglass <file>` | `<file>` |
+| Hotkey | <kbd>X</kbd> | <kbd>X</kbd> | <kbd>X</kbd> | <kbd>X</kbd> |
 
-### 🍎 macOS
-- ID: `Tool_ExifGlass` (you can change the ID)
-- Name: `ExifGlass 2` (you can change the tool name)
-- Integrated with ImageGlass.SDK: check the box
-- Executable: `/Applications/ExifGlass.app`
-- Argument: `<file>`
-- Hotkeys: optional
+ImageGlass must start ExifGlass itself: a script or launcher in front of it breaks the connection on Windows.
 
-### 🐧 Linux
-- ID: `Tool_ExifGlass` (you can change the ID)
-- Name: `ExifGlass 2` (you can change the tool name)
-- Integrated with ImageGlass.SDK: check the box
-- Executable: `flatpak`
-- Argument: `run io.github.d2phap.exifglass <file>`
-- Hotkeys: optional
+> [!NOTE]
+> If ImageGlass closes while ExifGlass has unsaved changes, ExifGlass keeps them and offers to restore them the next time it starts.
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/28c26471-1858-4928-885c-1b1b1cd34793" />
+
+### ImageGlass 9 (Windows)
+Add ExifGlass as an integrated tool, as [ImageGlass Docs / ImageGlass tools](https://imageglass.org/docs/imageglass-tools#add-your-tool-to-imageglass) describes: the executable is `ExifGlass.exe` (or `exifglass`) and the argument `<file>`. ExifGlass closes when you turn the tool off or close ImageGlass.
+
+### Flatpak permissions
+The ExifGlass Flatpak reaches ImageGlass 10 through its `--filesystem=host` permission. If you narrow its permissions (with Flatseal, for example), keep at least `~/.cache/ImageGlass/tools:ro`. The `xdg-cache/ImageGlass/tools` form doesn't work when `XDG_CACHE_HOME` is moved, because ImageGlass always uses `~/.cache`.
 
 
 

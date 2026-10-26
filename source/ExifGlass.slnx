@@ -14,6 +14,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/ExifGlass.Benchmarks/ExifGlass.Benchmarks.csproj" />
     <Project Path="tests/ExifGlass.Core.Tests/ExifGlass.Core.Tests.csproj" />
+    <Project Path="tests/ExifGlass.IpcHost/ExifGlass.IpcHost.csproj" />
     <Project Path="tests/ExifGlass.UI.Tests/ExifGlass.UI.Tests.csproj" />
   </Folder>
   <Project Path="ExifGlass.Core/ExifGlass.Core.csproj" />

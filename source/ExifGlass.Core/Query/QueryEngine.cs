@@ -120,7 +120,7 @@ public static class QueryEngine
             GroupCount = groupOrder.Count,
             IsFiltering = filtering,
             FilterCounts = filterCounts,
-            ChipCounts = query.Filters.Count == 0 ? filterCounts : ChipCounts(rows, query.Filters),
+            ChipCounts = query.Filters.Count == 0 && query.HiddenGroups.Count == 0 ? filterCounts : ChipCounts(rows, query),
         };
     }
 
@@ -260,14 +260,14 @@ public static class QueryEngine
     }
 
 
-    // each chip's count among the rows the chips already on let through (AND)
-    private static Dictionary<QuickFilter, int> ChipCounts(List<ViewRow> rows, IReadOnlySet<QuickFilter> active)
+    // each chip's count among the shown groups' rows the chips already on let through (AND)
+    private static Dictionary<QuickFilter, int> ChipCounts(List<ViewRow> rows, ViewQuery query)
     {
         var filters = Enum.GetValues<QuickFilter>();
         var counts = filters.ToDictionary(f => f, _ => 0);
         foreach (var row in rows)
         {
-            if (!Matches(row, active)) continue;
+            if (query.HiddenGroups.Contains(row.Group) || !Matches(row, query.Filters)) continue;
 
             foreach (var f in filters)
             {

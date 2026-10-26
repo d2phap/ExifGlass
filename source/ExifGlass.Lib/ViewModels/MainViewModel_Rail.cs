@@ -273,14 +273,15 @@ public sealed partial class MainViewModel
         if (!segments.SequenceEqual(Segments)) Segments = segments;
 
         var filters = Rows.Query.Filters;
+        var narrowed = filters.Count > 0 || shown < groups.Count;
         var hasAi = Rows.AiTotal > 0;
         foreach (var chip in AiQuickFilters.Concat(QuickFilters))
         {
-            // with a chip on, the others count within it, and one that would empty the view is off (owner after G7)
+            // with a chip on or a group hidden, the chips count within what's left, and one that would empty the view is off (owner after G7, item 86)
             var count = Rows.ChipCounts.GetValueOrDefault(chip.Filter);
             chip.IsOn = filters.Contains(chip.Filter);
             chip.Count = Document is null ? null : count.ToString(CultureInfo.InvariantCulture);
-            chip.IsAvailable = Document is not null && (chip.IsOn || count > 0 || (filters.Count == 0 && !chip.IsOnlyForAi));
+            chip.IsAvailable = Document is not null && (chip.IsOn || count > 0 || (!narrowed && !chip.IsOnlyForAi));
         }
 
         var aiChips = hasAi ? AiQuickFilters.Count : 1;

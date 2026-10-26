@@ -262,7 +262,7 @@ public sealed class ViewResult
     public IReadOnlyDictionary<QuickFilter, int> FilterCounts { get; init; } = new Dictionary<QuickFilter, int>();
 
     /// <summary>
-    /// Each chip's count within the chips already on, which combine with AND: a chip at 0 would empty the view, so the rail disables it (owner after G7).
+    /// Each chip's count within the shown groups and the chips already on, which combine with AND: a chip at 0 would empty the view, so the rail disables it (owner after G7, Appendix A item 86).
     /// </summary>
     public IReadOnlyDictionary<QuickFilter, int> ChipCounts { get; init; } = new Dictionary<QuickFilter, int>();
 

@@ -116,6 +116,39 @@ public class PanelShellTests
 
 
     [AvaloniaFact]
+    public async Task QuickFiltersCountWithinTheShownGroups()
+    {
+        using var shell = await TestShell.OpenWithFileAsync(1400);
+        var vm = shell.ViewModel;
+        var ids = vm.QuickFilters.Single(f => f.Filter == QuickFilter.HasTagId);
+        var gps = vm.QuickFilters.Single(f => f.Filter == QuickFilter.Gps);
+        var total = vm.Rows.FilterCounts[QuickFilter.HasTagId];
+        int IdsIn(string group) => vm.Rows.RowsInView.Count(r => r.Group == group && QueryEngine.Passes(r, QuickFilter.HasTagId));
+        var most = vm.RailGroups.Select(g => g.Name).MaxBy(IdsIn)!;
+        var left = total - IdsIn(most);
+        Assert.True(IdsIn(most) > 0);
+        Assert.True(gps.IsAvailable);
+
+        // a hidden group narrows the view as a chip does: the chips count what's left, and one at 0 is off (item 86)
+        vm.SetGroupHidden(most, true);
+        await shell.WaitForAsync(() => ids.Count == left.ToString());
+        Assert.Equal(left > 0, ids.IsAvailable);
+        Assert.False(gps.IsAvailable);
+        Assert.Equal(total, vm.Rows.FilterCounts[QuickFilter.HasTagId]);
+
+        foreach (var group in vm.RailGroups.ToList()) vm.SetGroupHidden(group.Name, true);
+        await shell.WaitForAsync(() => vm.RailGroups.All(g => !g.IsShown));
+        Assert.All(vm.QuickFilters, f => Assert.Equal("0", f.Count));
+        Assert.DoesNotContain(vm.QuickFilters, f => f.IsAvailable);
+
+        vm.ToggleAllGroupsCommand.Execute(null);
+        await shell.WaitForAsync(() => ids.Count == total.ToString());
+        Assert.True(ids.IsAvailable);
+        Assert.True(gps.IsAvailable);
+    }
+
+
+    [AvaloniaFact]
     public async Task HiddenGroupsAndQuickFiltersStayForTheNextLaunch()
     {
         using var shell = await TestShell.OpenWithFileAsync(1400);

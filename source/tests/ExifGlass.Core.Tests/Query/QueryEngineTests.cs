@@ -109,6 +109,30 @@ public class QueryEngineTests
 
 
     [Fact]
+    public void QuickFiltersCountWithinTheShownGroups()
+    {
+        var doc = Camera();
+        var all = QueryEngine.Run(doc, ViewQuery.Default, TestContext.Current.CancellationToken);
+
+        var noExif = QueryEngine.Run(doc, ViewQuery.Default with { HiddenGroups = new HashSet<string> { "EXIF" } }, TestContext.Current.CancellationToken);
+        Assert.Equal(1, noExif.ChipCounts[QuickFilter.Gps]);
+        Assert.Equal(all.FilterCounts, noExif.FilterCounts);
+
+        var gpsWithoutComposite = QueryEngine.Run(doc, ViewQuery.Default with
+        {
+            HiddenGroups = new HashSet<string> { "Composite" },
+            Filters = new HashSet<QuickFilter> { QuickFilter.Gps },
+        }, TestContext.Current.CancellationToken);
+        Assert.Equal(1, gpsWithoutComposite.ChipCounts[QuickFilter.Gps]);
+        Assert.Equal(1, gpsWithoutComposite.ChipCounts[QuickFilter.Converted]);
+
+        // the hidden groups are kept for every file, so this one may lack some of them
+        var unknown = QueryEngine.Run(doc, ViewQuery.Default with { HiddenGroups = new HashSet<string> { "XMP" } }, TestContext.Current.CancellationToken);
+        Assert.Equal(all.FilterCounts, unknown.ChipCounts);
+    }
+
+
+    [Fact]
     public void HidesAndCollapsesGroups()
     {
         var query = ViewQuery.Default with

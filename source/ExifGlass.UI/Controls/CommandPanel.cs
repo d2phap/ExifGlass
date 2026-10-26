@@ -177,6 +177,7 @@ public class CommandPanel : TemplatedControl
         base.OnAttachedToVisualTree(e);
 
         // the token colours resolve once the panel is in a themed tree
+        AccentPalette.Changed += AccentPalette_Changed;
         BuildInlines();
         if (IsExpanded) Dispatcher.UIThread.Post(() => Resize(animate: false), DispatcherPriority.Loaded);
     }
@@ -185,6 +186,7 @@ public class CommandPanel : TemplatedControl
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        AccentPalette.Changed -= AccentPalette_Changed;
         StopTyping();
     }
 
@@ -379,6 +381,9 @@ public class CommandPanel : TemplatedControl
 
 
     #region Event handlers
+
+    private void AccentPalette_Changed(object? sender, EventArgs e) => BuildInlines();
+
 
     private void Typer_Tick(object? sender, EventArgs e)
     {

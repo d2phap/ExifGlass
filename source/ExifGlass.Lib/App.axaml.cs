@@ -92,6 +92,8 @@ public partial class App : Application
         if (services.Settings.Current.Theme == AppTheme.System) await ThemeService.WaitForSystemThemeAsync();
         ThemeService.Apply(services.Settings.Current.Theme);
         ThemeService.Follow(() => services.ViewModel.Theme);
+        AccentService.Apply(services.Settings.Current.Accent);
+        AccentService.Follow(() => services.ViewModel.Accent);
 
         var perf = PerfRun.IsPerf(args);
         var window = services.CreateMainWindow();

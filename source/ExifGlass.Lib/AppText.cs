@@ -209,6 +209,16 @@ public static class AppText
     public const string THEME_LIGHT = "Light";
     public const string THEME_DARK = "Dark";
     public const string APP_THEME_DESC = "System follows your OS light or dark setting.";
+    public const string ACCENT_COLOR = "Accent color";
+    public const string ACCENT_COLOR_DESC = "System follows your OS accent color.";
+    public const string ACCENT_SYSTEM = "System accent color";
+    public const string ACCENT_BLUE = "Blue";
+    public const string ACCENT_PURPLE = "Purple";
+    public const string ACCENT_PINK = "Pink";
+    public const string ACCENT_ORANGE = "Orange";
+    public const string ACCENT_GREEN = "Green";
+    public const string ACCENT_YELLOW = "Yellow";
+    public const string ACCENT_GRAPHITE = "Graphite";
     public const string ALWAYS_ON_TOP = "Keep window always on top";
     public const string ALWAYS_ON_TOP_DESC = "Float above other apps while you compare files.";
     public const string CHECK_UPDATES = "Check for updates on startup";

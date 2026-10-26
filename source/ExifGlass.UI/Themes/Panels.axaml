@@ -325,7 +325,7 @@
                            Background="{DynamicResource BgPanelBrush}"
                            BorderBrush="{DynamicResource AccentA35Brush}"
                            BorderThickness="1"
-                           BoxShadow="{StaticResource ShadowSelectedCard}"
+                           BoxShadow="{DynamicResource ShadowSelectedCard}"
                            CornerRadius="{StaticResource RadiusPanel}">
           <StackPanel x:DataType="ui:SelectedTagView"
                       DataContext="{TemplateBinding View}"
@@ -728,7 +728,7 @@
                                  ui:FrameBox.Anchor="{TemplateBinding FocusPoint}"
                                  BorderBrush="{DynamicResource AccentBrush}"
                                  BorderThickness="1.5"
-                                 BoxShadow="{StaticResource ShadowFocusPoint}"
+                                 BoxShadow="{DynamicResource ShadowFocusPoint}"
                                  CornerRadius="{StaticResource RadiusControl20}"
                                  IsVisible="False" />
               <StackPanel Name="PART_Chips"

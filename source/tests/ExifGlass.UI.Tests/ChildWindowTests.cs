@@ -21,6 +21,7 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using ExifGlass.Core.ExifTool;
@@ -28,6 +29,7 @@ using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
+using ExifGlass.UI.Tokens;
 using ExifGlass.UI.Windows;
 using ExifGlass.ViewModels;
 using ExifGlass.Windows;
@@ -202,17 +204,59 @@ public class ChildWindowTests
     }
 
 
+    // Appendix A item 85: the footer has Reset, OK and Cancel only, at every width
     [AvaloniaTheory]
-    [InlineData(1400, false)]
-    [InlineData(800, true)]
-    public void TheFooterLinksToAboutWhileTheToolbarHidesIt(double width, bool link)
+    [InlineData(1400)]
+    [InlineData(800)]
+    public void TheFooterHasNoAboutLink(double width)
     {
         using var shell = TestShell.Open(width);
-        var (window, vm) = OpenSettings(shell);
+        var (window, _) = OpenSettings(shell);
 
-        Assert.Equal(link, vm.ShowsAboutLink);
-        Assert.Equal(link, ((Views.SettingsView)window.Content!).FindControl<GlassButton>("AboutLink")!.IsEffectivelyVisible);
+        Assert.DoesNotContain(window.GetVisualDescendants().OfType<GlassButton>(), b => Equals(b.Content, AppText.ABOUT));
         window.Close();
+    }
+
+
+    [AvaloniaFact]
+    public void TheAccentAppliesAtOnceCancelRestoresItAndOkSavesIt()
+    {
+        var app = Application.Current!;
+        try
+        {
+            using var shell = TestShell.Open(1400);
+            var (window, vm) = OpenSettings(shell);
+            var picker = Find<SwatchPicker>(window);
+            Assert.Equal(AccentService.Presets.Count + 1, picker.ItemCount);
+            Assert.Equal(0, picker.SelectedIndex);
+
+            picker.SelectedIndex = AccentService.IndexOf("Purple");
+            Assert.Equal("Purple", shell.ViewModel.Accent);
+            Assert.Equal(Color.Parse("#7C3AED"), AccentColor(app));
+            Assert.Equal(AppSettings.ACCENT_SYSTEM, shell.Settings.Current.Accent);
+
+            window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            shell.Settle();
+            Assert.Equal(AppSettings.ACCENT_SYSTEM, shell.ViewModel.Accent);
+            Assert.Equal(AccentPalette.Fill(AccentService.SystemAccent() ?? AccentPalette.DefaultAccent), AccentColor(app));
+
+            (window, vm) = OpenSettings(shell);
+            vm.AccentIndex = AccentService.IndexOf("Green");
+            vm.OkCommand.Execute(null);
+            shell.Settle();
+            Assert.Equal("Green", shell.Settings.Current.Accent);
+            Assert.Equal(Color.Parse("#15803D"), AccentColor(app));
+
+            (window, vm) = OpenSettings(shell);
+            Assert.Equal(AccentService.IndexOf("Green"), Find<SwatchPicker>(window).SelectedIndex);
+            vm.ResetCommand.Execute(null);
+            Assert.Equal(AppSettings.ACCENT_SYSTEM, vm.Accent);
+            window.Close();
+        }
+        finally
+        {
+            AccentPalette.Apply(app.Resources, null);
+        }
     }
 
 
@@ -635,6 +679,9 @@ public class ChildWindowTests
 
 
     private static T Find<T>(Window window) where T : Control => window.GetVisualDescendants().OfType<T>().First();
+
+
+    private static Color AccentColor(Application app) => app.TryGetResource(TokenKeys.ACCENT_COLOR, app.ActualThemeVariant, out var value) && value is Color color ? color : default;
 
 
     // an owned window follows the app's theme, not its owner's RequestedThemeVariant

@@ -355,7 +355,15 @@ public sealed class AiValueText : HighlightTextBlock
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        AccentPalette.Changed += AccentPalette_Changed;
         Build();
+    }
+
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        AccentPalette.Changed -= AccentPalette_Changed;
     }
 
 
@@ -451,6 +459,13 @@ public sealed class AiValueText : HighlightTextBlock
     private IBrush? Brush(string key) => this.TryFindResource(key, ActualThemeVariant, out var value) ? value as IBrush : null;
 
     #endregion // Private methods
+
+
+    #region Event handlers
+
+    private void AccentPalette_Changed(object? sender, EventArgs e) => Build();
+
+    #endregion // Event handlers
 }
 
 

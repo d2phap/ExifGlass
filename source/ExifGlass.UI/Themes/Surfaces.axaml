@@ -244,7 +244,7 @@
       <Setter Property="BorderBrush" Value="{DynamicResource AccentA35Brush}" />
     </Style>
     <Style Selector="^.accent /template/ Border#PART_Surface">
-      <Setter Property="BoxShadow" Value="{StaticResource ShadowSelectedCard}" />
+      <Setter Property="BoxShadow" Value="{DynamicResource ShadowSelectedCard}" />
     </Style>
     <Style Selector="^.ai">
       <Setter Property="BorderBrush" Value="{DynamicResource Accent2A30Brush}" />

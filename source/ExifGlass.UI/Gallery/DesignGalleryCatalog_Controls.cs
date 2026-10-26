@@ -44,7 +44,7 @@ public static partial class DesignGalleryCatalog
 
     private static IEnumerable<GallerySection> BuildControls() =>
     [
-        Buttons(), IconButtons(), Dropdowns(), StoreBadges(), Inputs(), TokenFields(), Checks(), Switches(), Segmented(), Combo(),
+        Buttons(), IconButtons(), Dropdowns(), StoreBadges(), Inputs(), TokenFields(), Checks(), Switches(), Segmented(), Swatches(), Combo(),
         Chips(), Badges(), Menus(), ToolTips(), Toasts(), Dialogs(), PushPanels(), Scrollbars(), Cards(), Feedback(),
         TextControls(), Expanders(), Windows(), Table(), Rail(), Inspector(), Ai(), Editing(),
     ];
@@ -283,6 +283,36 @@ public static partial class DesignGalleryCatalog
             new("rest", Theme(1)),
             new("hover", hover, "inactive option: State.Hover"),
             new("live", Theme(0), "click another option"),
+        ]);
+    }
+
+
+    private static GallerySection Swatches()
+    {
+        // the presets of Settings' accent row; the first stands for the OS accent
+        static SwatchPicker Picker(int selected, Func<Swatch, Swatch>? state = null, int stateAt = -1)
+        {
+            (string Label, string Color)[] colors = [("System", "#00828B"), ("Blue", "#225EDB"), ("Purple", "#7C3AED"), ("Pink", "#C2185B"), ("Orange", "#C2410C"), ("Yellow", "#FFB900"), ("Green", "#15803D"), ("Graphite", "#4B5563")];
+            var picker = new SwatchPicker();
+            for (var i = 0; i < colors.Length; i++)
+            {
+                var swatch = new Swatch { Color = Color.Parse(colors[i].Color), Icon = i == 0 ? IconId.DarkTheme : null };
+                ToolTip.SetTip(swatch, colors[i].Label);
+                picker.Items.Add(i == stateAt && state is not null ? state(swatch) : swatch);
+            }
+
+            picker.SelectedIndex = selected;
+            return picker;
+        }
+
+        return new GallerySection("c-swatch", "Swatches", "Appendix A item 84 (Settings' accent): round dots 24 in 32 hit areas, 4 apart; hover grows the dot 8%, pressed 0.96; picked: a 2 px TextPrimary ring 2 px around; keyboard focus: the ring in Accent; one is always picked and the arrow keys move it; System shows the OS accent with its icon.",
+        [
+            new("rest", Picker(0), "System picked"),
+            new("hover", Picker(0, s => s.Hover(), 2)),
+            new("pressed", Picker(0, s => s.Pressed(), 3)),
+            new("picked", Picker(5), "Yellow: dark text on it"),
+            new("focus-visible", Picker(1, s => s.FocusVisible(), 1)),
+            new("disabled", Picker(0).Disabled()),
         ]);
     }
 

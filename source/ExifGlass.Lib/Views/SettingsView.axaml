@@ -46,6 +46,27 @@
           </Grid>
         </Border>
 
+        <!--  Appendix A item 84: System, then the presets; a choice shows at once, as the theme does  -->
+        <Border MinHeight="56"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.ACCENT_COLOR}" />
+              <TextBlock tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{x:Static app:AppText.ACCENT_COLOR_DESC}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ui:SwatchPicker Name="AccentChoice"
+                             Grid.Column="1"
+                             VerticalAlignment="Center"
+                             AutomationProperties.Name="{x:Static app:AppText.ACCENT_COLOR}"
+                             ItemsSource="{Binding AccentChoices}"
+                             SelectedIndex="{Binding AccentIndex}" />
+          </Grid>
+        </Border>
+
         <Border MinHeight="56"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1">
@@ -168,7 +189,7 @@
             Background="{DynamicResource EmphasisA03Brush}"
             BorderBrush="{DynamicResource EmphasisA07Brush}"
             BorderThickness="0,1,0,0">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="8">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
         <ui:GlassButton Name="ResetButton"
                         Classes="ghost"
                         Command="{Binding ResetCommand}"
@@ -176,21 +197,14 @@
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         Icon="{x:Static ui:IconId.ArrowReset}"
                         ToolTip.Tip="{x:Static app:AppText.RESET_TIP}" />
-        <ui:GlassButton Name="AboutLink"
-                        Grid.Column="1"
-                        Classes="link"
-                        Command="{Binding OpenAboutCommand}"
-                        Content="{x:Static app:AppText.ABOUT}"
-                        IsVisible="{Binding ShowsAboutLink}"
-                        ToolTip.Tip="{x:Static app:AppText.AboutTooltip}" />
         <ui:GlassButton Name="OkButton"
-                        Grid.Column="3"
+                        Grid.Column="2"
                         MinWidth="80"
                         Classes="primary"
                         Command="{Binding OkCommand}"
                         Content="{x:Static app:AppText.OK}" />
         <ui:GlassButton Name="CancelButton"
-                        Grid.Column="4"
+                        Grid.Column="3"
                         MinWidth="80"
                         Command="{Binding CancelCommand}"
                         Content="{x:Static app:AppText.CANCEL}" />

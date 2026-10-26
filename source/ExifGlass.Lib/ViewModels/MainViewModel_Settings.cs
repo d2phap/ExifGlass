@@ -27,7 +27,7 @@ namespace ExifGlass.ViewModels;
 /// <summary>
 /// What OK in Settings saves (DS 6.15).
 /// </summary>
-public sealed record SettingsChange(AppTheme Theme, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments);
+public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments);
 
 
 public sealed partial class MainViewModel
@@ -51,6 +51,11 @@ public sealed partial class MainViewModel
 
     public SettingsStore Settings => _settings;
 
+    /// <summary>
+    /// The accent on screen, which Settings may be previewing (Appendix A item 84).
+    /// </summary>
+    public string Accent { get; private set; } = AppSettings.ACCENT_SYSTEM;
+
     #endregion // Properties
 
 
@@ -67,6 +72,16 @@ public sealed partial class MainViewModel
 
 
     /// <summary>
+    /// Shows an accent without saving it, as PreviewTheme does.
+    /// </summary>
+    public void PreviewAccent(string accent)
+    {
+        Accent = accent;
+        AccentService.Apply(accent);
+    }
+
+
+    /// <summary>
     /// Saves Settings' OK: a new ExifTool restarts it, new arguments apply to the file on screen, then the "Settings saved" toast.
     /// </summary>
     public async Task ApplySettingsAsync(SettingsChange change)
@@ -79,6 +94,7 @@ public sealed partial class MainViewModel
         _settings.Update(s =>
         {
             s.Theme = change.Theme;
+            s.Accent = change.Accent;
             s.AlwaysOnTop = change.AlwaysOnTop;
             s.CheckForUpdates = change.CheckForUpdates;
             s.ExifToolPath = change.ExifToolPath.Trim();
@@ -86,6 +102,7 @@ public sealed partial class MainViewModel
         });
 
         PreviewTheme(change.Theme);
+        PreviewAccent(change.Accent);
         IsPinned = change.AlwaysOnTop;
         if (argumentsChanged) _arguments = ArgumentPolicy.Analyze(change.Arguments);
 

@@ -24,6 +24,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Media;
 using ExifGlass.Core.Editing;
+using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Controls;
 
@@ -86,6 +87,20 @@ public class CommandPreview : TemplatedControl
     }
 
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        AccentPalette.Changed += AccentPalette_Changed;
+    }
+
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        AccentPalette.Changed -= AccentPalette_Changed;
+    }
+
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -122,6 +137,13 @@ public class CommandPreview : TemplatedControl
     private static string Breakable(string path) => path.Replace("\\", "\\" + ZERO_WIDTH_SPACE, StringComparison.Ordinal).Replace("/", "/" + ZERO_WIDTH_SPACE, StringComparison.Ordinal);
 
     #endregion // Private methods
+
+
+    #region Event handlers
+
+    private void AccentPalette_Changed(object? sender, EventArgs e) => BuildInlines();
+
+    #endregion // Event handlers
 }
 
 

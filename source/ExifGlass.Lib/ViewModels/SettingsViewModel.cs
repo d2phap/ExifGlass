@@ -28,7 +28,7 @@ using System.ComponentModel;
 namespace ExifGlass.ViewModels;
 
 /// <summary>
-/// The Settings window (DS 6.15): a draft of the settings that OK saves; the theme applies at once and Cancel restores it (Appendix B item 18).
+/// The Settings window (DS 6.15): a draft of the settings that OK saves; the theme and the accent apply at once and Cancel restores them (Appendix B item 18).
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
@@ -38,6 +38,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private int _pathGeneration;
     private bool _committed;
     private bool _following;
+    private bool _refreshingSwatches;
 
     #endregion // Fields and constants
 
@@ -50,6 +51,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         var current = main.Settings.Current;
         Theme = main.Theme;
+        Accent = main.Accent;
         AlwaysOnTop = main.IsPinned;
         CheckForUpdates = current.CheckForUpdates;
         ExifToolPath = current.ExifToolPath;
@@ -57,6 +59,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         main.PropertyChanged += Main_PropertyChanged;
         if (main.Metadata is { } metadata) metadata.StatusChanged += Metadata_StatusChanged;
+        AccentService.SystemAccentChanged += AccentService_SystemAccentChanged;
         UpdateArguments();
         _ = UpdatePathHintAsync();
     }
@@ -78,11 +81,6 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     public bool ShowsSandboxNote => _main.Channel.BackupInContainer;
 
-    /// <summary>
-    /// The footer's About link, while the toolbar has no About button (Appendix B item 4).
-    /// </summary>
-    public bool ShowsAboutLink => !_main.ShowSecondaryButtons;
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ThemeIndex))]
     public partial AppTheme Theme { get; set; }
@@ -96,6 +94,29 @@ public sealed partial class SettingsViewModel : ObservableObject
         set
         {
             if (value is >= 0 and <= 2) Theme = (AppTheme)value;
+        }
+    }
+
+    /// <summary>
+    /// The accent row's swatches: System in the OS accent, then the presets (Appendix A item 84).
+    /// </summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<SwatchItem> AccentChoices { get; private set; } = AccentService.Swatches();
+
+    /// <summary>
+    /// The accent setting: System, a preset's id, or a #RRGGBB the file holds.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AccentIndex))]
+    public partial string Accent { get; set; } = AppSettings.ACCENT_SYSTEM;
+
+    public int AccentIndex
+    {
+        get => AccentService.IndexOf(Accent);
+        set
+        {
+            // new swatches reset the list's selection before the binding puts it back
+            if (!_refreshingSwatches && value >= 0) Accent = AccentService.IdAt(value);
         }
     }
 
@@ -196,15 +217,18 @@ public sealed partial class SettingsViewModel : ObservableObject
 
 
     /// <summary>
-    /// The window is closing: without OK, the theme goes back to the saved one.
+    /// The window is closing: without OK, the theme and the accent go back to the saved ones.
     /// </summary>
     public void Close()
     {
         _main.PropertyChanged -= Main_PropertyChanged;
         if (_main.Metadata is { } metadata) metadata.StatusChanged -= Metadata_StatusChanged;
+        AccentService.SystemAccentChanged -= AccentService_SystemAccentChanged;
+        if (_committed) return;
 
-        var saved = _main.Settings.Current.Theme;
-        if (!_committed && _main.Theme != saved) _main.PreviewTheme(saved);
+        var saved = _main.Settings.Current;
+        if (_main.Theme != saved.Theme) _main.PreviewTheme(saved.Theme);
+        if (_main.Accent != saved.Accent) _main.PreviewAccent(saved.Accent);
     }
 
     #endregion // Public methods
@@ -217,6 +241,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         var defaults = new AppSettings();
         Theme = defaults.Theme;
+        Accent = defaults.Accent;
         AlwaysOnTop = defaults.AlwaysOnTop;
         CheckForUpdates = defaults.CheckForUpdates;
         ExifToolPath = defaults.ExifToolPath;
@@ -228,7 +253,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private async Task OkAsync()
     {
         _committed = true;
-        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, AlwaysOnTop, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments)));
+        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, Accent, AlwaysOnTop, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments)));
 
         // the window goes at once; ExifTool restarts and the file is read again behind it
         CloseRequested?.Invoke(this, EventArgs.Empty);
@@ -238,10 +263,6 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [RelayCommand]
     private void Cancel() => CloseRequested?.Invoke(this, EventArgs.Empty);
-
-
-    [RelayCommand]
-    private void OpenAbout() => _main.OpenAboutCommand.Execute(null);
 
 
     [RelayCommand]
@@ -273,6 +294,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         if (!_following) _main.PreviewTheme(value);
     }
+
+
+    partial void OnAccentChanged(string value) => _main.PreviewAccent(value);
 
 
     partial void OnArgumentsChanged(IReadOnlyList<string> value) => UpdateArguments();
@@ -381,14 +405,19 @@ public sealed partial class SettingsViewModel : ObservableObject
                 AlwaysOnTop = _main.IsPinned;
                 break;
 
-            case nameof(MainViewModel.ShowSecondaryButtons):
-                OnPropertyChanged(nameof(ShowsAboutLink));
-                break;
-
             case nameof(MainViewModel.Document):
                 UpdatePreview();
                 break;
         }
+    }
+
+
+    private void AccentService_SystemAccentChanged(object? sender, EventArgs e)
+    {
+        _refreshingSwatches = true;
+        AccentChoices = AccentService.Swatches();
+        _refreshingSwatches = false;
+        OnPropertyChanged(nameof(AccentIndex));
     }
 
 

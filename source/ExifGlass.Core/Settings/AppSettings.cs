@@ -98,6 +98,8 @@ public sealed class AppSettings
 
     public const string WINDOW_MAIN = "Main";
     public const string WINDOW_SETTINGS = "Settings";
+
+    public const string ACCENT_SYSTEM = "System";
     public const string WINDOW_ABOUT = "About";
 
     #endregion // Fields and constants
@@ -108,6 +110,11 @@ public sealed class AppSettings
     public int Version { get; set; } = CURRENT_VERSION;
 
     public AppTheme Theme { get; set; } = AppTheme.System;
+
+    /// <summary>
+    /// The accent (Appendix A item 84): System, a preset (Blue, Purple, Pink, Orange, Yellow, Green, Graphite) or #RRGGBB.
+    /// </summary>
+    public string Accent { get; set; } = ACCENT_SYSTEM;
 
     public bool AlwaysOnTop { get; set; }
 

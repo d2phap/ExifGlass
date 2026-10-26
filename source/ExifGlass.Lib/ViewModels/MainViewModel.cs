@@ -133,6 +133,7 @@ public sealed partial class MainViewModel : ObservableObject
         Loader.PreviewChanged += Loader_PreviewChanged;
 
         Theme = settings.Current.Theme;
+        Accent = settings.Current.Accent;
         IsPinned = settings.Current.AlwaysOnTop;
         RailOpen = settings.Current.RailOpen;
         InspectorOpen = settings.Current.InspectorOpen;

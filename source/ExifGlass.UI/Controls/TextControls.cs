@@ -328,7 +328,15 @@ public partial class PromptText : SelectableTextBlock
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        AccentPalette.Changed += AccentPalette_Changed;
         BuildInlines();
+    }
+
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        AccentPalette.Changed -= AccentPalette_Changed;
     }
 
 
@@ -494,6 +502,13 @@ public partial class PromptText : SelectableTextBlock
     private IBrush? Brush(string key) => this.TryFindResource(key, ActualThemeVariant, out var value) ? value as IBrush : null;
 
     #endregion // Private methods
+
+
+    #region Event handlers
+
+    private void AccentPalette_Changed(object? sender, EventArgs e) => BuildInlines();
+
+    #endregion // Event handlers
 
 
     #region Nested types

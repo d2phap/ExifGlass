@@ -16,7 +16,7 @@
                            Background="{DynamicResource BgPanelBrush}"
                            BorderBrush="{DynamicResource AccentA35Brush}"
                            BorderThickness="1"
-                           BoxShadow="{StaticResource ShadowSelectedCard}"
+                           BoxShadow="{DynamicResource ShadowSelectedCard}"
                            CornerRadius="{StaticResource RadiusPanel}">
           <DockPanel>
             <ui:GlassIcon Width="16"

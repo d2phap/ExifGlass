@@ -50,6 +50,7 @@ public static class SettingsOverrides
             switch (key)
             {
                 case nameof(AppSettings.Theme): target.Theme = fileValues.Theme; break;
+                case nameof(AppSettings.Accent): target.Accent = fileValues.Accent; break;
                 case nameof(AppSettings.AlwaysOnTop): target.AlwaysOnTop = fileValues.AlwaysOnTop; break;
                 case nameof(AppSettings.CheckForUpdates): target.CheckForUpdates = fileValues.CheckForUpdates; break;
                 case nameof(AppSettings.ExifToolPath): target.ExifToolPath = fileValues.ExifToolPath; break;
@@ -69,6 +70,7 @@ public static class SettingsOverrides
     private static string Canonical(string key) => key.ToLowerInvariant() switch
     {
         "theme" => nameof(AppSettings.Theme),
+        "accent" => nameof(AppSettings.Accent),
         "alwaysontop" => nameof(AppSettings.AlwaysOnTop),
         "checkforupdates" => nameof(AppSettings.CheckForUpdates),
         "exiftoolpath" => nameof(AppSettings.ExifToolPath),
@@ -93,6 +95,11 @@ public static class SettingsOverrides
                 };
                 if (theme is null) return false;
                 s.Theme = theme.Value;
+                return true;
+
+            case nameof(AppSettings.Accent):
+                if (value.Trim().Length == 0) return false;
+                s.Accent = value.Trim();
                 return true;
 
             case nameof(AppSettings.AlwaysOnTop):

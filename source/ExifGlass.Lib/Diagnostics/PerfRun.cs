@@ -84,6 +84,9 @@ public static class PerfRun
             await NextFrameAsync(window);
             var shown = watch.Elapsed.TotalMilliseconds;
             await open;
+
+            // the view model takes the loader's AI document once its rows are queried off the UI thread, so the AI reaches the screen after the read
+            await WaitForAsync(() => ReferenceEquals(vm.Document, vm.Loader.Document), TimeSpan.FromSeconds(5));
             var ai = watch.Elapsed.TotalMilliseconds;
 
             output.WriteLine(Invariant($"OPEN {Path.GetFileName(file)}: {vm.Rows.Total} tags in view, {vm.Document?.Tags.Count} read"));

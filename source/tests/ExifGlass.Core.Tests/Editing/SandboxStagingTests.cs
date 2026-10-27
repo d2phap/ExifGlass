@@ -86,7 +86,8 @@ public sealed class SandboxStagingTests(ExifToolFixture exifTool) : IDisposable
 
         var backup = staging.Commit(file);
         Assert.Equal("edited", File.ReadAllText(file));
-        Assert.Equal(created, File.GetCreationTimeUtc(file));
+        // Linux has no settable birth time: .NET reports min(ctime, mtime), which the write moves
+        if (OperatingSystem.IsWindows() || OperatingSystem.IsMacOS()) Assert.Equal(created, File.GetCreationTimeUtc(file));
         Assert.False(File.Exists(file + "_original"));
         Assert.Equal(Path.Combine(staging.BackupDirectory, DateTime.Now.ToString("yyyy-MM-dd"), "DSCF4127.JPG_original"), backup);
         Assert.Equal("the original bytes, longer than the edit", File.ReadAllText(backup!));

@@ -41,6 +41,10 @@ public static class AppFonts
 
     private static string? _mono;
 
+    // set while a size value is taken back (ReleaseSize): the default then passes uncoerced
+    [ThreadStatic]
+    private static bool _releasing;
+
     #endregion // Fields and constants
 
 
@@ -98,13 +102,31 @@ public static class AppFonts
     public static AppBuilder WithAdjustedFontSizes(this AppBuilder builder, double points)
     {
         var size = TextElement.FontSizeProperty;
-        StyledPropertyMetadata<double> Metadata() => new(size.GetDefaultValue(typeof(Control)), coerce: (_, value) => Math.Max(1, value + points));
+        var fallback = size.GetDefaultValue(typeof(Control));
+        StyledPropertyMetadata<double> Metadata() => new(fallback, coerce: (_, value) => _releasing && value == fallback ? value : Math.Max(1, value + points));
 
         // controls carry the attached size, inlines their own; TextElement owns it, so its metadata can't be overridden
         size.OverrideMetadata<Control>(Metadata());
         size.OverrideMetadata<Inline>(Metadata());
 
         return builder;
+    }
+
+
+    /// <summary>
+    /// Removes a font size value so the element takes its inherited size again. Avalonia keeps a coerced default as the element's own value once the last value goes, which would cut it off from its parent's size; the default passes uncoerced here, so Avalonia drops it.
+    /// </summary>
+    public static void ReleaseSize(IDisposable? value)
+    {
+        _releasing = true;
+        try
+        {
+            value?.Dispose();
+        }
+        finally
+        {
+            _releasing = false;
+        }
     }
 
 

@@ -57,12 +57,13 @@ public class TokensTests
         var text = new TextBlock { FontWeight = FontWeight.Bold };
 
         Typography.SetRole(text, TextRole.Meta);
-        Assert.Equal(11.5, text.FontSize);
+        Assert.Equal(11.5 + AppFonts.SizeOffset, text.FontSize);
         Assert.Equal(16, text.LineHeight);
         Assert.Equal(FontWeight.Bold, text.FontWeight);
 
         Typography.SetRole(text, TextRole.MonoBadge);
-        Assert.Equal(10.5 - AppFonts.SizeOffset, text.FontSize);
+        // the role adds the coercion's point back, so mono keeps its size on every OS (S3)
+        Assert.Equal(10.5, text.FontSize);
         Assert.True(double.IsNaN(text.LineHeight));
         Assert.Equal(AppFonts.Mono, text.FontFamily.Name);
         Assert.NotNull(text.FontFeatures);
@@ -72,6 +73,25 @@ public class TokensTests
         Assert.Equal(plain.FontFamily, text.FontFamily);
         Assert.Null(text.FontFeatures);
         Assert.Equal(FontWeight.Bold, text.FontWeight);
+    }
+
+
+    [AvaloniaFact]
+    public void ClearingARoleGivesTheTextItsInheritedSizeBack()
+    {
+        var plain = new TextBlock();
+        var text = new TextBlock();
+        var window = new Window { Content = new StackPanel { Children = { plain, text } } };
+        window.Show();
+
+        Typography.SetRole(text, TextRole.Meta);
+        Typography.SetRole(text, TextRole.None);
+        Assert.Equal(plain.FontSize, text.FontSize);
+
+        // still inherited, not a copy of the parent's size
+        window.FontSize = 20;
+        Assert.Equal(plain.FontSize, text.FontSize);
+        window.Close();
     }
 
     #endregion // Tests

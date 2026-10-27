@@ -71,7 +71,12 @@ public static partial class Typography
 
     private static void Apply(TextBlock text, TextRole role)
     {
-        foreach (var value in text.GetValue(AppliedProperty) ?? []) value?.Dispose();
+        // the size first, in Set's order: off Windows its removal must give back the inherited size, not a coerced default
+        if (text.GetValue(AppliedProperty) is { } applied)
+        {
+            AppFonts.ReleaseSize(applied[0]);
+            foreach (var value in applied.AsSpan(1)) value?.Dispose();
+        }
 
         if (role == TextRole.None)
         {

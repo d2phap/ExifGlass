@@ -129,6 +129,7 @@ public static partial class DesignGalleryCatalog
             View = view,
             IsEditing = editing,
             EditText = editing ? "FUJIFILM Corporation" : null,
+            FocusesEditor = false,
         };
 
         var source = new SelectedTagView("PNG:Parameters", "PNG", "parameters", "Parameters", SAMPLE_PROMPT, UiText.SAME_AS_VALUE, "string", "-PNG:Parameters", true, AiFields: 23);

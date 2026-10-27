@@ -327,6 +327,24 @@ public class PanelTests
 
 
     [AvaloniaFact]
+    public void EditModeFocusesTheEditorUnlessTheCardIsPinned()
+    {
+        var view = new SelectedTagView("EXIF:IFD0:Artist", "EXIF", "0x013B", "Artist", "Phap", "Phap", "string", "-IFD0:Artist", false);
+        var card = new SelectedTagCard { Width = 304, View = view };
+        var pinned = new SelectedTagCard { Width = 304, View = view, IsEditing = true, FocusesEditor = false };
+        var window = Show(new StackPanel { Children = { card, pinned } });
+
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(Part<TextBox>(pinned, "PART_Editor").IsFocused);
+
+        card.IsEditing = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(Part<TextBox>(card, "PART_Editor").IsFocused);
+        window.Close();
+    }
+
+
+    [AvaloniaFact]
     public void TheAiCardOffersCopyOnlyWhenThereIsSomethingToCopy()
     {
         static ExifGlass.Core.Ai.AiGenerationInfo Info(params ExifGlass.Core.Ai.AiPrompt[] prompts) => new([new ExifGlass.Core.Ai.AiSourceInfo

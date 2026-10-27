@@ -178,6 +178,11 @@ public class SelectedTagCard : TemplatedControl
         set => SetValue(EditTextProperty, value);
     }
 
+    /// <summary>
+    /// Gets whether edit mode focuses the editor (DS 6.2); off for a card pinned in edit mode, such as the gallery's, where the focus would pull the scroll to it.
+    /// </summary>
+    public bool FocusesEditor { get; init; } = true;
+
     public ICommand? CloseCommand
     {
         get => GetValue(CloseCommandProperty);
@@ -311,7 +316,7 @@ public class SelectedTagCard : TemplatedControl
         {
             Dispatcher.UIThread.Post(() =>
             {
-                if (_editor is null || !IsEditing) return;
+                if (_editor is null || !IsEditing || !FocusesEditor) return;
 
                 _editor.Focus(NavigationMethod.Tab);
                 _editor.SelectAll();

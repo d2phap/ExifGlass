@@ -610,7 +610,7 @@ public class MainWindowTests
 
     #region Nested types
 
-    private sealed class TestBuildInfo : IAppBuildInfo
+    internal sealed class TestBuildInfo : IAppBuildInfo
     {
         public string Version => "3.0.0.0";
         public string FullVersion => "3.0.0.0-test";

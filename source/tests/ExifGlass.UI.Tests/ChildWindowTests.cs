@@ -24,6 +24,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using ExifGlass.Core.Common;
 using ExifGlass.Core.ExifTool;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
@@ -429,24 +430,24 @@ public class ChildWindowTests
 
 
     [AvaloniaTheory]
-    [InlineData(AppChannel.WindowsZip, true, true)]
-    [InlineData(AppChannel.WindowsSideload, true, true)]
-    [InlineData(AppChannel.MacDirect, true, false)]
-    [InlineData(AppChannel.LinuxAppImage, true, false)]
-    [InlineData(AppChannel.WindowsStore, false, false)]
-    [InlineData(AppChannel.MacAppStore, false, false)]
-    [InlineData(AppChannel.LinuxFlatpak, false, false)]
-    public void TheStoreRowFollowsTheChannel(AppChannel channel, bool shows, bool microsoftStore)
+    [InlineData(AppChannel.WindowsZip, true)]
+    [InlineData(AppChannel.WindowsSideload, true)]
+    [InlineData(AppChannel.MacDirect, false)]
+    [InlineData(AppChannel.LinuxAppImage, false)]
+    [InlineData(AppChannel.WindowsStore, false)]
+    [InlineData(AppChannel.MacAppStore, false)]
+    [InlineData(AppChannel.LinuxFlatpak, false)]
+    [InlineData(AppChannel.Development, false)]
+    public void TheStoreRowShowsOnlyInTheWindowsDirectBuilds(AppChannel channel, bool shows)
     {
         var shell = new RecordingShell();
         var vm = new AboutViewModel(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()) { Channel = new ChannelPolicy(channel), Shell = shell });
 
         Assert.Equal(shows, vm.ShowsStore);
-        Assert.Equal(shows && microsoftStore, vm.IsMicrosoftStore);
         if (!shows) return;
 
         vm.OpenStoreCommand.Execute(null);
-        Assert.Equal(microsoftStore ? AppText.STORE_URL : UpdateService.RELEASES_URL, Assert.Single(shell.Opened));
+        Assert.Equal(AppText.STORE_URL, Assert.Single(shell.Opened));
     }
 
 
@@ -626,9 +627,14 @@ public class ChildWindowTests
         var variant = theme == "dark" ? ThemeVariant.Dark : ThemeVariant.Light;
         var failures = new List<string>();
         UpdateService? updates = null;
+        // the version line as the baselines have it, whichever test ran first
+        AppInfo.BuildInfo = new MainWindowTests.TestBuildInfo();
+
+        // each OS's own direct channel, so the Microsoft Store row shows only in the Windows baselines
+        var channel = OperatingSystem.IsWindows() ? AppChannel.WindowsZip : OperatingSystem.IsMacOS() ? AppChannel.MacDirect : AppChannel.LinuxAppImage;
         using var shell = TestShell.Open(1400, theme: variant, create: (s, r) =>
         {
-            updates = new UpdateService(s, new ChannelPolicy(AppChannel.WindowsZip), "3.0.0",
+            updates = new UpdateService(s, new ChannelPolicy(channel), "3.0.0",
                 _ => Task.FromResult("""{ "Version": "3.1.0", "PublishedDate": "2026-11-02T10:00:00" }"""), () => NOW);
             return new MainViewModel(s, r) { Channel = updates.Channel, Updates = updates };
         });

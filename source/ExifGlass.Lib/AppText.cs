@@ -262,8 +262,6 @@ public static class AppText
     public const string STORE_TITLE = "Microsoft Store";
     public const string STORE_SUB = "Support development · automatic updates";
     public const string STORE_GET = "Get ExifGlass";
-    public const string RELEASES_TITLE = "Downloads";
-    public const string RELEASES_SUB = "Every release on GitHub";
     public const string SHOW_FEWER = "Show fewer";
     public const string STORE_URL = "https://apps.microsoft.com/detail/9MX8S9HZ57W8";
     public const string TOAST_UPDATE_SUB = "Download it from About";

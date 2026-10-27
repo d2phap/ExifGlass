@@ -111,7 +111,7 @@ public class UpdateTests
     [InlineData("win", "Direct", null, AppChannel.WindowsZip, true, StoreBadgeKind.MicrosoftStore, true)]
     [InlineData("win", "Direct", "DuongDieuPhap.ExifGlass_xyz", AppChannel.WindowsSideload, true, StoreBadgeKind.MicrosoftStore, true)]
     [InlineData("win", "Direct", "9662DuongDieuPhap.ExifGlass_xjrmsrdc1fgj6", AppChannel.WindowsStore, false, StoreBadgeKind.Hidden, true)]
-    [InlineData("mac", "Direct", null, AppChannel.MacDirect, true, StoreBadgeKind.GitHubReleases, true)]
+    [InlineData("mac", "Direct", null, AppChannel.MacDirect, true, StoreBadgeKind.Hidden, true)]
     [InlineData("mac", "MacAppStore", null, AppChannel.MacAppStore, false, StoreBadgeKind.Hidden, false)]
     [InlineData("linux", "Direct", null, AppChannel.Development, false, StoreBadgeKind.Hidden, true)]
     public void DecidesWhatEachChannelAllows(string platform, string build, string? package, AppChannel channel, bool update, StoreBadgeKind badge, bool ig10)
@@ -138,7 +138,7 @@ public class UpdateTests
         var appImage = ChannelPolicy.Detect("linux", "Direct", null, ownAppImage, "/tmp/.mount_ExifGlA1b2C3/usr/lib/exifglass/ExifGlass");
 
         Assert.Equal((AppChannel.LinuxFlatpak, false, StoreBadgeKind.Hidden), (flatpak.Channel, flatpak.UpdateCheck, flatpak.StoreBadge));
-        Assert.Equal((AppChannel.LinuxAppImage, true, StoreBadgeKind.GitHubReleases), (appImage.Channel, appImage.UpdateCheck, appImage.StoreBadge));
+        Assert.Equal((AppChannel.LinuxAppImage, true, StoreBadgeKind.Hidden), (appImage.Channel, appImage.UpdateCheck, appImage.StoreBadge));
         Assert.Equal(OperatingSystem.IsWindows(), appImage.ImageGlass9);
     }
 

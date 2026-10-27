@@ -44,7 +44,6 @@ public enum StoreBadgeKind
 {
     Hidden,
     MicrosoftStore,
-    GitHubReleases,
 }
 
 
@@ -63,7 +62,6 @@ public sealed record ChannelPolicy(AppChannel Channel)
     public StoreBadgeKind StoreBadge => Channel switch
     {
         AppChannel.WindowsSideload or AppChannel.WindowsZip => StoreBadgeKind.MicrosoftStore,
-        AppChannel.MacDirect or AppChannel.LinuxAppImage => StoreBadgeKind.GitHubReleases,
         _ => StoreBadgeKind.Hidden,
     };
 

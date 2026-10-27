@@ -145,33 +145,26 @@
             </DockPanel>
           </Border>
 
-          <!--  D11: the Microsoft Store in the Windows direct builds, GitHub's releases in the direct macOS and AppImage builds  -->
+          <!--  D11: the Microsoft Store in the Windows direct builds  -->
           <Border Name="StoreRow"
                   Padding="0,14"
                   BorderBrush="{DynamicResource EmphasisA07Brush}"
                   BorderThickness="0,1,0,0"
                   IsVisible="{Binding ShowsStore}">
             <DockPanel>
-              <Panel Margin="16,0,0,0"
-                     VerticalAlignment="Center"
-                     DockPanel.Dock="Right">
-                <ui:GlassButton Name="StoreButton"
-                                Classes="primary"
-                                Command="{Binding OpenStoreCommand}"
-                                Content="{x:Static app:AppText.STORE_GET}"
-                                Icon="{x:Static ui:IconId.BrandMicrosoftStore}"
-                                IsVisible="{Binding IsMicrosoftStore}" />
-                <ui:GlassButton Name="ReleasesButton"
-                                Command="{Binding OpenStoreCommand}"
-                                Content="{x:Static app:AppText.VISIT}"
-                                Icon="{x:Static ui:IconId.Open}"
-                                IsVisible="{Binding IsReleases}" />
-              </Panel>
+              <ui:GlassButton Name="StoreButton"
+                              Margin="16,0,0,0"
+                              VerticalAlignment="Center"
+                              Classes="primary"
+                              Command="{Binding OpenStoreCommand}"
+                              Content="{x:Static app:AppText.STORE_GET}"
+                              DockPanel.Dock="Right"
+                              Icon="{x:Static ui:IconId.BrandMicrosoftStore}" />
               <StackPanel VerticalAlignment="Center">
-                <TextBlock tok:Typography.Role="BodyStrong" Text="{Binding StoreTitle}" />
+                <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.STORE_TITLE}" />
                 <TextBlock tok:Typography.Role="Body"
                            Classes="caption"
-                           Text="{Binding StoreText}" />
+                           Text="{x:Static app:AppText.STORE_SUB}" />
               </StackPanel>
             </DockPanel>
           </Border>

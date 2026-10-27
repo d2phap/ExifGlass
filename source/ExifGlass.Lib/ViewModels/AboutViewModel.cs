@@ -122,17 +122,9 @@ public sealed partial class AboutViewModel : ObservableObject
     };
 
     /// <summary>
-    /// D11: the Microsoft Store row in the Windows direct builds, GitHub's releases in the direct macOS and AppImage builds, none in the stores and Flatpak.
+    /// D11: the Microsoft Store row in the Windows direct builds only.
     /// </summary>
-    public bool ShowsStore => _main.Channel.StoreBadge != StoreBadgeKind.Hidden;
-
-    public bool IsMicrosoftStore => _main.Channel.StoreBadge == StoreBadgeKind.MicrosoftStore;
-
-    public bool IsReleases => _main.Channel.StoreBadge == StoreBadgeKind.GitHubReleases;
-
-    public string StoreTitle => IsMicrosoftStore ? AppText.STORE_TITLE : AppText.RELEASES_TITLE;
-
-    public string StoreText => IsMicrosoftStore ? AppText.STORE_SUB : AppText.RELEASES_SUB;
+    public bool ShowsStore => _main.Channel.StoreBadge == StoreBadgeKind.MicrosoftStore;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShownNotices), nameof(NoticesToggleText))]
@@ -204,7 +196,7 @@ public sealed partial class AboutViewModel : ObservableObject
 
 
     [RelayCommand]
-    private Task OpenStoreAsync() => Open(IsMicrosoftStore ? AppText.STORE_URL : UpdateService.RELEASES_URL);
+    private Task OpenStoreAsync() => Open(AppText.STORE_URL);
 
 
     [RelayCommand]

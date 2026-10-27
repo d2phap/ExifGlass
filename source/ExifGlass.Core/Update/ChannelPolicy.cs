@@ -92,9 +92,10 @@ public sealed record ChannelPolicy(AppChannel Channel)
     /// <summary>
     /// Works out the channel: the build flavor for macOS, the package identity on Windows (none: the ZIP), the environment on Linux.
     /// </summary>
-    public static ChannelPolicy Detect(string platformId, string buildChannel, string? packageFamilyName, Func<string, string?>? environment = null)
+    public static ChannelPolicy Detect(string platformId, string buildChannel, string? packageFamilyName, Func<string, string?>? environment = null, string? processPath = null)
     {
         environment ??= Environment.GetEnvironmentVariable;
+        processPath ??= Environment.ProcessPath;
 
         var channel = platformId switch
         {
@@ -104,7 +105,7 @@ public sealed record ChannelPolicy(AppChannel Channel)
             "mac" when buildChannel == "MacAppStore" => AppChannel.MacAppStore,
             "mac" => AppChannel.MacDirect,
             "linux" when !string.IsNullOrEmpty(environment("FLATPAK_ID")) => AppChannel.LinuxFlatpak,
-            "linux" when !string.IsNullOrEmpty(environment("APPIMAGE")) => AppChannel.LinuxAppImage,
+            "linux" when RunsFromAppImage(environment, processPath) => AppChannel.LinuxAppImage,
             _ => AppChannel.Development,
         };
 
@@ -112,4 +113,22 @@ public sealed record ChannelPolicy(AppChannel Channel)
     }
 
     #endregion // Public methods
+
+
+    #region Private methods
+
+    /// <summary>
+    /// An AppImage's runtime exports APPIMAGE and APPDIR to every process it starts, so ExifGlass started by
+    /// another AppImage (ImageGlass's tools) inherits them: only a process inside APPDIR is ExifGlass's AppImage.
+    /// </summary>
+    private static bool RunsFromAppImage(Func<string, string?> environment, string? processPath)
+    {
+        var appDir = environment("APPDIR");
+        if (string.IsNullOrEmpty(environment("APPIMAGE")) || string.IsNullOrEmpty(appDir) || string.IsNullOrEmpty(processPath)) return false;
+
+        var root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(appDir)) + Path.DirectorySeparatorChar;
+        return Path.GetFullPath(processPath).StartsWith(root, StringComparison.Ordinal);
+    }
+
+    #endregion // Private methods
 }

@@ -127,12 +127,42 @@ public class UpdateTests
     [Fact]
     public void TellsFlatpakFromAppImage()
     {
+        static string? ownAppImage(string name) => name switch
+        {
+            "APPIMAGE" => "/home/me/ExifGlass.AppImage",
+            "APPDIR" => "/tmp/.mount_ExifGlA1b2C3",
+            _ => null,
+        };
+
         var flatpak = ChannelPolicy.Detect("linux", "Direct", null, n => n == "FLATPAK_ID" ? "io.github.d2phap.exifglass" : null);
-        var appImage = ChannelPolicy.Detect("linux", "Direct", null, n => n == "APPIMAGE" ? "/home/me/ExifGlass.AppImage" : null);
+        var appImage = ChannelPolicy.Detect("linux", "Direct", null, ownAppImage, "/tmp/.mount_ExifGlA1b2C3/usr/lib/exifglass/ExifGlass");
 
         Assert.Equal((AppChannel.LinuxFlatpak, false, StoreBadgeKind.Hidden), (flatpak.Channel, flatpak.UpdateCheck, flatpak.StoreBadge));
         Assert.Equal((AppChannel.LinuxAppImage, true, StoreBadgeKind.GitHubReleases), (appImage.Channel, appImage.UpdateCheck, appImage.StoreBadge));
         Assert.Equal(OperatingSystem.IsWindows(), appImage.ImageGlass9);
+    }
+
+
+    [Fact]
+    public void ATarballStartedByAnotherAppImageStaysDevelopment()
+    {
+        // G10 finding 7: ImageGlass's AppImage starts its tools with its own APPIMAGE and APPDIR
+        static string? imageGlass(string name) => name switch
+        {
+            "APPIMAGE" => "/home/me/Applications/ImageGlass",
+            "APPDIR" => "/tmp/.mount_ImageGXyZ123",
+            _ => null,
+        };
+
+        var tarball = ChannelPolicy.Detect("linux", "Direct", null, imageGlass, "/home/me/ExifGlass/ExifGlass");
+        var nextDoor = ChannelPolicy.Detect("linux", "Direct", null, imageGlass, "/tmp/.mount_ImageGXyZ123-other/ExifGlass");
+        var noAppDir = ChannelPolicy.Detect("linux", "Direct", null, n => n == "APPIMAGE" ? "/home/me/ExifGlass.AppImage" : null, "/home/me/ExifGlass/ExifGlass");
+        var extracted = ChannelPolicy.Detect("linux", "Direct", null, n => n == "APPDIR" ? "/home/me/squashfs-root" : null, "/home/me/squashfs-root/usr/lib/exifglass/ExifGlass");
+
+        Assert.Equal((AppChannel.Development, false, StoreBadgeKind.Hidden), (tarball.Channel, tarball.UpdateCheck, tarball.StoreBadge));
+        Assert.Equal(AppChannel.Development, nextDoor.Channel);
+        Assert.Equal(AppChannel.Development, noAppDir.Channel);
+        Assert.Equal(AppChannel.Development, extracted.Channel);
     }
 
 

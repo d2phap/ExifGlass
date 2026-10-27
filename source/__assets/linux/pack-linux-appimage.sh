@@ -90,7 +90,7 @@ if command -v desktop-file-validate >/dev/null 2>&1; then desktop-file-validate 
 cat > "$APPDIR_STAGE/AppRun" <<'APPRUN_EOF'
 #!/bin/sh
 # Everything exported here reaches every host program the app starts (xdg-open, ExifTool), so it exports nothing but APPDIR,
-# and never clears APPIMAGE: ChannelPolicy reads it to know it runs as an AppImage.
+# and never clears APPIMAGE: ChannelPolicy reads it and APPDIR to know it runs as this AppImage.
 
 # the runtime exports APPDIR, an extracted squashfs-root/AppRun doesn't
 if [ -z "${APPDIR:-}" ]; then

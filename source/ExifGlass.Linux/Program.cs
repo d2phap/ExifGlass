@@ -39,8 +39,13 @@ internal static class Program
 
         var builder = BuildAvaloniaApp();
 
+        // CPU frames reuse one framebuffer: without it each frame maps a new window-sized one, whose GC.AddMemoryPressure forces a gen-2 GC on most frames
+        var x11 = new X11PlatformOptions { UseRetainedFramebuffer = true };
+
         // --render software: the memory reference run of plan 8, no GPU driver in the numbers
-        if (AppBootstrap.IsSoftwareRendering(args)) builder = builder.With(new X11PlatformOptions { RenderingMode = [X11RenderingMode.Software] });
+        if (AppBootstrap.IsSoftwareRendering(args)) x11.RenderingMode = [X11RenderingMode.Software];
+
+        builder = builder.With(x11);
 
         return builder.StartWithClassicDesktopLifetime(args);
     }

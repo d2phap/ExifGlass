@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
@@ -69,6 +71,9 @@ public class GlassButton : Button
 
 
     #region Protected methods
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new GlassButtonPeer(this);
+
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
@@ -210,6 +215,9 @@ public class GlassToggleButton : ToggleButton
 
     #region Protected methods
 
+    protected override AutomationPeer OnCreateAutomationPeer() => new GlassTogglePeer(this);
+
+
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -270,6 +278,9 @@ public class GlassDropDownButton : DropDownButton
 
 
     #region Protected methods
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new GlassButtonPeer(this);
+
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
@@ -373,4 +384,29 @@ public class StoreBadge : Button
     }
 
     #endregion // Protected methods
+}
+
+
+/// <summary>
+/// The design system's buttons in a screen reader (P12): AutomationProperties.Name, else the text they show, else their tooltip, which every icon-only button has.
+/// </summary>
+internal static class ButtonName
+{
+    // Avalonia's content peer falls back to Content.ToString(), which names a button with a panel inside "Avalonia.Controls.DockPanel"
+    public static string? Of(ContentControl owner, string? name) =>
+        !string.IsNullOrWhiteSpace(AutomationProperties.GetName(owner)) ? name
+        : owner.Content is string { Length: > 0 } text ? text
+        : ToolTip.GetTip(owner) as string;
+}
+
+
+internal sealed class GlassButtonPeer(Button owner) : ButtonAutomationPeer(owner)
+{
+    protected override string? GetNameCore() => ButtonName.Of((ContentControl)Owner, base.GetNameCore());
+}
+
+
+internal sealed class GlassTogglePeer(ToggleButton owner) : ToggleButtonAutomationPeer(owner)
+{
+    protected override string? GetNameCore() => ButtonName.Of((ContentControl)Owner, base.GetNameCore());
 }

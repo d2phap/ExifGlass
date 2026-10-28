@@ -45,6 +45,7 @@ public static class UiText
     public const string SCROLL_RIGHT = "Scroll right";
 
     // the table's column headers are Overline: uppercase (DS 1.1)
+    public const string TABLE = "Metadata tags";
     public const string COLUMN_INDEX = "#";
     public const string COLUMN_TAG_ID = "TAG ID";
     public const string COLUMN_TAG_NAME = "TAG NAME";
@@ -88,6 +89,7 @@ public static class UiText
     public const string SAVE_BINARY_TIP = "Save the tag's bytes as a file";
     public const string ADD_TAG_OVERLINE = "ADD TAG";
     public const string ADD_TAG = "Add tag";
+    public const string TAG_NAME = "Tag name";
     public const string TAG_NAME_PLACEHOLDER = "Tag name, e.g. Artist";
     public const string VALUE_PLACEHOLDER = "Value";
     public const string TAG_GROUP = "Tag group";

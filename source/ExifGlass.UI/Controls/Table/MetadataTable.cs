@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
@@ -130,6 +131,7 @@ public partial class MetadataTable : Panel
             ItemsSource = _source,
         };
         _grid.Classes.Add("table");
+        AutomationProperties.SetName(_grid, UiText.TABLE);
         ApplyThemes();
         _grid.Sorting += Grid_Sorting;
         _grid.LoadingRow += Grid_LoadingRow;

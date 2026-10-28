@@ -44,6 +44,7 @@
                               Padding="12,0,16,0"
                               Classes="primary"
                               CornerRadius="{StaticResource RadiusControl36}"
+                              AutomationProperties.Name="{x:Static eg:UiText.SAVE}"
                               Command="{TemplateBinding SaveCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <ui:SpinningIcon Width="15"
@@ -140,6 +141,7 @@
                         SelectedItem="{TemplateBinding Group, Mode=TwoWay}" />
               <TextBox Name="PART_Name"
                        Grid.Column="2"
+                       AutomationProperties.Name="{x:Static eg:UiText.TAG_NAME}"
                        PlaceholderText="{x:Static eg:UiText.TAG_NAME_PLACEHOLDER}"
                        Text="{TemplateBinding TagName, Mode=TwoWay}" />
               <!--  the menu surface of the ComboBox list: the shadow room as the child's margin, the 2 px gap as a band (plan 5.5)  -->
@@ -166,6 +168,7 @@
 
             <TextBox Name="PART_Value"
                      Classes="multiline"
+                     AutomationProperties.Name="{x:Static eg:UiText.VALUE_PLACEHOLDER}"
                      PlaceholderText="{x:Static eg:UiText.VALUE_PLACEHOLDER}"
                      Text="{TemplateBinding Value, Mode=TwoWay}" />
 

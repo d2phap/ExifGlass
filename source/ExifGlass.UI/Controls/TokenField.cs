@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Animation;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -435,7 +436,8 @@ public class TokenChip : Button
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == IsLockedProperty) PseudoClasses.Set(":locked", IsLocked);
+        if (change.Property == TextProperty) AutomationProperties.SetName(this, Text);
+        else if (change.Property == IsLockedProperty) PseudoClasses.Set(":locked", IsLocked);
         else if (change.Property == ErrorProperty) PseudoClasses.Set(":invalid", Error is not null);
     }
 

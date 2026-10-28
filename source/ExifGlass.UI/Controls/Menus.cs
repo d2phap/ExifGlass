@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -143,6 +144,22 @@ public class GlassMenuHeader : MenuItem
     }
 
     #endregion // Constructors
+
+
+    #region Protected methods
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new MenuHeaderPeer(this);
+
+    #endregion // Protected methods
+}
+
+
+// a screen reader reads the header as text, not as a disabled menu item
+internal sealed class MenuHeaderPeer(GlassMenuHeader owner) : ControlAutomationPeer(owner)
+{
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Text;
+
+    protected override string? GetNameCore() => base.GetNameCore() is { Length: > 0 } name ? name : ((GlassMenuHeader)Owner).Text;
 }
 
 

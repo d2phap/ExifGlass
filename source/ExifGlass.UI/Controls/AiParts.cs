@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -191,6 +192,7 @@ public class SourceLink : GlassButton
         _moreChip.IsVisible = more > 0;
         _more.Text = more > 0 ? "+" + more.ToString(CultureInfo.InvariantCulture) : null;
         ToolTip.SetTip(this, key is null ? null : Tip(key, OtherSources));
+        AutomationProperties.SetName(this, key is null ? null : $"{UiText.SHOW_SOURCE_TAG} {AiRows.SourceLabel(key)}");
         Tag = key is null ? null : new AiActionRequest(AiAction.ShowSourceTag, Key: key);
     }
 

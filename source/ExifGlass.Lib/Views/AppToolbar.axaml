@@ -21,6 +21,16 @@
                           IsChecked="{Binding IsRailShown, Mode=OneWay}"
                           ToolTip.Tip="{Binding RailTooltip}" />
 
+    <ui:SearchBox Name="Search"
+                  MinWidth="120"
+                  MaxWidth="520"
+                  VerticalAlignment="Center"
+                  AutomationProperties.Name="{x:Static app:AppText.SEARCH}"
+                  Classes.no-hint="{Binding !ShowSearchHint}"
+                  IsEnabled="{Binding HasDocument}"
+                  PlaceholderText="{x:Static app:AppText.SEARCH_PLACEHOLDER}"
+                  Text="{Binding SearchText, Mode=TwoWay}" />
+
     <StackPanel Orientation="Horizontal"
                 Spacing="4">
       <ui:GlassButton Name="OpenButton"
@@ -66,15 +76,6 @@
                             ToolTip.Tip="{Binding InspectorTooltip}" />
     </StackPanel>
 
-    <ui:SearchBox Name="Search"
-                  MinWidth="120"
-                  MaxWidth="520"
-                  VerticalAlignment="Center"
-                  AutomationProperties.Name="{x:Static app:AppText.SEARCH}"
-                  Classes.no-hint="{Binding !ShowSearchHint}"
-                  IsEnabled="{Binding HasDocument}"
-                  PlaceholderText="{x:Static app:AppText.SEARCH_PLACEHOLDER}"
-                  Text="{Binding SearchText, Mode=TwoWay}" />
-  </v:ToolbarRow>
+</v:ToolbarRow>
 
 </UserControl>

@@ -203,6 +203,7 @@
           </Grid.ColumnDefinitions>
           <Button Name="PART_Check"
                   Theme="{StaticResource RailCheckButton}"
+                  AutomationProperties.Name="{TemplateBinding ToggleTip}"
                   ToolTip.Tip="{TemplateBinding ToggleTip}">
             <DockPanel>
                         <Panel Name="PART_Box"
@@ -272,6 +273,7 @@
           <Button Name="PART_Jump"
                   Grid.Column="2"
                   Theme="{StaticResource RailJumpButton}"
+                  AutomationProperties.Name="{TemplateBinding JumpTip}"
                   ToolTip.Tip="{TemplateBinding JumpTip}">
             <TextBlock Name="PART_Count"
                        VerticalAlignment="Center"
@@ -459,6 +461,7 @@
                         Spacing="8">
               <TextBox Name="PART_Editor"
                        Classes="mono-editor"
+                       AutomationProperties.Name="{x:Static eg:UiText.EDIT_VALUE}"
                        Text="{TemplateBinding EditText, Mode=TwoWay}" />
               <StackPanel HorizontalAlignment="Right"
                           Orientation="Horizontal"

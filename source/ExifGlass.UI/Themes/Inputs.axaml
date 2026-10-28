@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:eg="using:ExifGlass.UI"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
 
@@ -286,7 +287,7 @@
               </ui:SquircleBorder.Transitions>
             </ui:SquircleBorder>
             <WrapPanel Name="PART_Panel" Margin="{TemplateBinding Padding}" ItemSpacing="6" LineSpacing="6" Orientation="Horizontal">
-              <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" PlaceholderText="{TemplateBinding Placeholder}" />
+              <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" AutomationProperties.Name="{x:Static eg:UiText.ADD_ARGUMENT}" PlaceholderText="{TemplateBinding Placeholder}" />
             </WrapPanel>
           </Panel>
           <ContentPresenter Name="PART_Note"

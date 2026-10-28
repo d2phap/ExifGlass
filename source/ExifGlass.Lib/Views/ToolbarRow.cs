@@ -22,7 +22,7 @@ using Avalonia.Controls;
 namespace ExifGlass.Views;
 
 /// <summary>
-/// The app toolbar's row: the first child at the left, the second at the right, and the third centred on the row, narrowed so it keeps Spacing from both, or filling the gap with FillsGap (owner at G4 review).
+/// The app toolbar's row: the first child at the left, the second centred on the row, narrowed so it keeps Spacing from the others, or filling the gap with FillsGap (owner at G4 review), and the third at the right; the children are in reading order, so Tab follows it.
 /// </summary>
 public class ToolbarRow : Panel
 {
@@ -45,9 +45,6 @@ public class ToolbarRow : Panel
         set => SetValue(SpacingProperty, value);
     }
 
-    /// <summary>
-    /// Gets or sets whether the third child fills the space between the others instead of staying centred.
-    /// </summary>
     public bool FillsGap
     {
         get => GetValue(FillsGapProperty);
@@ -74,14 +71,14 @@ public class ToolbarRow : Panel
         if (Children.Count < 3) return base.MeasureOverride(availableSize);
 
         Children[0].Measure(availableSize);
-        Children[1].Measure(availableSize);
+        Children[2].Measure(availableSize);
         var width = double.IsFinite(availableSize.Width)
             ? availableSize.Width
-            : Children[0].DesiredSize.Width + Children[1].DesiredSize.Width + 2 * Spacing + Children[2].MinWidth;
+            : Children[0].DesiredSize.Width + Children[2].DesiredSize.Width + 2 * Spacing + Children[1].MinWidth;
 
-        Children[2].Measure(new Size(Place(width, availableSize.Height).Centre.Width, availableSize.Height));
+        Children[1].Measure(new Size(Place(width, availableSize.Height).Centre.Width, availableSize.Height));
 
-        var height = Math.Max(Children[2].DesiredSize.Height, Math.Max(Children[0].DesiredSize.Height, Children[1].DesiredSize.Height));
+        var height = Math.Max(Children[1].DesiredSize.Height, Math.Max(Children[0].DesiredSize.Height, Children[2].DesiredSize.Height));
         return new Size(width, double.IsFinite(availableSize.Height) ? availableSize.Height : height);
     }
 
@@ -92,8 +89,8 @@ public class ToolbarRow : Panel
 
         var (left, right, centre) = Place(finalSize.Width, finalSize.Height);
         Children[0].Arrange(left);
-        Children[1].Arrange(right);
-        Children[2].Arrange(centre);
+        Children[1].Arrange(centre);
+        Children[2].Arrange(right);
 
         return finalSize;
     }
@@ -107,8 +104,8 @@ public class ToolbarRow : Panel
     private (Rect Left, Rect Right, Rect Centre) Place(double width, double height)
     {
         var leftWidth = Children[0].DesiredSize.Width;
-        var rightWidth = Children[1].DesiredSize.Width;
-        var centre = Children[2];
+        var rightWidth = Children[2].DesiredSize.Width;
+        var centre = Children[1];
 
         var from = leftWidth + Spacing;
         var to = width - rightWidth - Spacing;

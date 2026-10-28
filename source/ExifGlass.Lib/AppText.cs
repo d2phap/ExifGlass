@@ -185,6 +185,7 @@ public static class AppText
     public const string TOAST_BINARY_FAILED = "Couldn't read the binary data";
     public const string SAVE = "Save";
     public const string DISCARD = "Discard";
+    public const string RELOAD = "Reload";
 
     // D29: the edits ImageGlass's SHUTDOWN kept for the next start
     public const string RESTORE = "Restore";
@@ -354,6 +355,14 @@ public static class AppText
     public static string UnsavedTitle(string file) => $"Save changes to {file}?";
 
     public static string UnsavedBody(int count) => $"{PendingChanges(count)} not written yet. Discard drops them.";
+
+    /// <summary>
+    /// Save's question when another app changed the file after ExifGlass read it (owner at G12).
+    /// </summary>
+    public static string ChangedTitle(string file) => $"{file} changed on disk";
+
+    public static string ChangedBody(int count) =>
+        $"Another app changed the file after ExifGlass read it. Save writes {(count == 1 ? "1 change" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes"))} into the file as it is now; Reload reads it again and drops them.";
 
     /// <summary>
     /// D29's question at the start after ImageGlass closed the app with edits staged.

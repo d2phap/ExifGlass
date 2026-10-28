@@ -154,6 +154,60 @@ public class EditingTests
 
 
     [AvaloniaFact]
+    public async Task SaveAsksWhenAnotherAppChangedTheFile()
+    {
+        using var shell = TestShell.Open(1400);
+        var vm = shell.ViewModel;
+        var path = Path.Combine(shell.Folder, "a.jpg");
+        await File.WriteAllTextAsync(path, "first", TestContext.Current.CancellationToken);
+        await vm.OpenFileAsync(path);
+        await shell.WaitForAsync(() => vm.HasDocument);
+        var recorder = new RecordingShell();
+        vm.Shell = recorder;
+
+        // the file as it was read: no question
+        Delete(vm, "Tag 2");
+        await shell.WaitForAsync(() => vm.HasPending);
+        Assert.True(await vm.SaveAsync());
+        Assert.Empty(recorder.Asked);
+        Assert.Single(shell.Reader.Writes);
+        shell.Settle(300);
+
+        Delete(vm, "Tag 3");
+        await shell.WaitForAsync(() => vm.HasPending);
+        await File.AppendAllTextAsync(path, " and more", TestContext.Current.CancellationToken);
+
+        // Cancel keeps the edit and writes nothing
+        Assert.False(await vm.SaveAsync());
+        var asked = Assert.Single(recorder.Asked);
+        Assert.Equal("a.jpg changed on disk", asked.Title);
+        Assert.Equal("Another app changed the file after ExifGlass read it. Save writes 1 change into the file as it is now; Reload reads it again and drops them.", asked.Body);
+        Assert.Equal(("Save", "Reload"), (asked.PrimaryText, asked.SecondaryText));
+        Assert.Single(shell.Reader.Writes);
+        Assert.True(vm.HasPending);
+
+        // Save writes into the file as it is now
+        recorder.Answer = DialogAnswer.Primary;
+        Assert.True(await vm.SaveAsync());
+        Assert.Equal(2, shell.Reader.Writes.Count);
+        Assert.False(vm.HasPending);
+        shell.Settle(300);
+
+        // Reload drops the edit and reads the file again
+        Delete(vm, "Tag 4");
+        await shell.WaitForAsync(() => vm.HasPending);
+        File.SetLastWriteTimeUtc(path, DateTime.UtcNow.AddMinutes(1));
+        recorder.Answer = DialogAnswer.Secondary;
+        var reads = shell.Reader.Reads;
+        Assert.False(await vm.SaveAsync());
+        Assert.Equal(2, shell.Reader.Writes.Count);
+        Assert.False(vm.HasPending);
+        Assert.Equal(reads + 1, shell.Reader.Reads);
+        Assert.Equal(3, recorder.Asked.Count);
+    }
+
+
+    [AvaloniaFact]
     public async Task EscClosingTheWindowAsksAboutStagedEditsFirst()
     {
         using var shell = await TestShell.OpenWithFileAsync(1400);

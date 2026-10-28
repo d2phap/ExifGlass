@@ -200,6 +200,23 @@ public sealed class MetadataDocument
 
 
     /// <summary>
+    /// Whether another app changed the file since this read: it is still there, with another size or write time.
+    /// </summary>
+    public bool HasChangedOnDisk()
+    {
+        try
+        {
+            var file = new FileInfo(SourcePath);
+            return file.Exists && (file.Length != FileSize || file.LastWriteTimeUtc != FileModified);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return false;
+        }
+    }
+
+
+    /// <summary>
     /// The table row an AI field came from, for "Show source tag"; C2PA and XMP structs match their flattened rows.
     /// </summary>
     public TagRecord? FindSourceTag(string sourceKey)

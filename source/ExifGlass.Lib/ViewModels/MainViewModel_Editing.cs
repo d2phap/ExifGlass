@@ -322,6 +322,23 @@ public sealed partial class MainViewModel
         var edits = _edits;
         var focus = Selection.FocusedKey;
         IsEditing = false;
+
+        // another app changed the file since it was read (owner at G12): Save writes into it as it is now, Reload drops the edits and reads it again
+        if (Shell is { } shell && doc.HasChangedOnDisk())
+        {
+            var answer = await shell.AskAsync(new DialogRequest(AppText.ChangedTitle(doc.FileName), AppText.ChangedBody(edits.PendingCount),
+                AppText.SAVE, AppText.RELOAD, Icon: IconId.ArrowSync));
+
+            if (answer == DialogAnswer.Secondary)
+            {
+                DiscardEdits();
+                if (reload) await ReloadAsync(doc.SourcePath);
+                return !reload;
+            }
+
+            if (answer != DialogAnswer.Primary) return false;
+        }
+
         IsSaving = true;
 
         try
@@ -348,9 +365,7 @@ public sealed partial class MainViewModel
             // the read that follows keeps the groups, filters and selection, and drops what was staged
             if (reload)
             {
-                _reloadPath = doc.SourcePath;
-                await Loader.OpenAsync(doc.SourcePath);
-                _reloadPath = null;
+                await ReloadAsync(doc.SourcePath);
                 if (focus is not null && focus.StartsWith("New:", StringComparison.Ordinal)) SelectSavedTag(edits, focus);
             }
 
@@ -361,6 +376,14 @@ public sealed partial class MainViewModel
         {
             IsSaving = false;
         }
+    }
+
+
+    private async Task ReloadAsync(string path)
+    {
+        _reloadPath = path;
+        await Loader.OpenAsync(path);
+        _reloadPath = null;
     }
 
 

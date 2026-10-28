@@ -275,6 +275,7 @@ public static class AppText
     public const string MENU_SETTINGS = "Settings…";
     public const string MENU_QUIT = "Quit ExifGlass";
     public const string MENU_OPEN = "Open…";
+    public const string MENU_CLOSE_WINDOW = "Close Window";
     public const string MENU_COPY = "Copy";
     public const string MENU_SELECT_ALL = "Select All";
     public const string MENU_FIND = "Find";

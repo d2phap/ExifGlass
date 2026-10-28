@@ -434,7 +434,7 @@ public class AddTagCard : TemplatedControl
 
     #region Event handlers
 
-    // Down and Up walk the list, Enter or Tab take the highlighted name, Esc closes the list before it cancels the card
+    // Down and Up walk the list, Enter or Tab take the highlighted name and move to the value, Esc closes the list before it cancels the card
     private void Name_KeyDown(object? sender, KeyEventArgs e)
     {
         var open = _popup?.IsOpen == true && _list is not null;
@@ -467,8 +467,10 @@ public class AddTagCard : TemplatedControl
                 e.Handled = true;
                 break;
 
+            // Enter goes on to the value as Tab does, so the next keys type the value, not more name
             case Key.Enter or Key.Tab when open && _list!.SelectedItem is string name:
                 Pick(name);
+                if (e.Key == Key.Enter) _value?.Focus(NavigationMethod.Tab);
                 e.Handled = e.Key == Key.Enter;
                 break;
 

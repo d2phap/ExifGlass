@@ -740,6 +740,8 @@ public class EditingTests
         Dispatcher.UIThread.RunJobs();
         Assert.Equal("ArtworkTitle", card.TagName);
         Assert.False(popup.IsOpen);
+        Assert.True(Part<TextBox>(card, "PART_Value").IsFocused);
+        name.Focus();
 
         // Esc closes the list first, then cancels the card
         var cancelled = false;

@@ -83,7 +83,10 @@ public static class MacMenuBar
         return
         [
             Submenu(AppText.MENU_FILE,
-                new NativeMenuItem(AppText.MENU_OPEN) { Command = viewModel.OpenCommand, Gesture = Gesture(Key.O) }),
+                new NativeMenuItem(AppText.MENU_OPEN) { Command = viewModel.OpenCommand, Gesture = Gesture(Key.O) },
+                new NativeMenuItemSeparator(),
+                // through the window's own close, so staged edits ask first (D8)
+                new NativeMenuItem(AppText.MENU_CLOSE_WINDOW) { Command = new RelayCommand(window.Close), Gesture = Gesture(Key.W) }),
             Submenu(AppText.MENU_EDIT,
                 new NativeMenuItem(AppText.MENU_COPY) { Command = new RelayCommand(window.CopyFromMenu), Gesture = Gesture(Key.C) },
                 new NativeMenuItem(AppText.MENU_SELECT_ALL) { Command = new RelayCommand(window.SelectAllFromMenu), Gesture = Gesture(Key.A) },

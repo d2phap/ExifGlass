@@ -604,6 +604,10 @@ public class ChildWindowTests
         var menus = MacMenuBar.BuildWindowMenu(shell.Window).Items.Cast<NativeMenuItem>().ToList();
         Assert.Equal([AppText.MENU_FILE, AppText.MENU_EDIT, AppText.MENU_VIEW, AppText.MENU_WINDOW], menus.Select(m => m.Header));
 
+        var file = menus[0].Menu!.Items.OfType<NativeMenuItem>().ToList();
+        Assert.Equal(AppText.MENU_CLOSE_WINDOW, file[^1].Header);
+        Assert.Equal(new KeyGesture(Key.W, KeyModifiers.Meta), file[^1].Gesture);
+
         var edit = menus[1].Menu!.Items.OfType<NativeMenuItem>().ToList();
         Assert.Equal(new KeyGesture(Key.C, KeyModifiers.Meta), edit[0].Gesture);
         Assert.Equal(new KeyGesture(Key.K, KeyModifiers.Meta), edit[^1].Gesture);

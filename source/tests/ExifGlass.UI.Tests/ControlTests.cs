@@ -559,6 +559,30 @@ public class ControlTests
         }
     }
 
+
+    [AvaloniaFact]
+    public void OwnedWindowsCloseOnCommandWOnlyOnMacOS()
+    {
+        MotionTokens.IsFrozen = true;
+        try
+        {
+            var owner = Show(new Border(), 1240, 820);
+            var child = new OwnedWindow { Content = new Border() };
+            child.Show(owner);
+            Dispatcher.UIThread.RunJobs();
+
+            child.KeyPress(Key.W, RawInputModifiers.Meta, PhysicalKey.W, "w");
+            Wait(30);
+
+            Assert.Equal(!OperatingSystem.IsMacOS(), child.IsVisible);
+            owner.Close();
+        }
+        finally
+        {
+            MotionTokens.IsFrozen = false;
+        }
+    }
+
     #endregion // Controls
 
 

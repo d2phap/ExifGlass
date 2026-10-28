@@ -140,8 +140,9 @@ public class OwnedWindow : Window
     {
         base.OnKeyDown(e);
 
-        // unless a control used it: an open dropdown closes first
-        if (!e.Handled && e.Key == Key.Escape)
+        // unless a control used it: an open dropdown closes first; Cmd+W too on macOS, where these windows have no menus of their own
+        var closeKey = e.Key == Key.Escape || (OperatingSystem.IsMacOS() && e.Key == Key.W && e.KeyModifiers == KeyModifiers.Meta);
+        if (!e.Handled && closeKey)
         {
             e.Handled = true;
             Close();

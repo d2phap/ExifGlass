@@ -1,19 +1,19 @@
 # Privacy information
-Please be noted that this privacy information may be updated without notice.
+This page may be updated without notice. It covers ExifGlass 3 in every package: the Microsoft Store and Mac App Store versions, Flathub, and the downloads from GitHub Releases (MSIX, ZIP, DMG and AppImage).
 
-There are currently two (2) releases of ExifGlass: "Microsoft Store" and "Classic".
-The Microsoft Store release is available on Microsoft Store while the Classic release is downloadable from this website.
+### Your files stay on your computer
+ExifGlass reads and writes metadata with ExifTool, which runs on your computer. The files you open, their metadata, the AI prompts, workflows and other generation data inside them, and every change you make never leave your computer. ExifGlass looks nothing up online: model names and hashes, for example, are shown as they are and can be copied, but are never sent anywhere. ExifGlass collects no personal information, keeps no usage statistics and has no account.
 
-Both releases of ExifGlass will anonymously append a query string when you open a link from the software to this website.
-This allows us to count how many installations there are for each version of ExifGlass, and how many install/update
-attempts were successful or not.
+### The update check
+The GitHub downloads (MSIX, ZIP, DMG and AppImage) check for a new version at most once every five days, and when you click "Check now" in About. The check downloads a small file, `update.json`, from GitHub. The request carries only the app's name and version in its User-Agent header; GitHub sees your IP address as it does for any download. You can turn the check off in Settings.
 
-### Microsoft Store release
-ExifGlass, as a software, does not, in any way, collect or transmit any personal information. In fact, no information
-(personal or not) is ever collected or transmitted except as described in the above paragraph for the purpose of checking
-for and installing updates.
+The Microsoft Store, Mac App Store and Flathub versions never check: the store or Flathub delivers their updates.
 
-### Classic release
-ExifGlass, as a software, periodically checks for updates. This is done by downloading a small file from the website and
-is anonymous. You can disable this from the Settings dialog.
+### Links you open
+Some buttons open a page in your browser: the project's GitHub page, the Microsoft Store page, a third-party licence, and "Open in OpenStreetMap", which sends the photo's GPS coordinates to openstreetmap.org to show the place on a map. Nothing is sent until you click one of them, and each site's own privacy policy applies from there.
 
+### ImageGlass
+When ImageGlass starts ExifGlass as a tool, the two apps talk through a local pipe on your computer: ImageGlass tells ExifGlass which photo it shows. Nothing goes over the network.
+
+### Settings and recovery
+ExifGlass keeps its settings, and the unsaved changes it keeps for you when ImageGlass closes it, in a file in your user profile (or next to `ExifGlass.exe` in the portable ZIP). The Mac App Store version keeps the copies and backups it needs inside its own container.

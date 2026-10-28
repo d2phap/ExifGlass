@@ -1,36 +1,73 @@
-ExifGlass - EXIF Metadata Viewing Tool
+ExifGlass - AI & EXIF metadata viewer
 ===
 
-ExifGlass is a cross-platform EXIF metadata viewing tool, designed to work seamlessly with [ImageGlass - A Fast, Seamless Photo Viewer](https://imageglass.org), but can also be used as a standalone software on your computer. To use ExifGlass, you need to have [ExifTool by Phil Harvey](https://exiftool.org) installed on your system.
+ExifGlass shows the metadata inside your images, AI generations first. Open a picture made with Stable Diffusion, ComfyUI, InvokeAI, NovelAI, Fooocus, Midjourney and many more, and ExifGlass shows its prompt, negative prompt, models, LoRAs, sampler settings and seed, a summary of its workflow, and the provenance it carries. Every other tag ExifTool reads sits in one searchable table: camera settings, lens, exposure, GPS location, timestamps and more.
 
-With ExifGlass, you can easily access a comprehensive overview of the technical details associated with your images, including camera settings, location data, and more. This tool is particularly useful for professional photographers or anyone interested in the technical aspects of digital photography. Whether you use ExifGlass as a standalone software or in conjunction with ImageGlass, it provides a convenient and efficient way to view and manage the metadata associated with your images.
+ExifGlass works on its own or beside [ImageGlass](https://imageglass.org), where it follows the photo you browse. It runs on Windows, macOS and Linux, and comes with [ExifTool by Phil Harvey](https://exiftool.org) built in, so there is nothing else to install.
 
-You can download ExifGlass for free. To support the development of ExifGlass and gain access to future updates, consider purchasing it from the [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full).
+ExifGlass is free and open source. To support its development and get updates through the store, consider buying it from the [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full).
 
 [![ExifGlass on Microsoft Store](https://github.com/d2phap/ExifGlass/assets/3154213/ed878a58-cec3-4f74-ac56-c215477f6c61)](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full)
 
 <a href="https://github.com/d2phap/ExifGlass/releases">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" /></a>
-  
+
 <a href="https://github.com/d2phap/ExifGlass/releases">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
 </a>
 
 
 <br/>
-<img src="https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_2.png" />
+<img src="source/__assets/linux/screenshots/eg_flatpak_1.png" alt="ExifGlass showing the prompt, models and parameters of an AI image" />
 
 
-## ExifGlass features
-| Feature | Free version | [ExifGlass Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full) | 
+## Features
+
+### AI generation data
+- The prompt, negative prompt, models, LoRAs and embeddings, sampler, scheduler, steps, CFG, seed and size, read from AUTOMATIC1111 and Forge, ComfyUI, InvokeAI, NovelAI, Fooocus, SwarmUI, Draw Things, Easy Diffusion, Tensor.Art and Midjourney files.
+- ComfyUI workflows summarised (nodes, samplers, models) and saved as a `.json` file that loads back into ComfyUI.
+- Provenance: C2PA Content Credentials (shown as not verified, because ExifGlass checks no signature), the IPTC digital source type, AI labels and AI-training signals.
+- An "AI generation" group at the top of the table, each field linked to the tag it was read from.
+- Copy the generation parameters as AUTOMATIC1111 text, or export them as text or JSON.
+
+### Every tag
+- One table for every tag ExifTool reads, grouped, with tag IDs: search, sort, hide groups, and quick filters for dates and times, GPS, converted values, prompts, models and provenance.
+- An inspector for the selected tag, with the preview, the exposure, and the camera, lens, time and place.
+- Copy a value, a row or a selection; export the rows in view as CSV, plain text or ExifTool-style JSON.
+
+### Editing
+- Edit, add and delete tags; remove the GPS data or the AI generation data before you share a file, or strip all metadata. Changes wait until you save, and ExifTool keeps the original file as a backup.
+- The command bar shows the exact ExifTool command for the read, or for the save while changes wait, ready to copy.
+
+### Private by design
+- Everything stays on your computer: prompts and metadata are never sent anywhere, and nothing is looked up online. The only network request is the update check, which you can turn off (see [PRIVACY.md](PRIVACY.md)).
+
+
+## Download
+
+| System | Package | Notes |
 | -- | -- | -- |
-| Reads EXIF metadata | ✅ | ✅ |
-| Seamlessly works with [ImageGlass](https://imageglass.org) | ✅ | ✅ |
-| Drag-n-drop file to view metadata | ✅ | ✅ |
-| Copy metadata | ✅ | ✅ |
-| Export as Text, JSON, CSV | ✅ | ✅ |
-| Custom ExifTool's command-line arguments | ✅ | ✅ |
-| .NET self-contained | ✅ | ✅ |
+| Windows 10 and 11 (x64, Arm64) | [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full) | Paid, supports development; the Store keeps it up to date |
+| | `.msix` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Signed installer; ExifGlass checks for updates |
+| | Portable `.zip` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Unzip and run `ExifGlass.exe`; the settings stay in that folder |
+| macOS 14 or later (Apple silicon) | `.dmg` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Notarized; drag ExifGlass to Applications |
+| | Mac App Store | Paid, supports development; it can't connect to ImageGlass, because the App Sandbox doesn't allow it |
+| Linux (x64) | [Flathub](https://flathub.org/apps/io.github.d2phap.exifglass) | |
+| | `.AppImage` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Make it executable and run it |
+
+
+## Keyboard
+
+| Keys | Action |
+| -- | -- |
+| <kbd>Ctrl</kbd> + <kbd>O</kbd> | Open a file (or drop one on the window) |
+| <kbd>Ctrl</kbd> + <kbd>K</kbd> | Search tags |
+| <kbd>Ctrl</kbd> + <kbd>A</kbd>, <kbd>Ctrl</kbd> + <kbd>C</kbd> | Select every row in view, copy the selection |
+| <kbd>Ctrl</kbd> + <kbd>,</kbd> | Settings |
+| <kbd>F1</kbd> | About |
+| <kbd>Esc</kbd> | Step back: cancel an edit, close a menu or panel, clear the search, then the selection, then close the window |
+
+On macOS, <kbd>Cmd</kbd> takes the place of <kbd>Ctrl</kbd>.
 
 
 ## Use ExifGlass with ImageGlass
@@ -63,11 +100,12 @@ The ExifGlass Flatpak reaches ImageGlass 10 through its `--filesystem=host` perm
 
 
 ## Build ExifGlass from source code
-- .NET 10.0 and Visual Studio 2022
-- Add [ImageGlass.SDK](https://www.nuget.org/packages/ImageGlass.SDK) package (for ImageGlass 10).
-- Add [ImageGlass.Tools](https://www.nuget.org/packages/ImageGlass.Tools) package (for ImageGlass 9).
+- The [.NET 11 SDK](https://dotnet.microsoft.com/download) named in `source/global.json`.
+- ExifTool dropped into `source/__assets/exiftool` (git-ignored; its [README](source/__assets/exiftool/README.md) says where each build goes).
+- On Windows, Visual Studio's C++ build tools for the Native AOT publish.
+
+From `source/`, `scripts/test.ps1` runs every test project and `scripts/publish-aot.ps1` publishes a Native AOT build to `__artifacts/publish/<rid>` (`.sh` on macOS and Linux). Each platform's packaging is in `__assets/win`, `__assets/mac` and `__assets/linux`.
 
 
 ## License
-ExifGlass is free for both personal and commercial use, except the Store version. It is released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE).
-
+ExifGlass is free software, released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE). The store versions are paid builds of the same code that support its development. ExifTool and the other components ExifGlass ships with keep their own licences, listed in `THIRD-PARTY-NOTICES.txt` in every package and in About.

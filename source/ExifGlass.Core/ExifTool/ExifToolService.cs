@@ -34,6 +34,12 @@ public sealed class ExifToolService : IAsyncDisposable
     #region Fields and constants
 
     private const string BASE64_PREFIX = "base64:";
+    private const string FILE_NOT_FOUND = "File not found";
+
+    /// <summary>
+    /// The read error of a file ExifTool can't open though it exists: another app holds it, or the user may not read it.
+    /// </summary>
+    public const string FILE_NOT_OPENED = "Another app is using it, or it can't be read";
 
     private readonly ExifToolDaemon _daemon;
     private readonly StringPool _pool = new();
@@ -103,6 +109,9 @@ public sealed class ExifToolService : IAsyncDisposable
             (in ExifToolOutput o, CancellationToken ct) => ReadTable(o, pool, ct), cancellationToken).ConfigureAwait(false);
 
         if (!string.Equals(exifToolPath, shownPath, StringComparison.Ordinal)) ShowAs(read, shownPath);
+
+        // ExifTool says "File not found" for any file it can't open
+        if (read.Error == FILE_NOT_FOUND && File.Exists(exifToolPath)) read.Error = FILE_NOT_OPENED;
         return MetadataDocument.Create(shownPath, read, tagDb, watch.Elapsed);
     }
 

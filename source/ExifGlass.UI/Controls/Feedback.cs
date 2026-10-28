@@ -566,12 +566,15 @@ public class PulseRing : SquircleBorder
 
 /// <summary>
 /// Floats its child 4 px up and back every 4 s on the render thread: the empty card's logo (DS 6.9).
+/// Only while its window is active: on macOS a never-ending animation stalled the next window's first frames (About blank for seconds).
 /// </summary>
 public class FloatingPanel : Decorator
 {
     #region Fields and constants
 
     private const float RISE = -4f;
+
+    private WindowBase? _window;
 
     public static readonly StyledProperty<bool> IsFloatingProperty =
         AvaloniaProperty.Register<FloatingPanel, bool>(nameof(IsFloating), true);
@@ -595,7 +598,18 @@ public class FloatingPanel : Decorator
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+
+        _window = TopLevel.GetTopLevel(this) as WindowBase;
+        _window?.PropertyChanged += Window_PropertyChanged;
         UpdateFloat();
+    }
+
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        _window?.PropertyChanged -= Window_PropertyChanged;
+        _window = null;
+        base.OnDetachedFromVisualTree(e);
     }
 
 
@@ -617,7 +631,7 @@ public class FloatingPanel : Decorator
     private void StartFloat(CompositionVisual visual)
     {
         var animation = visual.Compositor.CreateVector3DKeyFrameAnimation();
-        if (IsFloating && !MotionTokens.IsFrozen)
+        if (IsFloating && !MotionTokens.IsFrozen && _window?.IsActive != false)
         {
             animation.InsertKeyFrame(0f, default);
             animation.InsertKeyFrame(0.5f, new Vector3D(0, RISE, 0), MotionTokens.LogoFloatEasing);
@@ -635,4 +649,14 @@ public class FloatingPanel : Decorator
     }
 
     #endregion // Private methods
+
+
+    #region Event handlers
+
+    private void Window_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == WindowBase.IsActiveProperty) UpdateFloat();
+    }
+
+    #endregion // Event handlers
 }

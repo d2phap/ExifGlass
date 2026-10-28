@@ -103,6 +103,7 @@
                          Text="{x:Static app:AppText.SELECTED}" />
               <ui:GlassButton Name="CopyRowsButton"
                               Classes="card"
+                              AutomationProperties.Name="{x:Static app:AppText.COPY_ROWS_TIP}"
                               Command="{Binding CopyRowsTsvCommand}"
                               Content="{x:Static app:AppText.COPY}"
                               Icon="{x:Static ui:IconId.Copy}"
@@ -110,6 +111,7 @@
                               ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_TIP}" />
               <ui:GlassButton Name="CopyRowsJsonButton"
                               Classes="card"
+                              AutomationProperties.Name="{x:Static app:AppText.COPY_ROWS_JSON_TIP}"
                               Command="{Binding CopyRowsJsonCommand}"
                               Content="{x:Static app:AppText.JSON}"
                               Icon="{x:Static ui:IconId.Braces}"

@@ -199,6 +199,7 @@
                 <DockPanel Height="24">
                   <ui:GlassButton Margin="0,0,-6,0"
                                   Classes="link"
+                                  AutomationProperties.Name="{x:Static eg:UiText.COPY_PROMPT}"
                                   Content="{x:Static eg:UiText.COPY}"
                                   DockPanel.Dock="Right"
                                   Icon="{x:Static ui:IconId.Copy}"
@@ -230,6 +231,7 @@
                   <ui:GlassButton Name="PART_CopyNegative"
                                   Margin="0,0,-6,0"
                                   Classes="link"
+                                  AutomationProperties.Name="{x:Static eg:UiText.COPY_NEGATIVE}"
                                   Content="{x:Static eg:UiText.COPY}"
                                   DockPanel.Dock="Right"
                                   Icon="{x:Static ui:IconId.Copy}"

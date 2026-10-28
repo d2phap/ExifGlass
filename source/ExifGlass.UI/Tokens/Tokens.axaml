@@ -33,8 +33,8 @@
       <SolidColorBrush x:Key="TextPrimaryBrush" Color="#212529" />
       <Color x:Key="TextSecondaryColor">#BF212529</Color>
       <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BF212529" />
-      <Color x:Key="TextTertiaryColor">#80212529</Color>
-      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80212529" />
+      <Color x:Key="TextTertiaryColor">#A3212529</Color>
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#A3212529" />
       <Color x:Key="EmphasisColor">#000000</Color>
       <SolidColorBrush x:Key="EmphasisBrush" Color="#000000" />
       <Color x:Key="StrokeHairlineColor">#14000000</Color>
@@ -55,10 +55,10 @@
       <SolidColorBrush x:Key="AccentTextBrush" Color="#225EDB" />
       <Color x:Key="Accent2TextColor">#BF3298</Color>
       <SolidColorBrush x:Key="Accent2TextBrush" Color="#BF3298" />
-      <Color x:Key="SuccessTextColor">#198754</Color>
-      <SolidColorBrush x:Key="SuccessTextBrush" Color="#198754" />
-      <Color x:Key="DangerTextColor">#DC3545</Color>
-      <SolidColorBrush x:Key="DangerTextBrush" Color="#DC3545" />
+      <Color x:Key="SuccessTextColor">#167A4C</Color>
+      <SolidColorBrush x:Key="SuccessTextBrush" Color="#167A4C" />
+      <Color x:Key="DangerTextColor">#C6303E</Color>
+      <SolidColorBrush x:Key="DangerTextBrush" Color="#C6303E" />
       <Color x:Key="WarningIconColor">#E8590C</Color>
       <SolidColorBrush x:Key="WarningIconBrush" Color="#E8590C" />
       <Color x:Key="SegmentedThumbColor">#FFFFFF</Color>
@@ -161,8 +161,8 @@
       <SolidColorBrush x:Key="TextPrimaryBrush" Color="#DEE2E6" />
       <Color x:Key="TextSecondaryColor">#BFDEE2E6</Color>
       <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BFDEE2E6" />
-      <Color x:Key="TextTertiaryColor">#80DEE2E6</Color>
-      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#80DEE2E6" />
+      <Color x:Key="TextTertiaryColor">#A1DEE2E6</Color>
+      <SolidColorBrush x:Key="TextTertiaryBrush" Color="#A1DEE2E6" />
       <Color x:Key="EmphasisColor">#FFFFFF</Color>
       <SolidColorBrush x:Key="EmphasisBrush" Color="#FFFFFF" />
       <Color x:Key="StrokeHairlineColor">#14FFFFFF</Color>

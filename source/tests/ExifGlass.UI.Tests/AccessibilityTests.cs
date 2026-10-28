@@ -91,16 +91,23 @@ public sealed class AccessibilityTests
         var app = Application.Current!;
         var variant = theme == "dark" ? ThemeVariant.Dark : ThemeVariant.Light;
         var window = Over(Resource(app, TokenKeys.BG_WINDOW_COLOR, variant), Colors.White);
-        string[] surfaces = [TokenKeys.BG_WINDOW_COLOR, TokenKeys.BG_PANEL_COLOR, TokenKeys.BG_ELEVATED_COLOR, TokenKeys.BG_HEADER_COLOR];
+        var panel = Over(Resource(app, TokenKeys.BG_PANEL_COLOR, variant), window);
+        (string Name, Color Color)[] surfaces =
+        [
+            ("window", window), ("panel", panel),
+            ("elevated", Over(Resource(app, TokenKeys.BG_ELEVATED_COLOR, variant), window)),
+            ("header", Over(Resource(app, TokenKeys.BG_HEADER_COLOR, variant), window)),
+            ("well on a panel", Over(Resource(app, TokenKeys.BG_SUBTLE_COLOR, variant), panel)),
+        ];
 
-        // Text.Tertiary (3.0 to 4.2) and the light theme's Success and Danger on the window gray (4.1) wait for the owner at G12
-        foreach (var text in new[] { TokenKeys.TEXT_PRIMARY_COLOR, TokenKeys.TEXT_SECONDARY_COLOR, TokenKeys.ACCENT_TEXT_COLOR })
+        // Accent2's AI labels are left out: dark Accent2 on the elevated gray reads 4.1 (G12)
+        string[] texts = [TokenKeys.TEXT_PRIMARY_COLOR, TokenKeys.TEXT_SECONDARY_COLOR, TokenKeys.TEXT_TERTIARY_COLOR, TokenKeys.ACCENT_TEXT_COLOR, TokenKeys.SUCCESS_TEXT_COLOR, TokenKeys.DANGER_TEXT_COLOR];
+        foreach (var text in texts)
         {
-            foreach (var key in surfaces)
+            foreach (var (name, surface) in surfaces)
             {
-                var surface = Over(Resource(app, key, variant), window);
                 var ratio = AccentPalette.Contrast(Over(Resource(app, text, variant), surface), surface);
-                Assert.True(ratio >= 4.5, System.FormattableString.Invariant($"{text} on {key}: {ratio:0.00}"));
+                Assert.True(ratio >= 4.5, System.FormattableString.Invariant($"{text} on the {name}: {ratio:0.00}"));
             }
         }
     }

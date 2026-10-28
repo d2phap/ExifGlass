@@ -47,6 +47,9 @@ public sealed class FrameProbe
     private long _allocated;
     private TimeSpan _paused;
     private long _started;
+    private int _frameGcs;
+    private TimeSpan _framePaused;
+    private double _maxGcPause;
 
     #endregion // Fields and constants
 
@@ -92,6 +95,7 @@ public sealed class FrameProbe
         _allocated = GC.GetTotalAllocatedBytes(false);
         _paused = GC.GetTotalPauseDuration();
         _started = Stopwatch.GetTimestamp();
+        (_frameGcs, _framePaused, _maxGcPause) = (_gen0, _paused, 0);
         _clock.Take();
         _visual?.SendHandlerMessage(true);
 
@@ -116,6 +120,7 @@ public sealed class FrameProbe
             Gc1 = GC.CollectionCount(1) - _gen1,
             Gc2 = GC.CollectionCount(2) - _gen2,
             GcPauseMs = (GC.GetTotalPauseDuration() - _paused).TotalMilliseconds,
+            MaxGcPauseMs = _maxGcPause,
             AllocatedKb = (GC.GetTotalAllocatedBytes(false) - _allocated) / 1024.0,
         };
     }
@@ -131,6 +136,11 @@ public sealed class FrameProbe
 
         if (_last is { } last) _ui.Add((time - last).TotalMilliseconds);
         _last = time;
+
+        // the pause of the GCs between two frames, an upper bound of each one's (plan 8: gen-0 and gen-1 pauses at most 8 ms)
+        var (gcs, paused) = (GC.CollectionCount(0), GC.GetTotalPauseDuration());
+        if (gcs != _frameGcs) _maxGcPause = Math.Max(_maxGcPause, (paused - _framePaused).TotalMilliseconds);
+        (_frameGcs, _framePaused) = (gcs, paused);
         _top.RequestAnimationFrame(t => OnFrame(t, generation));
     }
 
@@ -292,7 +302,10 @@ public readonly record struct GapStats(int Count, double P50, double P95, double
     /// <summary>
     /// Whether the plan's motion budget holds: p95 16.7 ms, p99 25 ms, none over 50 ms.
     /// </summary>
-    public bool MeetsBudget => Count == 0 || (P95 <= 16.7 + 0.5 && P99 <= 25 && Over50 == 0);
+    public bool MeetsBudget => Meets(16.7, 25);
+
+
+    public bool Meets(double p95, double p99) => Count == 0 || (P95 <= p95 + 0.5 && P99 <= p99 && Over50 == 0);
 
 
     public override string ToString() => Count == 0
@@ -326,6 +339,11 @@ public sealed class FrameStats
 
     public double GcPauseMs { get; init; }
 
+    /// <summary>
+    /// Gets the longest GC pause between two UI-thread frames.
+    /// </summary>
+    public double MaxGcPauseMs { get; init; }
+
     public double AllocatedKb { get; init; }
 
     #endregion // Properties
@@ -334,7 +352,7 @@ public sealed class FrameStats
     #region Public methods
 
     public override string ToString() => string.Create(CultureInfo.InvariantCulture,
-        $"{Label} ({Seconds:0.0} s)\n    UI thread frames:     {Ui}\n    render thread frames: {Render}\n    GC {Gc0}/{Gc1}/{Gc2} (pause {GcPauseMs:0.0} ms) · allocated {AllocatedKb:0} KB");
+        $"{Label} ({Seconds:0.0} s)\n    UI thread frames:     {Ui}\n    render thread frames: {Render}\n    GC {Gc0}/{Gc1}/{Gc2} (pause {GcPauseMs:0.0} ms, at most {MaxGcPauseMs:0.0} in a frame) · allocated {AllocatedKb:0} KB");
 
     #endregion // Public methods
 }

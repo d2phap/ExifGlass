@@ -41,6 +41,10 @@ public static class PerfRun
     private static readonly TimeSpan Idle = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan Motion = TimeSpan.FromMilliseconds(600);
 
+    // plan 8: composition motion on render-thread frames; layout motion (width glides, the rail's jump, a resize drag) on UI-thread frames at p95 25 / p99 33 (owner at G5 and G6)
+    private static readonly MotionBudget Composition = new("render-thread frames", OnRenderThread: true, P95: 16.7, P99: 25);
+    private static readonly MotionBudget Layout = new("UI-thread frames", OnRenderThread: false, P95: 25, P99: 33);
+
     #endregion // Fields and constants
 
 
@@ -68,7 +72,10 @@ public static class PerfRun
         output.Write(StartupClock.Format());
         if (StartupClock.Of(StartupClock.FIRST_FRAME) is { } first) output.WriteLine(Invariant($"  process created -> first frame {StartupClock.BeforeMain + first:0} ms"));
 
+        // the empty card's float draws every frame: what that costs, GCs included
+        probe.Start();
         await Task.Delay(Idle);
+        output.WriteLine(probe.Stop("IDLE FRAMES"));
         output.WriteLine("IDLE " + Memory());
         output.WriteLine("  Skia GPU cache " + (await probe.ReadGpuCacheAsync() ?? "n/a"));
 
@@ -101,15 +108,15 @@ public static class PerfRun
         if (file is not null) budgetsMet &= await MeasureTableAsync(window, vm, probe, output);
         if (file is not null) budgetsMet &= await MeasureRailAsync(vm, probe, output);
 
-        budgetsMet &= await MeasureAsync(probe, output, Invariant($"rail column 0 <-> {vm.RailColumn:0}"), onRenderThread: false, () => vm.ToggleRailCommand.Execute(null));
-        budgetsMet &= await MeasureAsync(probe, output, Invariant($"inspector column 0 <-> {vm.InspectorColumn:0}"), onRenderThread: false, () => vm.ToggleInspectorCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, Invariant($"rail column 0 <-> {vm.RailColumn:0}"), Layout, () => vm.ToggleRailCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, Invariant($"inspector column 0 <-> {vm.InspectorColumn:0}"), Layout, () => vm.ToggleInspectorCommand.Execute(null));
         budgetsMet &= await MeasureResizeAsync(window, vm, probe, output);
 
         var width = window.Width;
         window.Width = PUSH_WIDTH;
         await Task.Delay(Motion);
-        budgetsMet &= await MeasureAsync(probe, output, "rail push", onRenderThread: true, () => vm.ToggleRailCommand.Execute(null));
-        budgetsMet &= await MeasureAsync(probe, output, "inspector push", onRenderThread: true, () => vm.ToggleInspectorCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, "rail push", Composition, () => vm.ToggleRailCommand.Execute(null));
+        budgetsMet &= await MeasureAsync(probe, output, "inspector push", Composition, () => vm.ToggleInspectorCommand.Execute(null));
         window.Width = width;
         await Task.Delay(Motion);
 
@@ -130,7 +137,7 @@ public static class PerfRun
     #region Private methods
 
     // each round runs the action twice: the panel goes one way, then back; composition motion is judged on the render thread (plan 8), layout motion on the UI thread
-    private static async Task<bool> MeasureAsync(FrameProbe probe, TextWriter output, string label, bool onRenderThread, Action toggle)
+    private static async Task<bool> MeasureAsync(FrameProbe probe, TextWriter output, string label, MotionBudget budget, Action toggle)
     {
         UiWatchdog.Operation = label;
         probe.Start();
@@ -143,9 +150,17 @@ public static class PerfRun
         var stats = probe.Stop(Invariant($"MOTION {label}, {MOTION_ROUNDS} times each way"));
         UiWatchdog.Operation = "idle";
 
-        var judged = onRenderThread ? "render-thread frames" : "UI-thread frames";
-        var met = (onRenderThread ? stats.Render : stats.Ui).MeetsBudget && stats.Gc1 == 0 && stats.Gc2 == 0;
-        output.WriteLine(stats + (met ? $"\n    budget met ({judged})" : $"\n    BUDGET MISSED on {judged} (p95 16.7, p99 25, none over 50 ms, no gen-1/2 GC)"));
+        return Judge(stats, budget, output);
+    }
+
+
+    // plan 8: no gen-2 GC during motion, gen-0 and gen-1 pauses at most 8 ms (owner at G5)
+    private static bool Judge(FrameStats stats, MotionBudget budget, TextWriter output)
+    {
+        var met = (budget.OnRenderThread ? stats.Render : stats.Ui).Meets(budget.P95, budget.P99) && stats.Gc2 == 0 && stats.MaxGcPauseMs <= 8;
+        output.WriteLine(stats + (met
+            ? $"\n    budget met ({budget.Frames})"
+            : Invariant($"\n    BUDGET MISSED on {budget.Frames} (p95 {budget.P95}, p99 {budget.P99}, none over 50 ms, no gen-2 GC, GC pauses at most 8 ms)")));
         return met;
     }
 
@@ -172,9 +187,7 @@ public static class PerfRun
         var stats = probe.Stop(Invariant($"MOTION {label}, {MOTION_ROUNDS} times each way"));
         UiWatchdog.Operation = "idle";
 
-        var met = stats.Ui.MeetsBudget && stats.Gc1 == 0 && stats.Gc2 == 0;
-        output.WriteLine(stats + (met ? "\n    budget met (UI-thread frames)" : "\n    BUDGET MISSED on UI-thread frames (p95 16.7, p99 25, none over 50 ms, no gen-1/2 GC)"));
-        return met;
+        return Judge(stats, Layout, output);
     }
 
 
@@ -207,15 +220,15 @@ public static class PerfRun
             await Task.Delay(Motion);
         }
 
-        met &= await MeasureAsync(probe, output, "FLIP sort by value (asc, desc, none)", onRenderThread: true, () => vm.CycleSort(Core.Query.SortColumn.Value));
-        met &= await MeasureAsync(probe, output, "FLIP search date and clear", onRenderThread: true, () => vm.SearchText = vm.SearchText.Length == 0 ? "date" : string.Empty);
+        met &= await MeasureAsync(probe, output, "FLIP sort by value (asc, desc, none)", Composition, () => vm.CycleSort(Core.Query.SortColumn.Value));
+        met &= await MeasureAsync(probe, output, "FLIP search date and clear", Composition, () => vm.SearchText = vm.SearchText.Length == 0 ? "date" : string.Empty);
         if (vm.Rows.Groups.Count > 1)
         {
             var group = vm.Rows.Groups[1].Name;
-            met &= await MeasureAsync(probe, output, $"group collapse {group}", onRenderThread: true, () => vm.ToggleGroup(group));
+            met &= await MeasureAsync(probe, output, $"group collapse {group}", Composition, () => vm.ToggleGroup(group));
         }
 
-        met &= await MeasureAsync(probe, output, "column # 0 <-> 74", onRenderThread: false, () => vm.ToggleColumnCommand.Execute(Core.Export.TableColumns.Index));
+        met &= await MeasureAsync(probe, output, "column # 0 <-> 74", Layout, () => vm.ToggleColumnCommand.Execute(Core.Export.TableColumns.Index));
         return met;
     }
 
@@ -227,14 +240,14 @@ public static class PerfRun
 
         var (first, last) = (vm.RailGroups[0].Name, vm.RailGroups[^1].Name);
         var down = false;
-        var met = await MeasureAsync(probe, output, $"rail jump {first} <-> {last}", onRenderThread: false, () =>
+        var met = await MeasureAsync(probe, output, $"rail jump {first} <-> {last}", Layout, () =>
         {
             down = !down;
             _ = vm.JumpToGroupAsync(down ? last : first);
         });
 
         var group = vm.RailGroups[1];
-        met &= await MeasureAsync(probe, output, $"rail hide {group.Name}", onRenderThread: true, () => vm.SetGroupHidden(group.Name, group.IsShown));
+        met &= await MeasureAsync(probe, output, $"rail hide {group.Name}", Composition, () => vm.SetGroupHidden(group.Name, group.IsShown));
         return met;
     }
 
@@ -334,3 +347,6 @@ public static class PerfRun
 
     #endregion // Private methods
 }
+
+
+internal readonly record struct MotionBudget(string Frames, bool OnRenderThread, double P95, double P99);

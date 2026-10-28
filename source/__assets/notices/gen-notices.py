@@ -95,7 +95,7 @@ def main():
         index.append((slug, name, licence))
 
     # the runtime NativeAOT compiles in, and what it carries (the SDK folder's LICENSE.txt is the SDK's own terms)
-    add('dotnet', '.NET', 'MIT', MIT.format(copyright='Copyright (c) .NET Foundation and Contributors') + '\n\n' + package('runtime.win-x64.microsoft.dotnet.ilcompiler', '11.0.0-rc.2.26504.105', 'THIRD-PARTY-NOTICES.TXT'))
+    add('dotnet', '.NET', 'MIT', MIT.format(copyright='Copyright (c) .NET Foundation and Contributors') + '\n\n' + package('runtime.win-x64.microsoft.dotnet.ilcompiler', '11.0.0-rc.3.26522.148', 'THIRD-PARTY-NOTICES.TXT'))
     add('avalonia', 'Avalonia UI', 'MIT', MIT.format(copyright='Copyright 2013-2026 © The AvaloniaUI Project'))
     add('exiftool', 'ExifTool', 'Artistic-1.0-Perl or GPL-1.0+', read(SOURCE, '__assets', 'exiftool', 'LICENSE')
         + '\nOn Windows, ExifTool runs on the Strawberry Perl it comes with; the licences of Perl and its libraries ship beside it, in exiftool_files. On macOS it runs on the system Perl; on Linux, as one self-contained program.\n')

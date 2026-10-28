@@ -57,6 +57,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         DesignSystem.Initialize(this);
+        if (OperatingSystem.IsMacOS()) Windows.MacMenuBar.AttachAppMenu(this, () => Services?.ViewModel);
     }
 
 
@@ -99,7 +100,7 @@ public partial class App : Application
         var window = services.CreateMainWindow();
         var probe = perf ? new FrameProbe(window) : null;
         desktop.MainWindow = window;
-        if (OperatingSystem.IsMacOS()) Windows.MacMenuBar.Attach(this, window);
+        if (OperatingSystem.IsMacOS()) Windows.MacMenuBar.Attach(window);
         window.Show();
         StartupClock.Mark("main window shown");
 

@@ -594,7 +594,7 @@ public class ChildWindowTests
     {
         using var shell = TestShell.Open(1400);
 
-        var app = MacMenuBar.BuildAppMenu(shell.ViewModel).Items;
+        var app = MacMenuBar.BuildAppMenu(() => shell.ViewModel).Items;
         Assert.Equal(AppText.ABOUT, ((NativeMenuItem)app[0]).Header);
         Assert.IsType<NativeMenuItemSeparator>(app[1]);
         var settings = (NativeMenuItem)app[2];

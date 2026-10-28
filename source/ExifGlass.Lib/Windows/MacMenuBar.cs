@@ -32,23 +32,27 @@ public static class MacMenuBar
     #region Public methods
 
     /// <summary>
-    /// Gives the app its menu and the main window its menus; call on macOS only.
+    /// Gives the app its menu; call from Application.Initialize on macOS only.
+    /// Avalonia.Native reads the app menu once, right after Initialize, and puts "About Avalonia" in when there is none.
     /// </summary>
-    public static void Attach(Application app, MainWindow window)
-    {
-        NativeMenu.SetMenu(app, BuildAppMenu(window.ViewModel));
-        NativeMenu.SetMenu(window, BuildWindowMenu(window));
-    }
+    public static void AttachAppMenu(Application app, Func<MainViewModel?> viewModel) =>
+        NativeMenu.SetMenu(app, BuildAppMenu(viewModel));
 
 
     /// <summary>
-    /// The app menu: About, then Settings… (Cmd+,).
+    /// Gives the main window its menus; call on macOS only.
     /// </summary>
-    public static NativeMenu BuildAppMenu(MainViewModel viewModel) =>
+    public static void Attach(MainWindow window) => NativeMenu.SetMenu(window, BuildWindowMenu(window));
+
+
+    /// <summary>
+    /// The app menu: About, then Settings… (Cmd+,); the view model is looked up when an item is chosen, since the menu is made before it exists.
+    /// </summary>
+    public static NativeMenu BuildAppMenu(Func<MainViewModel?> viewModel) =>
     [
-        new NativeMenuItem(AppText.ABOUT) { Command = viewModel.OpenAboutCommand },
+        new NativeMenuItem(AppText.ABOUT) { Command = new RelayCommand(() => viewModel()?.OpenAboutCommand.Execute(null)) },
         new NativeMenuItemSeparator(),
-        new NativeMenuItem(AppText.MENU_SETTINGS) { Command = viewModel.OpenSettingsCommand, Gesture = Gesture(Key.OemComma) },
+        new NativeMenuItem(AppText.MENU_SETTINGS) { Command = new RelayCommand(() => viewModel()?.OpenSettingsCommand.Execute(null)), Gesture = Gesture(Key.OemComma) },
     ];
 
 

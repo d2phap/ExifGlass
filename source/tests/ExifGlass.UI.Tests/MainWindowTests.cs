@@ -1,6 +1,6 @@
 /*
 ExifGlass - AI & EXIF metadata viewer
-Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Copyright (C) 2023 - 2027 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify
@@ -619,7 +619,7 @@ public class MainWindowTests
         public string PlatformId => "test";
         public string Architecture => "x64";
         public string BuildDate => "2026.10.20";
-        public string Copyright => "© 2023 - 2026 Duong Dieu Phap";
+        public string Copyright => "© 2023 - 2027 Duong Dieu Phap";
     }
 
     #endregion // Nested types

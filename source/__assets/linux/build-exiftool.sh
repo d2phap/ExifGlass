@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # ExifGlass - EXIF Metadata Viewing Tool
-# Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+# Copyright (C) 2023 - 2027 DUONG DIEU PHAP
 # Project homepage: https://github.com/d2phap/ExifGlass
 #
 # This program is free software: you can redistribute it and/or modify

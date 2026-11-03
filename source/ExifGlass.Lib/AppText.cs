@@ -1,6 +1,6 @@
 /*
 ExifGlass - AI & EXIF metadata viewer
-Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Copyright (C) 2023 - 2027 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify
@@ -247,7 +247,7 @@ public static class AppText
     public const string NOTICES_OVERLINE = "THIRD-PARTY NOTICES";
     public const string BACK = "Back";
     public const string BACK_TIP = "Back (Esc)";
-    public const string COPYRIGHT = "Copyright © 2023 - 2026 Duong Dieu Phap";
+    public const string COPYRIGHT = "Copyright © 2023 - 2027 Duong Dieu Phap";
     public const string COPY_VERSION_INFO = "Copy version info";
     public const string TOAST_VERSION_COPIED = "Version info copied";
     public const string UPDATES = "Updates";
@@ -259,7 +259,7 @@ public static class AppText
     public const string DOWNLOAD = "Download";
     public const string WEBSITE = "Website";
     public const string VISIT = "Visit";
-    public const string HOMEPAGE_TEXT = "github.com/d2phap/ExifGlass";
+    public const string HOMEPAGE_TEXT = "imageglass.org/exifglass";
     public const string STORE_TITLE = "Microsoft Store";
     public const string STORE_SUB = "Support development · automatic updates";
     public const string STORE_GET = "Get ExifGlass";

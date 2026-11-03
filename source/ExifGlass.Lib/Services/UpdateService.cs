@@ -1,6 +1,6 @@
 /*
 ExifGlass - AI & EXIF metadata viewer
-Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Copyright (C) 2023 - 2027 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ public sealed partial class UpdateService : ObservableObject
 {
     #region Fields and constants
 
-    public const string RELEASES_URL = AppInfo.HOMEPAGE_URL + "/releases";
+    public const string RELEASES_URL = AppInfo.REPO_URL + "/releases";
 
     /// <summary>
     /// How long after launch the startup check waits, so it never competes with ExifTool's warm-up or the first file.

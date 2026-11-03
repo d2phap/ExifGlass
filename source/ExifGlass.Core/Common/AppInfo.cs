@@ -1,6 +1,6 @@
 /*
 ExifGlass - AI & EXIF metadata viewer
-Copyright (C) 2023 - 2026 DUONG DIEU PHAP
+Copyright (C) 2023 - 2027 DUONG DIEU PHAP
 Project homepage: https://github.com/d2phap/ExifGlass
 
 This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,8 @@ public static class AppInfo
     /// D23: what About and the store listings say under the name.
     /// </summary>
     public const string TAGLINE = "AI & EXIF metadata viewer";
-    public const string HOMEPAGE_URL = "https://github.com/d2phap/ExifGlass";
+    public const string HOMEPAGE_URL = "https://imageglass.org/exifglass";
+    public const string REPO_URL = "https://github.com/d2phap/ExifGlass";
 
     #endregion // Constants
 

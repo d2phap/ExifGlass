@@ -43,31 +43,16 @@ ExifGlass is free and open source. To support its development and get updates th
 - Everything stays on your computer: prompts and metadata are never sent anywhere, and nothing is looked up online. The only network request is the update check, which you can turn off (see [PRIVACY.md](PRIVACY.md)).
 
 
-## Download
-
-| System | Package | Notes |
-| -- | -- | -- |
-| Windows 10 and 11 (x64, Arm64) | [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=github_readme&mode=full) | Paid, supports development; the Store keeps it up to date |
-| | `.msix` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Signed installer; ExifGlass checks for updates |
-| | Portable `.zip` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Unzip and run `ExifGlass.exe`; the settings stay in that folder |
-| macOS 14 or later (Apple silicon) | `.dmg` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Notarized; drag ExifGlass to Applications |
-| | Mac App Store | Paid, supports development; it can't connect to ImageGlass, because the App Sandbox doesn't allow it |
-| Linux (x64) | [Flathub](https://flathub.org/apps/io.github.d2phap.exifglass) | |
-| | `.AppImage` from [Releases](https://github.com/d2phap/ExifGlass/releases) | Make it executable and run it |
-
-
 ## Keyboard
 
 | Keys | Action |
 | -- | -- |
-| <kbd>Ctrl</kbd> + <kbd>O</kbd> | Open a file (or drop one on the window) |
-| <kbd>Ctrl</kbd> + <kbd>K</kbd> | Search tags |
-| <kbd>Ctrl</kbd> + <kbd>A</kbd>, <kbd>Ctrl</kbd> + <kbd>C</kbd> | Select every row in view, copy the selection |
-| <kbd>Ctrl</kbd> + <kbd>,</kbd> | Settings |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>O</kbd> | Open a file (or drop one on the window) |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>K</kbd> | Search tags |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>A</kbd>, <kbd>Ctrl/Cmd</kbd> + <kbd>C</kbd> | Select every row in view, copy the selection |
+| <kbd>Ctrl/Cmd</kbd> + <kbd>,</kbd> | Settings |
 | <kbd>F1</kbd> | About |
 | <kbd>Esc</kbd> | Step back: cancel an edit, close a menu or panel, clear the search, then the selection, then close the window |
-
-On macOS, <kbd>Cmd</kbd> takes the place of <kbd>Ctrl</kbd>.
 
 
 ## Use ExifGlass with ImageGlass
@@ -94,18 +79,6 @@ ImageGlass must start ExifGlass itself: a script or launcher in front of it brea
 ### ImageGlass 9 (Windows)
 Add ExifGlass as an integrated tool, as [ImageGlass Docs / ImageGlass tools](https://imageglass.org/docs/imageglass-tools#add-your-tool-to-imageglass) describes: the executable is `ExifGlass.exe` (or `exifglass`) and the argument `<file>`. ExifGlass closes when you turn the tool off or close ImageGlass.
 
-### Flatpak permissions
-The ExifGlass Flatpak reaches ImageGlass 10 through its `--filesystem=host` permission. If you narrow its permissions (with Flatseal, for example), keep at least `~/.cache/ImageGlass/tools:ro`. The `xdg-cache/ImageGlass/tools` form doesn't work when `XDG_CACHE_HOME` is moved, because ImageGlass always uses `~/.cache`.
-
-
-
-## Build ExifGlass from source code
-- The [.NET 11 SDK](https://dotnet.microsoft.com/download) named in `source/global.json`.
-- ExifTool dropped into `source/__assets/exiftool` (git-ignored; its [README](source/__assets/exiftool/README.md) says where each build goes).
-- On Windows, Visual Studio's C++ build tools for the Native AOT publish.
-
-From `source/`, `scripts/test.ps1` runs every test project and `scripts/publish-aot.ps1` publishes a Native AOT build to `__artifacts/publish/<rid>` (`.sh` on macOS and Linux). Each platform's packaging is in `__assets/win`, `__assets/mac` and `__assets/linux`.
-
 
 ## License
-ExifGlass is free software, released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE). The store versions are paid builds of the same code that support its development. ExifTool and the other components ExifGlass ships with keep their own licences, listed in `THIRD-PARTY-NOTICES.txt` in every package and in About.
+ExifGlass is released under the terms of [GPLv3](https://github.com/d2phap/ExifGlass/blob/main/LICENSE). The store versions are paid builds of the same code that support its development.

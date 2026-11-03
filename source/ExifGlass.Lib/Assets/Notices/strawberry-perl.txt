@@ -1,0 +1,3 @@
+Perl is Copyright (C) 1993 - 2025 by Larry Wall and others.
+
+ExifTool runs on the Strawberry Perl it comes with; the licences of Perl and its libraries ship beside it, in exiftool_files.

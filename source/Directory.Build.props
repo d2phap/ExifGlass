@@ -1,12 +1,12 @@
 <Project>
   <PropertyGroup>
     <!-- Central app version: change it only here -->
-    <ExifGlassVersion>3.0.0.1104</ExifGlassVersion>
+    <ExifGlassVersion>3.0.0.1105</ExifGlassVersion>
     <ExifGlassReleaseType></ExifGlassReleaseType>
 
     <!-- Store bundle version (Major.Minor.BundleBuild.0); BundleBuild only ever goes up -->
     <ExifGlassBundleShortVersion>3.0.0</ExifGlassBundleShortVersion>
-    <ExifGlassBundleBuild>1104</ExifGlassBundleBuild>
+    <ExifGlassBundleBuild>1105</ExifGlassBundleBuild>
 
     <!-- Direct or MacAppStore; Windows and Linux flavors are detected at run time -->
     <ExifGlassChannel Condition="'$(ExifGlassChannel)' == ''">Direct</ExifGlassChannel>

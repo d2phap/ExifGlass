@@ -315,9 +315,9 @@ public class ChildWindowTests
         Assert.Contains(AboutViewModel.OsName, vm.VersionLine, StringComparison.Ordinal);
         Assert.Equal(AboutWindow.FirstSize.Width, window.ClientSize.Width);
 
-        var all = AboutViewModel.Notices.Count;
-        Assert.Equal(13, all);
-        Assert.Equal(["ExifTool", "ProDataGrid"], AboutViewModel.Notices.Skip(2).Take(2).Select(n => n.Name));
+        var all = vm.Notices.Count;
+        Assert.Equal(15, AboutViewModel.AllNotices.Count);
+        Assert.Equal("ExifTool", vm.Notices[2].Name);
         Assert.Equal(AboutViewModel.NOTICES_SHOWN, vm.ShownNotices.Count);
         Assert.Equal(AppText.SHOW_ALL, vm.NoticesToggleText);
 
@@ -377,12 +377,29 @@ public class ChildWindowTests
     public void EveryNoticeHasItsText()
     {
         var vm = new AboutViewModel(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()));
-        foreach (var notice in AboutViewModel.Notices)
+        foreach (var notice in AboutViewModel.AllNotices)
         {
             vm.ShowNoticeCommand.Execute(notice);
             Assert.True(vm.NoticeParagraphs.Count > 0, notice.Name);
             Assert.Contains(vm.NoticeParagraphs, p => p.Contains("Copyright", StringComparison.OrdinalIgnoreCase) || p.Contains('©'));
         }
+    }
+
+
+    // App Review reads About: the store build lists what it ships, its own Perl among them, and names no other platform
+    [AvaloniaFact]
+    public void TheMacAppStoreBuildListsTheNoticesOfWhatItShips()
+    {
+        AboutViewModel About(AppChannel channel) => new(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()) { Channel = new ChannelPolicy(channel) });
+
+        var store = About(AppChannel.MacAppStore).Notices.Select(n => n.Name).ToList();
+        var direct = About(AppChannel.MacDirect).Notices.Select(n => n.Name).ToList();
+        Assert.Contains("Perl", store);
+        Assert.DoesNotContain("ImageGlass.SDK", store);
+        Assert.DoesNotContain("Perl", direct);
+        Assert.Contains("ImageGlass.SDK", direct);
+        Assert.All(AboutViewModel.AllNotices, n => Assert.DoesNotMatch("Windows|Linux|macOS", n.Name));
+        if (OperatingSystem.IsMacOS()) Assert.DoesNotContain(store, name => name is "ANGLE" or "ImageGlass.Tools" or "Strawberry Perl" or "Tmds.DBus.Protocol");
     }
 
 
@@ -664,7 +681,7 @@ public class ChildWindowTests
         shell.Settle(250);
         Check(about, variant, "window-about-update", theme, failures);
 
-        about.ViewModel.ShowNoticeCommand.Execute(AboutViewModel.Notices.First(n => n.Name == "ExifTool"));
+        about.ViewModel.ShowNoticeCommand.Execute(about.ViewModel.Notices.First(n => n.Name == "ExifTool"));
         shell.Settle(200);
         Check(about, variant, "window-about-notice", theme, failures);
         about.Close();

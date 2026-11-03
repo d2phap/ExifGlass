@@ -31,7 +31,7 @@ namespace ExifGlass.ViewModels;
 /// <summary>
 /// One third-party notice in About: its text file, the component and its licence (__assets/notices/gen-notices.py).
 /// </summary>
-public sealed record NoticeView(string File, string Name, string Licence);
+public sealed record NoticeView(string File, string Name, string Licence, string Where = "");
 
 
 /// <summary>
@@ -46,7 +46,7 @@ public sealed partial class AboutViewModel : ObservableObject
 
     private const string NOTICES = "avares://ExifGlass.Lib/Assets/Notices/";
 
-    private static readonly Lazy<IReadOnlyList<NoticeView>> _notices = new(ReadNotices);
+    private static readonly Lazy<IReadOnlyList<NoticeView>> _allNotices = new(ReadNotices);
 
     private readonly MainViewModel _main;
     private readonly UpdateService? _updates;
@@ -60,6 +60,7 @@ public sealed partial class AboutViewModel : ObservableObject
     {
         _main = main;
         _updates = main.Updates;
+        Notices = [.. AllNotices.Where(n => Ships(n.Where, main.Channel))];
         if (_updates is not null) _updates.PropertyChanged += Updates_PropertyChanged;
     }
 
@@ -130,7 +131,12 @@ public sealed partial class AboutViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ShownNotices), nameof(NoticesToggleText))]
     public partial bool AllNoticesShown { get; set; }
 
-    public static IReadOnlyList<NoticeView> Notices => _notices.Value;
+    /// <summary>
+    /// Every notice of every build; About lists the <see cref="Notices"/> of this one.
+    /// </summary>
+    public static IReadOnlyList<NoticeView> AllNotices => _allNotices.Value;
+
+    public IReadOnlyList<NoticeView> Notices { get; }
 
     public IReadOnlyList<NoticeView> ShownNotices => AllNoticesShown ? Notices : [.. Notices.Take(NOTICES_SHOWN)];
 
@@ -228,10 +234,22 @@ public sealed partial class AboutViewModel : ObservableObject
     private Task Open(string url) => _main.Shell?.OpenUriAsync(url) ?? Task.CompletedTask;
 
 
+    // where (gen-notices.py): blank everywhere, else the OSes, mas for the Mac App Store build, imageglass beside the ImageGlass 10 hosts
+    internal static bool Ships(string where, ChannelPolicy channel) => where.Length == 0 || where.Split(',').Any(place => place switch
+    {
+        "windows" => OperatingSystem.IsWindows(),
+        "mac" => OperatingSystem.IsMacOS(),
+        "linux" => OperatingSystem.IsLinux(),
+        "mas" => channel.Channel == AppChannel.MacAppStore,
+        "imageglass" => channel.ImageGlass10,
+        _ => false,
+    });
+
+
     private static IReadOnlyList<NoticeView> ReadNotices() => [.. Read("index.tsv").Split('\n', StringSplitOptions.RemoveEmptyEntries)
         .Select(line => line.Split('\t'))
-        .Where(parts => parts.Length == 3)
-        .Select(parts => new NoticeView(parts[0], parts[1], parts[2]))];
+        .Where(parts => parts.Length >= 3)
+        .Select(parts => new NoticeView(parts[0], parts[1], parts[2], parts.Length > 3 ? parts[3].Trim() : string.Empty))];
 
 
     private static string Read(string file)

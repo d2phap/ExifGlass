@@ -90,28 +90,32 @@ def main():
 
     index = []
 
-    def add(slug, name, licence, text):
+    # where: blank everywhere, else the OSes it ships on (windows, mac, linux), mas for the Mac App Store build, imageglass beside the ImageGlass 10 hosts
+    def add(slug, name, licence, text, where=''):
         write(slug, text)
-        index.append((slug, name, licence))
+        index.append((slug, name, licence, where))
 
     # the runtime NativeAOT compiles in, and what it carries (the SDK folder's LICENSE.txt is the SDK's own terms)
     add('dotnet', '.NET', 'MIT', MIT.format(copyright='Copyright (c) .NET Foundation and Contributors') + '\n\n' + package('runtime.win-x64.microsoft.dotnet.ilcompiler', '11.0.0-rc.3.26522.148', 'THIRD-PARTY-NOTICES.TXT'))
     add('avalonia', 'Avalonia UI', 'MIT', MIT.format(copyright='Copyright 2013-2026 © The AvaloniaUI Project'))
-    add('exiftool', 'ExifTool', 'Artistic-1.0-Perl or GPL-1.0+', read(SOURCE, '__assets', 'exiftool', 'LICENSE')
-        + '\nOn Windows, ExifTool runs on the Strawberry Perl it comes with; the licences of Perl and its libraries ship beside it, in exiftool_files. On macOS it runs on the system Perl; on Linux, as one self-contained program.\n')
+    add('exiftool', 'ExifTool', 'Artistic-1.0-Perl or GPL-1.0+', read(SOURCE, '__assets', 'exiftool', 'LICENSE'))
+    add('strawberry-perl', 'Strawberry Perl', 'Artistic-1.0-Perl or GPL-1.0+', 'Perl is Copyright (C) 1993 - 2025 by Larry Wall and others.\n\n'
+        + 'ExifTool runs on the Strawberry Perl it comes with; the licences of Perl and its libraries ship beside it, in exiftool_files.\n', 'windows')
+    # the Mac App Store build runs ExifTool on its own Perl (App Review takes the system Perl for deprecated)
+    add('perl', 'Perl', 'Artistic-1.0-Perl or GPL-1.0+', read(HERE, 'Perl.txt'), 'mas')
     add('prodatagrid', 'ProDataGrid', 'MIT', MIT.format(copyright='Copyright (c) 2026 Wiesław Šoltés'))
     add('skiasharp', 'SkiaSharp and Skia', 'MIT, BSD-3-Clause', package('skiasharp', '4.153.1', 'LICENSE.txt') + '\n\n' + package('skiasharp.nativeassets.win32', '4.153.1', 'THIRD-PARTY-NOTICES.txt'))
     add('harfbuzzsharp', 'HarfBuzzSharp', 'MIT, Old MIT', package('harfbuzzsharp', '8.3.1.3', 'LICENSE.txt') + '\n\n' + package('harfbuzzsharp.nativeassets.win32', '8.3.1.3', 'THIRD-PARTY-NOTICES.txt'))
-    add('angle', 'ANGLE (Windows)', 'BSD-3-Clause', package('avalonia.angle.windows.natives', '2.1.27548.20260419', 'LICENSE'))
+    add('angle', 'ANGLE', 'BSD-3-Clause', package('avalonia.angle.windows.natives', '2.1.27548.20260419', 'LICENSE'), 'windows')
     add('communitytoolkit-mvvm', 'CommunityToolkit.Mvvm', 'MIT', MIT.format(copyright='Copyright (c) .NET Foundation and Contributors'))
     add('microcom', 'MicroCom.Runtime', 'MIT', MIT.format(copyright='Copyright 2021 (c) Nikita Tsukanov'))
-    add('tmds-dbus', 'Tmds.DBus.Protocol (Linux)', 'MIT', MIT.format(copyright='Copyright (c) Tom Deseyn'))
-    add('inter', 'Inter (macOS and Linux)', 'OFL-1.1', read(HERE, 'OFL-Inter.txt'))
-    add('imageglass-sdk', 'ImageGlass.SDK', 'MIT', MIT.format(copyright='Copyright (c) 2026 Duong Dieu Phap'))
-    add('imageglass-tools', 'ImageGlass.Tools (Windows)', 'MIT', MIT.format(copyright='Copyright (c) 2023 - 2025 Duong Dieu Phap'))
+    add('tmds-dbus', 'Tmds.DBus.Protocol', 'MIT', MIT.format(copyright='Copyright (c) Tom Deseyn'), 'linux')
+    add('inter', 'Inter', 'OFL-1.1', read(HERE, 'OFL-Inter.txt'), 'mac,linux')
+    add('imageglass-sdk', 'ImageGlass.SDK', 'MIT', MIT.format(copyright='Copyright (c) 2026 Duong Dieu Phap'), 'imageglass')
+    add('imageglass-tools', 'ImageGlass.Tools', 'MIT', MIT.format(copyright='Copyright (c) 2023 - 2025 Duong Dieu Phap'), 'windows')
 
     with open(os.path.join(OUT, 'index.tsv'), 'w', encoding='utf-8', newline='\n') as f:
-        f.write(''.join(f'{slug}\t{name}\t{licence}\n' for slug, name, licence in index))
+        f.write(''.join(f'{slug}\t{name}\t{licence}\t{where}\n' for slug, name, licence, where in index))
 
     print(f'{len(index)} notices in {OUT}')
 

@@ -29,8 +29,9 @@
     </Setter>
   </ControlTheme>
 
+  <!--  a transparent background, not none: a press in the shadow room reaches the root, and ShadowDismiss closes the popup  -->
   <ControlTheme x:Key="{x:Type PopupRoot}" TargetType="PopupRoot">
-    <Setter Property="Background" Value="{x:Null}" />
+    <Setter Property="Background" Value="Transparent" />
     <Setter Property="TransparencyLevelHint" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="FontFamily" Value="{DynamicResource FontUi}" />

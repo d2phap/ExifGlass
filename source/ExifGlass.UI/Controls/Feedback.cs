@@ -179,6 +179,9 @@ public class ProgressLine : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == IsIndeterminateProperty || change.Property == ValueProperty || change.Property == BoundsProperty) InvalidateArrange();
+
+        // a hidden line isn't arranged, so its sweep would run on unseen and keep the compositor rendering every frame
+        if (change.Property == IsVisibleProperty && !IsVisible) StopSweep();
     }
 
 
@@ -566,7 +569,8 @@ public class PulseRing : SquircleBorder
 
 /// <summary>
 /// Floats its child 4 px up and back every 4 s on the render thread: the empty card's logo (DS 6.9).
-/// Only while its window is active: on macOS a never-ending animation stalled the next window's first frames (About blank for seconds).
+/// Only while its window is active, and never on macOS: a never-ending animation holds the render thread on the next drawable,
+/// so every popup, tooltip and window waited behind it.
 /// </summary>
 public class FloatingPanel : Decorator
 {
@@ -631,7 +635,7 @@ public class FloatingPanel : Decorator
     private void StartFloat(CompositionVisual visual)
     {
         var animation = visual.Compositor.CreateVector3DKeyFrameAnimation();
-        if (IsFloating && !MotionTokens.IsFrozen && _window?.IsActive != false)
+        if (IsFloating && !MotionTokens.IsFrozen && !OperatingSystem.IsMacOS() && _window?.IsActive != false)
         {
             animation.InsertKeyFrame(0f, default);
             animation.InsertKeyFrame(0.5f, new Vector3D(0, RISE, 0), MotionTokens.LogoFloatEasing);

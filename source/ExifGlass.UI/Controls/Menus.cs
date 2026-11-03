@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -184,6 +185,8 @@ public static class MenuMotion
     /// </summary>
     public static readonly Thickness GAP_BAND = new(0, GAP, 0, GAP);
 
+    private static readonly DoubleTransition FADE_IN = new() { Property = Visual.OpacityProperty, Duration = MotionTokens.MenuOpen, Easing = MotionTokens.MenuOpenEasing };
+
     private static bool _registered;
     private static PixelPoint? _lastPress;
 
@@ -200,6 +203,8 @@ public static class MenuMotion
         if (_registered) return;
 
         _registered = true;
+        TemplatedControl.TemplateAppliedEvent.AddClassHandler<MenuFlyoutPresenter>((presenter, _) => Track(presenter));
+        TemplatedControl.TemplateAppliedEvent.AddClassHandler<ContextMenu>((menu, _) => Track(menu));
         Control.LoadedEvent.AddClassHandler<MenuFlyoutPresenter>((presenter, _) => PlayOpen(presenter));
         Control.LoadedEvent.AddClassHandler<ContextMenu>((menu, _) => PlayOpen(menu));
         InputElement.PointerPressedEvent.AddClassHandler<TopLevel>((top, e) => _lastPress = top.PointToScreen(e.GetPosition(top)), RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -234,6 +239,24 @@ public static class MenuMotion
 
     #region Private methods
 
+    // macOS draws a popup window as it shows, before Loaded: the surface waits hidden, or its first frame is the open menu
+    private static void Track(Control host)
+    {
+        host.AttachedToVisualTree -= Host_AttachedToVisualTree;
+        host.AttachedToVisualTree += Host_AttachedToVisualTree;
+        Hide(host);
+    }
+
+
+    private static void Hide(Control host)
+    {
+        if (MotionTokens.IsFrozen || host.GetVisualChildren().FirstOrDefault() is not Control surface) return;
+
+        surface.Transitions?.Remove(FADE_IN);
+        surface.Opacity = 0;
+    }
+
+
     private static void PlayOpen(Control host)
     {
         if (host.GetVisualChildren().FirstOrDefault() is not Control surface) return;
@@ -241,7 +264,7 @@ public static class MenuMotion
         Dispatcher.UIThread.Post(() =>
         {
             var (origin, rise) = OpenFrom(host, surface);
-            CompositionMotion.Fade(surface, 0, 1, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing);
+            FadeIn(surface);
             CompositionMotion.Move(surface, new Vector(0, rise), default, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing);
             CompositionMotion.Scale(surface, OPEN_SCALE, 1, MotionTokens.MenuOpen, MotionTokens.MenuOpenEasing, origin);
         }, DispatcherPriority.Render);
@@ -265,6 +288,16 @@ public static class MenuMotion
     }
 
 
+    // the fade runs on the UI side: the surface's first composition sync would drop a composition fade begun before it
+    private static void FadeIn(Control surface)
+    {
+        var transitions = surface.Transitions ??= [];
+        transitions.Remove(FADE_IN);
+        if (!MotionTokens.IsFrozen) transitions.Add(FADE_IN);
+        surface.Opacity = 1;
+    }
+
+
     // the presenter a menu flyout shows, found through its items' visual root
     private static Control? Surface(MenuFlyout flyout)
     {
@@ -277,4 +310,14 @@ public static class MenuMotion
     }
 
     #endregion // Private methods
+
+
+    #region Event handlers
+
+    private static void Host_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        if (sender is Control host) Hide(host);
+    }
+
+    #endregion // Event handlers
 }

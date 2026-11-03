@@ -42,6 +42,7 @@ public class OwnedWindow : Window
     private readonly ScaleTransform _scale = new(1, 1);
     private Choreo? _motion;
     private bool _closingAnimated;
+    private bool _activeAtClose;
 
     #endregion // Fields and constants
 
@@ -124,6 +125,7 @@ public class OwnedWindow : Window
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         base.OnClosing(e);
+        _activeAtClose |= IsActive;
         if (e.Cancel || _closingAnimated || !UsesContentMotion || MotionTokens.IsFrozen || Content is not Visual content) return;
 
         // 180 ms fade of the content, then the window closes for real
@@ -133,6 +135,15 @@ public class OwnedWindow : Window
         _motion?.Stop(jumpToEnd: false);
         _motion = new Choreo().Add(MotionTokens.ChildWindowClose, MotionTokens.ChildWindowCloseEasing, p => content.Opacity = from * (1 - p));
         _motion.PlayAsync(this).ContinueWith(_ => Avalonia.Threading.Dispatcher.UIThread.Post(Close), TaskScheduler.Default);
+    }
+
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        // macOS leaves no key window when the owner shows a tooltip, and its menus and shortcuts go with it
+        if (_activeAtClose && Owner is Window { IsVisible: true } owner) owner.Activate();
     }
 
 

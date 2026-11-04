@@ -5,6 +5,12 @@ set -euo pipefail
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ARTIFACTS_DIR="$SOURCE_DIR/__artifacts"
 
+# GUI apps and VS Code tasks don't read .bashrc, so they'd get the distro's older SDK
+if [ "$(uname -s)" = "Linux" ] && [ -x "$HOME/.dotnet/dotnet" ]; then
+  export DOTNET_ROOT="$HOME/.dotnet"
+  PATH="$DOTNET_ROOT:$PATH"
+fi
+
 host_os_name() {
   case "$(uname -s)" in
     Darwin) echo "mac" ;;

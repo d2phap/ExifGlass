@@ -144,7 +144,6 @@ static class Generator
         new("InverseHoverLayer", "#14FFFFFF", "#0D000000", "Inverse fills hovered (DS brightness 1.15)"),
         new("InversePressedLayer", "#1A000000", "#1A000000", "Inverse fills pressed (DS brightness 0.9)"),
 
-        // the Fluent 2 scroll bar of v2, which replaces DS 6.16 (owner, 2026-10-21)
         new("ScrollThumb", "#999999", "#BBBBBB", "Scroll bar thumb and arrows"),
         new("ScrollThumbHover", "#888888", "#CCCCCC", "Scroll bar thumb and arrows on hover"),
         new("ScrollThumbPressed", "#666666", "#DDDDDD", "Scroll bar thumb and arrows pressed"),
@@ -302,7 +301,7 @@ static class Generator
         ("SkeletonPulse", 1200, "Standard", "Skeleton pulse 0.45 to 1"),
         ("SkeletonStagger", 70, "Standard", "Skeleton stagger"),
         ("Spin", 800, "Linear", "Spinner turn"),
-        ("ScrollBar", 100, "Standard", "Scroll bar expand and collapse (v2)"),
+        ("ScrollBar", 100, "Standard", "Scroll bar expand and collapse"),
         ("TokenPop", 260, "Spring", "Token chip pop-in"),
         ("Dialog", 260, "Emphasized", "In-window dialog in"),
         ("DragRing", 1400, "EaseOut", "Drag-over logo ring: scale 0.94 to 1.5 while it fades, looped"),

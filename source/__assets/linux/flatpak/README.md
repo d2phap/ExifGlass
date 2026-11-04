@@ -57,9 +57,8 @@ Users install the bundle directly:
 flatpak install --user ExifGlass_<label>_linux-x64.flatpak
 ```
 
-The packer signs the bundle with v2's release key, `ImageGlass Release Signing`
-(`B8209BE8C428EBC0`), and embeds its public half, so the installs of v2's bundle keep
-verifying. `GPG_KEY=<key id>` picks another key; `GPG_KEY=` builds unsigned:
+The packer signs the bundle with the release key, `ImageGlass Release Signing`
+(`B8209BE8C428EBC0`), and embeds its public half so installs can verify it. `GPG_KEY=<key id>` picks another key; `GPG_KEY=` builds unsigned:
 
 ```bash
 GPG_KEY= bash __assets/linux/pack-linux-flatpak.sh

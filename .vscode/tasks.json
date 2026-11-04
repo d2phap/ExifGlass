@@ -226,7 +226,7 @@
     {
       "id": "gpgKey",
       "type": "promptString",
-      "description": "GPG key (email or key ID) to sign the Flatpak bundle or the AppImage; v2's release key by default. Leave blank for an unsigned one.",
+      "description": "GPG key (email or key ID) to sign the Flatpak bundle or the AppImage; the release key by default. Leave blank for an unsigned one.",
       "default": "CF5C8B327AB2544678908A69B8209BE8C428EBC0"
     }
   ]

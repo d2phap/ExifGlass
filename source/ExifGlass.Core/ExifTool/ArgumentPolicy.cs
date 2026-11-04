@@ -102,7 +102,7 @@ public static partial class ArgumentPolicy
     #region Fields and constants
 
     /// <summary>
-    /// The defaults v2 used, shown as the terminal-equivalent command.
+    /// The default arguments, shown as the terminal-equivalent command.
     /// </summary>
     public const string DEFAULT_ARGUMENTS = "-fast -G -t -m -q -H -charset UTF8";
 

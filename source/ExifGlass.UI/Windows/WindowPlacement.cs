@@ -62,7 +62,7 @@ public sealed class MemoryPlacementStore : IWindowPlacementStore
 
 
 /// <summary>
-/// Saves and restores a window's state, size and location (O15, plan 5.6): v2's race-free capture plus the off-screen guard and the frame extents (S4).
+/// Saves and restores a window's state, size and location, keeping the title strip on a screen and counting the frame.
 /// </summary>
 public static class WindowPlacement
 {
@@ -102,7 +102,7 @@ public static class WindowPlacement
 
             if (saved.Maximized)
             {
-                // the platform window must exist first (v2); the normal bounds above stay the restore-down size
+                // the platform window must exist first; the normal bounds above stay the restore-down size
                 window.Opened += (_, _) => window.WindowState = WindowState.Maximized;
                 decision += ", maximized on open";
             }
@@ -154,7 +154,7 @@ public static class WindowPlacement
 
     #region Nested types
 
-    // maximize and minimize move and resize the window before WindowState catches up, so the capture waits at Background (v2)
+    // maximize and minimize move and resize the window before WindowState catches up, so the capture waits at Background
     private sealed class Tracker(Window window, string key, IWindowPlacementStore store)
     {
         private bool _queued;

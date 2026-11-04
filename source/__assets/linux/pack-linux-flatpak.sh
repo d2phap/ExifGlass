@@ -8,7 +8,7 @@
 #      installs it for the current user to try.
 # Distribution steps: flatpak/README.md
 #
-# Env: GPG_KEY=<key id> (default: v2's release key; empty: unsigned), RELEASE_TAG=<tag> (default: the label), SKIP_PUBLISH=1 (reuses the last publish: local iteration only)
+# Env: GPG_KEY=<key id> (default: the release key; empty: unsigned), RELEASE_TAG=<tag> (default: the label), SKIP_PUBLISH=1 (reuses the last publish: local iteration only)
 
 set -euo pipefail
 
@@ -21,7 +21,7 @@ STATE_DIR="$WORK_DIR/.flatpak-builder"
 BUILD_PROPS_FILE="$SOURCE_DIR/Directory.Build.props"
 MANIFEST="$FLATPAK_DIR/io.github.d2phap.exifglass.yaml"
 APP_ID="io.github.d2phap.exifglass"
-# v2's release key; GPG_KEY= builds unsigned
+# release signing key; GPG_KEY= builds unsigned
 GPG_KEY="${GPG_KEY-CF5C8B327AB2544678908A69B8209BE8C428EBC0}"
 trap 'rm -rf "$WORK_DIR"' EXIT
 

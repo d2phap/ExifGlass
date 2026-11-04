@@ -7,7 +7,7 @@
 #   4. builds ExifGlass_<label>_linux-x64.AppImage and its .zsync, with update information AppImage managers read, GPG-signed when GPG_KEY is set.
 # Like the Flatpak, it ships no system library (libGL, libX11, libfontconfig): those must be the host's.
 #
-# Env: GPG_KEY=<key id> (default: v2's release key; empty: unsigned), APPIMAGETOOL=<path>, APPIMAGETOOL_SHA256=<hex> (checked on download), NO_UPDATE_INFO=1,
+# Env: GPG_KEY=<key id> (default: the release key; empty: unsigned), APPIMAGETOOL=<path>, APPIMAGETOOL_SHA256=<hex> (checked on download), NO_UPDATE_INFO=1,
 #      SKIP_PUBLISH=1 (reuses the last publish: local iteration only)
 
 set -euo pipefail
@@ -23,7 +23,7 @@ APPDIR_STAGE="$BUILD_ROOT/AppDir"
 TOOLS_DIR="$SOURCE_DIR/__artifacts/tools"
 BUILD_PROPS_FILE="$SOURCE_DIR/Directory.Build.props"
 APP_ID="io.github.d2phap.exifglass"
-# v2's release key; GPG_KEY= builds unsigned
+# release signing key; GPG_KEY= builds unsigned
 GPG_KEY="${GPG_KEY-CF5C8B327AB2544678908A69B8209BE8C428EBC0}"
 trap 'rm -rf "$BUILD_ROOT"' EXIT
 

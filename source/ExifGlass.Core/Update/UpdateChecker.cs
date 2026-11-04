@@ -23,7 +23,7 @@ using System.Text.Json.Serialization;
 namespace ExifGlass.Core.Update;
 
 /// <summary>
-/// The release feed (update.json), the same schema v2 published.
+/// The release feed (update.json).
 /// </summary>
 public sealed record UpdateInfo
 {

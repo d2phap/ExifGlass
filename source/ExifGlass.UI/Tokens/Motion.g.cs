@@ -215,7 +215,7 @@ public static partial class MotionTokens
     public static readonly TimeSpan Spin = TimeSpan.FromMilliseconds(800);
     public static readonly Easing SpinEasing = LinearEasing;
 
-    // Scroll bar expand and collapse (v2): 100 ms, Standard
+    // Scroll bar expand and collapse: 100 ms, Standard
     public static readonly TimeSpan ScrollBar = TimeSpan.FromMilliseconds(100);
     public static readonly Easing ScrollBarEasing = StandardEasing;
 

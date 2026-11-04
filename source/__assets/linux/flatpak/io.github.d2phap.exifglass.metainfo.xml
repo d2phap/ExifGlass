@@ -29,12 +29,24 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>ExifGlass - AI &amp; EXIF metadata viewer</caption>
+      <caption>Every tag ExifTool reads in one table, in light and dark themes</caption>
       <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_1.png</image>
     </screenshot>
     <screenshot>
-      <caption>ExifGlass - Works seamlessly with ImageGlass</caption>
+      <caption>Search tag names, IDs and values as you type</caption>
       <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_2.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Inspect and edit a single tag</caption>
+      <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_3.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The prompt, model and sampler settings of an AI image</caption>
+      <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_4.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Choose the ExifTool executable and the arguments it runs with</caption>
+      <image>https://raw.githubusercontent.com/d2phap/ExifGlass/refs/heads/main/source/__assets/linux/screenshots/eg_flatpak_5.png</image>
     </screenshot>
   </screenshots>
 

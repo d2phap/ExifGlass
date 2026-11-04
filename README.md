@@ -18,7 +18,7 @@ ExifGlass is free and open source. To support its development and get updates th
 
 
 <br/>
-<img src="source/__assets/linux/screenshots/eg_flatpak_1.png" alt="ExifGlass showing the prompt, models and parameters of an AI image" />
+<img src="source/__assets/linux/screenshots/eg_flatpak_1.png" alt="ExifGlass showing the prompt, model and sampler settings of an AI image" />
 
 
 ## Features
@@ -39,21 +39,6 @@ ExifGlass is free and open source. To support its development and get updates th
 - Edit, add and delete tags; remove the GPS data or the AI generation data before you share a file, or strip all metadata. Changes wait until you save, and ExifTool keeps the original file as a backup.
 - The command bar shows the exact ExifTool command for the read, or for the save while changes wait, ready to copy.
 
-### Private by design
-- Everything stays on your computer: prompts and metadata are never sent anywhere, and nothing is looked up online. The only network request is the update check, which you can turn off (see [PRIVACY.md](PRIVACY.md)).
-
-
-## Keyboard
-
-| Keys | Action |
-| -- | -- |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>O</kbd> | Open a file (or drop one on the window) |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>K</kbd> | Search tags |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>A</kbd>, <kbd>Ctrl/Cmd</kbd> + <kbd>C</kbd> | Select every row in view, copy the selection |
-| <kbd>Ctrl/Cmd</kbd> + <kbd>,</kbd> | Settings |
-| <kbd>F1</kbd> | About |
-| <kbd>Esc</kbd> | Step back: cancel an edit, close a menu or panel, clear the search, then the selection, then close the window |
-
 
 ## Use ExifGlass with ImageGlass
 ExifGlass follows the photo ImageGlass shows: as you browse in ImageGlass, the metadata table, the AI card and the inspector follow each photo. It works with ImageGlass 10 on Windows, macOS and Linux, and with ImageGlass 9 on Windows. The Mac App Store version can't connect to ImageGlass, because the App Sandbox doesn't allow it.
@@ -61,18 +46,16 @@ ExifGlass follows the photo ImageGlass shows: as you browse in ImageGlass, the m
 ### ImageGlass 10
 ImageGlass 10 comes with an ExifGlass tool already set up (ID `Tool_ExifGlass`, hotkey <kbd>X</kbd>). Press <kbd>X</kbd> to open ExifGlass beside the photo; it closes when ImageGlass closes. If the tool was removed, or ExifGlass is installed somewhere else, open Settings > Tools in ImageGlass, click "Add" and fill in:
 
-| | Windows | macOS | Linux (Flatpak) | Linux (AppImage) |
-| -- | -- | -- | -- | -- |
-| ID | `Tool_ExifGlass` | `Tool_ExifGlass` | `Tool_ExifGlass` | `Tool_ExifGlass` |
-| Integrated with ImageGlass.SDK | checked | checked | checked | checked |
-| Executable | `exifglass` (the Store and MSIX versions add it to PATH; for the ZIP, the full path of `ExifGlass.exe`) | `/Applications/ExifGlass.app` | `flatpak` | the full path of the `.AppImage` file |
-| Argument | `<file>` | `<file>` | `run io.github.d2phap.exifglass <file>` | `<file>` |
-| Hotkey | <kbd>X</kbd> | <kbd>X</kbd> | <kbd>X</kbd> | <kbd>X</kbd> |
+- **ID**: `Tool_ExifGlass`
+- **Integrated with ImageGlass.SDK**: checked
+- **Hotkey**: <kbd>X</kbd>
+- **Executable** and **Argument**, depending on how you installed ExifGlass:
+  - Windows (Store or MSIX): `exifglass`, with the argument `<file>`. These versions add `exifglass` to PATH.
+  - Windows (ZIP): the full path of `ExifGlass.exe`, with the argument `<file>`.
+  - macOS: `/Applications/ExifGlass.app`, with the argument `<file>`.
+  - Linux (AppImage): the full path of the `.AppImage` file, with the argument `<file>`.
+  - Linux (Flatpak): `flatpak`, with the argument `run io.github.d2phap.exifglass <file>`.
 
-ImageGlass must start ExifGlass itself: a script or launcher in front of it breaks the connection on Windows.
-
-> [!NOTE]
-> If ImageGlass closes while ExifGlass has unsaved changes, ExifGlass keeps them and offers to restore them the next time it starts.
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/28c26471-1858-4928-885c-1b1b1cd34793" />
 

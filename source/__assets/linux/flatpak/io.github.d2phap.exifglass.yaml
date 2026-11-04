@@ -8,6 +8,7 @@ finish-args:
   - --socket=x11
   - --share=ipc
   - --device=dri
+  - --share=network
   # D7: open and save any file, and reach ImageGlass 10's tool socket in ~/.cache/ImageGlass/tools (P10)
   - --filesystem=host
   # The bundled ExifTool (PAR::Packer/Perl) loads libcrypt.so.1 from here (see build-commands).

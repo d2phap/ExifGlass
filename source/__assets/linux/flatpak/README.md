@@ -57,12 +57,12 @@ Users install the bundle directly:
 flatpak install --user ExifGlass_<label>_linux-x64.flatpak
 ```
 
-To sign the bundle, generate a key once and pass it via `GPG_KEY` (the VS Code task
-prompts for it):
+The packer signs the bundle with v2's release key, `ImageGlass Release Signing`
+(`B8209BE8C428EBC0`), and embeds its public half, so the installs of v2's bundle keep
+verifying. `GPG_KEY=<key id>` picks another key; `GPG_KEY=` builds unsigned:
 
 ```bash
-gpg --quick-generate-key "ExifGlass Release Signing" default default never
-GPG_KEY="<your-key-id-or-email>" bash __assets/linux/pack-linux-flatpak.sh
+GPG_KEY= bash __assets/linux/pack-linux-flatpak.sh
 ```
 
 Signing is optional for a single-file bundle; users can install it either way.
@@ -85,10 +85,10 @@ Signing is optional for a single-file bundle; users can install it either way.
 
 ## Sandbox permissions
 
-`finish-args` grants X11 (`--socket=x11` + `--share=ipc`), GPU (`--device=dri`) and
-full filesystem (`--filesystem=host`, D7: opening and saving any file, exports and
-saved binary tags anywhere). No network: the Flatpak checks for no update (Flathub
-updates it), nothing is looked up online (D27), and links open through the portal.
+`finish-args` grants X11 (`--socket=x11` + `--share=ipc`), GPU (`--device=dri`),
+network (`--share=network`, owner 2026-11-04) and full filesystem (`--filesystem=host`,
+D7: opening and saving any file, exports and saved binary tags anywhere). The Flatpak
+still checks for no update (Flathub updates it), and links open through the portal.
 Flathub reviewers may ask to narrow `--filesystem=host` to `--filesystem=home`.
 
 `--filesystem=host` (or `home`) also covers ImageGlass 10's tool socket: ImageGlass

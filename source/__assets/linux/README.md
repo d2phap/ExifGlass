@@ -8,7 +8,7 @@
 | `pack-linux-x64-appimage` | `pack-linux-appimage.sh` | `ExifGlass_<label>_linux-x64.AppImage` and its `.zsync` |
 | `build-exiftool-linux-x64` | `build-exiftool.sh x64` | the PAR-packed ExifTool both packages ship (once per ExifTool version) |
 
-`pack-linux-x64-all` runs both packers. Each task prompts for a GPG key (blank builds unsigned).
+`pack-linux-x64-all` runs both packers. Each task prompts for a GPG key, v2's release key by default (blank builds unsigned).
 
 - **ExifTool:** neither package may rely on a Perl: the Flatpak runtime has none, and an AppImage runs on any distro. `build-exiftool.sh` packs ExifTool and Perl into one binary (`__assets/exiftool/unix/build/linux-x64/exiftool`), which `Directory.Build.targets` prefers; the Flatpak packer refuses the plain script, the AppImage packer warns.
 - **One description:** the desktop entry, the metainfo and the icons live in `flatpak/` and serve both packages. The icons are rendered from `__assets/__app/logo.svg` by `tools/gen-app-icons.cs`. Add a `<release>` to the metainfo for every version (the Flatpak packer warns when its newest isn't this label).
@@ -22,7 +22,7 @@
 - **No system libraries:** the packer fails if `libGL`, `libEGL`, `libX11`, `libxcb`, `libfontconfig` or `libfreetype` ever lands in the payload: they must be the host's.
 - **appimagetool** is downloaded once to `__artifacts/tools` (AppImage/appimagetool, continuous; pin it with `APPIMAGETOOL_SHA256`), or set `APPIMAGETOOL`.
 - **ImageGlass 10** runs `flatpak run io.github.d2phap.exifglass <file>` by default; AppImage users set the tool's path to the image.
-- **Signing:** `GPG_KEY=<key id>` embeds a GPG signature (an X.509 code-signing certificate can't be used); publish the key's fingerprint and the printed SHA-256.
+- **Signing:** both packers sign with v2's release key, `ImageGlass Release Signing` (`CF5C 8B32 7AB2 5446 7890  8A69 B820 9BE8 C428 EBC0`), the key v2's Flatpak installs already trust; `GPG_KEY=<key id>` picks another and `GPG_KEY=` builds unsigned. A GPG signature only: an X.509 code-signing certificate can't be used. Publish the fingerprint and the printed SHA-256.
 
 ## Flatpak
 

@@ -57,11 +57,11 @@ Users install the bundle directly:
 flatpak install --user ExifGlass_<label>_linux-x64.flatpak
 ```
 
-The packer signs the bundle with the release key, `ImageGlass Release Signing`
-(`B8209BE8C428EBC0`), and embeds its public half so installs can verify it. `GPG_KEY=<key id>` picks another key; `GPG_KEY=` builds unsigned:
+To sign the bundle, pass a GPG key via `GPG_KEY` (the VS Code task prompts for it); the
+packer embeds its public half so installs can verify it:
 
 ```bash
-GPG_KEY= bash __assets/linux/pack-linux-flatpak.sh
+GPG_KEY="<your-key-id-or-email>" bash __assets/linux/pack-linux-flatpak.sh
 ```
 
 Signing is optional for a single-file bundle; users can install it either way.

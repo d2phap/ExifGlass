@@ -35,7 +35,7 @@ modules:
     sources:
       - type: archive
         url: https://github.com/d2phap/ExifGlass/releases/download/3.0.0.1105/ExifGlass_3.0.0.1105_linux-x64.tar.gz
-        sha256: b8329d11993c67cc2aeca8d9be94f558e5d41fe07038c2e34bf65c389b8fc671
+        sha256: 50386a9378d6edd27c03238829d53acb11bee04e0ce270a239b1398ceb2dbb5a
         strip-components: 1
         dest: payload
       - type: file

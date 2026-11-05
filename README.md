@@ -1,5 +1,9 @@
+<div align="center">
+
 ExifGlass - AI & EXIF metadata viewer
 ===
+
+</div>
 
 ExifGlass is a cross-platform EXIF metadata viewing tool, designed to work seamlessly with [ImageGlass - A Fast, Seamless Photo Viewer](https://imageglass.org), but can also be used as a standalone software on your computer. 
 
@@ -9,8 +13,12 @@ For AI images, ExifGlass shows the prompt and settings that tools like Stable Di
 
 ExifGlass is open source. Buying it here supports its development, and the [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=eg_github_readme&mode=full) keeps it up to date.
 
-
-[![ExifGlass on Microsoft Store](https://github.com/d2phap/ExifGlass/assets/3154213/ed878a58-cec3-4f74-ac56-c215477f6c61)](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=eg_github_readme&mode=full)
+<div align="center">
+  
+<a href="https://imageglass.org/exifglass">
+  <img src="https://github.com/d2phap/ExifGlass/assets/3154213/ed878a58-cec3-4f74-ac56-c215477f6c61" />
+</a>
+<br/><br/>
 
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" />
@@ -19,12 +27,14 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
 </a>
+<br/><br/>
 
 
-<br/>
 <a href="https://imageglass.org/exifglass">
 <img src=".github/eg_ai_light.webp" alt="ExifGlass showing the prompt, model and sampler settings of an AI image" />
 </a>
+
+</div>
 
 ## Features
 

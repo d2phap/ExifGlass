@@ -12,17 +12,19 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 
 [![ExifGlass on Microsoft Store](https://github.com/d2phap/ExifGlass/assets/3154213/ed878a58-cec3-4f74-ac56-c215477f6c61)](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=eg_github_readme&mode=full)
 
-<a href="https://github.com/d2phap/ExifGlass/releases">
-  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" /></a>
+<a href="https://imageglass.org/exifglass">
+  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" />
+</a>
 
-<a href="https://github.com/d2phap/ExifGlass/releases">
+<a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
 </a>
 
 
 <br/>
+<a href="https://imageglass.org/exifglass">
 <img src=".github/eg_ai_light.webp" alt="ExifGlass showing the prompt, model and sampler settings of an AI image" />
-
+</a>
 
 ## Features
 

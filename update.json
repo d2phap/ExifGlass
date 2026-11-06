@@ -1,9 +1,9 @@
 {
     "ApiVersion": 1,
-    "Version": "2.0.0.0",
-    "Title": "ExifGlass 2 - Cross-platform support!",
-    "Description": "- Added support for Windows, macOS and Linux\r\n- Added support for ImageGlass 10\r\n-Updated the internal ExifTool.exe to v13.59.",
+    "Version": "3.0.0.1105",
+    "Title": "ExifGlass 3 - UI Revamp for AI Prompt Inspection & Metadata Editing",
+    "Description": "- New beautiful app GUI\r\n- New metadata table with search, sorting, group filters and quick filters\r\n- New inspector panel with preview, exposure, camera, lens, date and location\r\n- Edit, add and delete tags\r\n- Remove GPS data, AI data, or all metadata\r\n- Show AI prompts and generation settings\r\n- Screen reader support",
     "ChangelogUrl": "https://github.com/d2phap/ExifGlass/releases",
-    "PublishedDate": "2026-07-15T14:24:26",
+    "PublishedDate": "2026-11-05T14:24:26",
     "DownloadUrl": "https://github.com/d2phap/ExifGlass/releases"
 }

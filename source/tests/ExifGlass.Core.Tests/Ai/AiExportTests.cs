@@ -120,7 +120,7 @@ public class AiExportTests(ExifToolFixture exifTool)
         Assert.Equal("AI:generator", rows[0].Key);
         Assert.Equal("AUTOMATIC1111 1.10.1", rows[0].Value);
         Assert.Equal(("Generated", AiKind.Generated), (rows[1].Value, rows[1].KindChip!.Value));
-        Assert.Equal(["Prompt", "Negative prompt", "Prompt · ADetailer", "Prompt · Hires"], rows.Where(r => r.Kind == AiFieldKind.Prompt).Select(r => r.Label));
+        Assert.Equal(["Prompt", "Negative prompt", "Prompt: ADetailer", "Prompt: Hires"], rows.Where(r => r.Kind == AiFieldKind.Prompt).Select(r => r.Label));
         Assert.Equal(["Model", "VAE", "LoRA", "Embedding", "Upscaler", "ControlNet", "Detailer", "Detailer"], rows.Where(r => r.Kind == AiFieldKind.Model).Select(r => r.Label));
         Assert.Equal("Sampler", rows.First(r => r.Kind == AiFieldKind.Parameter).Label);
         Assert.DoesNotContain(rows, r => r.Kind == AiFieldKind.Parameter && r.Name is "model" or "modelHash" or "vae" or "vaeHash");
@@ -152,9 +152,9 @@ public class AiExportTests(ExifToolFixture exifTool)
         var rows = AiRows.Build(await Read("a1111.png")).Rows;
 
         var lora = rows.Single(r => r.Label == "LoRA");
-        Assert.Equal("add_detail · 0.8 · 7c6bad76eb54", lora.Value);
-        Assert.Equal("add_detail   0.8   7c6bad76eb54", lora.Display);
-        Assert.Equal([new AiSpan(13, 3, AiSpanKind.WeightChip), new AiSpan(19, 12, AiSpanKind.Chip)], lora.Spans);
+        Assert.Equal("add_detail, 0.8, 7c6bad76eb54", lora.Value);
+        Assert.Equal("add_detail\u2002 0.8\u2002 7c6bad76eb54", lora.Display);
+        Assert.Equal([new AiSpan(12, 3, AiSpanKind.WeightChip), new AiSpan(17, 12, AiSpanKind.Chip)], lora.Spans);
 
         var prompt = rows.Single(r => r.Label == "Prompt");
         Assert.Equal(prompt.Value, prompt.Display);
@@ -170,23 +170,23 @@ public class AiExportTests(ExifToolFixture exifTool)
     {
         var c2pa = AiRows.Build(await Read("c2pa_chatgpt.png")).Rows;
         Assert.Contains(c2pa, r => r is { Label: "Claim generator", Value: "ChatGPT", Kind: AiFieldKind.Provenance });
-        Assert.Contains(c2pa, r => r is { Label: "Source type", Value: "Trained algorithmic media · trainedAlgorithmicMedia" });
+        Assert.Contains(c2pa, r => r is { Label: "Source type", Value: "Trained algorithmic media, trainedAlgorithmicMedia" });
         Assert.Contains(c2pa, r => r is { Label: "Ingredient 1" } && r.Value.Contains("Created by GPT-4o", StringComparison.Ordinal));
-        Assert.Contains(c2pa, r => r is { Label: "Signature", Value: "Not verified · ExifGlass doesn't check C2PA signatures" });
+        Assert.Contains(c2pa, r => r is { Label: "Signature", Value: "Not verified, ExifGlass doesn't check C2PA signatures" });
 
         var aigc = AiRows.Build(await Read("aigc.png")).Rows;
-        Assert.Contains(aigc, r => r is { Label: "AI label", Value: "AI-generated · GB 45438-2025 code 1" });
+        Assert.Contains(aigc, r => r is { Label: "AI label", Value: "AI-generated, GB 45438-2025 code 1" });
 
         var character = AiRows.Build(await Read("charactercard.png"));
         Assert.Contains(character.Rows, r => r is { Label: "Character", Value: "Test Character", Kind: AiFieldKind.Character });
         Assert.Equal(AiKind.CharacterCard, character.Rows[1].KindChip);
 
         var comfy = AiRows.Build(await Read("comfyui.png")).Rows;
-        Assert.Contains(comfy, r => r is { Label: "Workflow", Kind: AiFieldKind.Workflow } && r.Value.StartsWith("1 node · 1 sampler · 0 models", StringComparison.Ordinal));
+        Assert.Contains(comfy, r => r is { Label: "Workflow", Kind: AiFieldKind.Workflow } && r.Value.StartsWith("1 node, 1 sampler, 0 models", StringComparison.Ordinal));
         Assert.Contains(comfy, r => r is { Label: "API prompt" } && r.Value.EndsWith("ComfyUI API prompt", StringComparison.Ordinal));
 
         var novelai = AiRows.Build(await Read("novelai.png")).Rows;
-        Assert.Contains(novelai, r => r is { Label: "Character 1", Value: "girl, umbrella · at 0.5, 0.5" });
+        Assert.Contains(novelai, r => r is { Label: "Character 1", Value: "girl, umbrella, at 0.5, 0.5" });
     }
 
 

@@ -92,8 +92,8 @@ public sealed partial class AboutViewModel : ObservableObject
     {
         get
         {
-            var exifTool = _main.Metadata?.Version is { } version ? $" · ExifTool {version}" : string.Empty;
-            return $"{AppInfo.PRODUCT_NAME} {AppVersion} ({BuildDate}) · {RuntimeInformation.OSDescription} · {Architecture} · .NET {Environment.Version}{exifTool}";
+            var exifTool = _main.Metadata?.Version is { } version ? $", ExifTool {version}" : string.Empty;
+            return $"{AppInfo.PRODUCT_NAME} {AppVersion} ({BuildDate}), {RuntimeInformation.OSDescription}, {Architecture}, .NET {Environment.Version}{exifTool}";
         }
     }
 

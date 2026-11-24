@@ -35,7 +35,7 @@ public sealed record AiParameterView(string Label, string Value);
 
 
 /// <summary>
-/// One model of the AI card: name, "LoRA · 7c6bad76eb54", the weight chip, the hash it copies.
+/// One model of the AI card: name, "LoRA, 7c6bad76eb54", the weight chip, the hash it copies.
 /// </summary>
 public sealed record AiModelView(string Name, string Meta, string? Weight, string? Hash, IconId Icon, bool IsAccent, bool IsFirst);
 
@@ -768,7 +768,7 @@ public class AiCard : TemplatedControl
         {
             foreach (var p in primary.Prompts.Where(p => p.Label.Length > 0 && !IsCharacter(p) && p.Label is not ("Prompt information" or "Expanded")))
             {
-                more.Add(new AiKeyValue((p.Role == AiPromptRole.Positive ? Lang.Current[LangId.Ai_Prompt] : Lang.Current[LangId.Ai_NegativePrompt]) + " · " + p.Label, p.Text));
+                more.Add(new AiKeyValue((p.Role == AiPromptRole.Positive ? Lang.Current[LangId.Ai_Prompt] : Lang.Current[LangId.Ai_NegativePrompt]) + ": " + p.Label, p.Text));
             }
         }
 
@@ -793,7 +793,7 @@ public class AiCard : TemplatedControl
     private static AiModelView ModelView(AiModelRef m, bool first)
     {
         var type = AiRows.ModelLabel(m.Kind);
-        var meta = m.Hash is { } hash ? $"{type} · {hash}" : type;
+        var meta = m.Hash is { } hash ? $"{type}, {hash}" : type;
         var icon = m.Kind switch
         {
             AiModelKind.Lora => IconId.AiLora,
@@ -878,7 +878,7 @@ public class AiCard : TemplatedControl
         foreach (var a in active?.Actions ?? [])
         {
             var text = AiRows.ActionLabel(a.Action);
-            if (a.Description is { Length: > 0 } description) text += " · " + description;
+            if (a.Description is { Length: > 0 } description) text += ", " + description;
             if (a.SoftwareAgent is { } agent) text += " by " + agent;
             rows.Add(new AiKeyValue(first ? Lang.Current[LangId.Ai_Actions] : string.Empty, text));
             first = false;
@@ -909,7 +909,7 @@ public class AiCard : TemplatedControl
             {
                 var action = own.Actions.FirstOrDefault(a => a.DigitalSourceType is not null) ?? own.Actions.FirstOrDefault();
                 detail = action is null ? own.ClaimGenerator ?? string.Empty : AiRows.ActionLabel(action.Action) + " by " + (action.SoftwareAgent ?? own.ClaimGenerator ?? "?");
-                if (action?.DigitalSourceLabel is { } dst) detail += " · " + dst;
+                if (action?.DigitalSourceLabel is { } dst) detail += ", " + dst;
             }
 
             views.Add(new AiIngredientView(title, detail));

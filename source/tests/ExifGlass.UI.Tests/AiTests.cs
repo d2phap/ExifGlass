@@ -99,7 +99,7 @@ public sealed class AiTests
         var window = Show(card);
 
         Assert.Contains(card.Credentials!.Rows, r => r is { Key: "Claimed by", Value: "ChatGPT" });
-        Assert.Equal(new AiIngredientView("image.png", "Created by GPT-4o · Trained algorithmic media"), card.Credentials.Ingredients.Single());
+        Assert.Equal(new AiIngredientView("image.png", "Created by GPT-4o, Trained algorithmic media"), card.Credentials.Ingredients.Single());
         Assert.Contains(card.GetVisualDescendants().OfType<Badge>(), b => b.Text == Lang.Current[LangId.Ai_NotVerified]);
         Assert.True(Part<Control>(card, "PART_ProvenanceNote").IsVisible);
         Assert.Equal(AiAction.CopyJson, Part<Button>(card, "PART_MainAction").Tag);
@@ -219,7 +219,7 @@ public sealed class AiTests
         var vm = shell.ViewModel;
 
         Assert.Equal("4 tags", vm.Summary);
-        Assert.Equal($"· {vm.Rows.AiTotal} AI fields", vm.AiSummary);
+        Assert.Equal($"{vm.Rows.AiTotal} AI fields", vm.AiSummary);
         Assert.Equal($"EXPORTS THE 4 TAGS AND {vm.Rows.AiTotal} AI FIELDS IN VIEW", vm.ExportHeader);
         Assert.Equal("PNG:Parameters", vm.Rows.Groups[0].SourceKey);
 
@@ -350,7 +350,7 @@ public sealed class AiTests
         // Copy generation parameters gives the infotext back as A1111 wrote it, so "Read generation parameters" fills the same settings
         await vm.AiActionCommand.ExecuteAsync(new AiActionRequest(AiAction.CopyGenerationParameters));
         Assert.Equal(TestDocuments.A1111, recorder.Copied[^1]);
-        Assert.Equal(("Copied generation parameters", "AUTOMATIC1111 1.10.1 · A1111 text"), recorder.Toasts[^1]);
+        Assert.Equal(("Copied generation parameters", "A1111 text from AUTOMATIC1111 1.10.1"), recorder.Toasts[^1]);
 
         await vm.AiActionCommand.ExecuteAsync(new AiActionRequest(AiAction.CopyPrompt));
         Assert.Equal(("Copied prompt", $"{recorder.Copied[^1].Length} characters"), recorder.Toasts[^1]);

@@ -100,7 +100,7 @@ public class MetadataDocumentTests
 
         Assert.Equal("FUJIFILM X-T5", Detail(d, "Camera").Value);
         Assert.Equal("XF33mmF1.4 R LM WR", Detail(d, "Lens").Value);
-        Assert.Equal(("Oct 12, 2026 · 14:03:22", "UTC+08:00"), (Detail(d, "Captured").Value, Detail(d, "Captured").Sub));
+        Assert.Equal(("Oct 12, 2026 at 14:03:22", "UTC+08:00"), (Detail(d, "Captured").Value, Detail(d, "Captured").Sub));
         Assert.Equal(("Classic Chrome", "Film simulation"), (Detail(d, "Look").Value, Detail(d, "Look").Sub));
         Assert.Equal("22.2759° N, 114.1455° E", Detail(d, "Location").Value);
         Assert.Equal("12 m Above Sea Level altitude", Detail(d, "Location").Sub);
@@ -111,7 +111,7 @@ public class MetadataDocumentTests
         Assert.True(d.Frame.HasFocusPoint);
         Assert.Equal(50, d.Frame.FocusX!.Value, 1);
         Assert.Equal("7728×5152", d.Frame.SizeLabel);
-        Assert.Equal("JPEG · 18 MB · 7728×5152", d.MetaLine);
+        Assert.Equal("JPEG, 18 MB, 7728×5152", d.MetaLine);
     }
 
 
@@ -161,7 +161,7 @@ public class MetadataDocumentTests
 
 
     [Theory]
-    [InlineData("2026:01:02 03:04:05", "Jan 2, 2026 · 03:04:05")]
+    [InlineData("2026:01:02 03:04:05", "Jan 2, 2026 at 03:04:05")]
     [InlineData("2026:13:02 03:04:05", "2026:13:02 03:04:05")]
     [InlineData("today", "today")]
     public void FormatsDates(string value, string expected) => Assert.Equal(expected, DerivedInfo.FormatDate(value));

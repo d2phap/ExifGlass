@@ -100,9 +100,9 @@ public static partial class DesignGalleryCatalog
 
         return new GallerySection("c-rail", "Rail", "DS 6.10 / S2: file card (Emphasis 3.5%, radius 12; thumbnail 38 radius 10 with the preview, the extension, or a dashed outline; composition bar 6 px, 2 px gaps, square segments clipped to radius 2, growing 1100 ms); group rows 32 in two parts 2 apart (owner after G7): the checkbox, dot and name show or hide, the count jumps; hovering either lights both, a press only its own (hover Emphasis 5%, radius 14); hidden in TextTertiary with the dot at 35%.",
         [
-            new("file card", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS), "the extension until the preview comes"),
-            new("file card :preview", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", SEGMENTS, preview: true), "preview as cover, radius 10"),
-            new("two groups hidden", File("DSCF4127.JPG", "JPEG · 18 MB · 7728×5152", "JPG", hidden), "hidden segments shrink to nothing"),
+            new("file card", File("DSCF4127.JPG", "JPEG, 18 MB, 7728×5152", "JPG", SEGMENTS), "the extension until the preview comes"),
+            new("file card :preview", File("DSCF4127.JPG", "JPEG, 18 MB, 7728×5152", "JPG", SEGMENTS, preview: true), "preview as cover, radius 10"),
+            new("two groups hidden", File("DSCF4127.JPG", "JPEG, 18 MB, 7728×5152", "JPG", hidden), "hidden segments shrink to nothing"),
             new("reading", File("Reading…", "ExifTool is parsing the file", null), "dashed thumbnail (Proto)"),
             new("groups header", header, "count 5/7 while some are hidden"),
             new("row", Row("EXIF", "57"), "count mono 11, TextSecondary"),
@@ -138,7 +138,7 @@ public static partial class DesignGalleryCatalog
         var frame = new FrameInfo(7728, 5152, "3:2", 39.8, 52, 46);
         DetailItem[] details =
         [
-            new("Camera", "FUJIFILM X-T5"), new("Lens", "XF33mmF1.4 R LM WR"), new("Captured", "Oct 11, 2026 · 07:42:18", "UTC+08:00"),
+            new("Camera", "FUJIFILM X-T5"), new("Lens", "XF33mmF1.4 R LM WR"), new("Captured", "Oct 11, 2026 at 07:42:18", "UTC+08:00"),
             new("Location", "22.2759° N, 114.1455° E", "12 m altitude", "https://www.openstreetmap.org/?mlat=22.2759&mlon=114.1455#map=15/22.2759/114.1455"),
             new("Software", "Digital Camera X-T5 Ver2.10"),
         ];

@@ -108,7 +108,7 @@ public static class UiText
 
 
     public static string SourceTagsDescription(IReadOnlyList<string> tags) => (tags.Count == 1 ? Lang.Current[LangId._TagsOne] : Lang.Current[LangId._Tags, tags.Count])
-        + (tags.Count > 0 ? " · " + string.Join(", ", tags) : string.Empty);
+        + (tags.Count > 0 ? ": " + string.Join(", ", tags) : string.Empty);
 
 
     /// <summary>

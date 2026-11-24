@@ -98,7 +98,7 @@ public static class AppText
     public static string PendingChanges(int count) => count == 1 ? Lang.Current[LangId.Pending_ChangesOne] : Lang.Current[LangId.Pending_Changes, count];
 
     /// <summary>
-    /// The pending bar's line (DS 6.13): "Save writes DSCF4127.JPG · backup kept as DSCF4127.JPG_original".
+    /// The pending bar's line (DS 6.13): "Save writes DSCF4127.JPG and keeps a backup as DSCF4127.JPG_original".
     /// </summary>
     public static string SaveWrites(string file) => Lang.Current[LangId.Pending_SaveWrites, file];
 
@@ -201,7 +201,7 @@ public static class AppText
         Lang.Current[LangId.Settings_OldExifTool, version] + " " + string.Join(" ", missing.Select(f => Lang.Current[LangId.Settings_OldExifToolNeeds, f.Name, f.MinVersion]));
 
     /// <summary>
-    /// The "Settings saved" toast's line (Proto): "8 arguments · bundled ExifTool".
+    /// The "Settings saved" toast's line (Proto): "8 arguments, bundled ExifTool".
     /// </summary>
     public static string SettingsSavedSub(int arguments, bool custom)
     {
@@ -210,7 +210,7 @@ public static class AppText
     }
 
     /// <summary>
-    /// The path field's placeholder (plan 4.4): "Bundled · exiftool 13.59".
+    /// The path field's placeholder (plan 4.4): "Bundled exiftool 13.59".
     /// </summary>
     public static string ExifToolPlaceholder(Core.ExifTool.ExifToolSource? source, string? version) => (source, version) switch
     {
@@ -225,12 +225,12 @@ public static class AppText
     public static string Refused(string argument, string reason) => $"{argument}: {reason}";
 
     /// <summary>
-    /// About's version line (FewerPhotos): "Version 3.0.0.1020-alpha (2026.10.25) · Windows · x64".
+    /// About's version line (FewerPhotos): "Version 3.0.0.1020-alpha (2026.10.25), Windows x64".
     /// </summary>
     public static string VersionLine(string version, string buildDate, string os, string architecture) => Lang.Current[LangId.About_VersionLine, version, buildDate, os, architecture];
 
     /// <summary>
-    /// The Updates row's line, kept to one (owner at the P9 review): "You're up to date · checked at 12:17".
+    /// The Updates row's line, kept to one (owner at the P9 review): "You're up to date (checked at 12:17)".
     /// </summary>
     public static string UpToDate(string time) => Lang.Current[LangId.About_UpToDate, time];
 

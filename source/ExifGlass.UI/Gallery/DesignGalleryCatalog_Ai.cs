@@ -95,8 +95,8 @@ public static partial class DesignGalleryCatalog
                 new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Warning, Icon = IconId.AiWarning, Text = "The UI workflow isn't valid JSON (character 18,204)." },
                 new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Danger, Icon = IconId.Delete, Text = "Prompts, workflows and parameters are removed when you save." }), "plain, info, warning, danger"),
             new("source link", Row(Link(), Link().Hover(), Link().Pressed(), Link().FocusVisible()), "rest, :pointerover (AccentText), :pressed, :focus-visible"),
-            new("file card, AI badge", new FileCard { Width = RAIL_CONTENT, Title = "00042-2841937305.png", Meta = "PNG · 2.1 MB · 1024×1536", Extension = "PNG", Segments = SEGMENTS, AiBadge = "SD WebUI v1.10.1", AiKind = AiKind.Generated }, "under the meta, jumps to the AI group"),
-            new("file card, character card", new FileCard { Width = RAIL_CONTENT, Title = "captain.png", Meta = "PNG · 412 kB · 400×600", Extension = "PNG", Segments = SEGMENTS, AiBadge = "Character card", AiKind = AiKind.CharacterCard }, "neutral"),
+            new("file card, AI badge", new FileCard { Width = RAIL_CONTENT, Title = "00042-2841937305.png", Meta = "PNG, 2.1 MB, 1024×1536", Extension = "PNG", Segments = SEGMENTS, AiBadge = "SD WebUI v1.10.1", AiKind = AiKind.Generated }, "under the meta, jumps to the AI group"),
+            new("file card, character card", new FileCard { Width = RAIL_CONTENT, Title = "captain.png", Meta = "PNG, 412 kB, 400×600", Extension = "PNG", Segments = SEGMENTS, AiBadge = "Character card", AiKind = AiKind.CharacterCard }, "neutral"),
         ]);
     }
 
@@ -117,7 +117,7 @@ public static partial class DesignGalleryCatalog
 
     private static AiGenerationInfo ComfySample()
     {
-        AiField[] main = [Field("sampler", "Sampler", "dpmpp_2m"), Field("scheduler", "Scheduler", "karras"), Field("steps", "Steps", "24 of 30"), Field("cfg", "CFG", "6.5"), Field("seed", "Seed", "156680208700286"), Field("size", "Size", "1024x1536"), Field("denoise", "Denoise", "1.0"), Field("noise", "Noise", "enable"), Field("upscale", "Upscale", "4x-UltraSharp · ×1.5")];
+        AiField[] main = [Field("sampler", "Sampler", "dpmpp_2m"), Field("scheduler", "Scheduler", "karras"), Field("steps", "Steps", "24 of 30"), Field("cfg", "CFG", "6.5"), Field("seed", "Seed", "156680208700286"), Field("size", "Size", "1024x1536"), Field("denoise", "Denoise", "1.0"), Field("noise", "Noise", "enable"), Field("upscale", "Upscale", "4x-UltraSharp, ×1.5")];
         AiField[] refiner = [Field("sampler", "Sampler", "euler"), Field("scheduler", "Scheduler", "karras"), Field("steps", "Steps", "30 (from 24)"), Field("cfg", "CFG", "6.5"), Field("seed", "Seed", "156680208700286")];
         const string WORKFLOW = "{\"nodes\": []}";
 

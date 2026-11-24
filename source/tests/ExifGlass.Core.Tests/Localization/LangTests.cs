@@ -49,9 +49,10 @@ public sealed class LangTests : IDisposable
 
 
     [Fact]
-    public void TheEnglishHasNoEmDash()
+    public void TheEnglishHasNoEmDashOrMiddleDot()
     {
-        Assert.DoesNotContain(Lang.DefaultLangMap, kv => kv.Value.Contains('—'));
+        // both read as machine-written in the owner's eyes: a comma, parentheses or another element instead
+        Assert.DoesNotContain(Lang.DefaultLangMap, kv => kv.Value.Contains('—') || kv.Value.Contains('·'));
     }
 
 

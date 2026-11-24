@@ -48,12 +48,13 @@
                          TextTrimming="CharacterEllipsis" />
               <!--  AI fields are counted apart from tags, in Accent2 (AI addendum question 2)  -->
               <TextBlock Name="AiSummaryText"
-                         Margin="-4,0,0,0"
+                         Margin="-8,0,0,0"
                          VerticalAlignment="Center"
-                         Foreground="{DynamicResource Accent2TextBrush}"
                          IsVisible="{Binding HasAiSummary}"
-                         Text="{Binding AiSummary}"
-                         TextTrimming="CharacterEllipsis" />
+                         TextTrimming="CharacterEllipsis">
+                <Run Foreground="{DynamicResource TextSecondaryBrush}" Text=", " />
+                <Run Foreground="{DynamicResource Accent2TextBrush}" Text="{Binding AiSummary}" />
+              </TextBlock>
               <ItemsControl Name="Chips"
                             VerticalAlignment="Center"
                             IsVisible="{Binding HasFilterChips}"
@@ -76,7 +77,7 @@
                               IsVisible="{Binding HasFilterChips}" />
             </StackPanel>
 
-            <!--  DS 6.9: "N selected · Copy · JSON · Clear" while rows are selected  -->
+            <!--  DS 6.9: N selected, then Copy, JSON and Clear while rows are selected  -->
             <StackPanel Name="SelectionRow"
                         VerticalAlignment="Center"
                         IsVisible="{Binding HasRowSelection}"

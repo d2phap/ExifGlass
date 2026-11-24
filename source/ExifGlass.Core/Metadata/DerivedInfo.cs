@@ -90,7 +90,7 @@ public sealed partial record DerivedInfo(
 
         var type = doc.Find("File", "FileType")?.Value;
         var size = doc.Find("File", "FileSize")?.Value;
-        var meta = string.Join(" · ", new[] { type, size, frame.SizeLabel }.Where(s => !string.IsNullOrEmpty(s)));
+        var meta = string.Join(", ", new[] { type, size, frame.SizeLabel }.Where(s => !string.IsNullOrEmpty(s)));
 
         return new DerivedInfo(exposure, details, frame, meta);
     }
@@ -114,7 +114,7 @@ public sealed partial record DerivedInfo(
 
 
     /// <summary>
-    /// "2026:10:12 14:03:22" becomes "Oct 12, 2026 · 14:03:22"; anything else stays as it is.
+    /// "2026:10:12 14:03:22" becomes "Oct 12, 2026 at 14:03:22"; anything else stays as it is.
     /// </summary>
     public static string FormatDate(string value)
     {

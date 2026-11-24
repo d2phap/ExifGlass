@@ -53,7 +53,7 @@ public sealed record AiRow(string Key, string Name, string Label, string Value, 
     #region Properties
 
     /// <summary>
-    /// The text the table draws: Value with the " · " before each chip blanked, so one set of match ranges fits both.
+    /// The text the table draws: Value with the ", " before each chip blanked, so one set of match ranges fits both.
     /// </summary>
     public string Display
     {
@@ -108,8 +108,9 @@ public static class AiRows
     #region Fields and constants
 
     // what a row's value shows between its text and each chip; the table draws blanks of the same length
-    private const string SEPARATOR = " · ";
-    private const string BLANK = "   ";
+    private const string SEPARATOR = ", ";
+    // as long as SEPARATOR, so one set of spans fits both strings; the en space keeps the chips as far apart as three spaces would
+    private const string BLANK = "\u2002 ";
 
     private static readonly AiModelKind[] MODEL_ORDER =
     [
@@ -292,7 +293,7 @@ public static class AiRows
 
         if (p.Label == "Prompt information") return ("promptInformation", p.Label);
 
-        return negative ? ("negativePrompt", "Negative prompt · " + p.Label) : ("prompt", "Prompt · " + p.Label);
+        return negative ? ("negativePrompt", "Negative prompt: " + p.Label) : ("prompt", "Prompt: " + p.Label);
     }
 
 
@@ -341,13 +342,13 @@ public static class AiRows
 
             foreach (var pass in s.Passes)
             {
-                rows.Add("pass", "Sampler · " + pass.Title, new Value().Text(PassSummary(pass)), s.SourceKeys.FirstOrDefault(), AiFieldKind.Parameter, s);
+                rows.Add("pass", "Sampler: " + pass.Title, new Value().Text(PassSummary(pass)), s.SourceKeys.FirstOrDefault(), AiFieldKind.Parameter, s);
             }
         }
     }
 
 
-    // "euler · karras · 30 steps · CFG 6.5 · seed 42", the rest as "Label value"
+    // "euler, karras, 30 steps, CFG 6.5, seed 42", the rest as "Label value"
     private static string PassSummary(AiSamplerPass pass)
     {
         var parts = new List<string>(pass.Parameters.Count);
@@ -411,8 +412,8 @@ public static class AiRows
 
         if (s.Training is { } training)
         {
-            if (training.DataMining is { } mining) rows.Add("dataMining", "AI training · Data mining", new Value().Text(mining), Key(s, "DataMining"), AiFieldKind.Provenance, s);
-            if (training.LearningOptOutIn is { } optOut) rows.Add("learningOptOut", "AI training · Opt-out", new Value().Text(optOut), Key(s, "LearningOptOutIn"), AiFieldKind.Provenance, s);
+            if (training.DataMining is { } mining) rows.Add("dataMining", "AI training: Data mining", new Value().Text(mining), Key(s, "DataMining"), AiFieldKind.Provenance, s);
+            if (training.LearningOptOutIn is { } optOut) rows.Add("learningOptOut", "AI training: Opt-out", new Value().Text(optOut), Key(s, "LearningOptOutIn"), AiFieldKind.Provenance, s);
         }
     }
 

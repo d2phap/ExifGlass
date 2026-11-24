@@ -89,7 +89,7 @@ public sealed partial class MainViewModel
 
     public AiKind AiBadgeKind => AiInfo?.Kind ?? (HasCharacterCard ? AiKind.CharacterCard : AiKind.None);
 
-    public string? AiBadgeTip => AiBadge is null ? null : $"{AiGenerationInfo.KindLabel(AiBadgeKind)} · {AiInfo?.Generator ?? AiBadge}\n{Lang.Current[LangId.Ai_JumpTo]}";
+    public string? AiBadgeTip => AiBadge is null ? null : $"{AiGenerationInfo.KindLabel(AiBadgeKind)} ({AiInfo?.Generator ?? AiBadge})\n{Lang.Current[LangId.Ai_JumpTo]}";
 
     /// <summary>
     /// R19: a custom ExifTool older than the AI read needs, said in the AI card; the bundled one always reads everything.
@@ -106,9 +106,9 @@ public sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// The AI part of the table summary, in Accent2 (question 2): "· 23 AI fields", "· 1 of 23 AI fields".
+    /// The AI part of the table summary, in Accent2 (question 2): "23 AI fields", "1 of 23 AI fields", after a gray comma.
     /// </summary>
-    public string? AiSummary => Rows.AiSummary.Length == 0 ? null : "· " + Rows.AiSummary;
+    public string? AiSummary => Rows.AiSummary.Length == 0 ? null : Rows.AiSummary;
 
     public bool HasAiSummary => AiSummary is not null;
 
@@ -198,7 +198,7 @@ public sealed partial class MainViewModel
                 break;
 
             case AiAction.CopyWorkflowJson when AiCard.SavedWorkflow(ai) is { } workflow:
-                await CopyAndToastAsync(workflow.Json, Lang.Current[LangId.Toast_CopiedWorkflow], $"{workflow.FormatLabel} · {AiRows.FormatSize(workflow.Size)}");
+                await CopyAndToastAsync(workflow.Json, Lang.Current[LangId.Toast_CopiedWorkflow], $"{workflow.FormatLabel} ({AiRows.FormatSize(workflow.Size)})");
                 break;
 
             case AiAction.SaveWorkflow:

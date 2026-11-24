@@ -72,7 +72,7 @@ public static partial class DesignGalleryCatalog
             new(":focus-visible", Row(b => b.FocusVisible()), "2 px inset ring, no glow, 120 ms"),
             new(":disabled", Row(b => b.Disabled()), "opacity 0.45"),
             new("list row", ListRows(), "ListRowButton (About's notices, as FewerPhotos's): full width, the hover past the text column, the wide press: Black 8% and scale 0.98"),
-            new("card 30 · small 28 · tiny 24", new StackPanel
+            new("card 30, small 28, tiny 24", new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 8,

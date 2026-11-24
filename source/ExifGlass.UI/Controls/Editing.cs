@@ -103,7 +103,7 @@ public class PendingBar : TemplatedControl
     }
 
     /// <summary>
-    /// Gets or sets "Save writes DSCF4127.JPG · backup kept as DSCF4127.JPG_original".
+    /// Gets or sets "Save writes DSCF4127.JPG and keeps a backup as DSCF4127.JPG_original".
     /// </summary>
     public string? Subtitle
     {

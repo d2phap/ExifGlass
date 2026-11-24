@@ -117,7 +117,7 @@ public static partial class DesignGalleryCatalog
             (TextRole.BodyStrong, "Remove GPS data", "13/19 Medium"),
             (TextRole.Control, "Export", "12.5 Medium"),
             (TextRole.Caption, "Float above other apps while you compare files.", "12/16"),
-            (TextRole.Meta, "JPEG · 18 MB · 7728×5152", "11.5/16"),
+            (TextRole.Meta, "JPEG, 18 MB, 7728×5152", "11.5/16"),
             (TextRole.Overline, "GROUPS", "11 Medium +0.06em"),
             (TextRole.Badge, "Edited", "10.5 Medium"),
             (TextRole.Mono, "-EXIF:FNumber=2.0", "mono 11.5"),
@@ -132,7 +132,7 @@ public static partial class DesignGalleryCatalog
             states.Add(new GalleryState(KebabCase().Replace(role.ToString(), "-$1").ToLowerInvariant(), text, spec));
         }
 
-        states.Add(new GalleryState("fonts", DesignGallery.Text(AppFonts.Ui + " · " + AppFonts.Mono, TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH), "UI and mono family on this OS (mono: the system's, owner 2026-10-21)"));
+        states.Add(new GalleryState("fonts", DesignGallery.Text(AppFonts.Ui + ", " + AppFonts.Mono, TextRole.Caption, TokenKeys.TEXT_SECONDARY_BRUSH), "UI and mono family on this OS (mono: the system's, owner 2026-10-21)"));
         return new GallerySection("type", "Type ramp", "DS 1.1; macOS and Linux draw Inter 1 pt smaller (D4), mono sizes add the point back (S3); grayscale antialiasing on every window.", states);
     }
 
@@ -262,9 +262,9 @@ public static partial class DesignGalleryCatalog
         return new GallerySection("icons", "Icons (O16)", "Drawn for ExifGlass: 20-unit box, 1.5 stroke, round caps; Filled variants for on states; the Store mark is the official one. Hover a tile for its id.",
         [
             new("all " + Enum.GetValues<IconId>().Length.ToString(CultureInfo.InvariantCulture), all, "18 px"),
-            new("12 · 13 · 14 · 16 · 18", sizes, "chip 14, button 16, toolbar 18, small 12-13"),
+            new("12, 13, 14, 16, 18", sizes, "chip 14, button 16, toolbar 18, small 12-13"),
             new("regular / filled", filled, "on states and statuses"),
-            new("logo 48 · 60 · 104", new StackPanel
+            new("logo 48, 60, 104", new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 16,

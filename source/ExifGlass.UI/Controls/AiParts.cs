@@ -149,11 +149,11 @@ public class SourceLink : GlassButton
     #region Public methods
 
     /// <summary>
-    /// The tooltip: "Show source tag · -PNG:Parameters", then the other tags.
+    /// The tooltip: "Show source tag (-PNG:Parameters)", then the other tags.
     /// </summary>
     public static string Tip(string key, IReadOnlyList<string>? others)
     {
-        var tip = $"{Lang.Current[LangId.Ai_ShowSourceTag]} · -{AiRows.SourceLabel(key)}";
+        var tip = $"{Lang.Current[LangId.Ai_ShowSourceTag]} (-{AiRows.SourceLabel(key)})";
         return others is { Count: > 0 } ? tip + "\n" + Lang.Current[LangId.Ai_Also] + string.Join(", ", others.Select(AiRows.SourceLabel)) : tip;
     }
 

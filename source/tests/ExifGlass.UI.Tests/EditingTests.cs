@@ -66,7 +66,7 @@ public class EditingTests
         var bar = shell.Window.Table.PendingBar;
         Assert.True(bar.IsVisible);
         Assert.Equal("1 pending change", bar.Title);
-        Assert.Equal("Save writes a.jpg · backup kept as a.jpg_original", bar.Subtitle);
+        Assert.Equal("Save writes a.jpg and keeps a backup as a.jpg_original", bar.Subtitle);
         Assert.Null(bar.Note);
         Assert.Equal(58, bar.Bounds.Height, 0.5);
         Assert.Equal(viewport - 58, table.Scroller.Viewport.Height, 0.5);
@@ -268,7 +268,7 @@ public class EditingTests
         await shell.WaitForAsync(() => vm.HasDocument);
 
         Assert.True(vm.RemoveGpsCommand.CanExecute(null));
-        Assert.Equal("2 location tags · -gps*=", vm.GpsDescription);
+        Assert.Equal("2 location tags (-gps*=)", vm.GpsDescription);
         Assert.False(vm.RemoveAiCommand.CanExecute(null));
         Assert.Equal("No AI generation data in this file", vm.AiRemovalDescription);
 
@@ -340,7 +340,7 @@ public class EditingTests
         await shell.WaitForAsync(() => vm.HasAi);
 
         Assert.True(vm.RemoveAiCommand.CanExecute(null));
-        Assert.Equal("Prompts, workflows and parameters · provenance kept", vm.AiRemovalDescription);
+        Assert.Equal("Prompts, workflows and parameters (provenance stays)", vm.AiRemovalDescription);
         vm.RemoveAiCommand.Execute(null);
         await shell.WaitForAsync(() => vm.Rows.RowsInView.Any(r => r.EditState == EditState.Removed));
 
@@ -466,7 +466,7 @@ public class EditingTests
         vm.Shell = recorder;
         await vm.SaveBinaryCommand.ExecuteAsync(null);
         Assert.Equal(shell.Reader.Binary, recorder.Saved.ToArray());
-        Assert.Equal(("Saved binary data", "x_ThumbnailImage.jpg · 0.0 kB"), recorder.Toasts[^1]);
+        Assert.Equal(("Saved binary data", "x_ThumbnailImage.jpg (0.0 kB)"), recorder.Toasts[^1]);
 
         shell.Reader.Binary = null;
         await vm.SaveBinaryCommand.ExecuteAsync(null);
@@ -688,7 +688,7 @@ public class EditingTests
         MotionTokens.IsFrozen = true;
         try
         {
-            var bar = new PendingBar { Title = "3 pending changes", Subtitle = "Save writes a.jpg · backup kept as a.jpg_original", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top };
+            var bar = new PendingBar { Title = "3 pending changes", Subtitle = "Save writes a.jpg and keeps a backup as a.jpg_original", VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top };
             var window = Show(bar, 520);
             Assert.False(bar.IsVisible);
 
@@ -845,7 +845,7 @@ public class EditingTests
             vm.EditText = "Fujifilm";
             vm.ApplyEditCommand.Execute(null);
             await Until(() => vm.PendingCount == 1);
-            Assert.Equal("Save writes camera.jpg · backup kept in ExifGlass's container", vm.PendingSubtitle);
+            Assert.Equal("Save writes camera.jpg and keeps a backup in ExifGlass's container", vm.PendingSubtitle);
 
             Assert.True(await vm.SaveAsync());
             await Until(() => vm.Document?.Find("EXIF", "Make")?.Value == "Fujifilm");

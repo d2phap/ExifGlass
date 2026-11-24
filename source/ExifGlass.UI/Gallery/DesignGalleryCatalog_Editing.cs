@@ -41,7 +41,7 @@ public static partial class DesignGalleryCatalog
         {
             Width = BAR_SAMPLE_WIDTH,
             Title = "3 pending changes",
-            Subtitle = "Save writes DSCF4127.JPG · backup kept as DSCF4127.JPG_original",
+            Subtitle = "Save writes DSCF4127.JPG and keeps a backup as DSCF4127.JPG_original",
             Note = note,
             IsSaving = saving,
             IsOpen = true,

@@ -129,7 +129,7 @@ public class TableShellTests
         shell.Settle();
         Assert.Equal(vm.Rows.Total, vm.SelectedCount);
 
-        // DS 6.9: "N selected · Copy · JSON · Clear", and the buttons lose their labels
+        // DS 6.9: N selected, then Copy, JSON and Clear, and the buttons lose their labels
         Assert.True(panel.SelectionRow.IsVisible);
         Assert.False(panel.SummaryRow.IsVisible);
         Assert.Equal(vm.Rows.Total.ToString(System.Globalization.CultureInfo.InvariantCulture), panel.SelectedCountText.Text);

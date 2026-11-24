@@ -94,7 +94,7 @@ public sealed partial class MainViewModel
             if (training.DataMining is not null) signals.Add(AppText.PLUS_DATA_MINING);
             if (training.LearningOptOutIn is not null) signals.Add(AppText.EXIF_OPT_OUT);
             var value = training.IsOptOut ? Lang.Current[LangId.Inspector_NotAllowed] : training.DataMining ?? training.LearningOptOutIn ?? string.Empty;
-            return [.. details, new DetailItem(DetailsCard.AI_TRAINING, value, string.Join(" · ", signals))];
+            return [.. details, new DetailItem(DetailsCard.AI_TRAINING, value, string.Join(", ", signals))];
         }
     }
 

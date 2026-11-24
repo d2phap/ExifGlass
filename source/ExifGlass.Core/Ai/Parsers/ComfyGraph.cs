@@ -254,7 +254,7 @@ internal sealed class ComfyGraph
 
     #region Private methods
 
-    private static string Join(string a, string b) => a.Length == 0 ? b : b.Length == 0 ? a : a + " · " + b;
+    private static string Join(string a, string b) => a.Length == 0 ? b : b.Length == 0 ? a : a + ", " + b;
 
 
     // CLIPTextEncode text; SDXL text_g/text_l; Flux clip_l/t5xxl; SD3 clip_l/clip_g/t5xxl; Qwen prompt

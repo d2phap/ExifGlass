@@ -28,7 +28,7 @@ using Xunit;
 namespace ExifGlass.UI.Tests;
 
 /// <summary>
-/// The Language setting: OK switches every open window at once, no restart (Lang.Current is shared, so each test puts English back).
+/// The Language setting: a choice shows in every open window at once, no restart; OK keeps it, Cancel puts the saved one back (Lang.Current is shared, so each test puts English back).
 /// </summary>
 public sealed class LanguageTests
 {
@@ -59,7 +59,7 @@ public sealed class LanguageTests
     #region Tests
 
     [AvaloniaFact]
-    public async Task OkSwitchesEveryOpenWindowWithoutARestart()
+    public async Task AChoiceShowsInEveryOpenWindowAndOkKeepsIt()
     {
         var english = Lang.Current;
         var userDirectory = Lang.UserDirectory;
@@ -76,10 +76,18 @@ public sealed class LanguageTests
             vm.SelectedLanguage = vm.Languages.Single(l => !l.Pack.IsBuiltIn);
             shell.Settle();
 
-            // chosen, not applied: the row credits the translators, every window still speaks English
+            // shown at once in every window, Settings too, before OK saves anything
+            Assert.Equal("Tiếng Việt", Lang.Current.Metadata.LocalName);
+            Assert.Equal(Lang.BUILT_IN, shell.Settings.Current.Language);
             Assert.Equal("Contributors: An, Bình", vm.LanguageContributors);
-            Assert.Equal("Search", window.Toolbar.Search.PlaceholderText);
-            Assert.Equal("About", about.Title);
+            Assert.Equal("Cài đặt", settings.Title);
+            Assert.Contains(settings.GetVisualDescendants().OfType<TextBlock>(), t => t.Text == "Ngôn ngữ");
+            Assert.Equal("Tìm kiếm", window.Toolbar.Search.PlaceholderText);
+            Assert.Equal($"Mở tệp ({UiText.Shortcut("O")})", ToolTip.GetTip(window.Toolbar.OpenButton));
+            Assert.Equal("Giới thiệu", about.Title);
+            Assert.EndsWith(" thẻ", shell.ViewModel.Summary, StringComparison.Ordinal);
+            Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(), t => t.Text == "NHÓM");
+            Assert.Contains(window.GetVisualDescendants().OfType<DataGridColumnHeader>(), h => Equals(h.Content, "TÊN THẺ"));
 
             vm.OkCommand.Execute(null);
             shell.Settle(300);
@@ -88,12 +96,7 @@ public sealed class LanguageTests
             Assert.Equal(PACK, shell.Settings.Current.Language);
             Assert.Equal("Tiếng Việt", Lang.Current.Metadata.LocalName);
             Assert.Equal("Tìm kiếm", window.Toolbar.Search.PlaceholderText);
-            Assert.Equal($"Mở tệp ({UiText.Shortcut("O")})", ToolTip.GetTip(window.Toolbar.OpenButton));
-            Assert.Equal("Giới thiệu", about.Title);
             Assert.True(about.IsVisible);
-            Assert.EndsWith(" thẻ", shell.ViewModel.Summary, StringComparison.Ordinal);
-            Assert.Contains(window.GetVisualDescendants().OfType<TextBlock>(), t => t.Text == "NHÓM");
-            Assert.Contains(window.GetVisualDescendants().OfType<DataGridColumnHeader>(), h => Equals(h.Content, "TÊN THẺ"));
             Assert.Equal("Đã lưu cài đặt", window.Toasts.Title);
 
             // a key the pack lacks keeps its English
@@ -116,7 +119,7 @@ public sealed class LanguageTests
 
 
     [AvaloniaFact]
-    public async Task CancelKeepsTheLanguage()
+    public async Task CancelPutsTheSavedLanguageBack()
     {
         var english = Lang.Current;
         var userDirectory = Lang.UserDirectory;
@@ -127,11 +130,40 @@ public sealed class LanguageTests
             var (_, vm) = await OpenSettingsAsync(shell);
 
             vm.SelectedLanguage = vm.Languages.Single(l => !l.Pack.IsBuiltIn);
+            shell.Settle();
+            Assert.Equal("Tìm kiếm", shell.Window.Toolbar.Search.PlaceholderText);
+
             vm.CancelCommand.Execute(null);
             shell.Settle();
 
             Assert.True(Lang.Current.IsBuiltIn);
             Assert.Equal(Lang.BUILT_IN, shell.Settings.Current.Language);
+            Assert.Equal("Search", shell.Window.Toolbar.Search.PlaceholderText);
+        }
+        finally
+        {
+            Lang.Current = english;
+            Lang.UserDirectory = userDirectory;
+        }
+    }
+
+
+    [AvaloniaFact]
+    public async Task ClosingSettingsPutsTheSavedLanguageBack()
+    {
+        var english = Lang.Current;
+        var userDirectory = Lang.UserDirectory;
+        try
+        {
+            using var shell = await TestShell.OpenWithFileAsync(1400);
+            InstallPack(shell);
+            var (settings, vm) = await OpenSettingsAsync(shell);
+
+            vm.SelectedLanguage = vm.Languages.Single(l => !l.Pack.IsBuiltIn);
+            settings.Close();
+            shell.Settle();
+
+            Assert.Same(english, Lang.Current);
             Assert.Equal("Search", shell.Window.Toolbar.Search.PlaceholderText);
         }
         finally

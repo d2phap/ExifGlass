@@ -29,7 +29,7 @@ namespace ExifGlass.ViewModels;
 /// <summary>
 /// What OK in Settings saves (DS 6.15).
 /// </summary>
-public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments, string Language = Lang.BUILT_IN);
+public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments, string Language);
 
 
 public sealed partial class MainViewModel
@@ -108,6 +108,12 @@ public sealed partial class MainViewModel
 
 
     /// <summary>
+    /// Shows a language in every window without saving it: Settings applies its choice at once and Cancel restores the saved one, as PreviewTheme does.
+    /// </summary>
+    public void PreviewLanguage(Lang language) => Lang.Current = language;
+
+
+    /// <summary>
     /// Saves Settings' OK: a new ExifTool restarts it, new arguments apply to the file on screen, then the "Settings saved" toast.
     /// </summary>
     public async Task ApplySettingsAsync(SettingsChange change)
@@ -129,8 +135,8 @@ public sealed partial class MainViewModel
             s.Language = change.Language;
         });
 
-        // every open window follows at once, before the toast below speaks
-        if (languageChanged) Lang.Current = Lang.FromSetting(change.Language);
+        // Settings shows its choice already; any other caller's language is read here, before the toast below speaks
+        if (languageChanged && !Lang.Current.SettingValue.Equals(change.Language, StringComparison.OrdinalIgnoreCase)) Lang.Current = Lang.FromSetting(change.Language);
 
         PreviewTheme(change.Theme);
         PreviewAccent(change.Accent);

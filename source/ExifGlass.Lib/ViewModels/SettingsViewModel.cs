@@ -52,13 +52,14 @@ public sealed class LanguageChoice(Lang pack)
 
 
 /// <summary>
-/// The Settings window (DS 6.15): a draft of the settings that OK saves; the theme and the accent apply at once and Cancel restores them (Appendix B item 18).
+/// The Settings window (DS 6.15): a draft of the settings that OK saves; the theme, the accent and the language apply at once and Cancel restores them (Appendix B item 18).
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
     #region Fields and constants
 
     private readonly MainViewModel _main;
+    private readonly Lang _savedLanguage = Lang.Current;
     private int _pathGeneration;
     private bool _committed;
     private bool _following;
@@ -88,7 +89,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         AccentService.SystemAccentChanged += AccentService_SystemAccentChanged;
         UpdateArguments();
         _ = UpdatePathHintAsync();
-        _ = LoadLanguagesAsync(current.Language);
+        _ = LoadLanguagesAsync();
     }
 
     #endregion // Constructors
@@ -265,10 +266,26 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// </summary>
     public async Task LoadLanguagesAsync(string? select = null)
     {
-        var wanted = select ?? SelectedLanguage?.Pack.SettingValue ?? Lang.BUILT_IN;
         var packs = await Task.Run(Lang.LoadAll);
-        Languages = [.. packs.Select(p => new LanguageChoice(p))];
+
+        // the language on screen keeps its own instance, so listing again doesn't count as choosing it
+        var shown = Lang.Current;
+        var wanted = select ?? SelectedLanguage?.Pack.SettingValue ?? shown.SettingValue;
+        Languages = [.. packs.Select(p => new LanguageChoice(p.SettingValue.Equals(shown.SettingValue, StringComparison.OrdinalIgnoreCase) ? shown : p))];
         SelectedLanguage = Languages.FirstOrDefault(c => c.Pack.SettingValue.Equals(wanted, StringComparison.OrdinalIgnoreCase)) ?? Languages[0];
+    }
+
+
+    /// <summary>
+    /// Reads again the lines it builds, after the language it previews changed them.
+    /// </summary>
+    public void RefreshText()
+    {
+        UpdateArguments();
+        _ = UpdatePathHintAsync();
+        RefreshSwatches();
+        OnPropertyChanged(nameof(ExifToolPlaceholder));
+        OnPropertyChanged(nameof(LanguageContributors));
     }
 
 
@@ -306,7 +323,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
 
     /// <summary>
-    /// The window is closing: without OK, the theme and the accent go back to the saved ones.
+    /// The window is closing: without OK, the theme, the accent and the language go back to the saved ones.
     /// </summary>
     public void Close()
     {
@@ -318,6 +335,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         var saved = _main.Settings.Current;
         if (_main.Theme != saved.Theme) _main.PreviewTheme(saved.Theme);
         if (_main.Accent != saved.Accent) _main.PreviewAccent(saved.Accent);
+        if (!ReferenceEquals(Lang.Current, _savedLanguage)) _main.PreviewLanguage(_savedLanguage);
     }
 
     #endregion // Public methods
@@ -388,6 +406,21 @@ public sealed partial class SettingsViewModel : ObservableObject
 
 
     partial void OnAccentChanged(string value) => _main.PreviewAccent(value);
+
+
+    partial void OnSelectedLanguageChanged(LanguageChoice? value)
+    {
+        if (value is not null && !ReferenceEquals(value.Pack, Lang.Current)) _main.PreviewLanguage(value.Pack);
+    }
+
+
+    private void RefreshSwatches()
+    {
+        _refreshingSwatches = true;
+        AccentChoices = AccentService.Swatches();
+        _refreshingSwatches = false;
+        OnPropertyChanged(nameof(AccentIndex));
+    }
 
 
     partial void OnArgumentsChanged(IReadOnlyList<string> value) => UpdateArguments();
@@ -503,13 +536,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     }
 
 
-    private void AccentService_SystemAccentChanged(object? sender, EventArgs e)
-    {
-        _refreshingSwatches = true;
-        AccentChoices = AccentService.Swatches();
-        _refreshingSwatches = false;
-        OnPropertyChanged(nameof(AccentIndex));
-    }
+    private void AccentService_SystemAccentChanged(object? sender, EventArgs e) => RefreshSwatches();
 
 
     private void Metadata_StatusChanged(object? sender, EventArgs e) => Avalonia.Threading.Dispatcher.UIThread.Post(() =>

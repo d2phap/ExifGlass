@@ -111,6 +111,7 @@ public class TokenField : TemplatedControl
     public TokenField()
     {
         LangResources.Bind(this, PlaceholderProperty, LangId.Settings_AddArgument);
+        LangResources.Track(this, () => Rebuild(popLast: false));
         Tokens.CollectionChanged += (_, _) =>
         {
             if (!_rebuilding) Rebuild(popLast: false);

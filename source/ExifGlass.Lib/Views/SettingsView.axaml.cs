@@ -22,6 +22,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using ExifGlass.Core.Localization;
 using ExifGlass.UI.Controls;
+using ExifGlass.UI.Localization;
 using ExifGlass.ViewModels;
 using System.ComponentModel;
 
@@ -43,6 +44,7 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
         if (LanguageMenuButton.Flyout is PopupFlyoutBase flyout) MenuMotion.Attach(flyout);
+        LangResources.Track(this, () => _viewModel?.RefreshText());
 
         ArgumentField.NoteProvider = SettingsViewModel.NoteFor;
         ArgumentField.SuggestionHint = SettingsViewModel.HintFor;

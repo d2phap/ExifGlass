@@ -104,7 +104,7 @@ def main():
     # the Mac App Store build runs ExifTool on its own Perl (App Review takes the system Perl for deprecated)
     add('perl', 'Perl', 'Artistic-1.0-Perl or GPL-1.0+', read(HERE, 'Perl.txt'), 'mas')
     add('prodatagrid', 'ProDataGrid', 'MIT', MIT.format(copyright='Copyright (c) 2026 Wiesław Šoltés'))
-    add('skiasharp', 'SkiaSharp and Skia', 'MIT, BSD-3-Clause', package('skiasharp', '4.153.1', 'LICENSE.txt') + '\n\n' + package('skiasharp.nativeassets.win32', '4.153.1', 'THIRD-PARTY-NOTICES.txt'))
+    add('skiasharp', 'SkiaSharp and Skia', 'MIT, BSD-3-Clause', package('skiasharp', '4.157.0', 'LICENSE.txt') + '\n\n' + package('skiasharp.nativeassets.win32', '4.157.0', 'THIRD-PARTY-NOTICES.txt'))
     add('harfbuzzsharp', 'HarfBuzzSharp', 'MIT, Old MIT', package('harfbuzzsharp', '8.3.1.3', 'LICENSE.txt') + '\n\n' + package('harfbuzzsharp.nativeassets.win32', '8.3.1.3', 'THIRD-PARTY-NOTICES.txt'))
     add('angle', 'ANGLE', 'BSD-3-Clause', package('avalonia.angle.windows.natives', '2.1.27548.20260419', 'LICENSE'), 'windows')
     add('communitytoolkit-mvvm', 'CommunityToolkit.Mvvm', 'MIT', MIT.format(copyright='Copyright (c) .NET Foundation and Contributors'))

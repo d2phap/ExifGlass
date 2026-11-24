@@ -126,7 +126,8 @@ eg_check_glibc_floor() {
 
 	echo "    requires: ${EG_GLIBC_FLOOR:-unknown}"
 	if [[ "$bad" == "1" ]]; then
-		echo "Error: the floor exceeds GLIBC_$max, so the build would not start on Ubuntu 20.04 (#21)." >&2
+		echo "Error: the floor exceeds GLIBC_$max, so the build would not start on every distro" >&2
+		echo "       this release targets (#21)." >&2
 		echo "       ExifGlass too new? It was linked without -p:SysRoot." >&2
 		echo "       exiftool (or a module inside it) too new? Rebuild it on glibc <= $max:" >&2
 		echo "       see __assets/linux/README.md. GLIBC_MAX=<ver> overrides (debug only)." >&2

@@ -30,7 +30,8 @@
 #     x64         the only supported Linux arch (maps to the linux-x64 RID)
 #     --force     rebuild even if the output binary already exists
 #     --container re-run this script inside AlmaLinux 8 (glibc 2.28) so the loader and the XS
-#                 modules clear the packers' GLIBC_2.29 floor (#21). Needs podman or docker.
+#                 modules clear the packers' GLIBC_2.29 floor (#21). Implies --force, since the
+#                 cached binary is whatever the last host built. Needs podman or docker.
 #
 # Requires PAR::Packer + ExifTool's helper modules. On Debian/Ubuntu (libperl-dev supplies the
 # Perl headers pp links its C loader against -- build-essential alone is not enough):
@@ -51,7 +52,8 @@ CONTAINER=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --force) FORCE="--force"; shift ;;
-    --container) CONTAINER=1; shift ;;
+    # the cached binary is whatever the last host built, so always replace it
+    --container) CONTAINER=1; FORCE="--force"; shift ;;
     -*) echo "ERROR: unknown option '$1'." >&2; exit 1 ;;
     *) ARCH="$1"; shift ;;
   esac

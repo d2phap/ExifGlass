@@ -22,9 +22,13 @@ NativeAOT links against the *build* machine's glibc. A plain publish from Zorin 
 
 `linux-x64-sysroot.sh` fixes it, after ImageGlass's packer:
 
-- **`EG_GLIBC_MAX` = 2.29** is the floor both packers enforce: Ubuntu 20.04+, Mint 20+, Debian 10+,
-  Fedora 29+, RHEL 8+. `eg_check_glibc_floor` fails the pack and names the offending symbols.
+- **`EG_GLIBC_MAX` = 2.29** is the floor both packers enforce: **Ubuntu 20.04+, Mint 20+, Debian 11+,
+  Fedora 30+, RHEL 9+**. `eg_check_glibc_floor` fails the pack and names the offending symbols.
   `GLIBC_MAX=<ver>` overrides it for debugging only.
+- **glibc 2.28 distros are out of scope**: RHEL/Alma/Rocky 8, Debian 10 and Fedora 29 are one
+  version below the floor, verified failing with `libm.so.6: version GLIBC_2.29 not found`. The 2.29
+  comes entirely from `exp`/`log`/`log2`/`pow` in the Ubuntu 20.04 sysroot's libm; pinning a glibc
+  2.28 sysroot instead (Debian 10, RHEL 8) would reach them, at the cost of an EOL deb source.
 - **`publish-aot.sh linux-x64`** links against a pinned **Ubuntu 20.04 (glibc 2.31)** sysroot,
   assembled from sha256-checked `.deb`s cached in `__artifacts/tools/`. That lands the binary at
   exactly 2.29 — `exp`, `log`, `log2` and `pow` are the only symbols reaching it — so the floor
@@ -54,6 +58,16 @@ NativeAOT links against the *build* machine's glibc. A plain publish from Zorin 
   `build-exiftool.sh` prints the floor it produced and warns when it is too high; the packers then
   refuse that binary. `unzip` is needed for the in-archive scan — without it the check says so and
   passes the modules unchecked.
+- **Check the real thing**, not just the symbols — the packers' floor is a static read, so run the
+  built image on the oldest target too:
+
+  ```bash
+  podman run --rm -v "$PWD:/b:z" -w /b -e APPIMAGE_EXTRACT_AND_RUN=1 \
+    docker.io/library/ubuntu:20.04 ./ExifGlass_<label>_linux-x64.AppImage --selftest
+  ```
+
+  From `__artifacts/bundle/`. All six selftest lines should read PASS, including the bundled
+  ExifTool.
 
 [#21]: https://github.com/d2phap/ExifGlass/issues/21
 

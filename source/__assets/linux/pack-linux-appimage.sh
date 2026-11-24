@@ -26,6 +26,7 @@ APP_ID="io.github.d2phap.exifglass"
 GPG_KEY="${GPG_KEY:-}"
 trap 'rm -rf "$BUILD_ROOT"' EXIT
 
+. "$SOURCE_DIR/__assets/linux/_common.sh"
 . "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
 GLIBC_MAX="${GLIBC_MAX:-$EG_GLIBC_MAX}"
 
@@ -84,6 +85,7 @@ cp "$FLATPAK_DIR/$APP_ID.svg" "$APPDIR_STAGE/usr/share/icons/hicolor/scalable/ap
 ln -sf "$APP_ID.png" "$APPDIR_STAGE/.DirIcon"
 
 # one metainfo for both packages: it describes the app, and Flathub is the stricter reader
+eg_sync_metainfo_release "$FLATPAK_DIR/$APP_ID.metainfo.xml" "$REL_LABEL" "$EG_RELEASE_TYPE"
 cp "$FLATPAK_DIR/$APP_ID.metainfo.xml" "$APPDIR_STAGE/usr/share/metainfo/$APP_ID.metainfo.xml"
 cp "$FLATPAK_DIR/$APP_ID.desktop" "$APPDIR_STAGE/$APP_ID.desktop"
 printf 'X-AppImage-Name=ExifGlass\nX-AppImage-Version=%s\nX-AppImage-Arch=%s\n' "$REL_LABEL" "$ARCH" >> "$APPDIR_STAGE/$APP_ID.desktop"

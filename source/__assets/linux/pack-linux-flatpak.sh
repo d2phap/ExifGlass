@@ -25,6 +25,7 @@ APP_ID="io.github.d2phap.exifglass"
 GPG_KEY="${GPG_KEY:-}"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
+. "$SOURCE_DIR/__assets/linux/_common.sh"
 . "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
 GLIBC_MAX="${GLIBC_MAX:-$EG_GLIBC_MAX}"
 
@@ -58,9 +59,7 @@ fi
 # /app is read-only: a portable marker would keep the settings for one run only (D19)
 [[ ! -e "$PUBLISH_DIR/.egportable" ]] || { echo "Error: .egportable must never ship in the Flatpak" >&2; exit 1; }
 
-# the metainfo's newest release is what Flathub and the software centres show
-TOP_RELEASE="$(sed -n 's:.*<release version="\([^"]*\)".*:\1:p' "$FLATPAK_DIR/$APP_ID.metainfo.xml" | head -n 1)"
-[[ "$TOP_RELEASE" == "$REL_LABEL" ]] || echo "WARNING: the metainfo's newest <release> is $TOP_RELEASE, not $REL_LABEL (release checklist)"
+eg_sync_metainfo_release "$FLATPAK_DIR/$APP_ID.metainfo.xml" "$REL_LABEL" "$EG_RELEASE_TYPE"
 
 echo "==> Staging the payload"
 STAGE_DIR="$WORK_DIR/stage"

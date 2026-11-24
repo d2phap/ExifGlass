@@ -11,7 +11,7 @@
 `pack-linux-x64-all` runs both packers. Each task prompts for a GPG key (blank builds unsigned).
 
 - **ExifTool:** neither package may rely on a Perl: the Flatpak runtime has none, and an AppImage runs on any distro. `build-exiftool.sh` packs ExifTool and Perl into one binary (`__assets/exiftool/unix/build/linux-x64/exiftool`), which `Directory.Build.targets` prefers; the Flatpak packer refuses the plain script, the AppImage packer warns. Build it on an old glibc: see [glibc floor](#glibc-floor).
-- **One description:** the desktop entry, the metainfo and the icons live in `flatpak/` and serve both packages. The icons are rendered from `__assets/__app/logo.svg` by `tools/gen-app-icons.cs`. Add a `<release>` to the metainfo for every version (the Flatpak packer warns when its newest isn't this label).
+- **One description:** the desktop entry, the metainfo and the icons live in `flatpak/` and serve both packages. The icons are rendered from `__assets/__app/logo.svg` by `tools/gen-app-icons.cs`. The newest `<release>` tracks `ExifGlassVersion`: both packers insert it (`eg_sync_metainfo_release` in `_common.sh`) with today's date, `type="development"` when `ExifGlassReleaseType` is set, keeping the older entries. Hand-write the entry first if you want real release notes in it — a matching label is left alone.
 - **Channel:** `ChannelPolicy.Detect` reads `FLATPAK_ID` (no update check, no download row in About) and `APPIMAGE` (update check on, as the DMG and the ZIP). `ExifGlass --selftest` prints it.
 
 ## glibc floor

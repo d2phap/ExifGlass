@@ -131,4 +131,14 @@ if [ -s "$ERR_LOG" ]; then
   sed 's/^/         /' "$ERR_LOG" >&2
   exit 1
 fi
-echo "OK: built ExifTool $VER ($(du -h "$OUT" | cut -f1))"
+
+# pp reuses the prebuilt parl, so -p:SysRoot cannot lower this: the loader carries the glibc of
+# whatever host PAR::Packer was installed on (#21).
+. "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
+NEED="$(objdump -T "$OUT" 2>/dev/null | grep -o 'GLIBC_[0-9][0-9.]*' | sort -uV | tail -n1 || true)"
+if [ -n "$NEED" ] && [ "$(printf '%s\n' "$EG_GLIBC_MAX" "${NEED#GLIBC_}" | sort -V | tail -n1)" != "$EG_GLIBC_MAX" ]; then
+  echo "WARNING: this ExifTool needs $NEED, above the GLIBC_$EG_GLIBC_MAX the packers allow, so"
+  echo "         both of them will refuse it. Build it on an older glibc: see __assets/linux/README.md."
+fi
+
+echo "OK: built ExifTool $VER ($(du -h "$OUT" | cut -f1)), glibc floor ${NEED:-unknown}"

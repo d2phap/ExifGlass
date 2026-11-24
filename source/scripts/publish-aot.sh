@@ -2,6 +2,8 @@
 # Publishes a trimmed NativeAOT build into __artifacts/publish/<rid>; trim and AOT warnings are errors.
 # Usage: scripts/publish-aot.sh [osx-arm64|linux-x64] [--runtime-async off] [--channel MacAppStore]
 # The Mac App Store flavor (EG_MAS) goes to __artifacts/publish/<rid>-mas.
+# linux-x64 links against the pinned glibc 2.31 sysroot (__assets/linux/linux-x64-sysroot.sh)
+# so the binary runs on older distros; EG_NO_SYSROOT=1 skips that for local iteration.
 . "$(dirname "$0")/_common.sh"
 
 RID=""
@@ -30,9 +32,20 @@ new_report "publish-aot-$RID$SUFFIX"
 report "Publishing $RID_HEAD for $RID (Platform=$RID_PLATFORM, RuntimeAsync=$ASYNC, Channel=$CHANNEL)"
 rm -rf "$OUT_DIR"
 
+# NativeAOT links against the BUILD host's glibc, so a build from a new distro will not start on
+# older ones (#21). EG_NO_SYSROOT=1 skips it for fast local iteration.
+SYSROOT_ARGS=()
+if [ "$RID" = "linux-x64" ] && [ "${EG_NO_SYSROOT:-0}" != "1" ]; then
+  . "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
+  eg_sysroot_prepare "$ARTIFACTS_DIR/tools"
+  eg_force_native_relink "$SOURCE_DIR/$RID_HEAD" "$RID"
+  SYSROOT_ARGS=(-p:SysRoot="$EG_SYSROOT")
+  report "Linking against the glibc $EG_SYSROOT_GLIBC sysroot: $EG_SYSROOT"
+fi
+
 START=$(date +%s)
 set +e
-OUTPUT="$(dotnet publish "$SOURCE_DIR/$RID_HEAD/$RID_HEAD.csproj" -c Release -r "$RID" -p:Platform="$RID_PLATFORM" -p:ExifGlassRuntimeAsync="$ASYNC_FLAG" -p:ExifGlassChannel="$CHANNEL" -o "$OUT_DIR" 2>&1)"
+OUTPUT="$(dotnet publish "$SOURCE_DIR/$RID_HEAD/$RID_HEAD.csproj" -c Release -r "$RID" -p:Platform="$RID_PLATFORM" -p:ExifGlassRuntimeAsync="$ASYNC_FLAG" -p:ExifGlassChannel="$CHANNEL" ${SYSROOT_ARGS[@]+"${SYSROOT_ARGS[@]}"} -o "$OUT_DIR" 2>&1)"
 CODE=$?
 set -e
 echo "$OUTPUT" | grep -E 'error|warning|->' | while IFS= read -r line; do report "  $line"; done || true

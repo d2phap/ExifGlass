@@ -3,12 +3,12 @@
 # Packs the Linux build of ExifGlass as one AppImage (linux-x64, plan 3), ImageGlass's and FewerPhotos's packer:
 #   1. publishes a fresh NativeAOT build (scripts/publish-aot.sh; the version is compiled in), with the PAR-packed ExifTool;
 #   2. stages an AppDir: the payload under usr/lib/exifglass, a minimal AppRun, the Flatpak's desktop entry, metainfo and icons;
-#   3. prints the glibc floor of the shipped binaries: an AppImage runs on the host's glibc;
+#   3. refuses a glibc floor above GLIBC_2.29: an AppImage runs on the host's glibc (#21);
 #   4. builds ExifGlass_<label>_linux-x64.AppImage and its .zsync, with update information AppImage managers read, GPG-signed when GPG_KEY is set.
 # Like the Flatpak, it ships no system library (libGL, libX11, libfontconfig): those must be the host's.
 #
 # Env: GPG_KEY=<key id>, APPIMAGETOOL=<path>, APPIMAGETOOL_SHA256=<hex> (checked on download), NO_UPDATE_INFO=1,
-#      SKIP_PUBLISH=1 (reuses the last publish: local iteration only)
+#      SKIP_PUBLISH=1 (reuses the last publish: local iteration only), GLIBC_MAX=<ver> (debug only)
 
 set -euo pipefail
 
@@ -25,6 +25,9 @@ BUILD_PROPS_FILE="$SOURCE_DIR/Directory.Build.props"
 APP_ID="io.github.d2phap.exifglass"
 GPG_KEY="${GPG_KEY:-}"
 trap 'rm -rf "$BUILD_ROOT"' EXIT
+
+. "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
+GLIBC_MAX="${GLIBC_MAX:-$EG_GLIBC_MAX}"
 
 prop() { sed -n "s:.*<$1>\(.*\)</$1>.*:\1:p" "$BUILD_PROPS_FILE" | head -n 1; }
 
@@ -110,12 +113,8 @@ chmod 755 "$APPDIR_STAGE/AppRun"
 sh -n "$APPDIR_STAGE/AppRun"
 
 # the highest symbol version any shipped binary needs is the oldest distro it runs on
-GLIBC_FLOOR="$(
-	{ find "$APPDIR_STAGE/usr/lib/exifglass" -type f \( -name "ExifGlass" -o -name "exiftool" -o -name "*.so" -o -name "*.so.*" \) -print0 \
-	  | xargs -0 -r -n1 objdump -T 2>/dev/null || true; } \
-	| grep -o 'GLIBC_[0-9][0-9.]*' | sort -uV | tail -n1 || true
-)"
-echo "==> glibc floor: ${GLIBC_FLOOR:-unknown}"
+eg_check_glibc_floor "$GLIBC_MAX" "$APPDIR_STAGE/usr/lib/exifglass"
+GLIBC_FLOOR="$EG_GLIBC_FLOOR"
 
 # no distro packages appimagetool: cache AppImage/appimagetool (its runtime reads zstd) under __artifacts
 TOOL="${APPIMAGETOOL:-}"

@@ -8,7 +8,8 @@
 #      installs it for the current user to try.
 # Distribution steps: flatpak/README.md
 #
-# Env: GPG_KEY=<key id>, RELEASE_TAG=<tag> (default: the label), SKIP_PUBLISH=1 (reuses the last publish: local iteration only)
+# Env: GPG_KEY=<key id>, RELEASE_TAG=<tag> (default: the label), SKIP_PUBLISH=1 (reuses the last publish: local iteration only),
+#      GLIBC_MAX=<ver> (debug only)
 
 set -euo pipefail
 
@@ -23,6 +24,9 @@ MANIFEST="$FLATPAK_DIR/io.github.d2phap.exifglass.yaml"
 APP_ID="io.github.d2phap.exifglass"
 GPG_KEY="${GPG_KEY:-}"
 trap 'rm -rf "$WORK_DIR"' EXIT
+
+. "$SOURCE_DIR/__assets/linux/linux-x64-sysroot.sh"
+GLIBC_MAX="${GLIBC_MAX:-$EG_GLIBC_MAX}"
 
 prop() { sed -n "s:.*<$1>\(.*\)</$1>.*:\1:p" "$BUILD_PROPS_FILE" | head -n 1; }
 
@@ -64,6 +68,9 @@ rm -rf "$WORK_DIR"
 mkdir -p "$STAGE_DIR/ExifGlass" "$OUT_DIR"
 ( cd "$PUBLISH_DIR" && cp -a . "$STAGE_DIR/ExifGlass/" )
 find "$STAGE_DIR/ExifGlass" -type f \( -name "*.dbg" -o -name "*.pdb" \) -delete
+
+# the tarball is also a direct download, run on the host glibc rather than the runtime's (#21)
+eg_check_glibc_floor "$GLIBC_MAX" "$STAGE_DIR/ExifGlass"
 
 echo "==> Creating $TARBALL_NAME"
 rm -f "$TARBALL_PATH"

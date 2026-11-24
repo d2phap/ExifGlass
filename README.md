@@ -16,19 +16,19 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 <div align="center">
 
 <a href="https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&amp;cid=eg_github_readme&amp;mode=full">
-  <img height="56" src=".github/badge-ms-store.svg" alt="Download ExifGlass on the Microsoft Store" />
+  <img width="215" src=".github/badge-ms-store.svg" alt="Download ExifGlass on the Microsoft Store" />
 </a>
 &nbsp;&nbsp;
 <a href="https://apps.apple.com/app/apple-store/id6790062127?pt=128974924&amp;ct=eg_github_readme&amp;mt=8">
-  <img height="56" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
+  <img width="215" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
 </a>
-<br/><br/>
+<br/>
 
 
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" />
 </a>
-&nbsp;&nbsp;
+&nbsp;
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
 </a>

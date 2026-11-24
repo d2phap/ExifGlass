@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using System.Text.Json.Serialization;
 
 namespace ExifGlass.Core.Settings;
@@ -117,6 +118,11 @@ public sealed class AppSettings
     public string Accent { get; set; } = ACCENT_SYSTEM;
 
     public bool AlwaysOnTop { get; set; }
+
+    /// <summary>
+    /// The language pack's file name in the user or app _lang folder, or "English" for the built-in text.
+    /// </summary>
+    public string Language { get; set; } = Lang.BUILT_IN;
 
     public bool CheckForUpdates { get; set; } = true;
 

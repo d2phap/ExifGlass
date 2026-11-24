@@ -53,6 +53,7 @@ public static class SettingsOverrides
                 case nameof(AppSettings.Accent): target.Accent = fileValues.Accent; break;
                 case nameof(AppSettings.AlwaysOnTop): target.AlwaysOnTop = fileValues.AlwaysOnTop; break;
                 case nameof(AppSettings.CheckForUpdates): target.CheckForUpdates = fileValues.CheckForUpdates; break;
+                case nameof(AppSettings.Language): target.Language = fileValues.Language; break;
                 case nameof(AppSettings.ExifToolPath): target.ExifToolPath = fileValues.ExifToolPath; break;
                 case nameof(AppSettings.ExifToolArguments): target.ExifToolArguments = fileValues.ExifToolArguments; break;
                 case nameof(AppSettings.VisibleColumns): target.VisibleColumns = [.. fileValues.VisibleColumns]; break;
@@ -73,6 +74,7 @@ public static class SettingsOverrides
         "accent" => nameof(AppSettings.Accent),
         "alwaysontop" => nameof(AppSettings.AlwaysOnTop),
         "checkforupdates" => nameof(AppSettings.CheckForUpdates),
+        "language" => nameof(AppSettings.Language),
         "exiftoolpath" => nameof(AppSettings.ExifToolPath),
         "exiftoolarguments" => nameof(AppSettings.ExifToolArguments),
         "visiblecolumns" => nameof(AppSettings.VisibleColumns),
@@ -110,6 +112,11 @@ public static class SettingsOverrides
             case nameof(AppSettings.CheckForUpdates):
                 if (!TryBool(value, out var check)) return false;
                 s.CheckForUpdates = check;
+                return true;
+
+            case nameof(AppSettings.Language):
+                if (value.Trim().Length == 0) return false;
+                s.Language = value.Trim();
                 return true;
 
             case nameof(AppSettings.ExifToolPath):

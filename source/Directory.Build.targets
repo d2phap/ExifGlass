@@ -155,6 +155,12 @@ if (!System.IO.File.Exists(OutputPath) || System.IO.File.ReadAllText(OutputPath)
   </Target>
 
 
+  <!-- The built-in language packs next to each app head, where Lang.BuiltInDirectory looks; the packers ship the whole publish folder -->
+  <ItemGroup Condition="'$(ExifGlassPlatformId)' != ''">
+    <None Include="$(MSBuildThisFileDirectory)__assets\__app\_lang\*.eglang.json" Link="_lang\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+
   <!-- ExifTool next to each app head: official releases dropped into __assets/exiftool; a clone without them still builds -->
   <PropertyGroup Condition="'$(ExifGlassPlatformId)' != ''">
     <ExifToolDir>$(MSBuildThisFileDirectory)__assets\exiftool\</ExifToolDir>

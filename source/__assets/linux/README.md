@@ -42,16 +42,18 @@ NativeAOT links against the *build* machine's glibc. A plain publish from Zorin 
   that its perl and XS modules come from there too; AlmaLinux 8 (glibc 2.28) is still maintained:
 
   ```bash
-  podman run --rm -v "$PWD:/src" -w /src almalinux:8 bash -c '
-    dnf -y install epel-release && dnf -y install perl perl-devel perl-App-cpanminus gcc make &&
-    cpanm --notest PAR::Packer Archive::Zip Compress::Zlib Digest::SHA \
-                   IO::Compress::Bzip2 Time::Piece IO::String &&
-    __assets/linux/build-exiftool.sh x64 --force'
+  __assets/linux/build-exiftool.sh x64 --container
   ```
 
-  Run it from `source/`. `build-exiftool.sh` prints the floor it produced and warns when it is too
-  high; the packers then refuse that binary. `unzip` is needed for the in-archive scan — without it
-  the check says so and passes the modules unchecked.
+  That re-runs the script inside `almalinux:8` (override with `EG_EXIFTOOL_IMAGE`), installing Perl
+  and PAR::Packer there, so the loader and the XS modules both come from glibc 2.28. It needs
+  `podman` or `docker` (`sudo apt install podman`; rootless podman writes the output as you rather
+  than as root). Without `--container` the script builds against the host Perl, which is fine for
+  development but not for a release.
+
+  `build-exiftool.sh` prints the floor it produced and warns when it is too high; the packers then
+  refuse that binary. `unzip` is needed for the in-archive scan — without it the check says so and
+  passes the modules unchecked.
 
 [#21]: https://github.com/d2phap/ExifGlass/issues/21
 

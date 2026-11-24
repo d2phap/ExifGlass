@@ -26,9 +26,11 @@
 # build on Linux (a Linux CI runner, or WSL on Windows), per target architecture. Driven by the
 # VS Code "build-exiftool-linux-<arch>" tasks (see ../../../.vscode/tasks.json); run it by hand as:
 #
-#   ./build-exiftool.sh <arch> [--force]
-#     x64       the only supported Linux arch (maps to the linux-x64 RID)
-#     --force   rebuild even if the output binary already exists
+#   ./build-exiftool.sh <arch> [--force] [--container]
+#     x64         the only supported Linux arch (maps to the linux-x64 RID)
+#     --force     rebuild even if the output binary already exists
+#     --container re-run this script inside AlmaLinux 8 (glibc 2.28) so the loader and the XS
+#                 modules clear the packers' GLIBC_2.29 floor (#21). Needs podman or docker.
 #
 # Requires PAR::Packer + ExifTool's helper modules. On Debian/Ubuntu (libperl-dev supplies the
 # Perl headers pp links its C loader against -- build-essential alone is not enough):
@@ -43,8 +45,18 @@
 # -----------------------------------------------------------------------------
 set -euo pipefail
 
-ARCH="${1:?target architecture required: x64}"
-FORCE="${2:-}"
+ARCH=""
+FORCE=""
+CONTAINER=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --force) FORCE="--force"; shift ;;
+    --container) CONTAINER=1; shift ;;
+    -*) echo "ERROR: unknown option '$1'." >&2; exit 1 ;;
+    *) ARCH="$1"; shift ;;
+  esac
+done
+: "${ARCH:?target architecture required: x64}"
 
 case "$ARCH" in
   x64) ;;
@@ -58,7 +70,7 @@ SRC="$SOURCE_DIR/__assets/exiftool/unix"
 OUT="$SOURCE_DIR/__assets/exiftool/unix/build/linux-$ARCH/exiftool"
 
 if [ -f "$OUT" ] && [ "$FORCE" != "--force" ]; then
-  echo "ExifTool already built: $OUT  (pass '--force' as the 2nd argument to rebuild)"
+  echo "ExifTool already built: $OUT  (pass --force to rebuild)"
   exit 0
 fi
 
@@ -67,6 +79,34 @@ if [ ! -f "$SRC/exiftool" ]; then
   echo "       Put exiftool.org's Image-ExifTool distribution (the 'exiftool' script + 'lib/')" >&2
   echo "       under that folder first." >&2
   exit 1
+fi
+
+# --- Build inside an old-glibc image instead ---------------------------------
+# Everything in the PAR binary comes from the build host's Perl: the parl loader AND the XS modules
+# it appends, which the loader extracts and dlopens. The sysroot cannot reach either, so the only
+# fix is an old Perl. AlmaLinux 8 is glibc 2.28 and still maintained.
+if [ "$CONTAINER" = "1" ]; then
+  ENGINE="${EG_CONTAINER_ENGINE:-}"
+  if [ -z "$ENGINE" ]; then
+    for e in podman docker; do
+      if command -v "$e" >/dev/null 2>&1; then ENGINE="$e"; break; fi
+    done
+  fi
+  if [ -z "$ENGINE" ]; then
+    echo "ERROR: --container needs podman or docker (sudo apt install podman)." >&2
+    exit 1
+  fi
+
+  IMAGE="${EG_EXIFTOOL_IMAGE:-docker.io/library/almalinux:8}"
+  echo "Building ExifTool in $IMAGE via $ENGINE"
+  # :z relabels the bind mount on SELinux hosts and is ignored elsewhere
+  exec "$ENGINE" run --rm -v "$SOURCE_DIR:/src:z" -w /src "$IMAGE" bash -euc '
+    dnf -y install epel-release
+    dnf -y install perl perl-devel perl-App-cpanminus gcc make zlib-devel bzip2-devel binutils
+    cpanm --notest PAR::Packer Archive::Zip Compress::Zlib Digest::SHA \
+                   IO::Compress::Bzip2 Time::Piece IO::String
+    bash __assets/linux/build-exiftool.sh '"$ARCH"' --force
+  '
 fi
 
 # --- Require PAR::Packer ------------------------------------------------------

@@ -465,6 +465,7 @@ public enum LangId
     Toast_LanguageInstalledOne,
     Toast_LanguageInstalled,
     Toast_LanguageIncompatible,
+    Toast_LanguageInstallFailed,
 
     #endregion // Toasts
 

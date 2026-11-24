@@ -175,6 +175,43 @@ public sealed class LanguageTests
 
 
     [AvaloniaFact]
+    public async Task ReinstallingTheShownPackShowsItsNewText()
+    {
+        var english = Lang.Current;
+        var userDirectory = Lang.UserDirectory;
+        try
+        {
+            using var shell = await TestShell.OpenWithFileAsync(1400);
+            InstallPack(shell);
+            var (_, first) = await OpenSettingsAsync(shell);
+            first.SelectedLanguage = first.Languages.Single(l => !l.Pack.IsBuiltIn);
+            first.OkCommand.Execute(null);
+            shell.Settle(300);
+            Assert.Equal("Tìm kiếm", shell.Window.Toolbar.Search.PlaceholderText);
+
+            // the same file name with new text, picked from outside the language folder
+            var update = Directory.CreateDirectory(Path.Combine(shell.Folder, "update")).FullName;
+            File.WriteAllText(Path.Combine(update, PACK), PACK_JSON.Replace("\"Toolbar_Search\": \"Tìm kiếm\"", "\"Toolbar_Search\": \"Tìm thẻ\"", StringComparison.Ordinal));
+            var (_, vm) = await OpenSettingsAsync(shell);
+            await vm.InstallLanguagesAsync([Path.Combine(update, PACK)]);
+            shell.Settle();
+
+            Assert.Equal("Tìm thẻ", shell.Window.Toolbar.Search.PlaceholderText);
+
+            vm.CancelCommand.Execute(null);
+            shell.Settle();
+
+            Assert.Equal("Tìm thẻ", shell.Window.Toolbar.Search.PlaceholderText);
+        }
+        finally
+        {
+            Lang.Current = english;
+            Lang.UserDirectory = userDirectory;
+        }
+    }
+
+
+    [AvaloniaFact]
     public async Task TheBuiltInEnglishComesFirstAndCreditsItsAuthor()
     {
         var userDirectory = Lang.UserDirectory;

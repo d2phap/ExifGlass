@@ -59,7 +59,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     #region Fields and constants
 
     private readonly MainViewModel _main;
-    private readonly Lang _savedLanguage = Lang.Current;
+    private Lang _savedLanguage = Lang.Current;
     private int _pathGeneration;
     private bool _committed;
     private bool _following;
@@ -264,14 +264,20 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// <summary>
     /// Lists the languages again and picks <paramref name="select"/>, a Language setting, or keeps the choice.
     /// </summary>
-    public async Task LoadLanguagesAsync(string? select = null)
+    public async Task LoadLanguagesAsync(string? select = null, IReadOnlyCollection<string>? installed = null)
     {
         var packs = await Task.Run(Lang.LoadAll);
 
-        // the language on screen keeps its own instance, so listing again doesn't count as choosing it
+        // the language on screen keeps its own instance, so listing again doesn't count as choosing it; a pack just installed over it is read anew
         var shown = Lang.Current;
+        var keep = installed?.Contains(shown.FileName, StringComparer.OrdinalIgnoreCase) != true;
         var wanted = select ?? SelectedLanguage?.Pack.SettingValue ?? shown.SettingValue;
-        Languages = [.. packs.Select(p => new LanguageChoice(p.SettingValue.Equals(shown.SettingValue, StringComparison.OrdinalIgnoreCase) ? shown : p))];
+        Languages = [.. packs.Select(p => new LanguageChoice(keep && SameSetting(p, shown) ? shown : p))];
+
+        // Cancel then goes back to the saved language as the new file has it
+        if (installed?.Contains(_savedLanguage.FileName, StringComparer.OrdinalIgnoreCase) == true
+            && Languages.FirstOrDefault(c => SameSetting(c.Pack, _savedLanguage)) is { } saved) _savedLanguage = saved.Pack;
+
         SelectedLanguage = Languages.FirstOrDefault(c => c.Pack.SettingValue.Equals(wanted, StringComparison.OrdinalIgnoreCase)) ?? Languages[0];
     }
 
@@ -297,9 +303,10 @@ public sealed partial class SettingsViewModel : ObservableObject
         if (files.Count == 0) return;
 
         var result = await Task.Run(() => Lang.Install(files));
-        await LoadLanguagesAsync(result.Installed.FirstOrDefault());
+        await LoadLanguagesAsync(result.Installed.FirstOrDefault(), result.Installed);
 
         if (result.Incompatible.Count > 0) ToastRequested?.Invoke(this, new SettingsToast(Lang.Current[LangId.Toast_LanguageIncompatible], string.Join(", ", result.Incompatible), ToastKind.Danger));
+        else if (result.Failed.Count > 0) ToastRequested?.Invoke(this, new SettingsToast(Lang.Current[LangId.Toast_LanguageInstallFailed, string.Join(", ", result.Failed)], null, ToastKind.Danger));
         else ToastRequested?.Invoke(this, new SettingsToast(AppText.LanguagesInstalled(result.Installed.Count), SelectedLanguage?.Name));
     }
 
@@ -495,6 +502,9 @@ public sealed partial class SettingsViewModel : ObservableObject
             PathHint = null;
         }
     }
+
+
+    private static bool SameSetting(Lang a, Lang b) => a.SettingValue.Equals(b.SettingValue, StringComparison.OrdinalIgnoreCase);
 
 
     private static bool SamePath(string a, string b)

@@ -465,6 +465,7 @@ public sealed partial class Lang
         new(LangId.Toast_LanguageInstalledOne, "Installed 1 language pack"),
         new(LangId.Toast_LanguageInstalled, "Installed {0:N0} language packs"),
         new(LangId.Toast_LanguageIncompatible, "Made for another version of ExifGlass"),
+        new(LangId.Toast_LanguageInstallFailed, "Couldn't install {0}"),
 
         #endregion // Toasts
 

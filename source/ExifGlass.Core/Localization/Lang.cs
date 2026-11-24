@@ -24,9 +24,9 @@ using System.Text.Json;
 namespace ExifGlass.Core.Localization;
 
 /// <summary>
-/// What installing language packs did: the files copied, and the names of those made for another version.
+/// What installing language packs did: the files installed, the names of those made for another version, and of those that couldn't be copied.
 /// </summary>
-public sealed record LangInstallResult(IReadOnlyList<string> Installed, IReadOnlyList<string> Incompatible);
+public sealed record LangInstallResult(IReadOnlyList<string> Installed, IReadOnlyList<string> Incompatible, IReadOnlyList<string> Failed);
 
 
 /// <summary>
@@ -247,11 +247,12 @@ public sealed partial class Lang
     /// </summary>
     public static LangInstallResult Install(IEnumerable<string> filePaths)
     {
-        if (UserDirectory is not { } target) return new LangInstallResult([], []);
+        if (UserDirectory is not { } target) return new LangInstallResult([], [], []);
 
         Directory.CreateDirectory(target);
         var installed = new List<string>();
         var incompatible = new List<string>();
+        var failed = new List<string>();
         foreach (var file in filePaths)
         {
             if (Load(file) is null)
@@ -260,18 +261,25 @@ public sealed partial class Lang
                 continue;
             }
 
+            var name = Path.GetFileName(file);
+            var destination = Path.Combine(target, name);
             try
             {
-                File.Copy(file, Path.Combine(target, Path.GetFileName(file)), overwrite: true);
-                installed.Add(Path.GetFileName(file));
+                // a pack picked from the folder it installs to is already in place: copying it onto itself fails
+                if (!string.Equals(Path.GetFullPath(file), Path.GetFullPath(destination), OperatingSystem.IsLinux() ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase))
+                {
+                    File.Copy(file, destination, overwrite: true);
+                }
+
+                installed.Add(name);
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                incompatible.Add(PackName(file));
+                failed.Add(PackName(file));
             }
         }
 
-        return new LangInstallResult(installed, incompatible);
+        return new LangInstallResult(installed, incompatible, failed);
     }
 
 

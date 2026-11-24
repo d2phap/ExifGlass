@@ -190,10 +190,27 @@ public sealed class LangTests : IDisposable
 
         Assert.Equal(["Zulu.eglang.json"], result.Installed);
         Assert.Equal(["Ancient"], result.Incompatible);
+        Assert.Empty(result.Failed);
         Assert.True(File.Exists(Path.Combine(user, "Zulu.eglang.json")));
         Assert.True(all[0].IsBuiltIn);
         Assert.Contains(all, l => l.Metadata.LocalName == "isiZulu");
         Assert.Equal("isiZulu", Lang.FromSetting("Zulu.eglang.json").Metadata.LocalName);
+    }
+
+
+    [Fact]
+    public void APackPickedFromItsOwnFolderCountsAsInstalled()
+    {
+        var user = Directory.CreateDirectory(Path.Combine(_dir, "own")).FullName;
+        Lang.UserDirectory = user;
+        var path = Path.Combine(user, "Own" + Lang.FILE_EXTENSION);
+        File.WriteAllText(path, """{ "_Metadata": { "LocalName": "Own", "MinVersion": 3 }, "Items": {} }""");
+
+        var result = Lang.Install([path]);
+
+        Assert.Equal(["Own.eglang.json"], result.Installed);
+        Assert.Empty(result.Incompatible);
+        Assert.Empty(result.Failed);
     }
 
 

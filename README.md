@@ -11,19 +11,24 @@ With ExifGlass, you can easily access a comprehensive overview of the technical 
 
 For AI images, ExifGlass shows the prompt and settings that tools like Stable Diffusion, ComfyUI and Midjourney save inside the file, so you can see how an image was made and reuse its settings. It tells you when a file is marked as AI-generated, too.
 
-ExifGlass is open source. Buying it here supports its development, and the [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=eg_github_readme&mode=full) keeps it up to date.
+ExifGlass is open source. Buying it here supports its development, and the [Microsoft Store](https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&cid=eg_github_readme&mode=full) and the [Mac App Store](https://apps.apple.com/app/apple-store/id6790062127?pt=128974924&ct=eg_github_readme&mt=8) keep it up to date.
 
 <div align="center">
-  
-<a href="https://imageglass.org/exifglass">
-  <img src="https://github.com/d2phap/ExifGlass/assets/3154213/ed878a58-cec3-4f74-ac56-c215477f6c61" />
+
+<a href="https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&amp;cid=eg_github_readme&amp;mode=full">
+  <img height="56" src=".github/badge-ms-store.svg" alt="Download ExifGlass on the Microsoft Store" />
+</a>
+&nbsp;&nbsp;
+<a href="https://apps.apple.com/app/apple-store/id6790062127?pt=128974924&amp;ct=eg_github_readme&amp;mt=8">
+  <img height="56" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
 </a>
 <br/><br/>
+
 
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" />
 </a>
-
+&nbsp;&nbsp;
 <a href="https://imageglass.org/exifglass">
   <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
 </a>
@@ -35,6 +40,13 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 </a>
 
 </div>
+
+
+## Requirements
+- Windows 11, 10 64-bit build 1809 or later
+- macOS 14+ Apple Silicon arm64
+- Linux X11 desktop x64: Ubuntu 20.04+, Mint 20+, Debian 11+, Fedora 30+, RHEL 9+
+
 
 ## Features
 

@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Localization;
 using System.Text.RegularExpressions;
 
 namespace ExifGlass.Core.Editing;
@@ -63,7 +64,7 @@ public sealed partial record SaveResult(SaveOutcome Outcome, IReadOnlyList<strin
         }
 
         var outcome = updated > 0 ? SaveOutcome.Updated : unchanged > 0 && errors.Count == 0 ? SaveOutcome.Unchanged : SaveOutcome.Failed;
-        if (outcome == SaveOutcome.Failed && errors.Count == 0) errors.Add(status is { } s and not 0 ? $"ExifTool stopped with status {s}" : "ExifTool didn't update the file");
+        if (outcome == SaveOutcome.Failed && errors.Count == 0) errors.Add(status is { } s and not 0 ? Lang.Current[LangId.Save_ExifToolStopped, s] : Lang.Current[LangId.Save_NotUpdated]);
 
         var backup = sourcePath + "_original";
         return new SaveResult(outcome, errors, [.. warnings.Distinct()], outcome == SaveOutcome.Updated && File.Exists(backup) ? backup : null);

@@ -17,273 +17,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Common;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI;
-using System.Globalization;
+using ExifGlass.UI.Localization;
 
 namespace ExifGlass;
 
 /// <summary>
-/// The words the app's screens show (plan 5.9: all strings in one place, sentence case); the design system's own are in UiText.
+/// The app's text that is built from parts (plan 5.9): counts, file names and shortcuts; the words themselves are LangId keys.
 /// </summary>
 public static class AppText
 {
     #region Constants
 
-    public const string OPEN = "Open";
-    public const string OPEN_FILE = "Open file…";
-    public const string OPEN_SETTINGS = "Open settings";
-    public const string RETRY = "Retry";
-    public const string ABOUT = "About";
-    public const string SETTINGS = "Settings";
-    public const string SEARCH = "Search tags";
-
-    public const string SEARCH_PLACEHOLDER = "Search";
-    public const string SUMMARY_NO_FILE = "No file";
-    public const string SUMMARY_READING = "Reading metadata…";
-
-    public const string SHOW_RAIL = "Show groups panel";
-    public const string HIDE_RAIL = "Hide groups panel";
-    public const string SHOW_INSPECTOR = "Show inspector";
-    public const string HIDE_INSPECTOR = "Hide inspector";
-    public const string PIN = "Keep window on top";
-    public const string UNPIN = "Unpin window";
-    public const string COPY_COMMAND = "Copy command";
-
-    public const string EMPTY_TITLE = "Drop a file here to view its metadata";
-    public const string EMPTY_CAPTION = "Or click the button below";
-    public const string RELEASE_TO_INSPECT = "Release to inspect";
-    public const string EXIFTOOL_MISSING_TITLE = "ExifTool isn't available";
-    public const string EXIFTOOL_MISSING_CAPTION = "ExifGlass reads metadata with ExifTool. Choose its path in Settings, or retry.";
-
-    public const string TOAST_PINNED = "Pinned on top";
-    public const string TOAST_PINNED_SUB = "ExifGlass stays above other windows";
-    public const string TOAST_UNPINNED = "Unpinned";
-    public const string TOAST_UNPINNED_SUB = "Window behaves normally";
-    public const string TOAST_READ_FAILED = "Couldn't read that file";
-    public const string TOAST_FOLDER = "Folders can't be opened";
-    public const string TOAST_FOLDER_SUB = "Drop a file instead";
-    public const string TOAST_COMMAND_COPIED = "Command copied";
-    public const string TOAST_COMMAND_COPIED_SUB = "Paste it into any terminal";
-
-    public const string PICKER_TITLE = "Open a file";
-    public const string PICKER_IMAGES = "Images";
-    public const string PICKER_ALL = "All files";
-
-    // the table (DS 6.9, 7.2, 7.4; Proto)
-    public const string COLLAPSE_ALL = "Collapse all";
-    public const string EXPAND_ALL = "Expand all";
-    public const string COLLAPSE_ALL_TIP = "Collapse all groups";
-    public const string EXPAND_ALL_TIP = "Expand all groups";
-    public const string EDIT = "Edit";
-    public const string EDIT_TIP = "Edit metadata";
-    public const string COLUMNS = "Columns";
-    public const string COLUMNS_TIP = "Show or hide columns";
-    public const string COLUMNS_HEADER = "COLUMNS";
-    public const string EXPORT = "Export";
-    public const string SELECTED = "selected";
-    public const string COPY = "Copy";
-    public const string JSON = "JSON";
-    public const string CLEAR = "Clear";
-    public const string CLEAR_ALL = "Clear all";
-    public const string REMOVE_FILTER = "Remove filter";
-    public const string COPY_ROWS_TIP = "Copy as tab-separated name and value";
-    public const string COPY_ROWS_JSON_TIP = "Copy as JSON with group-prefixed keys";
-    public const string CLEAR_SELECTION_TIP = "Clear the selection (Esc)";
-    public const string NO_MATCH_TITLE = "No tags match";
-    public const string NO_MATCH_CAPTION = "Try a different search, or clear the filters.";
-    public const string CLEAR_FILTERS = "Clear filters";
-
-    public const string COLUMN_INDEX = "Index";
-    public const string COLUMN_TAG_ID = "Tag ID";
-    public const string COLUMN_TAG_NAME = "Tag name";
-    public const string COLUMN_VALUE = "Value";
-    public const string AT_LEAST_ONE = "At least one";
-    public const string HIDDEN_AT_WIDTH = "Hidden at this width";
-
-    public const string EXPORT_CSV = "CSV";
-    public const string EXPORT_CSV_DESC = "Spreadsheet-ready, one row per tag";
-    public const string EXPORT_TEXT = "Plain text";
-    public const string EXPORT_TEXT_DESC = "Tab-separated, like exiftool -t";
-    public const string EXPORT_JSON = "JSON";
-    public const string EXPORT_JSON_DESC = "Compatible with exiftool -j -G";
-    public const string EXPORT_COPY = "Copy as JSON";
-    public const string EXPORT_COPY_DESC = "Straight to the clipboard";
-
-    public const string EDIT_ADD = "Add tag…";
-    public const string EDIT_ADD_DESC = "Write a new EXIF, XMP or IPTC tag";
-    public const string EDIT_GPS = "Remove GPS data";
-    public const string EDIT_GPS_NONE = "No GPS data in this file";
-    public const string EDIT_AI = "Remove AI generation data";
-    public const string EDIT_AI_DESC = "Prompts, workflows and parameters · provenance kept";
-    public const string EDIT_STRIP = "Strip all metadata";
-    public const string EDIT_STRIP_DESC = "Removes every writable tag · -all=";
-
-    public const string FILTER_DATES = "Date & time";
-    public const string FILTER_GPS = "GPS";
-    public const string FILTER_CONVERTED = "Converted";
-    public const string FILTER_TAG_ID = "Has tag ID";
-    public const string FILTER_AI = "AI generation";
-    public const string FILTER_PROMPTS = "Prompts";
-    public const string FILTER_MODELS = "Models";
-    public const string FILTER_PROVENANCE = "Provenance";
-    public const string FILTER_AI_TIP = "Show AI fields and the tags they were read from";
-    public const string FILTER_PROMPTS_TIP = "Show the prompts";
-    public const string FILTER_MODELS_TIP = "Show the models, LoRAs and embeddings";
-    public const string FILTER_PROVENANCE_TIP = "Show Content Credentials, IPTC, the AI label and AI-training signals";
-
-    public const string TOAST_COPIED_VALUE = "Copied value";
-    public const string TOAST_COPIED_CELL = "Copied cell";
-    public const string TOAST_COPIED_TSV_SUB = "Tab-separated name and value";
-    public const string TOAST_COPIED_JSON_SUB = "Group-prefixed keys";
-    public const string TOAST_COPIED_AS_JSON = "Copied as JSON";
-    public const string TOAST_EXPORT_FAILED = "Export failed";
-
-    // the rail (DS 6.10; Proto) and the inspector (DS 6.11; Appendix B item 16)
-    public const string GROUPS = "GROUPS";
-    public const string QUICK_FILTERS = "QUICK FILTERS";
-    public const string HIDE_ALL = "Hide all";
-    public const string SHOW_ALL = "Show all";
-    public const string FILE_READING = "Reading…";
-    public const string FILE_READING_SUB = "ExifTool is parsing the file";
-    public const string FILE_NONE = "No file open";
-    public const string FILE_NONE_SUB = "Open or drop a file";
-    public const string TOAST_COPIED_KEY = "Copied tag key";
-    public const string TOAST_COPIED_RAW = "Copied raw value";
-    public const string TOAST_COPIED_FORMAT = "Copied format";
-    public const string TOAST_EDIT_STAGED = "Edit staged";
-    public const string TOAST_NO_CHANGE = "No change";
-    public const string TOAST_COPIED_PROMPT = "Copied prompt";
-    public const string TOAST_COPIED_NEGATIVE = "Copied negative prompt";
-    public const string TOAST_COPIED_PARAMETERS = "Copied generation parameters";
-    public const string TOAST_COPIED_AI_JSON = "Copied AI data as JSON";
-    public const string TOAST_COPIED_WORKFLOW = "Copied workflow JSON";
-    public const string TOAST_COPIED_CHARACTER = "Copied character card";
-    public const string TOAST_SAVED_WORKFLOW = "Saved workflow";
-    public const string TOAST_SAVED_PARAMETERS = "Saved generation parameters";
-    public const string TOAST_SAVED_AI_JSON = "Saved AI data";
-    public const string TOAST_SAVED_CHARACTER = "Saved character card";
-
-    // the Export menu's AI items (P7)
-    public const string EXPORT_AI_HEADER = "AI GENERATION";
-    public const string EXPORT_AI_PARAMETERS = "Generation parameters";
-    public const string EXPORT_AI_PARAMETERS_DESC = "A1111 text, as .txt";
-    public const string EXPORT_AI_JSON = "AI data as JSON";
-    public const string EXPORT_AI_JSON_DESC = "Every parsed field with its source tag";
-    public const string EXPORT_AI_WORKFLOW = "Workflow";
-    public const string EXPORT_AI_WORKFLOW_DESC = "Exactly as embedded, as .json";
-
-    // editing, the pending bar, Save and the unsaved-changes dialog (DS 7.3, 6.13; S5; D8; Appendix B items 3 and 16)
-    public const string EDIT_STAGED = "Already staged";
-    public const string EDIT_AI_NONE = "No AI generation data in this file";
-    public const string EDIT_GPS_MANIFEST = "Only in the Content Credentials, which ExifTool can't edit";
-    public const string NOTE_MANIFEST_GPS = "The location in the Content Credentials stays: Strip all metadata removes it with the manifest";
-    public const string TOAST_TAG_STAGED = "Tag staged";
-    public const string TOAST_NOTHING_SAVED = "Nothing to change";
-    public const string TOAST_NOTHING_SAVED_SUB = "The file already had these values";
-    public const string TOAST_SAVED_BINARY = "Saved binary data";
-    public const string TOAST_BINARY_FAILED = "Couldn't read the binary data";
-    public const string SAVE = "Save";
-    public const string DISCARD = "Discard";
-    public const string RELOAD = "Reload";
-
-    // D29: the edits ImageGlass's SHUTDOWN kept for the next start
-    public const string RESTORE = "Restore";
-    public const string NOT_NOW = "Not now";
-    public const string RESTORED_SUB = "Nothing is written until you save";
-    public const string TOAST_RECOVERY_GONE = "Couldn't restore unsaved changes";
-    public const string SAVE_UNAVAILABLE = "ExifTool isn't available";
-    public const string BINARY_FILES = "Binary data";
-
-    // the Details card's AI-training row (AI addendum question 10)
-    public const string AI_TRAINING = "AI training";
-    public const string NOT_ALLOWED = "Not allowed";
-    public const string PLUS_DATA_MINING = "PLUS DataMining";
-    public const string EXIF_OPT_OUT = "Exif 3.1 LearningOptOutIn";
-
-    // Settings (DS 6.15, Proto)
-    public const string GENERAL_OVERLINE = "GENERAL";
-    public const string EXIFTOOL_OVERLINE = "EXIFTOOL";
-    public const string PREVIEW_OVERLINE = "COMMAND PREVIEW";
-    public const string APP_THEME = "App theme";
-    public const string THEME_SYSTEM = "System";
-    public const string THEME_LIGHT = "Light";
-    public const string THEME_DARK = "Dark";
-    public const string APP_THEME_DESC = "System follows your OS light or dark setting.";
-    public const string ACCENT_COLOR = "Accent color";
-    public const string ACCENT_COLOR_DESC = "System follows your OS accent color.";
-    public const string ACCENT_SYSTEM = "System accent color";
-    public const string ACCENT_BLUE = "Blue";
-    public const string ACCENT_PURPLE = "Purple";
-    public const string ACCENT_PINK = "Pink";
-    public const string ACCENT_ORANGE = "Orange";
-    public const string ACCENT_GREEN = "Green";
-    public const string ACCENT_YELLOW = "Yellow";
-    public const string ACCENT_GRAPHITE = "Graphite";
-    public const string ALWAYS_ON_TOP = "Keep window always on top";
-    public const string ALWAYS_ON_TOP_DESC = "Float above other apps while you compare files.";
-    public const string CHECK_UPDATES = "Check for updates on startup";
-    public const string CHECK_UPDATES_DESC = "A quiet check against GitHub releases.";
-    public const string EXECUTABLE_PATH = "Executable path";
-    public const string BROWSE = "Browse…";
-    public const string BROWSE_TIP = "Choose the exiftool to run";
-    public const string ARGUMENTS = "Arguments";
-    public const string ARGUMENTS_KEYS = "Enter to add · Backspace to remove";
-    public const string ARGUMENTS_HINT = "Hover an argument to see what it does.";
-    public const string RESET = "Reset";
-    public const string RESET_TIP = "Back to the default settings";
-    public const string OK = "OK";
-    public const string CANCEL = "Cancel";
-    public const string BUNDLED_EXIFTOOL = "Bundled ExifTool";
-    public const string PATH_NOT_FOUND = "No file at this path. ExifGlass uses its bundled ExifTool instead.";
-    public const string NO_EXIFTOOL = "No ExifTool was found. Choose the exiftool to run.";
-    public const string USE_BUNDLED = "Clear the path to use the bundled ExifTool.";
-    public const string SANDBOX_NOTE = "This version runs its bundled ExifTool and keeps the _original backups in its own container.";
-    public const string PICKER_EXIFTOOL = "Choose ExifTool";
-    public const string PICKER_PROGRAMS = "Programs";
-    public const string TOAST_SETTINGS_SAVED = "Settings saved";
-
-    // About (FewerPhotos's About, owner at the P9 review; D10, D11)
-    public const string NOTICES_OVERLINE = "THIRD-PARTY NOTICES";
-    public const string BACK = "Back";
-    public const string BACK_TIP = "Back (Esc)";
+    // names, addresses and specification terms every language keeps
     public const string COPYRIGHT = "Copyright © 2023 - 2027 Duong Dieu Phap";
-    public const string COPY_VERSION_INFO = "Copy version info";
-    public const string TOAST_VERSION_COPIED = "Version info copied";
-    public const string UPDATES = "Updates";
-    public const string NEW_BADGE = "NEW";
-    public const string CHECK_NOW = "Check now";
-    public const string NOT_CHECKED = "Not checked yet";
-    public const string CHECKING_UPDATES = "Checking for updates…";
-    public const string UPDATE_ERROR = "Couldn't check. Check your connection.";
-    public const string DOWNLOAD = "Download";
-    public const string WEBSITE = "Website";
-    public const string VISIT = "Visit";
     public const string HOMEPAGE_TEXT = "imageglass.org/exifglass";
     public const string STORE_TITLE = "Microsoft Store";
-    public const string STORE_SUB = "Support development · automatic updates";
-    public const string STORE_GET = "Get ExifGlass";
-    public const string SHOW_FEWER = "Show fewer";
     public const string STORE_URL = "https://apps.microsoft.com/detail/9MX8S9HZ57W8";
-    public const string TOAST_UPDATE_SUB = "Download it from About";
-
-    // the macOS menu bar (Appendix B item 5)
-    public const string MENU_FILE = "File";
-    public const string MENU_EDIT = "Edit";
-    public const string MENU_VIEW = "View";
-    public const string MENU_WINDOW = "Window";
-    public const string MENU_SETTINGS = "Settings…";
-    public const string MENU_QUIT = "Quit ExifGlass";
-    public const string MENU_OPEN = "Open…";
-    public const string MENU_CLOSE_WINDOW = "Close Window";
-    public const string MENU_COPY = "Copy";
-    public const string MENU_SELECT_ALL = "Select All";
-    public const string MENU_FIND = "Find";
-    public const string MENU_GROUPS = "Groups Panel";
-    public const string MENU_INSPECTOR = "Inspector";
-    public const string MENU_COMMAND_BAR = "Command Bar";
-    public const string MENU_MINIMIZE = "Minimize";
-    public const string MENU_ZOOM = "Zoom";
+    public const string PLUS_DATA_MINING = "PLUS DataMining";
+    public const string EXIF_OPT_OUT = "Exif 3.1 LearningOptOutIn";
 
     #endregion // Constants
 
@@ -291,103 +45,112 @@ public static class AppText
     #region Public methods
 
     /// <summary>
+    /// Gives the XAML tooltips their platform shortcuts: "Open file (Ctrl+O)".
+    /// </summary>
+    public static void RegisterResources()
+    {
+        LangResources.SetArguments(LangId.Toolbar_OpenFileTip, UiText.Shortcut("O"));
+        LangResources.SetArguments(LangId.Toolbar_SettingsTip, UiText.Shortcut(","));
+        LangResources.SetArguments(LangId.Toolbar_AboutTip, "F1");
+        LangResources.SetArguments(LangId.Edit_AddTagTip, UiText.Shortcut("Enter"));
+        LangResources.SetArguments(LangId.Inspector_ApplyTip, UiText.Shortcut("Enter"));
+    }
+
+
+    /// <summary>
     /// The window title (Appendix B item 14): "{file} – ExifGlass", or the app name alone.
     /// </summary>
     public static string WindowTitle(string? fileName) => string.IsNullOrEmpty(fileName) ? AppInfo.PRODUCT_NAME : $"{fileName} – {AppInfo.PRODUCT_NAME}";
 
-    public static string InGroups(int count) => count == 1 ? "in 1 group" : string.Create(CultureInfo.InvariantCulture, $"in {count:N0} groups");
+    public static string InGroups(int count) => count == 1 ? Lang.Current[LangId.Table_InGroupsOne] : Lang.Current[LangId.Table_InGroups, count];
 
-    public static string OpenedOneOf(int total) => string.Create(CultureInfo.InvariantCulture, $"Opened 1 of {total:N0} files");
+    public static string OpenedOneOf(int total) => Lang.Current[LangId.Toast_OpenedOneOf, total];
 
-    public static string OpenTooltip => $"Open file ({UiText.Shortcut("O")})";
+    public static string Tags(int count) => UiText.Tags(count);
 
-    public static string Tags(int count) => count == 1 ? "1 tag" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} tags");
+    public static string CopiedTags(int count) => Lang.Current[LangId.Toast_CopiedTags, Tags(count)];
 
-    public static string CopiedTags(int count) => $"Copied {Tags(count)}";
+    public static string CopiedAsJson(int count) => Lang.Current[LangId.Toast_CopiedRowsAsJson, count];
 
-    public static string CopiedAsJson(int count) => string.Create(CultureInfo.InvariantCulture, $"Copied {count:N0} as JSON");
-
-    public static string TagsInView(int tags, int ai) => $"{TagsAndAi(tags, ai)} in view";
+    public static string TagsInView(int tags, int ai) => Lang.Current[LangId.Table_InView, TagsAndAi(tags, ai)];
 
     /// <summary>
     /// The Export menu's header (DS 8: be concrete), uppercase as a menu header (DS 6.8).
     /// </summary>
-    public static string ExportsInView(int tags, int ai) => $"EXPORTS THE {TagsAndAi(tags, ai).ToUpperInvariant()} IN VIEW";
+    public static string ExportsInView(int tags, int ai) => Lang.Current[LangId.Export_Header, TagsAndAi(tags, ai).ToUpperInvariant()];
 
     /// <summary>
     /// "22 tags and 15 AI fields": AI fields are counted apart from tags (AI addendum question 2).
     /// </summary>
-    public static string TagsAndAi(int tags, int ai) => ai == 0 ? Tags(tags) : $"{Tags(tags)} and {AiFields(ai)}";
+    public static string TagsAndAi(int tags, int ai) => ai == 0 ? Tags(tags) : Lang.Current[LangId._TagsAndAi, Tags(tags), AiFields(ai)];
 
-    public static string Exported(string file) => $"Exported {file}";
+    public static string Exported(string file) => Lang.Current[LangId.Toast_Exported, file];
 
-    public static string ExportedSub(int tags, int ai, long bytes) => string.Create(CultureInfo.InvariantCulture, $"{TagsAndAi(tags, ai)} · {bytes / 1024.0:0.0} kB");
+    public static string ExportedSub(int tags, int ai, long bytes) => Lang.Current[LangId.Toast_ExportedSub, TagsAndAi(tags, ai), bytes / 1024.0];
 
-    public static string GpsTags(int count) => string.Create(CultureInfo.InvariantCulture, $"{count:N0} location {(count == 1 ? "tag" : "tags")} · {Core.Editing.WritePlan.REMOVE_GPS}");
+    public static string GpsTags(int count) => count == 1
+        ? Lang.Current[LangId.Edit_GpsTagsOne, Core.Editing.WritePlan.REMOVE_GPS]
+        : Lang.Current[LangId.Edit_GpsTags, count, Core.Editing.WritePlan.REMOVE_GPS];
 
     /// <summary>
     /// The pending bar's title (S5): "3 pending changes".
     /// </summary>
-    public static string PendingChanges(int count) => count == 1 ? "1 pending change" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} pending changes");
+    public static string PendingChanges(int count) => count == 1 ? Lang.Current[LangId.Pending_ChangesOne] : Lang.Current[LangId.Pending_Changes, count];
 
     /// <summary>
     /// The pending bar's line (DS 6.13): "Save writes DSCF4127.JPG · backup kept as DSCF4127.JPG_original".
     /// </summary>
-    public static string SaveWrites(string file) => $"Save writes {file} · backup kept as {file}_original";
+    public static string SaveWrites(string file) => Lang.Current[LangId.Pending_SaveWrites, file];
 
     /// <summary>
     /// The Mac App Store build's pending bar line (D7): the backup stays in the app's container.
     /// </summary>
-    public static string SaveWritesInContainer(string file) => $"Save writes {file} · backup kept in ExifGlass's container";
+    public static string SaveWritesInContainer(string file) => Lang.Current[LangId.Pending_SaveWritesInContainer, file];
 
     public static string TagStaged(string group, string name) => $"{group}:{name}";
 
-    public static string Saved(int count) => count == 1 ? "Saved 1 change" : string.Create(CultureInfo.InvariantCulture, $"Saved {count:N0} changes");
+    public static string Saved(int count) => count == 1 ? Lang.Current[LangId.Toast_SavedOne] : Lang.Current[LangId.Toast_Saved, count];
 
-    public static string BackupKept(string file) => $"Backup kept as {file}_original";
+    public static string BackupKept(string file) => Lang.Current[LangId.Toast_BackupKept, file];
 
-    public const string BACKUP_KEPT_IN_CONTAINER = "Backup kept in ExifGlass's container";
-
-    public static string SaveFailed(string file) => $"Couldn't save {file}";
+    public static string SaveFailed(string file) => Lang.Current[LangId.Toast_SaveFailed, file];
 
     /// <summary>
     /// D8's question when another file is asked for or the window closes with edits staged.
     /// </summary>
-    public static string UnsavedTitle(string file) => $"Save changes to {file}?";
+    public static string UnsavedTitle(string file) => Lang.Current[LangId.Dialog_UnsavedTitle, file];
 
-    public static string UnsavedBody(int count) => $"{PendingChanges(count)} not written yet. Discard drops them.";
+    public static string UnsavedBody(int count) => Lang.Current[LangId.Dialog_UnsavedBody, PendingChanges(count)];
 
     /// <summary>
     /// Save's question when another app changed the file after ExifGlass read it (owner at G12).
     /// </summary>
-    public static string ChangedTitle(string file) => $"{file} changed on disk";
+    public static string ChangedTitle(string file) => Lang.Current[LangId.Dialog_ChangedTitle, file];
 
     public static string ChangedBody(int count) =>
-        $"Another app changed the file after ExifGlass read it. Save writes {(count == 1 ? "1 change" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes"))} into the file as it is now; Reload reads it again and drops them.";
+        Lang.Current[LangId.Dialog_ChangedBody, count == 1 ? Lang.Current[LangId._ChangesOne] : Lang.Current[LangId._Changes, count]];
 
     /// <summary>
     /// D29's question at the start after ImageGlass closed the app with edits staged.
     /// </summary>
-    public static string RecoveryTitle(string file) => $"Restore changes to {file}?";
+    public static string RecoveryTitle(string file) => Lang.Current[LangId.Dialog_RecoveryTitle, file];
 
     public static string RecoveryBody(int count, bool fileChanged)
     {
-        var kept = count == 1 ? "1 change wasn't saved" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes weren't saved");
-        return fileChanged
-            ? $"{kept} when ImageGlass closed ExifGlass, and the file has changed since. Discard drops them."
-            : $"{kept} when ImageGlass closed ExifGlass. Discard drops them.";
+        var kept = count == 1 ? Lang.Current[LangId.Dialog_RecoveryKeptOne] : Lang.Current[LangId.Dialog_RecoveryKept, count];
+        return Lang.Current[fileChanged ? LangId.Dialog_RecoveryBodyChanged : LangId.Dialog_RecoveryBody, kept];
     }
 
-    public static string RecoveryGone(string file) => $"{file} was moved or deleted";
+    public static string RecoveryGone(string file) => Lang.Current[LangId.Toast_RecoveryGoneSub, file];
 
-    public static string Restored(int count) => count == 1 ? "Restored 1 change" : string.Create(CultureInfo.InvariantCulture, $"Restored {count:N0} changes");
+    public static string Restored(int count) => count == 1 ? Lang.Current[LangId.Toast_RestoredOne] : Lang.Current[LangId.Toast_Restored, count];
 
-    public static string RestoreDropped(int count) => count == 1 ? "1 change no longer applies to the file" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} changes no longer apply to the file");
+    public static string RestoreDropped(int count) => count == 1 ? Lang.Current[LangId.Toast_RestoreDroppedOne] : Lang.Current[LangId.Toast_RestoreDropped, count];
 
     /// <summary>
     /// The Add-tag card's hint for a name ExifTool has no writable tag for: "ExifTool has no EXIF tag it can write named Foo".
     /// </summary>
-    public static string NotWritable(string group, string name) => $"ExifTool has no {group} tag it can write named {name}";
+    public static string NotWritable(string group, string name) => Lang.Current[LangId.Edit_NotWritable, group, name];
 
     /// <summary>
     /// A note from the AI redaction, with how many more there are: "PNG:Comment can't be removed (+2 more)".
@@ -396,66 +159,64 @@ public static class AppText
     {
         0 => string.Empty,
         1 => notes[0],
-        _ => string.Create(CultureInfo.InvariantCulture, $"{notes[0]} (+{notes.Count - 1} more)"),
+        _ => Lang.Current[LangId._FirstOfMore, notes[0], notes.Count - 1],
     };
 
-    public static string SavedBinary(string file, int bytes) => string.Create(CultureInfo.InvariantCulture, $"{file} · {bytes / 1024.0:0.0} kB");
+    public static string SavedBinary(string file, int bytes) => Lang.Current[LangId.Toast_SavedBinarySub, file, bytes / 1024.0];
 
     /// <summary>
     /// The hidden-groups chip (Proto): "Hiding EXIF" or "Hiding 3 groups".
     /// </summary>
     public static string Hiding(IReadOnlyCollection<string> groups) => groups.Count == 1
-        ? $"Hiding {groups.First()}"
-        : string.Create(CultureInfo.InvariantCulture, $"Hiding {groups.Count} groups");
+        ? Lang.Current[LangId.Table_HidingOne, groups.First()]
+        : Lang.Current[LangId.Table_Hiding, groups.Count];
 
     /// <summary>
     /// A copied cell's toast line: the text, cut at 40 characters (Proto).
     /// </summary>
     public static string Clip(string text) => text.Length > 40 ? string.Concat(text.AsSpan(0, 40), "…") : text;
 
-    public static string SettingsTooltip => $"{SETTINGS} ({UiText.Shortcut(",")})";
+    public static string HideGroup(string group) => Lang.Current[LangId.Rail_HideGroup, group];
 
-    public static string HideGroup(string group) => $"Hide {group} tags";
+    public static string ShowGroup(string group) => Lang.Current[LangId.Rail_ShowGroup, group];
 
-    public static string ShowGroup(string group) => $"Show {group} tags";
+    public static string JumpTo(string group) => Lang.Current[LangId.Rail_JumpTo, group];
 
-    public static string JumpTo(string group) => $"Jump to {group}";
+    public static string Characters(int count) => UiText.Characters(count);
 
-    public static string Characters(int count) => count == 1 ? "1 character" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} characters");
+    public static string AiFields(int count) => count == 1 ? Lang.Current[LangId._AiFieldsOne] : Lang.Current[LangId._AiFields, count];
 
-    public static string AboutTooltip => $"{ABOUT} (F1)";
-
-    public static string AiFields(int count) => count == 1 ? "1 AI field" : string.Create(CultureInfo.InvariantCulture, $"{count:N0} AI fields");
-
-    public static string A1111Text(string generator) => $"{generator} · A1111 text";
+    public static string A1111Text(string generator) => Lang.Current[LangId.Toast_A1111Text, generator];
 
     /// <summary>
     /// A copied AI value's toast: "Copied seed", "Copied character 1"; "Copied value" without a label.
     /// </summary>
-    public static string CopiedField(string? label) => string.IsNullOrEmpty(label) ? TOAST_COPIED_VALUE
-        : label.Length > 1 && char.IsUpper(label[1]) ? "Copied " + label
-        : "Copied " + char.ToLowerInvariant(label[0]) + label[1..];
+    public static string CopiedField(string? label) => string.IsNullOrEmpty(label) ? Lang.Current[LangId.Toast_CopiedValue]
+        : Lang.Current[LangId.Toast_CopiedField, label.Length > 1 && char.IsUpper(label[1]) ? label : char.ToLowerInvariant(label[0]) + label[1..]];
 
     /// <summary>
     /// R19 in the AI card: "Your ExifTool 12.40 can't read every AI field. C2PA Content Credentials in every container need 12.75."
     /// </summary>
     public static string OldExifTool(string version, IReadOnlyList<Core.ExifTool.ExifToolFeature> missing) =>
-        $"Your ExifTool {version} can't read every AI field. " + string.Join(" ", missing.Select(f => string.Create(CultureInfo.InvariantCulture, $"{f.Name} need {f.MinVersion:0.00}.")));
+        Lang.Current[LangId.Settings_OldExifTool, version] + " " + string.Join(" ", missing.Select(f => Lang.Current[LangId.Settings_OldExifToolNeeds, f.Name, f.MinVersion]));
 
     /// <summary>
     /// The "Settings saved" toast's line (Proto): "8 arguments · bundled ExifTool".
     /// </summary>
-    public static string SettingsSavedSub(int arguments, bool custom) =>
-        string.Create(CultureInfo.InvariantCulture, $"{arguments:N0} {(arguments == 1 ? "argument" : "arguments")} · {(custom ? "custom" : "bundled")} ExifTool");
+    public static string SettingsSavedSub(int arguments, bool custom)
+    {
+        var count = arguments == 1 ? Lang.Current[LangId.Toast_SettingsSavedArgumentsOne] : Lang.Current[LangId.Toast_SettingsSavedArguments, arguments];
+        return Lang.Current[custom ? LangId.Toast_SettingsSavedCustom : LangId.Toast_SettingsSavedBundled, count];
+    }
 
     /// <summary>
     /// The path field's placeholder (plan 4.4): "Bundled · exiftool 13.59".
     /// </summary>
     public static string ExifToolPlaceholder(Core.ExifTool.ExifToolSource? source, string? version) => (source, version) switch
     {
-        (Core.ExifTool.ExifToolSource.SystemPath, { } v) => $"On PATH · exiftool {v}",
-        (_, { } v) => $"Bundled · exiftool {v}",
-        _ => BUNDLED_EXIFTOOL,
+        (Core.ExifTool.ExifToolSource.SystemPath, { } v) => Lang.Current[LangId.Settings_ExifToolOnPath, v],
+        (_, { } v) => Lang.Current[LangId.Settings_ExifToolBundled, v],
+        _ => Lang.Current[LangId.Settings_BundledExifTool],
     };
 
     /// <summary>
@@ -466,33 +227,39 @@ public static class AppText
     /// <summary>
     /// About's version line (FewerPhotos): "Version 3.0.0.1020-alpha (2026.10.25) · Windows · x64".
     /// </summary>
-    public static string VersionLine(string version, string buildDate, string os, string architecture) => $"Version {version} ({buildDate}) · {os} · {architecture}";
+    public static string VersionLine(string version, string buildDate, string os, string architecture) => Lang.Current[LangId.About_VersionLine, version, buildDate, os, architecture];
 
     /// <summary>
     /// The Updates row's line, kept to one (owner at the P9 review): "You're up to date · checked at 12:17".
     /// </summary>
-    public static string UpToDate(string time) => $"You're up to date · checked at {time}";
+    public static string UpToDate(string time) => Lang.Current[LangId.About_UpToDate, time];
 
     public static string UpdateReady(string version, string released) =>
-        string.IsNullOrEmpty(released) ? $"Version {version} is available" : $"Version {version} is available ({released})";
+        string.IsNullOrEmpty(released) ? Lang.Current[LangId.About_UpdateReady, version] : Lang.Current[LangId.About_UpdateReadyDate, version, released];
 
     /// <summary>
     /// D10's startup toast: "ExifGlass 3.0.1 is available".
     /// </summary>
-    public static string UpdateAvailable(string version) => $"{AppInfo.PRODUCT_NAME} {version} is available";
+    public static string UpdateAvailable(string version) => Lang.Current[LangId.Toast_UpdateAvailable, AppInfo.PRODUCT_NAME, version];
 
     public static string ThemeName(AppTheme theme) => theme switch
     {
-        AppTheme.Light => THEME_LIGHT,
-        AppTheme.Dark => THEME_DARK,
-        _ => THEME_SYSTEM,
+        AppTheme.Light => Lang.Current[LangId.Settings_ThemeLight],
+        AppTheme.Dark => Lang.Current[LangId.Settings_ThemeDark],
+        _ => Lang.Current[LangId.Settings_ThemeSystem],
     };
-
 
     /// <summary>
     /// DS 1.3 without its em dash (owner at G4 review): "Theme: System (click for Light)".
     /// </summary>
-    public static string ThemeTooltip(AppTheme current, AppTheme next) => $"Theme: {ThemeName(current)} (click for {ThemeName(next)})";
+    public static string ThemeTooltip(AppTheme current, AppTheme next) => Lang.Current[LangId.Toolbar_ThemeTip, ThemeName(current), ThemeName(next)];
+
+    /// <summary>
+    /// The Language row's line: "Contributors: Duong Dieu Phap"; empty for a pack that names no one.
+    /// </summary>
+    public static string Contributors(IReadOnlyList<string> names) => names.Count == 0 ? string.Empty : Lang.Current[LangId.Settings_LanguageContributors, string.Join(", ", names)];
+
+    public static string LanguagesInstalled(int count) => count == 1 ? Lang.Current[LangId.Toast_LanguageInstalledOne] : Lang.Current[LangId.Toast_LanguageInstalled, count];
 
     #endregion // Public methods
 }

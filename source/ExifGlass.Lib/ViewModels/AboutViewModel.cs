@@ -20,6 +20,7 @@ using Avalonia.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Common;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Update;
 using ExifGlass.Services;
 using System.ComponentModel;
@@ -115,11 +116,11 @@ public sealed partial class AboutViewModel : ObservableObject
 
     public string UpdateText => UpdateState switch
     {
-        UpdateState.Checking => AppText.CHECKING_UPDATES,
+        UpdateState.Checking => Lang.Current[LangId.About_Checking],
         UpdateState.UpToDate => AppText.UpToDate((_updates?.CheckedAt ?? DateTimeOffset.Now).ToLocalTime().ToString("HH:mm", CultureInfo.InvariantCulture)),
         UpdateState.Available => AppText.UpdateReady(_updates?.Latest?.Version ?? string.Empty, Released(_updates?.Latest)),
-        UpdateState.Failed => AppText.UPDATE_ERROR,
-        _ => AppText.NOT_CHECKED,
+        UpdateState.Failed => Lang.Current[LangId.About_UpdateError],
+        _ => Lang.Current[LangId.About_NotChecked],
     };
 
     /// <summary>
@@ -142,7 +143,7 @@ public sealed partial class AboutViewModel : ObservableObject
 
     public bool ShowsNoticesToggle => Notices.Count > NOTICES_SHOWN;
 
-    public string NoticesToggleText => AllNoticesShown ? AppText.SHOW_FEWER : AppText.SHOW_ALL;
+    public string NoticesToggleText => AllNoticesShown ? Lang.Current[LangId._ShowFewer] : Lang.Current[LangId._ShowAll];
 
     /// <summary>
     /// The notice whose full text shows in place of the main page, with Back (FewerPhotos).
@@ -174,6 +175,17 @@ public sealed partial class AboutViewModel : ObservableObject
 
 
     #region Public methods
+
+    /// <summary>
+    /// Reads the lines it builds again after a language change.
+    /// </summary>
+    public void RefreshText()
+    {
+        OnPropertyChanged(nameof(VersionLine));
+        OnPropertyChanged(nameof(UpdateText));
+        OnPropertyChanged(nameof(NoticesToggleText));
+    }
+
 
     public void Close()
     {
@@ -211,7 +223,7 @@ public sealed partial class AboutViewModel : ObservableObject
         if (_main.Shell is not { } shell) return;
 
         await shell.CopyTextAsync(VersionInfo);
-        ToastRequested?.Invoke(this, AppText.TOAST_VERSION_COPIED);
+        ToastRequested?.Invoke(this, Lang.Current[LangId.Toast_VersionCopied]);
     }
 
 

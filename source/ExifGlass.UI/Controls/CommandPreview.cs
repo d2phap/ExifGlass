@@ -24,6 +24,8 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Media;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Controls;
@@ -164,7 +166,8 @@ public sealed class CommandText : SelectableTextBlock
     public CommandText()
     {
         // the theme's menu calls the base Copy, which would keep them
-        var copy = new GlassMenuItem { Header = UiText.COPY, Glyph = IconId.Copy, InputGesture = TextBox.CopyGesture };
+        var copy = new GlassMenuItem { Glyph = IconId.Copy, InputGesture = TextBox.CopyGesture };
+        LangResources.Bind(copy, HeaderedSelectingItemsControl.HeaderProperty, LangId._Copy);
         copy.Click += (_, _) => CopyClean();
         var menu = new MenuFlyout { Items = { copy } };
         MenuMotion.Attach(menu);

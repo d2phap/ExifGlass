@@ -22,6 +22,8 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 
 namespace ExifGlass.UI.Controls;
 
@@ -333,11 +335,21 @@ public class StoreBadge : Button
     public static readonly DirectProperty<StoreBadge, IconId> GlyphProperty =
         AvaloniaProperty.RegisterDirect<StoreBadge, IconId>(nameof(Glyph), b => b.Glyph);
 
-    private string _caption = UiText.STORE_CAPTION;
+    private string _caption = Lang.Current[LangId.Badge_StoreCaption];
     private string _target = UiText.STORE_TARGET;
     private IconId _glyph = IconId.BrandMicrosoftStore;
 
     #endregion // Fields and constants
+
+
+    #region Constructors
+
+    public StoreBadge()
+    {
+        LangResources.Track(this, UpdateKind);
+    }
+
+    #endregion // Constructors
 
 
     #region Properties
@@ -376,14 +388,19 @@ public class StoreBadge : Button
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property != KindProperty) return;
-
-        (Caption, Target, Glyph) = Kind == StoreBadgeKind.GitHubReleases
-            ? (UiText.RELEASES_CAPTION, UiText.RELEASES_TARGET, IconId.ArrowDownload)
-            : (UiText.STORE_CAPTION, UiText.STORE_TARGET, IconId.BrandMicrosoftStore);
+        if (change.Property == KindProperty) UpdateKind();
     }
 
     #endregion // Protected methods
+
+
+    #region Private methods
+
+    private void UpdateKind() => (Caption, Target, Glyph) = Kind == StoreBadgeKind.GitHubReleases
+        ? (Lang.Current[LangId.Badge_ReleasesCaption], UiText.RELEASES_TARGET, IconId.ArrowDownload)
+        : (Lang.Current[LangId.Badge_StoreCaption], UiText.STORE_TARGET, IconId.BrandMicrosoftStore);
+
+    #endregion // Private methods
 }
 
 

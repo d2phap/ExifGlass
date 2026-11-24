@@ -92,7 +92,8 @@ public static class QueryEngine
             var hidden = query.HiddenGroups.Contains(name);
             var collapsed = query.CollapsedGroups.Contains(name);
             var ai = name == GroupInfo.AI_GROUP;
-            var description = ai ? GroupInfo.Describe(name) : doc.Groups.FirstOrDefault(g => g.Name == name)?.Description ?? string.Empty;
+            // described per query, so a new language reaches the headers with the next one
+            var description = GroupInfo.Describe(name, name == "MakerNotes" ? doc.Find("EXIF", "Make")?.Value : null);
             var group = new ViewGroup(name, description, all.Count, passing.Count, hidden, collapsed) { SourceKey = ai ? cache.AiSource : null };
             groups.Add(group);
 

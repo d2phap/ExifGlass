@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:eg="using:ExifGlass.UI"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
@@ -329,7 +330,8 @@
                            BorderThickness="1"
                            BoxShadow="{DynamicResource ShadowSelectedCard}"
                            CornerRadius="{StaticResource RadiusPanel}">
-          <StackPanel x:DataType="ui:SelectedTagView"
+          <StackPanel Name="PART_Content"
+                      x:DataType="ui:SelectedTagView"
                       DataContext="{TemplateBinding View}"
                       Spacing="12">
             <!--  group chip, Tag ID; Delete or Undo, a divider, Close  -->
@@ -342,7 +344,7 @@
                               DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Dismiss}"
-                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+                              ToolTip.Tip="{l:Lang _Close}" />
               <ui:SquircleBorder Name="PART_Divider"
                                  Width="1"
                                  Height="16"
@@ -354,7 +356,7 @@
                               Command="{TemplateBinding DeleteCommand}"
                               DockPanel.Dock="Right"
                               Icon="{x:Static ui:IconId.Delete}"
-                              ToolTip.Tip="{x:Static eg:UiText.DELETE_TAG}" />
+                              ToolTip.Tip="{l:Lang Inspector_DeleteTag}" />
               <ui:GlassButton Name="PART_Undo"
                               Classes="small"
                               Command="{TemplateBinding DeleteCommand}"
@@ -362,7 +364,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.ArrowUndo}"
                               IsVisible="False"
-                              ToolTip.Tip="{x:Static eg:UiText.UNDO_DELETE}" />
+                              ToolTip.Tip="{l:Lang Inspector_UndoDelete}" />
               <StackPanel VerticalAlignment="Center"
                           Orientation="Horizontal"
                           Spacing="8">
@@ -410,7 +412,7 @@
                               DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Copy}"
-                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
+                              ToolTip.Tip="{l:Lang _CopyValue}" />
               <TextBlock Name="PART_Name"
                          tok:Typography.Role="Title"
                          Text="{Binding Name}"
@@ -461,7 +463,7 @@
                         Spacing="8">
               <TextBox Name="PART_Editor"
                        Classes="mono-editor"
-                       AutomationProperties.Name="{x:Static eg:UiText.EDIT_VALUE}"
+                       AutomationProperties.Name="{l:Lang Inspector_EditValue}"
                        Text="{TemplateBinding EditText, Mode=TwoWay}" />
               <StackPanel HorizontalAlignment="Right"
                           Orientation="Horizontal"
@@ -469,13 +471,13 @@
                 <ui:GlassButton Name="PART_Cancel"
                                 Classes="card"
                                 Command="{TemplateBinding CancelCommand}"
-                                Content="{x:Static eg:UiText.CANCEL}"
-                                ToolTip.Tip="{x:Static eg:UiText.CANCEL_TIP}" />
+                                Content="{l:Lang _Cancel}"
+                                ToolTip.Tip="{l:Lang _CancelTip}" />
                 <ui:GlassButton Name="PART_Apply"
                                 Classes="card primary"
                                 Command="{TemplateBinding ApplyCommand}"
-                                Content="{x:Static eg:UiText.APPLY}"
-                                ToolTip.Tip="{x:Static eg:UiText.ApplyTip}" />
+                                Content="{l:Lang _Apply}"
+                                ToolTip.Tip="{l:Lang Inspector_ApplyTip}" />
               </StackPanel>
             </StackPanel>
 
@@ -484,7 +486,7 @@
               <ui:GlassButton Margin="0,0,-6,0"
                               Classes="link"
                               Command="{TemplateBinding RevertCommand}"
-                              Content="{x:Static eg:UiText.REVERT}"
+                              Content="{l:Lang Inspector_Revert}"
                               DockPanel.Dock="Right" />
               <TextBlock VerticalAlignment="Center"
                          tok:Typography.Role="Meta"
@@ -493,13 +495,15 @@
                          TextTrimming="CharacterEllipsis" />
             </DockPanel>
 
-            <!--  Raw (-n), Format (D18), Tag key: label 70, gap 12, rows 6 apart  -->
-            <Grid Name="PART_Details"
-                  ColumnDefinitions="70,*"
-                  RowDefinitions="Auto,6,Auto,6,Auto">
+            <!--  Raw (-n), Format (D18), Tag key: label 70 (wider for a longer translation), gap 12, rows 6 apart  -->
+            <Grid Name="PART_Details" RowDefinitions="Auto,6,Auto,6,Auto">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="70" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
               <TextBlock tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.RAW_VALUE}" />
+                         Text="{l:Lang Inspector_RawValue}" />
               <!--  Raw and Format copy as Tag key does (owner after G7)  -->
               <DockPanel Grid.Column="1" MinHeight="20" Margin="12,0,0,0">
                 <ui:GlassButton Name="PART_CopyRaw"
@@ -510,7 +514,7 @@
                                 DockPanel.Dock="Right"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Icon="{x:Static ui:IconId.Copy}"
-                                ToolTip.Tip="{x:Static eg:UiText.COPY_RAW_VALUE}" />
+                                ToolTip.Tip="{l:Lang Inspector_CopyRawValue}" />
                 <TextBlock Name="PART_Raw"
                            VerticalAlignment="Center"
                            tok:Typography.Role="Mono"
@@ -520,7 +524,7 @@
               <TextBlock Grid.Row="2"
                          tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.FORMAT}" />
+                         Text="{l:Lang Inspector_Format}" />
               <DockPanel Grid.Row="2"
                          Grid.Column="1"
                          Height="20"
@@ -533,7 +537,7 @@
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Icon="{x:Static ui:IconId.Copy}"
                                 IsVisible="{Binding HasFormat}"
-                                ToolTip.Tip="{x:Static eg:UiText.COPY_FORMAT}" />
+                                ToolTip.Tip="{l:Lang Inspector_CopyFormat}" />
                 <TextBlock Name="PART_Format"
                            VerticalAlignment="Center"
                            tok:Typography.Role="Mono"
@@ -543,7 +547,7 @@
                          VerticalAlignment="Center"
                          tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.TAG_KEY}" />
+                         Text="{l:Lang Inspector_TagKey}" />
               <DockPanel Grid.Row="4"
                          Grid.Column="1"
                          Height="20"
@@ -555,7 +559,7 @@
                                 DockPanel.Dock="Right"
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Icon="{x:Static ui:IconId.Copy}"
-                                ToolTip.Tip="{x:Static eg:UiText.COPY_TAG_KEY}" />
+                                ToolTip.Tip="{l:Lang Inspector_CopyTagKey}" />
                 <TextBlock Name="PART_Key"
                            VerticalAlignment="Center"
                            tok:Typography.Role="Mono"
@@ -575,7 +579,7 @@
                 <ui:GlassButton DockPanel.Dock="Right"
                                 Classes="link"
                                 Command="{TemplateBinding GoToAiCommand}"
-                                Content="{x:Static eg:UiText.GO_TO_AI}" />
+                                Content="{l:Lang Inspector_GoToAi}" />
                 <ui:GlassIcon Width="14"
                               Height="14"
                               Margin="0,0,8,0"
@@ -596,18 +600,18 @@
                         Spacing="6">
               <ui:GlassButton Name="PART_SaveBinary"
                               Command="{TemplateBinding SaveBinaryCommand}"
-                              Content="{x:Static eg:UiText.SAVE_BINARY}"
+                              Content="{l:Lang Inspector_SaveBinary}"
                               Icon="{x:Static ui:IconId.ArrowDownload}"
                               IconSize="15"
                               IsVisible="False"
-                              ToolTip.Tip="{x:Static eg:UiText.SAVE_BINARY_TIP}" />
+                              ToolTip.Tip="{l:Lang Inspector_SaveBinaryTip}" />
               <ui:GlassButton Name="PART_Edit"
                               Classes="primary"
                               Command="{TemplateBinding EditCommand}"
-                              Content="{x:Static eg:UiText.EDIT}"
+                              Content="{l:Lang _Edit}"
                               Icon="{x:Static ui:IconId.Edit}"
                               IconSize="15"
-                              ToolTip.Tip="{x:Static eg:UiText.EDIT_VALUE}" />
+                              ToolTip.Tip="{l:Lang Inspector_EditValue}" />
             </StackPanel>
           </StackPanel>
         </ui:SquircleBorder>
@@ -712,7 +716,7 @@
               <TextBlock VerticalAlignment="Center"
                          tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.PREVIEW_OVERLINE}" />
+                         Text="{l:Lang Inspector_PreviewOverline}" />
             </DockPanel>
             <ui:FrameBox Name="PART_Box"
                          HorizontalAlignment="Center"
@@ -889,7 +893,7 @@
                                           IsVisible="{Binding HasLink}"
                                           ToolTip.Tip="{Binding Link}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                              <TextBlock VerticalAlignment="Center" Text="{x:Static eg:UiText.OPEN_IN_OSM}" />
+                              <TextBlock VerticalAlignment="Center" Text="{l:Lang Inspector_OpenInOsm}" />
                               <ui:GlassIcon Width="11"
                                             Height="11"
                                             VerticalAlignment="Center"
@@ -915,7 +919,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Camera}" />
                 <Grid ColumnDefinitions="70*,30*" RowDefinitions="Auto,Auto">
-                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_CAMERA}" />
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{l:Lang Inspector_Camera}" />
                   <ui:Skeleton Grid.Row="1" Margin="0,5" Index="0" />
                 </Grid>
               </DockPanel>
@@ -929,7 +933,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Aperture}" />
                 <Grid ColumnDefinitions="85*,15*" RowDefinitions="Auto,Auto">
-                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_LENS}" />
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{l:Lang Inspector_Lens}" />
                   <ui:Skeleton Grid.Row="1" Margin="0,5" Index="1" />
                 </Grid>
               </DockPanel>
@@ -943,7 +947,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Clock}" />
                 <Grid ColumnDefinitions="60*,40*" RowDefinitions="Auto,Auto">
-                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_CAPTURED}" />
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{l:Lang Inspector_Captured}" />
                   <ui:Skeleton Grid.Row="1" Margin="0,5" Index="2" />
                 </Grid>
               </DockPanel>
@@ -957,7 +961,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Location}" />
                 <Grid ColumnDefinitions="75*,25*" RowDefinitions="Auto,Auto">
-                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.DETAIL_LOCATION}" />
+                  <TextBlock FontSize="{StaticResource FontSizeOverline}" Foreground="{DynamicResource TextSecondaryBrush}" Text="{l:Lang Inspector_Location}" />
                   <ui:Skeleton Grid.Row="1" Margin="0,5" Index="3" />
                 </Grid>
               </DockPanel>

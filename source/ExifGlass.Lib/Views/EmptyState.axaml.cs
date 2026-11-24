@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using ExifGlass.ViewModels;
 using System.ComponentModel;
 
@@ -39,6 +41,7 @@ public partial class EmptyState : UserControl
     public EmptyState()
     {
         InitializeComponent();
+        LangResources.Track(this, UpdateText);
     }
 
     #endregion // Constructors
@@ -66,13 +69,13 @@ public partial class EmptyState : UserControl
     {
         if (_viewModel?.ExifToolProblem is { } problem)
         {
-            TitleText.Text = AppText.EXIFTOOL_MISSING_TITLE;
-            CaptionText.Text = $"{problem.TrimEnd('.')}. {AppText.EXIFTOOL_MISSING_CAPTION}";
+            TitleText.Text = Lang.Current[LangId._ExifToolUnavailable];
+            CaptionText.Text = $"{problem.TrimEnd('.')}. {Lang.Current[LangId.Empty_ExifToolMissingCaption]}";
             return;
         }
 
-        TitleText.Text = AppText.EMPTY_TITLE;
-        CaptionText.Text = AppText.EMPTY_CAPTION;
+        TitleText.Text = Lang.Current[LangId.Empty_Title];
+        CaptionText.Text = Lang.Current[LangId.Empty_Caption];
     }
 
     #endregion // Private methods

@@ -26,8 +26,10 @@ using Avalonia.Media;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
 
@@ -301,7 +303,7 @@ public sealed class NameCell : Panel
             Tag = new AiActionRequest(AiAction.JumpToAiGroup),
         };
         mark[!TemplatedControl.ForegroundProperty] = mark.GetResourceObservable(TokenKeys.ACCENT2_TEXT_BRUSH).ToBinding();
-        ToolTip.SetTip(mark, UiText.PARSED_INTO_TIP);
+        LangResources.Bind(mark, ToolTip.TipProperty, LangId.Table_ParsedIntoTip);
         return mark;
     }
 
@@ -559,9 +561,9 @@ public sealed class ValueCell : Panel
             _badge.IsVisible = true;
             (_badge.Kind, _badge.Text) = state switch
             {
-                EditState.Edited => (BadgeKind.Edited, UiText.BADGE_EDITED),
-                EditState.Deleted or EditState.Removed => (BadgeKind.Delete, UiText.BADGE_DELETE),
-                _ => (BadgeKind.New, UiText.BADGE_NEW),
+                EditState.Edited => (BadgeKind.Edited, Lang.Current[LangId.Table_BadgeEdited]),
+                EditState.Deleted or EditState.Removed => (BadgeKind.Delete, Lang.Current[LangId.Table_BadgeDelete]),
+                _ => (BadgeKind.New, Lang.Current[LangId.Table_BadgeNew]),
             };
         }
     }
@@ -731,8 +733,8 @@ public sealed class CopyButton : GlassButton
         Focusable = false;
         HorizontalAlignment = HorizontalAlignment.Center;
         VerticalAlignment = VerticalAlignment.Center;
-        ToolTip.SetTip(this, UiText.COPY_VALUE);
-        AutomationProperties.SetName(this, UiText.COPY_VALUE);
+        LangResources.Bind(this, ToolTip.TipProperty, LangId._CopyValue);
+        LangResources.Bind(this, AutomationProperties.NameProperty, LangId._CopyValue);
     }
 
     #endregion // Constructors

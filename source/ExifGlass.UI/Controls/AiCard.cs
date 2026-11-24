@@ -21,6 +21,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using ExifGlass.Core.Ai;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using System.Globalization;
 using System.Windows.Input;
 
@@ -47,7 +49,7 @@ public sealed record AiCharacterView(string Number, string Caption, string Centr
 
     public Thickness Line => IsFirst ? default : new Thickness(0, 1, 0, 0);
 
-    public AiActionRequest Copy => new(AiAction.CopyText, Caption, $"{UiText.CHARACTER} {Number}");
+    public AiActionRequest Copy => new(AiAction.CopyText, Caption, $"{Lang.Current[LangId.Ai_Character]} {Number}");
 
     #endregion // Properties
 }
@@ -235,7 +237,7 @@ public class AiCard : TemplatedControl
     private string? _warning;
     private AiRawView? _raw;
     private AiPassesView? _passesView;
-    private string _promptTitle = UiText.PROMPT_OVERLINE;
+    private string _promptTitle = Lang.Current[LangId.Ai_PromptOverline];
     private string? _prompt;
     private string? _negative;
     private string? _negativeNote;
@@ -255,7 +257,7 @@ public class AiCard : TemplatedControl
     private AiSectionView? _iptc;
     private AiSectionView? _aigc;
     private AiSectionView? _training;
-    private string _mainActionText = UiText.COPY_PARAMETERS;
+    private string _mainActionText = Lang.Current[LangId.Ai_CopyParameters];
     private IconId _mainActionIcon = IconId.Copy;
     private IReadOnlyList<(string Title, IReadOnlyList<AiField> Fields)> _passFields = [];
     private Button? _more;
@@ -272,6 +274,7 @@ public class AiCard : TemplatedControl
     {
         AddHandler(Button.ClickEvent, Button_Click);
         UpdatePseudoClasses();
+        LangResources.Track(this, RefreshText);
     }
 
     #endregion // Constructors
@@ -645,7 +648,7 @@ public class AiCard : TemplatedControl
         base.OnPropertyChanged(change);
 
         if (change.Property == IsExpandedProperty) PseudoClasses.Set(":expanded", IsExpanded);
-        else if (change.Property == AllModelsOpenProperty) MoreModelsLabel = MoreModels.Count == 0 ? null : AllModelsOpen ? UiText.SHOW_LESS : UiText.MoreCount(MoreModels.Count);
+        else if (change.Property == AllModelsOpenProperty) MoreModelsLabel = MoreModels.Count == 0 ? null : AllModelsOpen ? Lang.Current[LangId._ShowLess] : UiText.MoreCount(MoreModels.Count);
         else if (change.Property == SelectedPassProperty) ShowPass(SelectedPass);
         else if (change.Property == IsLoadingProperty) UpdatePseudoClasses();
         else if (change.Property == InfoProperty)
@@ -659,6 +662,17 @@ public class AiCard : TemplatedControl
 
 
     #region Private methods
+
+    // the language changed: the same data again, keeping what the user opened
+    private void RefreshText()
+    {
+        var (expanded, parameters, models, pass) = (IsExpanded, AllParametersOpen, AllModelsOpen, SelectedPass);
+        Update(Info);
+        BuildMenu();
+        (IsExpanded, AllParametersOpen, AllModelsOpen) = (expanded, parameters, models);
+        if (pass < PassesView?.Titles.Count) SelectedPass = pass;
+    }
+
 
     private void Update(AiGenerationInfo? info)
     {
@@ -685,7 +699,7 @@ public class AiCard : TemplatedControl
         UpdateProvenance(info);
 
         var generation = primary is { IsGeneration: true };
-        MainActionText = generation ? UiText.COPY_PARAMETERS : UiText.COPY_AI_JSON;
+        MainActionText = generation ? Lang.Current[LangId.Ai_CopyParameters] : Lang.Current[LangId.Ai_CopyJson];
         MainActionIcon = generation ? IconId.Copy : IconId.Braces;
 
         IsExpanded = false;
@@ -703,7 +717,7 @@ public class AiCard : TemplatedControl
             ?? prompts.FirstOrDefault(p => p.Role == AiPromptRole.Positive && !IsCharacter(p))
             ?? info?.Prompt;
         Prompt = positive?.Text;
-        PromptTitle = positive?.Label == "Prompt information" ? UiText.PROMPT_INFORMATION_OVERLINE : UiText.PROMPT_OVERLINE;
+        PromptTitle = positive?.Label == "Prompt information" ? Lang.Current[LangId.Ai_PromptInformationOverline] : Lang.Current[LangId.Ai_PromptOverline];
 
         var negative = prompts.FirstOrDefault(p => p.Role == AiPromptRole.Negative && p.Label.Length == 0);
         NegativePrompt = negative?.Text;
@@ -732,7 +746,7 @@ public class AiCard : TemplatedControl
         var passes = new List<(string Title, IReadOnlyList<AiField> Fields)>();
         if (primary is not null && !primary.IsProvenance)
         {
-            passes.Add((primary.MainPassTitle ?? UiText.PASS_MAIN, [.. primary.Parameters.Where(Shown)]));
+            passes.Add((primary.MainPassTitle ?? Lang.Current[LangId.Ai_PassMain], [.. primary.Parameters.Where(Shown)]));
             foreach (var pass in primary.Passes) passes.Add((pass.Title, [.. pass.Parameters.Where(Shown)]));
         }
 
@@ -754,7 +768,7 @@ public class AiCard : TemplatedControl
         {
             foreach (var p in primary.Prompts.Where(p => p.Label.Length > 0 && !IsCharacter(p) && p.Label is not ("Prompt information" or "Expanded")))
             {
-                more.Add(new AiKeyValue((p.Role == AiPromptRole.Positive ? UiText.PROMPT : UiText.NEGATIVE_PROMPT) + " · " + p.Label, p.Text));
+                more.Add(new AiKeyValue((p.Role == AiPromptRole.Positive ? Lang.Current[LangId.Ai_Prompt] : Lang.Current[LangId.Ai_NegativePrompt]) + " · " + p.Label, p.Text));
             }
         }
 
@@ -804,9 +818,9 @@ public class AiCard : TemplatedControl
         var app = saved.Format is AiWorkflowFormat.InvokeAiWorkflow or AiWorkflowFormat.InvokeAiGraph ? "InvokeAI" : "ComfyUI";
         var summary = string.Join(" + ", info.Workflows.Select(w => w.FormatLabel).Distinct());
         Workflow = new AiWorkflowView(
-            Count(saved.NodeCount), UiText.Plural(saved.NodeCount, "node"),
-            Count(saved.SamplerCount), UiText.Plural(saved.SamplerCount, "sampler"),
-            Count(saved.ModelCount), UiText.Plural(saved.ModelCount, "model"),
+            Count(saved.NodeCount), UiText.Nodes(saved.NodeCount),
+            Count(saved.SamplerCount), UiText.SamplerNoun(saved.SamplerCount),
+            Count(saved.ModelCount), UiText.ModelNoun(saved.ModelCount),
             AiRows.FormatSize(saved.Size), summary, UiText.SaveWorkflowTip(app), UiText.CopyWorkflowTip(AiRows.FormatSize(saved.Size)), saved.SourceKey);
     }
 
@@ -827,28 +841,28 @@ public class AiCard : TemplatedControl
         if (info.Sources.FirstOrDefault(s => s.Iptc is not null) is { Iptc: { } iptc } iptcSource)
         {
             var rows = new List<AiKeyValue>();
-            if (iptc.DigitalSourceType is { } dst) rows.Add(new AiKeyValue(UiText.SOURCE_TYPE, DigitalSourceTypes.Label(dst), DigitalSourceTypes.Term(dst)));
-            if (iptc.AiSystem is { } system) rows.Add(new AiKeyValue(UiText.AI_SYSTEM, iptc.AiSystemVersion is null ? system : $"{system} {iptc.AiSystemVersion}"));
-            if (iptc.PromptWriter is { } writer) rows.Add(new AiKeyValue(UiText.PROMPT_WRITER, writer));
-            if (iptc.Credit is { } credit) rows.Add(new AiKeyValue(UiText.CREDIT, credit));
+            if (iptc.DigitalSourceType is { } dst) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_SourceType], DigitalSourceTypes.Label(dst), DigitalSourceTypes.Term(dst)));
+            if (iptc.AiSystem is { } system) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_System], iptc.AiSystemVersion is null ? system : $"{system} {iptc.AiSystemVersion}"));
+            if (iptc.PromptWriter is { } writer) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_PromptWriter], writer));
+            if (iptc.Credit is { } credit) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_Credit], credit));
             if (rows.Count > 0) Iptc = Section(rows, iptcSource);
         }
 
         if (info.Sources.FirstOrDefault(s => s.Aigc is not null) is { Aigc: { } aigc } aigcSource)
         {
-            List<AiKeyValue> rows = [new(UiText.AIGC_LABEL, aigc.Meaning, UiText.AigcCode(aigc.Label))];
-            if (aigc.ContentProducer is { } producer) rows.Add(new AiKeyValue(UiText.AIGC_PRODUCER, producer, IsMono: true));
-            if (aigc.ProduceId is { } produceId) rows.Add(new AiKeyValue(UiText.AIGC_PRODUCE_ID, produceId, IsMono: true));
-            if (aigc.ContentPropagator is { } propagator) rows.Add(new AiKeyValue(UiText.AIGC_PROPAGATOR, propagator, IsMono: true));
-            if (aigc.PropagateId is { } propagateId) rows.Add(new AiKeyValue(UiText.AIGC_PROPAGATE_ID, propagateId, IsMono: true));
+            List<AiKeyValue> rows = [new(Lang.Current[LangId.Ai_AigcLabel], aigc.Meaning, UiText.AigcCode(aigc.Label))];
+            if (aigc.ContentProducer is { } producer) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_AigcProducer], producer, IsMono: true));
+            if (aigc.ProduceId is { } produceId) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_AigcProduceId], produceId, IsMono: true));
+            if (aigc.ContentPropagator is { } propagator) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_AigcPropagator], propagator, IsMono: true));
+            if (aigc.PropagateId is { } propagateId) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_AigcPropagateId], propagateId, IsMono: true));
             Aigc = Section(rows, aigcSource);
         }
 
         if (info.Sources.FirstOrDefault(s => s.Training is not null) is { Training: { } training } trainingSource)
         {
             var rows = new List<AiKeyValue>();
-            if (training.DataMining is { } mining) rows.Add(new AiKeyValue(UiText.DATA_MINING, mining));
-            if (training.LearningOptOutIn is { } optOut) rows.Add(new AiKeyValue(UiText.LEARNING_OPT_OUT, optOut));
+            if (training.DataMining is { } mining) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_DataMining], mining));
+            if (training.LearningOptOutIn is { } optOut) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_LearningOptOut], optOut));
             Training = Section(rows, trainingSource);
         }
     }
@@ -858,7 +872,7 @@ public class AiCard : TemplatedControl
     {
         var rows = new List<AiKeyValue>();
         var active = c2pa.Active ?? c2pa.Manifests.FirstOrDefault();
-        if (active?.ClaimGenerator is { } claim) rows.Add(new AiKeyValue(UiText.CLAIMED_BY, active.ClaimGeneratorVersion is null ? claim : $"{claim} {active.ClaimGeneratorVersion}"));
+        if (active?.ClaimGenerator is { } claim) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_ClaimedBy], active.ClaimGeneratorVersion is null ? claim : $"{claim} {active.ClaimGeneratorVersion}"));
 
         var first = true;
         foreach (var a in active?.Actions ?? [])
@@ -866,13 +880,13 @@ public class AiCard : TemplatedControl
             var text = AiRows.ActionLabel(a.Action);
             if (a.Description is { Length: > 0 } description) text += " · " + description;
             if (a.SoftwareAgent is { } agent) text += " by " + agent;
-            rows.Add(new AiKeyValue(first ? UiText.ACTIONS : string.Empty, text));
+            rows.Add(new AiKeyValue(first ? Lang.Current[LangId.Ai_Actions] : string.Empty, text));
             first = false;
         }
 
-        foreach (var a in active?.Actions.Where(a => a.DigitalSourceLabel is not null) ?? []) rows.Add(new AiKeyValue(UiText.SOURCE_TYPE, a.DigitalSourceLabel!));
-        if (c2pa.Manifests.Count > 0) rows.Add(new AiKeyValue(UiText.MANIFESTS, UiText.ManifestCount(c2pa.Manifests.Count)));
-        if (c2pa.RemoteManifestUrl is { } url) rows.Add(new AiKeyValue(UiText.REMOTE_MANIFEST, url, IsMono: true));
+        foreach (var a in active?.Actions.Where(a => a.DigitalSourceLabel is not null) ?? []) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_SourceType], a.DigitalSourceLabel!));
+        if (c2pa.Manifests.Count > 0) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_Manifests], UiText.ManifestCount(c2pa.Manifests.Count)));
+        if (c2pa.RemoteManifestUrl is { } url) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_RemoteManifest], url, IsMono: true));
 
         return Section(rows, source);
     }
@@ -888,9 +902,9 @@ public class AiCard : TemplatedControl
         foreach (var ingredient in active.Ingredients)
         {
             var own = ingredient.ManifestLabel is { } label ? c2pa.Manifests.FirstOrDefault(m => m.Label == label) : null;
-            var title = ingredient.Title ?? own?.Title ?? UiText.INGREDIENT;
+            var title = ingredient.Title ?? own?.Title ?? Lang.Current[LangId.Ai_Ingredient];
             string detail;
-            if (own is null) detail = UiText.NO_OWN_CREDENTIALS;
+            if (own is null) detail = Lang.Current[LangId.Ai_NoOwnCredentials];
             else
             {
                 var action = own.Actions.FirstOrDefault(a => a.DigitalSourceType is not null) ?? own.Actions.FirstOrDefault();
@@ -945,19 +959,19 @@ public class AiCard : TemplatedControl
         flyout.Items.Clear();
         if (info is null) return;
 
-        flyout.Items.Add(new GlassMenuHeader { Text = UiText.AI_MENU_HEADER });
-        if (info.Primary is { IsGeneration: true }) flyout.Items.Add(MenuItem(AiAction.CopyGenerationParameters, IconId.Copy, UiText.COPY_PARAMETERS, UiText.COPY_PARAMETERS_DESC));
-        flyout.Items.Add(MenuItem(AiAction.CopyJson, IconId.Braces, UiText.COPY_AS_JSON, UiText.COPY_AS_JSON_DESC));
+        flyout.Items.Add(new GlassMenuHeader { Text = Lang.Current[LangId.Ai_MenuHeader] });
+        if (info.Primary is { IsGeneration: true }) flyout.Items.Add(MenuItem(AiAction.CopyGenerationParameters, IconId.Copy, Lang.Current[LangId.Ai_CopyParameters], Lang.Current[LangId.Ai_CopyParametersDesc]));
+        flyout.Items.Add(MenuItem(AiAction.CopyJson, IconId.Braces, Lang.Current[LangId._CopyAsJson], Lang.Current[LangId.Ai_JsonDesc]));
         if (SavedWorkflow(info) is { } workflow)
         {
             var app = workflow.Format is AiWorkflowFormat.InvokeAiWorkflow or AiWorkflowFormat.InvokeAiGraph ? "InvokeAI" : "ComfyUI";
-            flyout.Items.Add(MenuItem(AiAction.CopyWorkflowJson, IconId.AiWorkflow, UiText.COPY_WORKFLOW_JSON, UiText.CopyWorkflowTip(AiRows.FormatSize(workflow.Size))));
-            flyout.Items.Add(MenuItem(AiAction.SaveWorkflow, IconId.Save, UiText.SAVE_WORKFLOW, UiText.SaveWorkflowTip(app)));
+            flyout.Items.Add(MenuItem(AiAction.CopyWorkflowJson, IconId.AiWorkflow, Lang.Current[LangId.Ai_CopyWorkflowJson], UiText.CopyWorkflowTip(AiRows.FormatSize(workflow.Size))));
+            flyout.Items.Add(MenuItem(AiAction.SaveWorkflow, IconId.Save, Lang.Current[LangId.Ai_SaveWorkflow], UiText.SaveWorkflowTip(app)));
         }
 
         flyout.Items.Add(new Separator());
         var tags = SourceTags(info);
-        flyout.Items.Add(MenuItem(AiAction.ShowSourceTags, IconId.AiSource, UiText.SHOW_SOURCE_TAGS, UiText.SourceTagsDescription(tags.Select(AiRows.SourceLabel).ToList())));
+        flyout.Items.Add(MenuItem(AiAction.ShowSourceTags, IconId.AiSource, Lang.Current[LangId.Ai_ShowSourceTags], UiText.SourceTagsDescription(tags.Select(AiRows.SourceLabel).ToList())));
     }
 
 
@@ -971,9 +985,9 @@ public class AiCard : TemplatedControl
 
     private AiActionRequest Request(AiAction action) => action switch
     {
-        AiAction.CopyPrompt => new(action, Prompt, UiText.PROMPT),
-        AiAction.CopyNegativePrompt => new(action, NegativePrompt, UiText.NEGATIVE_PROMPT),
-        AiAction.CopyText => new(action, Raw?.Text, UiText.RAW_TEXT),
+        AiAction.CopyPrompt => new(action, Prompt, Lang.Current[LangId.Ai_Prompt]),
+        AiAction.CopyNegativePrompt => new(action, NegativePrompt, Lang.Current[LangId.Ai_NegativePrompt]),
+        AiAction.CopyText => new(action, Raw?.Text, Lang.Current[LangId.Ai_RawText]),
         AiAction.ShowSourceTag => new(action, Key: SourceKey),
         _ => new(action),
     };
@@ -992,7 +1006,7 @@ public class AiCard : TemplatedControl
     private static string Centre(string label)
     {
         var open = label.IndexOf('(', StringComparison.Ordinal);
-        return open > 0 && label.EndsWith(')') ? UiText.CENTRE + " " + label[(open + 1)..^1] : string.Empty;
+        return open > 0 && label.EndsWith(')') ? Lang.Current[LangId.Ai_Centre] + " " + label[(open + 1)..^1] : string.Empty;
     }
 
 
@@ -1082,6 +1096,14 @@ public class AiFieldCard : TemplatedControl
     {
         AddHandler(Button.ClickEvent, Button_Click);
         UpdatePseudoClasses();
+
+        // the view's computed text (length, the cut well) is read again only when it changes
+        LangResources.Track(this, () =>
+        {
+            var view = View;
+            SetCurrentValue(ViewProperty, null);
+            SetCurrentValue(ViewProperty, view);
+        });
     }
 
     #endregion // Constructors
@@ -1223,6 +1245,7 @@ public class CharacterCard : TemplatedControl
     public CharacterCard()
     {
         AddHandler(Button.ClickEvent, Button_Click);
+        LangResources.Track(this, Update);
     }
 
     #endregion // Constructors
@@ -1309,8 +1332,16 @@ public class CharacterCard : TemplatedControl
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property != SourceProperty) return;
+        if (change.Property == SourceProperty) Update();
+    }
 
+    #endregion // Protected methods
+
+
+    #region Private methods
+
+    private void Update()
+    {
         var source = Source;
         var card = source?.Character;
         CharacterName = card?.Name ?? source?.CharacterName;
@@ -1321,15 +1352,15 @@ public class CharacterCard : TemplatedControl
         OtherSources = source is { SourceKeys.Count: > 1 } ? [.. source.SourceKeys.Skip(1)] : [];
 
         var rows = new List<AiKeyValue>();
-        if (card?.Creator is { Length: > 0 } creator) rows.Add(new AiKeyValue(UiText.CREATOR, creator));
-        if (card?.CharacterVersion is { Length: > 0 } version) rows.Add(new AiKeyValue(UiText.VERSION, version));
+        if (card?.Creator is { Length: > 0 } creator) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_Creator], creator));
+        if (card?.CharacterVersion is { Length: > 0 } version) rows.Add(new AiKeyValue(Lang.Current[LangId.Ai_Version], version));
         Rows = rows;
         PseudoClasses.Set(":rows", rows.Count > 0);
         PseudoClasses.Set(":tags", card?.Tags.Count > 0);
         PseudoClasses.Set(":description", !string.IsNullOrWhiteSpace(card?.Description));
     }
 
-    #endregion // Protected methods
+    #endregion // Private methods
 
 
     #region Event handlers

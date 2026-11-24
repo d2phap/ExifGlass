@@ -23,8 +23,10 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Transformation;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
 
@@ -132,7 +134,7 @@ public sealed class GroupHeaderView : Grid
     {
         Group = group;
         var ai = group.Name == GroupInfo.AI_GROUP;
-        _name.Text = ai ? UiText.AI_GROUP : group.Name;
+        _name.Text = ai ? Lang.Current[LangId._AiGeneration] : group.Name;
         _count.Text = CountLabel(group);
         _description.Text = group.Description;
         _dot.Group = ai ? null : group.Name;
@@ -184,7 +186,8 @@ public sealed class GroupHeaderView : Grid
     {
         if (key is not null && _from is null)
         {
-            var from = new TextBlock { Text = UiText.FROM, VerticalAlignment = VerticalAlignment.Center };
+            var from = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+            LangResources.Bind(from, TextBlock.TextProperty, LangId.Ai_From);
             Typography.SetRole(from, TextRole.Meta);
             from[!TextBlock.ForegroundProperty] = from.GetResourceObservable(TokenKeys.TEXT_TERTIARY_BRUSH).ToBinding();
             _link = new SourceLink { Focusable = false };

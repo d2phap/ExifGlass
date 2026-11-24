@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Settings;
 using ExifGlass.Diagnostics;
@@ -70,7 +71,7 @@ public interface IMetadataReader
     /// Writes the staged edits in one ExifTool call; ExifTool keeps FILE_original.
     /// </summary>
     Task<SaveResult> WriteAsync(string path, EditSet edits, CancellationToken cancellationToken) =>
-        Task.FromResult(new SaveResult(SaveOutcome.Failed, [AppText.SAVE_UNAVAILABLE], [], null));
+        Task.FromResult(new SaveResult(SaveOutcome.Failed, [Lang.Current[LangId._ExifToolUnavailable]], [], null));
 
     /// <summary>
     /// A binary tag's bytes (D12); null when there are none.
@@ -329,7 +330,7 @@ public sealed class MetadataService : IMetadataReader, IAsyncDisposable
         await _started.WaitAsync(cancellationToken).ConfigureAwait(false);
 
         if (_exifTool is { } service && Status == ExifToolStatus.Ready) return service;
-        throw new ExifToolUnavailableException(Problem ?? AppText.EXIFTOOL_MISSING_TITLE);
+        throw new ExifToolUnavailableException(Problem ?? Lang.Current[LangId._ExifToolUnavailable]);
     }
 
 

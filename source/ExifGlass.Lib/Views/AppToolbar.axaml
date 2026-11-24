@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ExifGlass.UI.Localization"
              xmlns:app="using:ExifGlass"
              xmlns:ui="using:ExifGlass.UI.Controls"
              xmlns:v="using:ExifGlass.Views"
@@ -25,21 +26,21 @@
                   MinWidth="120"
                   MaxWidth="520"
                   VerticalAlignment="Center"
-                  AutomationProperties.Name="{x:Static app:AppText.SEARCH}"
+                  AutomationProperties.Name="{l:Lang Toolbar_SearchTags}"
                   Classes.no-hint="{Binding !ShowSearchHint}"
                   IsEnabled="{Binding HasDocument}"
-                  PlaceholderText="{x:Static app:AppText.SEARCH_PLACEHOLDER}"
+                  PlaceholderText="{l:Lang Toolbar_Search}"
                   Text="{Binding SearchText, Mode=TwoWay}" />
 
     <StackPanel Orientation="Horizontal"
                 Spacing="4">
       <ui:GlassButton Name="OpenButton"
                       Classes="ghost toolbar"
-                      AutomationProperties.Name="{x:Static app:AppText.OPEN_FILE}"
+                      AutomationProperties.Name="{l:Lang Toolbar_OpenFile}"
                       Command="{Binding OpenCommand}"
                       Content="{Binding OpenLabel}"
                       Icon="{x:Static ui:IconId.FolderOpen}"
-                      ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
+                      ToolTip.Tip="{l:Lang Toolbar_OpenFileTip}" />
       <ui:GlassToggleButton Name="PinToggle"
                             AutomationProperties.Name="{Binding PinTooltip}"
                             CheckedIcon="{x:Static ui:IconId.PinFilled}"
@@ -56,17 +57,17 @@
                       ToolTip.Tip="{Binding ThemeTooltip}" />
       <ui:GlassButton Name="SettingsButton"
                       Classes="ghost toolbar"
-                      AutomationProperties.Name="{x:Static app:AppText.SETTINGS}"
+                      AutomationProperties.Name="{l:Lang _Settings}"
                       Command="{Binding OpenSettingsCommand}"
                       Icon="{x:Static ui:IconId.Settings}"
-                      ToolTip.Tip="{x:Static app:AppText.SettingsTooltip}" />
+                      ToolTip.Tip="{l:Lang Toolbar_SettingsTip}" />
       <ui:GlassButton Name="AboutButton"
                       Classes="ghost toolbar"
-                      AutomationProperties.Name="{x:Static app:AppText.ABOUT}"
+                      AutomationProperties.Name="{l:Lang _About}"
                       Command="{Binding OpenAboutCommand}"
                       Icon="{x:Static ui:IconId.Info}"
                       IsVisible="{Binding ShowSecondaryButtons}"
-                      ToolTip.Tip="{x:Static app:AppText.AboutTooltip}" />
+                      ToolTip.Tip="{l:Lang Toolbar_AboutTip}" />
       <ui:GlassToggleButton Name="InspectorToggle"
                             AutomationProperties.Name="{Binding InspectorTooltip}"
                             CheckedIcon="{x:Static ui:IconId.PanelRightFilled}"

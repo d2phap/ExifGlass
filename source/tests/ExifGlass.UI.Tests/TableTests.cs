@@ -27,6 +27,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.UI.Controls;
@@ -292,7 +293,7 @@ public class TableTests
         Assert.Equal([key], copied);
         Assert.True(host.Table.IsCopied(key));
 
-        var nameHeader = host.Window.GetVisualDescendants().OfType<DataGridColumnHeader>().First(h => Equals(h.Content, UiText.COLUMN_TAG_NAME));
+        var nameHeader = host.Window.GetVisualDescendants().OfType<DataGridColumnHeader>().First(h => Equals(h.Content, Lang.Current[LangId.Table_HeaderTagName]));
         host.Click(nameHeader.TranslatePoint(new Point(30, 16), host.Window)!.Value);
         Assert.Equal([SortColumn.TagName], sorts);
     }

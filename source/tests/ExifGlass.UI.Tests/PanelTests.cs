@@ -25,6 +25,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
@@ -365,13 +366,13 @@ public class PanelTests
         }]);
         var window = Show(card);
         Assert.Equal("ChatGPT", card.Generator);
-        Assert.Equal(UiText.COPY_AI_JSON, card.MainActionText);
+        Assert.Equal(Lang.Current[LangId.Ai_CopyJson], card.MainActionText);
         Assert.Equal(AiAction.CopyJson, Part<Button>(card, "PART_MainAction").Tag);
         Assert.False(Part<Control>(card, "PART_PromptSection").IsVisible);
         Assert.True(Part<Control>(card, "PART_ProvenanceNote").IsVisible);
 
         card.Info = Info(new ExifGlass.Core.Ai.AiPrompt("a lighthouse", ExifGlass.Core.Ai.AiPromptRole.Positive));
-        Assert.Equal(UiText.COPY_PARAMETERS, card.MainActionText);
+        Assert.Equal(Lang.Current[LangId.Ai_CopyParameters], card.MainActionText);
         Assert.Equal(AiAction.CopyGenerationParameters, Part<Button>(card, "PART_MainAction").Tag);
         Assert.True(Part<Control>(card, "PART_PromptSection").IsVisible);
         Assert.False(Part<Control>(card, "PART_ProvenanceNote").IsVisible);

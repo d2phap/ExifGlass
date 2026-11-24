@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Localization;
 using System.Collections.Frozen;
 
 namespace ExifGlass.Core.Metadata;
@@ -32,24 +33,24 @@ public static class GroupInfo
     /// </summary>
     public const string AI_GROUP = "AI";
 
-    private static readonly FrozenDictionary<string, string> DESCRIPTIONS = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> DESCRIPTIONS = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
-        [AI_GROUP] = "Parsed by ExifGlass",
-        ["ExifTool"] = "Reader",
-        ["File"] = "File system",
-        ["EXIF"] = "Camera & capture",
-        ["MakerNotes"] = "Vendor-specific",
-        ["XMP"] = "Adobe XMP",
-        ["ICC_Profile"] = "Color profile",
-        ["Composite"] = "Derived by ExifTool",
-        ["PNG"] = "PNG chunks",
-        ["IPTC"] = "Press metadata",
-        ["JFIF"] = "JPEG header",
-        ["Photoshop"] = "Photoshop resources",
-        ["QuickTime"] = "Video container",
-        ["JUMBF"] = "C2PA Content Credentials",
-        ["MPF"] = "Multi-picture format",
-        ["RIFF"] = "WebP and AVI container",
+        [AI_GROUP] = LangId.Group_Ai,
+        ["ExifTool"] = LangId.Group_ExifTool,
+        ["File"] = LangId.Group_File,
+        ["EXIF"] = LangId.Group_Exif,
+        ["MakerNotes"] = LangId.Group_MakerNotes,
+        ["XMP"] = LangId.Group_Xmp,
+        ["ICC_Profile"] = LangId.Group_IccProfile,
+        ["Composite"] = LangId.Group_Composite,
+        ["PNG"] = LangId.Group_Png,
+        ["IPTC"] = LangId.Group_Iptc,
+        ["JFIF"] = LangId.Group_Jfif,
+        ["Photoshop"] = LangId.Group_Photoshop,
+        ["QuickTime"] = LangId.Group_QuickTime,
+        ["JUMBF"] = LangId.Group_Jumbf,
+        ["MPF"] = LangId.Group_Mpf,
+        ["RIFF"] = LangId.Group_Riff,
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     #endregion // Fields and constants
@@ -65,10 +66,10 @@ public static class GroupInfo
         if (group == "MakerNotes" && !string.IsNullOrWhiteSpace(make))
         {
             var m = make.Trim();
-            return string.Concat(m[..1].ToUpperInvariant(), m[1..].ToLowerInvariant(), " maker notes");
+            return Lang.Current[LangId.Group_MakerNotesOf, string.Concat(m[..1].ToUpperInvariant(), m[1..].ToLowerInvariant())];
         }
 
-        return DESCRIPTIONS.GetValueOrDefault(group, string.Empty);
+        return DESCRIPTIONS.TryGetValue(group, out var key) ? Lang.Current[key] : string.Empty;
     }
 
     #endregion // Public methods

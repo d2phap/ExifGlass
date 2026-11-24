@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:eg="using:ExifGlass.UI"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
@@ -37,14 +38,14 @@
                               Classes="ghost"
                               CornerRadius="{StaticResource RadiusControl36}"
                               Command="{TemplateBinding DiscardCommand}"
-                              Content="{x:Static eg:UiText.DISCARD}"
-                              ToolTip.Tip="{x:Static eg:UiText.DISCARD_TIP}" />
+                              Content="{l:Lang _Discard}"
+                              ToolTip.Tip="{l:Lang Pending_DiscardTip}" />
               <ui:GlassButton Name="PART_Save"
                               Height="36"
                               Padding="12,0,16,0"
                               Classes="primary"
                               CornerRadius="{StaticResource RadiusControl36}"
-                              AutomationProperties.Name="{x:Static eg:UiText.SAVE}"
+                              AutomationProperties.Name="{l:Lang _Save}"
                               Command="{TemplateBinding SaveCommand}">
                 <StackPanel Orientation="Horizontal" Spacing="6">
                   <ui:SpinningIcon Width="15"
@@ -53,10 +54,10 @@
                                    Icon="{x:Static ui:IconId.Save}"
                                    IsSpinning="{TemplateBinding IsSaving}" />
                   <Panel VerticalAlignment="Center">
-                    <TextBlock Name="PART_SaveText" Text="{x:Static eg:UiText.SAVE}" />
+                    <TextBlock Name="PART_SaveText" Text="{l:Lang _Save}" />
                     <TextBlock Name="PART_SavingText"
                                IsVisible="False"
-                               Text="{x:Static eg:UiText.SAVING}" />
+                               Text="{l:Lang Pending_Saving}" />
                   </Panel>
                 </StackPanel>
               </ui:GlassButton>
@@ -125,24 +126,24 @@
                               DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Dismiss}"
-                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+                              ToolTip.Tip="{l:Lang _Close}" />
               <TextBlock VerticalAlignment="Center"
                          tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.ADD_TAG_OVERLINE}" />
+                         Text="{l:Lang Edit_AddTagOverline}" />
             </DockPanel>
 
             <Grid ColumnDefinitions="92,8,*">
               <ComboBox Name="PART_Group"
                         Width="92"
                         MinWidth="0"
-                        AutomationProperties.Name="{x:Static eg:UiText.TAG_GROUP}"
+                        AutomationProperties.Name="{l:Lang Edit_TagGroup}"
                         ItemsSource="{TemplateBinding Groups}"
                         SelectedItem="{TemplateBinding Group, Mode=TwoWay}" />
               <TextBox Name="PART_Name"
                        Grid.Column="2"
-                       AutomationProperties.Name="{x:Static eg:UiText.TAG_NAME}"
-                       PlaceholderText="{x:Static eg:UiText.TAG_NAME_PLACEHOLDER}"
+                       AutomationProperties.Name="{l:Lang _TagName}"
+                       PlaceholderText="{l:Lang Edit_TagNamePlaceholder}"
                        Text="{TemplateBinding TagName, Mode=TwoWay}" />
               <!--  the menu surface of the ComboBox list: the shadow room as the child's margin, the 2 px gap as a band (plan 5.5)  -->
               <Popup Name="PART_Suggestions"
@@ -168,8 +169,8 @@
 
             <TextBox Name="PART_Value"
                      Classes="multiline"
-                     AutomationProperties.Name="{x:Static eg:UiText.VALUE_PLACEHOLDER}"
-                     PlaceholderText="{x:Static eg:UiText.VALUE_PLACEHOLDER}"
+                     AutomationProperties.Name="{l:Lang _Value}"
+                     PlaceholderText="{l:Lang _Value}"
                      Text="{TemplateBinding Value, Mode=TwoWay}" />
 
             <TextBlock Name="PART_Hint"
@@ -185,15 +186,15 @@
               <ui:GlassButton Name="PART_Cancel"
                               Classes="card"
                               Command="{TemplateBinding CancelCommand}"
-                              Content="{x:Static eg:UiText.CANCEL}"
-                              ToolTip.Tip="{x:Static eg:UiText.CANCEL_TIP}" />
+                              Content="{l:Lang _Cancel}"
+                              ToolTip.Tip="{l:Lang _CancelTip}" />
               <ui:GlassButton Name="PART_Add"
                               Classes="card primary"
                               Command="{TemplateBinding AddCommand}"
-                              Content="{x:Static eg:UiText.ADD_TAG}"
+                              Content="{l:Lang Edit_AddTag}"
                               Icon="{x:Static ui:IconId.Add}"
                               IconSize="14"
-                              ToolTip.Tip="{x:Static eg:UiText.AddTagTip}" />
+                              ToolTip.Tip="{l:Lang Edit_AddTagTip}" />
             </StackPanel>
           </StackPanel>
         </ui:SquircleBorder>
@@ -314,8 +315,8 @@
                       VerticalAlignment="Top"
                       IsVisible="False"
                       Kind="Edited"
-                      Text="{x:Static eg:UiText.WRITE}"
-                      ToolTip.Tip="{x:Static eg:UiText.WRITE_TIP}" />
+                      Text="{l:Lang CommandBar_Write}"
+                      ToolTip.Tip="{l:Lang CommandBar_WriteTip}" />
             <!--  its height glides 20 to the wrapped text, at most 140 (code)  -->
             <Panel Name="PART_TextHost"
                    Grid.Column="2"
@@ -338,13 +339,13 @@
                               HorizontalAlignment="Right"
                               VerticalAlignment="Bottom"
                               Classes="ghost"
-                              AutomationProperties.Name="{x:Static eg:UiText.COPY_COMMAND}"
+                              AutomationProperties.Name="{l:Lang _CopyCommand}"
                               Command="{TemplateBinding CopyCommand}"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Copy}"
                               IconSize="15"
                               RenderTransform="translate(-34px, 0px)"
-                              ToolTip.Tip="{x:Static eg:UiText.COPY_COMMAND}">
+                              ToolTip.Tip="{l:Lang _CopyCommand}">
                 <ui:GlassButton.Transitions>
                   <Transitions>
                     <BrushTransition Easing="{x:Static tok:MotionTokens.HoverEasing}" Property="Foreground" Duration="0:0:0.16" />

@@ -21,10 +21,12 @@ using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Platform.Storage;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.Integration;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Windows;
 using ExifGlass.ViewModels;
 
@@ -42,18 +44,12 @@ public partial class MainWindow : Window, IShellView, IHostWindow
     /// </summary>
     public static readonly Size FirstSize = new(1240, 820);
 
-    private static readonly FilePickerFileType ImageFiles = new(AppText.PICKER_IMAGES)
-    {
-        Patterns =
-        [
-            "*.jpg", "*.jpeg", "*.jpe", "*.jfif", "*.png", "*.apng", "*.webp", "*.gif", "*.bmp", "*.tif", "*.tiff", "*.heic", "*.heif", "*.hif",
-            "*.avif", "*.jxl", "*.psd", "*.exr", "*.dng", "*.cr2", "*.cr3", "*.crw", "*.nef", "*.nrw", "*.arw", "*.srf", "*.sr2", "*.raf",
-            "*.orf", "*.rw2", "*.pef", "*.srw", "*.x3f", "*.3fr", "*.iiq", "*.erf", "*.mos", "*.mrw", "*.rwl",
-        ],
-        AppleUniformTypeIdentifiers = ["public.image"],
-    };
-
-    private static readonly FilePickerFileType AllFiles = new(AppText.PICKER_ALL) { Patterns = ["*"] };
+    private static readonly string[] IMAGE_PATTERNS =
+    [
+        "*.jpg", "*.jpeg", "*.jpe", "*.jfif", "*.png", "*.apng", "*.webp", "*.gif", "*.bmp", "*.tif", "*.tiff", "*.heic", "*.heif", "*.hif",
+        "*.avif", "*.jxl", "*.psd", "*.exr", "*.dng", "*.cr2", "*.cr3", "*.crw", "*.nef", "*.nrw", "*.arw", "*.srf", "*.sr2", "*.raf",
+        "*.orf", "*.rw2", "*.pef", "*.srw", "*.x3f", "*.3fr", "*.iiq", "*.erf", "*.mos", "*.mrw", "*.rwl",
+    ];
 
     private readonly IWindowPlacementStore _placements;
     private SettingsWindow? _settingsWindow;
@@ -86,6 +82,7 @@ public partial class MainWindow : Window, IShellView, IHostWindow
         WindowPlacement.Attach(this, AppSettings.WINDOW_MAIN, FirstSize, placements);
         InitializeLayout();
         InitializeInput();
+        LangResources.Track(this, () => (DataContext as MainViewModel)?.RefreshText());
     }
 
     #endregion // Constructors
@@ -94,6 +91,10 @@ public partial class MainWindow : Window, IShellView, IHostWindow
     #region Properties
 
     public MainViewModel ViewModel => (MainViewModel)DataContext!;
+
+    private static FilePickerFileType ImageFiles => new(Lang.Current[LangId.Picker_Images]) { Patterns = IMAGE_PATTERNS, AppleUniformTypeIdentifiers = ["public.image"] };
+
+    private static FilePickerFileType AllFiles => new(Lang.Current[LangId.Picker_AllFiles]) { Patterns = ["*"] };
 
     #endregion // Properties
 
@@ -104,7 +105,7 @@ public partial class MainWindow : Window, IShellView, IHostWindow
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = AppText.PICKER_TITLE,
+            Title = Lang.Current[LangId.Picker_OpenTitle],
             AllowMultiple = false,
             FileTypeFilter = [AllFiles, ImageFiles],
         });
@@ -243,7 +244,7 @@ public partial class MainWindow : Window, IShellView, IHostWindow
     private sealed class NoReader : IMetadataReader
     {
         public Task<Core.Metadata.MetadataDocument> ReadAsync(string path, CancellationToken cancellationToken) =>
-            Task.FromException<Core.Metadata.MetadataDocument>(new ExifToolUnavailableException(AppText.EXIFTOOL_MISSING_TITLE));
+            Task.FromException<Core.Metadata.MetadataDocument>(new ExifToolUnavailableException(Lang.Current[LangId._ExifToolUnavailable]));
 
         public Task<Core.Ai.AiGenerationInfo?> ReadAiAsync(string path, CancellationToken cancellationToken) => Task.FromResult<Core.Ai.AiGenerationInfo?>(null);
     }

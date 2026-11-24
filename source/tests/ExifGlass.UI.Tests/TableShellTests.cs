@@ -23,6 +23,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Query;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI.Controls;
@@ -71,12 +72,12 @@ public class TableShellTests
         using var shell = await TestShell.OpenWithFileAsync(1400);
         var vm = shell.ViewModel;
         var button = shell.Window.Table.CollapseAllButton;
-        Assert.Equal(AppText.COLLAPSE_ALL, button.Content);
+        Assert.Equal(Lang.Current[LangId.Table_CollapseAll], button.Content);
 
         vm.ToggleCollapseAllCommand.Execute(null);
         await shell.WaitForAsync(() => vm.IsAllCollapsed);
         shell.Settle();
-        Assert.Equal(AppText.EXPAND_ALL, button.Content);
+        Assert.Equal(Lang.Current[LangId.Table_ExpandAll], button.Content);
         Assert.All(vm.Rows.Items, i => Assert.IsType<GroupHeaderItem>(i));
         Assert.Equal(vm.Rows.Total, vm.Rows.RowsInView.Count);
 
@@ -141,14 +142,14 @@ public class TableShellTests
         vm.ClearSelectionCommand.Execute(null);
         shell.Settle();
         Assert.True(panel.SummaryRow.IsVisible);
-        Assert.Equal(AppText.EXPORT, panel.ExportButton.Content);
+        Assert.Equal(Lang.Current[LangId.Table_Export], panel.ExportButton.Content);
 
         // a cell copies its text
         var key = MetadataTable.RowKeys(vm.Rows)[1];
         vm.Selection.SelectCell(key, TableColumns.TagName);
         Assert.True(vm.CopySelection());
         shell.Settle();
-        Assert.Equal(AppText.TOAST_COPIED_CELL, shell.Window.Toasts.Title);
+        Assert.Equal(Lang.Current[LangId.Toast_CopiedCell], shell.Window.Toasts.Title);
     }
 
 
@@ -167,7 +168,7 @@ public class TableShellTests
         Assert.Equal(TableColumns.Value, vm.Columns);
         var value = vm.ColumnChoices.Single(c => c.Column == TableColumns.Value);
         Assert.True(value.IsLocked);
-        Assert.Equal(AppText.AT_LEAST_ONE, value.Hint);
+        Assert.Equal(Lang.Current[LangId.Table_AtLeastOne], value.Hint);
 
         vm.ToggleColumnCommand.Execute(TableColumns.Value);
         Assert.Equal(TableColumns.Value, vm.Columns);
@@ -183,7 +184,7 @@ public class TableShellTests
 
         Assert.True(vm.IdColumnsHidden);
         Assert.False(shell.Window.Table.Table.Grid.Columns.First(c => Equals(c.ColumnKey, TableItem.COLUMN_ID)).IsVisible);
-        Assert.Equal(AppText.HIDDEN_AT_WIDTH, vm.ColumnChoices.Single(c => c.Column == TableColumns.TagId).Hint);
+        Assert.Equal(Lang.Current[LangId.Table_HiddenAtWidth], vm.ColumnChoices.Single(c => c.Column == TableColumns.TagId).Hint);
 
         // icon-only below 660, as the P4 rules say
         Assert.Null(shell.Window.Table.CollapseAllButton.Content);
@@ -200,7 +201,7 @@ public class TableShellTests
         vm.SetGroupHidden("EXIF", true);
         vm.ToggleFilter(QuickFilter.HasTagId);
         await shell.WaitForAsync(() => vm.FilterChips.Count == 2);
-        Assert.Equal(["Hiding EXIF", AppText.FILTER_TAG_ID], vm.FilterChips.Select(c => c.Label));
+        Assert.Equal(["Hiding EXIF", Lang.Current[LangId.Filter_HasTagId]], vm.FilterChips.Select(c => c.Label));
         Assert.False(vm.ShowSummaryDetail);
         Assert.True(vm.Rows.IsFiltering);
         Assert.DoesNotContain(vm.Rows.RowsInView, r => r.Group == "EXIF");
@@ -292,7 +293,7 @@ public class TableShellTests
 
             await vm.CopyAsJsonCommand.ExecuteAsync(null);
             Assert.StartsWith("[", shell.Copied[^1]);
-            Assert.Equal((AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(vm.Rows.TagsInView, vm.Rows.AiInView)), shell.Toasts[^1]);
+            Assert.Equal((Lang.Current[LangId.Toast_CopiedAsJson], AppText.TagsInView(vm.Rows.TagsInView, vm.Rows.AiInView)), shell.Toasts[^1]);
         }
         finally
         {

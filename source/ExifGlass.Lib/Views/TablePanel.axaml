@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ExifGlass.UI.Localization"
              xmlns:app="using:ExifGlass"
              xmlns:ex="using:ExifGlass.Core.Export"
              xmlns:tok="using:ExifGlass.UI.Tokens"
@@ -64,14 +65,14 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                   <DataTemplate x:DataType="vm:FilterChipItem">
-                    <ui:FilterChip Classes.ai="{Binding IsAi}" Text="{Binding Label}" ToolTip.Tip="{x:Static app:AppText.REMOVE_FILTER}" />
+                    <ui:FilterChip Classes.ai="{Binding IsAi}" Text="{Binding Label}" ToolTip.Tip="{l:Lang Table_RemoveFilter}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
               <ui:GlassButton Name="ClearAllButton"
                               Classes="ghost tiny"
                               Command="{Binding ClearFiltersCommand}"
-                              Content="{x:Static app:AppText.CLEAR_ALL}"
+                              Content="{l:Lang Table_ClearAll}"
                               IsVisible="{Binding HasFilterChips}" />
             </StackPanel>
 
@@ -100,29 +101,29 @@
               <TextBlock Margin="0,0,4,0"
                          VerticalAlignment="Center"
                          FontWeight="Medium"
-                         Text="{x:Static app:AppText.SELECTED}" />
+                         Text="{l:Lang Table_Selected}" />
               <ui:GlassButton Name="CopyRowsButton"
                               Classes="card"
-                              AutomationProperties.Name="{x:Static app:AppText.COPY_ROWS_TIP}"
+                              AutomationProperties.Name="{l:Lang Table_CopyRowsTip}"
                               Command="{Binding CopyRowsTsvCommand}"
-                              Content="{x:Static app:AppText.COPY}"
+                              Content="{l:Lang _Copy}"
                               Icon="{x:Static ui:IconId.Copy}"
                               IconSize="14"
-                              ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_TIP}" />
+                              ToolTip.Tip="{l:Lang Table_CopyRowsTip}" />
               <ui:GlassButton Name="CopyRowsJsonButton"
                               Classes="card"
-                              AutomationProperties.Name="{x:Static app:AppText.COPY_ROWS_JSON_TIP}"
+                              AutomationProperties.Name="{l:Lang Table_CopyRowsJsonTip}"
                               Command="{Binding CopyRowsJsonCommand}"
-                              Content="{x:Static app:AppText.JSON}"
+                              Content="{l:Lang _Json}"
                               Icon="{x:Static ui:IconId.Braces}"
                               IconSize="14"
-                              ToolTip.Tip="{x:Static app:AppText.COPY_ROWS_JSON_TIP}" />
+                              ToolTip.Tip="{l:Lang Table_CopyRowsJsonTip}" />
               <ui:GlassButton Name="ClearSelectionButton"
                               Classes="ghost card"
                               Command="{Binding ClearSelectionCommand}"
-                              Content="{x:Static app:AppText.CLEAR}"
+                              Content="{l:Lang _Clear}"
                               Foreground="{DynamicResource TextSecondaryBrush}"
-                              ToolTip.Tip="{x:Static app:AppText.CLEAR_SELECTION_TIP}" />
+                              ToolTip.Tip="{l:Lang Table_ClearSelectionTip}" />
             </StackPanel>
 
             <StackPanel Name="TableButtons"
@@ -140,65 +141,65 @@
 
               <!--  S5 Edit menu: each item says what it removes, and turns off once staged or when the file has nothing for it  -->
               <ui:GlassDropDownButton Name="EditButton"
-                                      AutomationProperties.Name="{x:Static app:AppText.EDIT_TIP}"
+                                      AutomationProperties.Name="{l:Lang Table_EditTip}"
                                       Content="{Binding EditContent}"
                                       Icon="{x:Static ui:IconId.Edit}"
                                       IsEnabled="{Binding HasDocument}"
-                                      ToolTip.Tip="{x:Static app:AppText.EDIT_TIP}">
+                                      ToolTip.Tip="{l:Lang Table_EditTip}">
                 <ui:GlassDropDownButton.Flyout>
                   <MenuFlyout Placement="BottomEdgeAlignedRight">
                     <ui:GlassMenuItem Name="AddTagItem"
                                       Command="{Binding OpenAddTagCommand}"
-                                      Description="{x:Static app:AppText.EDIT_ADD_DESC}"
+                                      Description="{l:Lang Edit_AddTagMenuDesc}"
                                       Glyph="{x:Static ui:IconId.Add}"
-                                      Header="{x:Static app:AppText.EDIT_ADD}" />
+                                      Header="{l:Lang Edit_AddTagMenu}" />
                     <ui:GlassMenuItem Name="RemoveGpsItem"
                                       Command="{Binding RemoveGpsCommand}"
                                       Description="{Binding GpsDescription}"
                                       Glyph="{x:Static ui:IconId.LocationOff}"
-                                      Header="{x:Static app:AppText.EDIT_GPS}" />
+                                      Header="{l:Lang Edit_RemoveGps}" />
                     <ui:GlassMenuItem Name="RemoveAiItem"
                                       Command="{Binding RemoveAiCommand}"
                                       Description="{Binding AiRemovalDescription}"
                                       Glyph="{x:Static ui:IconId.Sparkle}"
-                                      Header="{x:Static app:AppText.EDIT_AI}" />
+                                      Header="{l:Lang Edit_RemoveAi}" />
                     <ui:GlassMenuItem Name="StripAllItem"
                                       Classes="danger"
                                       Command="{Binding StripAllCommand}"
                                       Description="{Binding StripDescription}"
                                       Glyph="{x:Static ui:IconId.Eraser}"
-                                      Header="{x:Static app:AppText.EDIT_STRIP}" />
+                                      Header="{l:Lang Edit_StripAll}" />
                   </MenuFlyout>
                 </ui:GlassDropDownButton.Flyout>
               </ui:GlassDropDownButton>
 
               <ui:GlassDropDownButton Name="ColumnsButton"
-                                      AutomationProperties.Name="{x:Static app:AppText.COLUMNS_TIP}"
+                                      AutomationProperties.Name="{l:Lang Table_ColumnsTip}"
                                       Content="{Binding ColumnsContent}"
                                       Icon="{x:Static ui:IconId.ColumnTriple}"
-                                      ToolTip.Tip="{x:Static app:AppText.COLUMNS_TIP}">
+                                      ToolTip.Tip="{l:Lang Table_ColumnsTip}">
                 <ui:GlassDropDownButton.Flyout>
                   <MenuFlyout Placement="BottomEdgeAlignedRight">
-                    <ui:GlassMenuHeader Text="{x:Static app:AppText.COLUMNS_HEADER}" />
+                    <ui:GlassMenuHeader Text="{l:Lang Table_ColumnsHeader}" />
                     <ui:GlassMenuItem Name="ColumnIndexItem"
                                       Command="{Binding ToggleColumnCommand}"
                                       CommandParameter="{x:Static ex:TableColumns.Index}"
-                                      Header="{x:Static app:AppText.COLUMN_INDEX}"
+                                      Header="{l:Lang Table_ColumnIndex}"
                                       ToggleType="CheckBox" />
                     <ui:GlassMenuItem Name="ColumnIdItem"
                                       Command="{Binding ToggleColumnCommand}"
                                       CommandParameter="{x:Static ex:TableColumns.TagId}"
-                                      Header="{x:Static app:AppText.COLUMN_TAG_ID}"
+                                      Header="{l:Lang Table_ColumnTagId}"
                                       ToggleType="CheckBox" />
                     <ui:GlassMenuItem Name="ColumnNameItem"
                                       Command="{Binding ToggleColumnCommand}"
                                       CommandParameter="{x:Static ex:TableColumns.TagName}"
-                                      Header="{x:Static app:AppText.COLUMN_TAG_NAME}"
+                                      Header="{l:Lang _TagName}"
                                       ToggleType="CheckBox" />
                     <ui:GlassMenuItem Name="ColumnValueItem"
                                       Command="{Binding ToggleColumnCommand}"
                                       CommandParameter="{x:Static ex:TableColumns.Value}"
-                                      Header="{x:Static app:AppText.COLUMN_VALUE}"
+                                      Header="{l:Lang _Value}"
                                       ToggleType="CheckBox" />
                   </MenuFlyout>
                 </ui:GlassDropDownButton.Flyout>
@@ -206,54 +207,54 @@
 
               <!--  styled as Columns, not the accent primary (owner after G7)  -->
               <ui:GlassDropDownButton Name="ExportButton"
-                                      AutomationProperties.Name="{x:Static app:AppText.EXPORT}"
+                                      AutomationProperties.Name="{l:Lang Table_Export}"
                                       Content="{Binding ExportContent}"
                                       Icon="{x:Static ui:IconId.ArrowDownload}"
                                       IsEnabled="{Binding HasDocument}"
-                                      ToolTip.Tip="{x:Static app:AppText.EXPORT}">
+                                      ToolTip.Tip="{l:Lang Table_Export}">
                 <ui:GlassDropDownButton.Flyout>
                   <MenuFlyout Placement="BottomEdgeAlignedRight">
                     <ui:GlassMenuHeader Text="{Binding ExportHeader}" />
                     <ui:GlassMenuItem Command="{Binding ExportCommand}"
                                       CommandParameter="{x:Static ex:ExportFormat.Csv}"
-                                      Description="{x:Static app:AppText.EXPORT_CSV_DESC}"
+                                      Description="{l:Lang Export_CsvDesc}"
                                       Glyph="{x:Static ui:IconId.Table}"
-                                      Header="{x:Static app:AppText.EXPORT_CSV}" />
+                                      Header="{l:Lang Export_Csv}" />
                     <ui:GlassMenuItem Command="{Binding ExportCommand}"
                                       CommandParameter="{x:Static ex:ExportFormat.PlainText}"
-                                      Description="{x:Static app:AppText.EXPORT_TEXT_DESC}"
+                                      Description="{l:Lang Export_TextDesc}"
                                       Glyph="{x:Static ui:IconId.Document}"
-                                      Header="{x:Static app:AppText.EXPORT_TEXT}" />
+                                      Header="{l:Lang Export_Text}" />
                     <ui:GlassMenuItem Command="{Binding ExportCommand}"
                                       CommandParameter="{x:Static ex:ExportFormat.Json}"
-                                      Description="{x:Static app:AppText.EXPORT_JSON_DESC}"
+                                      Description="{l:Lang Export_JsonDesc}"
                                       Glyph="{x:Static ui:IconId.Braces}"
-                                      Header="{x:Static app:AppText.EXPORT_JSON}" />
+                                      Header="{l:Lang _Json}" />
                     <Separator />
                     <ui:GlassMenuItem Command="{Binding CopyAsJsonCommand}"
-                                      Description="{x:Static app:AppText.EXPORT_COPY_DESC}"
+                                      Description="{l:Lang Export_CopyDesc}"
                                       Glyph="{x:Static ui:IconId.Copy}"
-                                      Header="{x:Static app:AppText.EXPORT_COPY}" />
+                                      Header="{l:Lang _CopyAsJson}" />
                     <!--  the AI data (P7 Exports): A1111 text, normalized JSON, the workflow as embedded  -->
                     <Separator IsVisible="{Binding HasAi}" />
-                    <ui:GlassMenuHeader IsVisible="{Binding HasAi}" Text="{x:Static app:AppText.EXPORT_AI_HEADER}" />
+                    <ui:GlassMenuHeader IsVisible="{Binding HasAi}" Text="{l:Lang _AiGenerationOverline}" />
                     <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
                                       CommandParameter="{x:Static vm:AiExportKind.Parameters}"
-                                      Description="{x:Static app:AppText.EXPORT_AI_PARAMETERS_DESC}"
+                                      Description="{l:Lang Export_AiParametersDesc}"
                                       Glyph="{x:Static ui:IconId.Sparkle}"
-                                      Header="{x:Static app:AppText.EXPORT_AI_PARAMETERS}"
+                                      Header="{l:Lang Export_AiParameters}"
                                       IsVisible="{Binding HasGenerationParameters}" />
                     <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
                                       CommandParameter="{x:Static vm:AiExportKind.Json}"
-                                      Description="{x:Static app:AppText.EXPORT_AI_JSON_DESC}"
+                                      Description="{l:Lang Ai_JsonDesc}"
                                       Glyph="{x:Static ui:IconId.Braces}"
-                                      Header="{x:Static app:AppText.EXPORT_AI_JSON}"
+                                      Header="{l:Lang Export_AiJson}"
                                       IsVisible="{Binding HasAi}" />
                     <ui:GlassMenuItem Command="{Binding ExportAiCommand}"
                                       CommandParameter="{x:Static vm:AiExportKind.Workflow}"
-                                      Description="{x:Static app:AppText.EXPORT_AI_WORKFLOW_DESC}"
+                                      Description="{l:Lang Export_AiWorkflowDesc}"
                                       Glyph="{x:Static ui:IconId.AiWorkflow}"
-                                      Header="{x:Static app:AppText.EXPORT_AI_WORKFLOW}"
+                                      Header="{l:Lang Export_AiWorkflow}"
                                       IsVisible="{Binding HasWorkflow}" />
                   </MenuFlyout>
                 </ui:GlassDropDownButton.Flyout>
@@ -294,17 +295,17 @@
                 <TextBlock HorizontalAlignment="Center"
                            FontSize="{StaticResource FontSizeSubtitle}"
                            FontWeight="Medium"
-                           Text="{x:Static app:AppText.NO_MATCH_TITLE}" />
+                           Text="{l:Lang Table_NoMatchTitle}" />
                 <TextBlock HorizontalAlignment="Center"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="{x:Static app:AppText.NO_MATCH_CAPTION}"
+                           Text="{l:Lang Table_NoMatchCaption}"
                            TextAlignment="Center"
                            TextWrapping="Wrap" />
                 <ui:GlassButton Name="ClearFiltersButton"
                                 Margin="0,6,0,0"
                                 HorizontalAlignment="Center"
                                 Command="{Binding ClearFiltersCommand}"
-                                Content="{x:Static app:AppText.CLEAR_FILTERS}" />
+                                Content="{l:Lang Table_ClearFilters}" />
               </StackPanel>
             </ui:MetadataTable.Placeholder>
           </ui:MetadataTable>

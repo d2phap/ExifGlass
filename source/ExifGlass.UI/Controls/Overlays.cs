@@ -24,6 +24,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
+using ExifGlass.Core.Localization;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
 
@@ -228,7 +229,7 @@ public enum DialogAnswer
 /// <summary>
 /// What an in-window dialog asks (D8: Save / Discard / Cancel).
 /// </summary>
-public sealed record DialogRequest(string Title, string? Body, string PrimaryText, string? SecondaryText = null, string CancelText = UiText.DIALOG_CANCEL, bool IsSecondaryDanger = true, IconId? Icon = null);
+public sealed record DialogRequest(string Title, string? Body, string PrimaryText, string? SecondaryText = null, string? CancelText = null, bool IsSecondaryDanger = true, IconId? Icon = null);
 
 
 /// <summary>
@@ -385,7 +386,7 @@ public class DialogCard : TemplatedControl
         AvaloniaProperty.Register<DialogCard, string?>(nameof(SecondaryText));
 
     public static readonly StyledProperty<string?> CancelTextProperty =
-        AvaloniaProperty.Register<DialogCard, string?>(nameof(CancelText), UiText.DIALOG_CANCEL);
+        AvaloniaProperty.Register<DialogCard, string?>(nameof(CancelText));
 
     public static readonly StyledProperty<bool> IsSecondaryDangerProperty =
         AvaloniaProperty.Register<DialogCard, bool>(nameof(IsSecondaryDanger), true);
@@ -462,7 +463,7 @@ public class DialogCard : TemplatedControl
         Body = request.Body;
         PrimaryText = request.PrimaryText;
         SecondaryText = request.SecondaryText;
-        CancelText = request.CancelText;
+        CancelText = request.CancelText ?? Lang.Current[LangId._Cancel];
         IsSecondaryDanger = request.IsSecondaryDanger;
         Icon = request.Icon;
     }

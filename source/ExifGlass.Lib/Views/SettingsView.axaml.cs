@@ -17,8 +17,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Controls;
 using ExifGlass.ViewModels;
 using System.ComponentModel;
 
@@ -39,6 +42,7 @@ public partial class SettingsView : UserControl
     public SettingsView()
     {
         InitializeComponent();
+        if (LanguageMenuButton.Flyout is PopupFlyoutBase flyout) MenuMotion.Attach(flyout);
 
         ArgumentField.NoteProvider = SettingsViewModel.NoteFor;
         ArgumentField.SuggestionHint = SettingsViewModel.HintFor;
@@ -102,7 +106,49 @@ public partial class SettingsView : UserControl
     }
 
 
-    private void ViewModel_ToastRequested(object? sender, (string Title, string? Subtitle) toast) => Toasts.Show(toast.Title, toast.Subtitle);
+    private void ViewModel_ToastRequested(object? sender, SettingsToast toast) => Toasts.Show(toast.Title, toast.Subtitle, toast.Kind);
+
+
+    private static FilePickerFileType LanguagePacks => new(Lang.Current[LangId.Picker_LanguagePack]) { Patterns = ["*" + Lang.FILE_EXTENSION] };
+
+
+    private async void InstallLanguageItem_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel is null || TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Lang.Current[LangId.Settings_LanguageInstall],
+            AllowMultiple = true,
+            FileTypeFilter = [LanguagePacks],
+        });
+
+        await _viewModel.InstallLanguagesAsync([.. files.Select(f => f.TryGetLocalPath()).OfType<string>()]);
+    }
+
+
+    private async void ExportLanguageItem_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_viewModel is null || TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+
+        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = Lang.Current[LangId.Settings_LanguageExport],
+            SuggestedFileName = _viewModel.ExportFileName,
+            FileTypeChoices = [LanguagePacks],
+        });
+        if (file is null) return;
+
+        try
+        {
+            await using var stream = await file.OpenWriteAsync();
+            _viewModel.ExportLanguage(stream, file.Name);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Toasts.Show(Lang.Current[LangId.Toast_ExportFailed], ex.Message, ToastKind.Danger);
+        }
+    }
 
 
     private async void BrowseButton_Click(object? sender, RoutedEventArgs e)
@@ -110,12 +156,12 @@ public partial class SettingsView : UserControl
         if (_viewModel is null || TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
 
         FilePickerFileType[] types = OperatingSystem.IsWindows()
-            ? [new FilePickerFileType(AppText.PICKER_PROGRAMS) { Patterns = ["*.exe"] }, new FilePickerFileType(AppText.PICKER_ALL) { Patterns = ["*"] }]
-            : [new FilePickerFileType(AppText.PICKER_ALL) { Patterns = ["*"] }];
+            ? [new FilePickerFileType(Lang.Current[LangId.Picker_Programs]) { Patterns = ["*.exe"] }, new FilePickerFileType(Lang.Current[LangId.Picker_AllFiles]) { Patterns = ["*"] }]
+            : [new FilePickerFileType(Lang.Current[LangId.Picker_AllFiles]) { Patterns = ["*"] }];
 
         var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = AppText.PICKER_EXIFTOOL,
+            Title = Lang.Current[LangId.Picker_ExifToolTitle],
             AllowMultiple = false,
             FileTypeFilter = types,
         });

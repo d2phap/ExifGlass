@@ -25,6 +25,7 @@ using Avalonia.VisualTree;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.UI.Controls;
@@ -99,7 +100,7 @@ public sealed class AiTests
 
         Assert.Contains(card.Credentials!.Rows, r => r is { Key: "Claimed by", Value: "ChatGPT" });
         Assert.Equal(new AiIngredientView("image.png", "Created by GPT-4o · Trained algorithmic media"), card.Credentials.Ingredients.Single());
-        Assert.Contains(card.GetVisualDescendants().OfType<Badge>(), b => b.Text == UiText.NOT_VERIFIED);
+        Assert.Contains(card.GetVisualDescendants().OfType<Badge>(), b => b.Text == Lang.Current[LangId.Ai_NotVerified]);
         Assert.True(Part<Control>(card, "PART_ProvenanceNote").IsVisible);
         Assert.Equal(AiAction.CopyJson, Part<Button>(card, "PART_MainAction").Tag);
         window.Close();
@@ -177,7 +178,8 @@ public sealed class AiTests
         Assert.Equal(("PNG:Parameters", TableColumns.Value), (vm.Selection.CurrentKey, vm.Selection.CurrentColumn));
         Assert.Null(vm.FocusedAiField);
         Assert.Equal(vm.Rows.RowsInView.Count(r => r is { IsAi: true, SourceKey: "PNG:Parameters" }), vm.FocusedTag?.AiFields);
-        Assert.Equal("(same as value)", vm.FocusedTag!.Raw);
+        Assert.True(vm.FocusedTag!.IsRawSame);
+        Assert.Equal("(same as value)", vm.FocusedTag.ShownRaw);
         Assert.Same(inspector.TagCard, FirstShownCard(inspector));
         Assert.True(inspector.AiCard.IsVisible);
 
@@ -384,7 +386,7 @@ public sealed class AiTests
         Assert.Equal([matches[0]], ShownText.Matches(matches, ShownText.CELL));
 
         // the value well shows 10,000 and says how many more there are; Copy still has them all
-        var tag = new SelectedTagView("PNG:Workflow", "PNG", "Workflow", "Workflow", huge, UiText.SAME_AS_VALUE, "string", "-PNG:Workflow", false);
+        var tag = new SelectedTagView("PNG:Workflow", "PNG", "Workflow", "Workflow", huge, huge, "string", "-PNG:Workflow", false);
         Assert.StartsWith(huge[..ShownText.WELL], tag.ShownValue, StringComparison.Ordinal);
         Assert.EndsWith(UiText.MoreCharacters(huge.Length - ShownText.WELL), tag.ShownValue, StringComparison.Ordinal);
         Assert.Equal("short", ShownText.Well("short"));

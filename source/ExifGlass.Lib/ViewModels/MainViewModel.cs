@@ -22,6 +22,7 @@ using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.Core.Settings;
@@ -260,7 +261,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string WindowTitle => AppText.WindowTitle(Document?.FileName);
 
-    public string Summary => Document is null ? (IsLoading ? AppText.SUMMARY_READING : AppText.SUMMARY_NO_FILE) : Rows.Summary;
+    public string Summary => Document is null ? (IsLoading ? Lang.Current[LangId.Table_SummaryReading] : Lang.Current[LangId.Table_SummaryNoFile]) : Rows.Summary;
 
     public string SummaryDetail => Document is null ? string.Empty : AppText.InGroups(Document.Groups.Count);
 
@@ -276,27 +277,27 @@ public sealed partial class MainViewModel : ObservableObject
 
     public string ThemeTooltip => AppText.ThemeTooltip(Theme, ThemeService.Next(Theme));
 
-    public string PinTooltip => IsPinned ? AppText.UNPIN : AppText.PIN;
+    public string PinTooltip => IsPinned ? Lang.Current[LangId.Toolbar_Unpin] : Lang.Current[LangId.Toolbar_Pin];
 
     // with no file the panels stay closed and their toggles off, whatever the settings say (owner at G4 review)
     public bool IsRailDocked => HasDocument && RailMode == PanelMode.Docked && RailOpen;
 
     public bool IsRailShown => HasDocument && (RailMode == PanelMode.Docked ? RailOpen : IsRailPushed);
 
-    public string RailTooltip => IsRailShown ? AppText.HIDE_RAIL : AppText.SHOW_RAIL;
+    public string RailTooltip => IsRailShown ? Lang.Current[LangId.Toolbar_HideRail] : Lang.Current[LangId.Toolbar_ShowRail];
 
     public bool IsInspectorDocked => HasDocument && InspectorMode == PanelMode.Docked && InspectorOpen;
 
     public bool IsInspectorShown => HasDocument && (InspectorMode == PanelMode.Docked ? InspectorOpen : IsInspectorPushed);
 
-    public string InspectorTooltip => IsInspectorShown ? AppText.HIDE_INSPECTOR : AppText.SHOW_INSPECTOR;
+    public string InspectorTooltip => IsInspectorShown ? Lang.Current[LangId.Toolbar_HideInspector] : Lang.Current[LangId.Toolbar_ShowInspector];
 
     public bool ShowSecondaryButtons => Toolbar == ToolbarMode.Full;
 
     /// <summary>
     /// The Open button's label: hidden below 620 px, where the toolbar is icon-only.
     /// </summary>
-    public string? OpenLabel => Toolbar == ToolbarMode.IconOnly ? null : AppText.OPEN;
+    public string? OpenLabel => Toolbar == ToolbarMode.IconOnly ? null : Lang.Current[LangId._Open];
 
     public bool ShowSearchHint => Toolbar != ToolbarMode.IconOnly;
 
@@ -324,7 +325,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// </summary>
     public void OpenDropped(IReadOnlyList<string> files, int folderCount)
     {
-        if (folderCount > 0) Shell?.ShowToast(AppText.TOAST_FOLDER, AppText.TOAST_FOLDER_SUB, ToastKind.Info);
+        if (folderCount > 0) Shell?.ShowToast(Lang.Current[LangId.Toast_Folder], Lang.Current[LangId.Toast_FolderSub], ToastKind.Info);
         if (files.Count == 0) return;
 
         _ = OpenFileAsync(files[0]);
@@ -416,8 +417,8 @@ public sealed partial class MainViewModel : ObservableObject
         IsPinned = !IsPinned;
         _settings.Update(s => s.AlwaysOnTop = IsPinned);
 
-        if (IsPinned) Shell?.ShowToast(AppText.TOAST_PINNED, AppText.TOAST_PINNED_SUB);
-        else Shell?.ShowToast(AppText.TOAST_UNPINNED, AppText.TOAST_UNPINNED_SUB);
+        if (IsPinned) Shell?.ShowToast(Lang.Current[LangId.Toast_Pinned], Lang.Current[LangId.Toast_PinnedSub]);
+        else Shell?.ShowToast(Lang.Current[LangId.Toast_Unpinned], Lang.Current[LangId.Toast_UnpinnedSub]);
     }
 
 
@@ -482,7 +483,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (Shell is null) return;
 
         await Shell.CopyTextAsync(WritePlan.ToCommandLine(CommandTokens));
-        Shell.ShowToast(AppText.TOAST_COMMAND_COPIED, AppText.TOAST_COMMAND_COPIED_SUB);
+        Shell.ShowToast(Lang.Current[LangId.Toast_CommandCopied], Lang.Current[LangId.Toast_CommandCopiedSub]);
     }
 
     #endregion // Commands
@@ -559,7 +560,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     private void UpdateExifToolState()
     {
-        ExifToolProblem = _metadata?.Status is ExifToolStatus.Missing or ExifToolStatus.Failed ? _metadata.Problem ?? AppText.EXIFTOOL_MISSING_TITLE : null;
+        ExifToolProblem = _metadata?.Status is ExifToolStatus.Missing or ExifToolStatus.Failed ? _metadata.Problem ?? Lang.Current[LangId._ExifToolUnavailable] : null;
         UpdateCommandTokens();
     }
 
@@ -583,7 +584,7 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
 
-    private void Loader_Failed(object? sender, LoadFailedEventArgs e) => Shell?.ShowToast(AppText.TOAST_READ_FAILED, e.Message, ToastKind.Danger);
+    private void Loader_Failed(object? sender, LoadFailedEventArgs e) => Shell?.ShowToast(Lang.Current[LangId.Toast_ReadFailed], e.Message, ToastKind.Danger);
 
 
     private void Metadata_StatusChanged(object? sender, EventArgs e) => Dispatcher.UIThread.Post(UpdateExifToolState);

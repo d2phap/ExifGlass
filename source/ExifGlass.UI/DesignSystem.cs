@@ -21,12 +21,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using ExifGlass.UI.Controls;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI;
 
 /// <summary>
-/// Starts the design system once the app's resources are loaded: the system mono font, menu motion, and grayscale text on every window and popup (S3).
+/// Starts the design system once the app's resources are loaded: the system mono font, the language, menu motion, and grayscale text on every window and popup (S3).
 /// </summary>
 public static class DesignSystem
 {
@@ -42,6 +43,7 @@ public static class DesignSystem
     public static void Initialize(Application app)
     {
         AppFonts.ApplyMono(app.Resources);
+        LangResources.Attach(app.Resources);
         if (_initialized) return;
 
         _initialized = true;

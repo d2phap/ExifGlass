@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ExifGlass.UI.Localization"
              xmlns:app="using:ExifGlass"
              xmlns:tok="using:ExifGlass.UI.Tokens"
              xmlns:ui="using:ExifGlass.UI.Controls"
@@ -15,93 +16,155 @@
         <TextBlock Margin="0,10,0,4"
                    tok:Typography.Role="Overline"
                    Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.GENERAL_OVERLINE}" />
+                   Text="{l:Lang Settings_General}" />
+
+        <!--  the language applies with OK, to every open window; the line under it credits the translators  -->
+        <Border MinHeight="56"
+                Padding="0,8"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_Language}" />
+              <TextBlock Name="ContributorsText"
+                         tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         IsVisible="{Binding HasLanguageContributors}"
+                         Text="{Binding LanguageContributors}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ComboBox Name="LanguageChoice"
+                      Grid.Column="1"
+                      Width="246"
+                      VerticalAlignment="Center"
+                      AutomationProperties.Name="{l:Lang Settings_Language}"
+                      ItemsSource="{Binding Languages}"
+                      SelectedItem="{Binding SelectedLanguage}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LanguageChoice">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                               IsVisible="{Binding EnglishName, Converter={x:Static ObjectConverters.IsNotNull}}"
+                               Text="{Binding EnglishName}"
+                               TextTrimming="CharacterEllipsis" />
+                  </StackPanel>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ui:GlassButton Name="LanguageMenuButton"
+                            Grid.Column="2"
+                            Margin="0,0,-6,0"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{l:Lang Settings_LanguageMore}"
+                            Classes="ghost"
+                            Icon="{x:Static ui:IconId.MoreHorizontal}"
+                            ToolTip.Tip="{l:Lang Settings_LanguageMore}">
+              <ui:GlassButton.Flyout>
+                <MenuFlyout Placement="BottomEdgeAlignedRight">
+                  <ui:GlassMenuItem Name="InstallLanguageItem"
+                                    Click="InstallLanguageItem_Click"
+                                    Glyph="{x:Static ui:IconId.ArrowDownload}"
+                                    Header="{l:Lang Settings_LanguageInstall}" />
+                  <ui:GlassMenuItem Name="ExportLanguageItem"
+                                    Click="ExportLanguageItem_Click"
+                                    Glyph="{x:Static ui:IconId.ArrowUpload}"
+                                    Header="{l:Lang Settings_LanguageExport}" />
+                </MenuFlyout>
+              </ui:GlassButton.Flyout>
+            </ui:GlassButton>
+          </Grid>
+        </Border>
 
         <Border MinHeight="56"
+                Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
             <StackPanel VerticalAlignment="Center">
-              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.APP_THEME}" />
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_AppTheme}" />
               <TextBlock tok:Typography.Role="Meta"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static app:AppText.APP_THEME_DESC}"
+                         Text="{l:Lang Settings_AppThemeDesc}"
                          TextWrapping="Wrap" />
             </StackPanel>
             <ui:SegmentedControl Name="ThemeChoice"
                                  Grid.Column="1"
                                  Width="246"
                                  VerticalAlignment="Center"
-                                 AutomationProperties.Name="{x:Static app:AppText.APP_THEME}"
+                                 AutomationProperties.Name="{l:Lang Settings_AppTheme}"
                                  SelectedIndex="{Binding ThemeIndex}">
               <ui:SegmentedControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <UniformGrid Rows="1" />
                 </ItemsPanelTemplate>
               </ui:SegmentedControl.ItemsPanel>
-              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_SYSTEM}" Icon="{x:Static ui:IconId.DarkTheme}" />
-              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_LIGHT}" Icon="{x:Static ui:IconId.WeatherSunny}" />
-              <ui:SegmentedItem Content="{x:Static app:AppText.THEME_DARK}" Icon="{x:Static ui:IconId.WeatherMoon}" />
+              <ui:SegmentedItem Content="{l:Lang Settings_ThemeSystem}" Icon="{x:Static ui:IconId.DarkTheme}" />
+              <ui:SegmentedItem Content="{l:Lang Settings_ThemeLight}" Icon="{x:Static ui:IconId.WeatherSunny}" />
+              <ui:SegmentedItem Content="{l:Lang Settings_ThemeDark}" Icon="{x:Static ui:IconId.WeatherMoon}" />
             </ui:SegmentedControl>
           </Grid>
         </Border>
 
         <!--  Appendix A item 84: System, then the presets; a choice shows at once, as the theme does  -->
         <Border MinHeight="56"
+                Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
             <StackPanel VerticalAlignment="Center">
-              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.ACCENT_COLOR}" />
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_AccentColor}" />
               <TextBlock tok:Typography.Role="Meta"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static app:AppText.ACCENT_COLOR_DESC}"
+                         Text="{l:Lang Settings_AccentColorDesc}"
                          TextWrapping="Wrap" />
             </StackPanel>
             <ui:SwatchPicker Name="AccentChoice"
                              Grid.Column="1"
                              VerticalAlignment="Center"
-                             AutomationProperties.Name="{x:Static app:AppText.ACCENT_COLOR}"
+                             AutomationProperties.Name="{l:Lang Settings_AccentColor}"
                              ItemsSource="{Binding AccentChoices}"
                              SelectedIndex="{Binding AccentIndex}" />
           </Grid>
         </Border>
 
         <Border MinHeight="56"
+                Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <StackPanel VerticalAlignment="Center">
-              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.ALWAYS_ON_TOP}" />
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_AlwaysOnTop}" />
               <TextBlock tok:Typography.Role="Meta"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static app:AppText.ALWAYS_ON_TOP_DESC}"
+                         Text="{l:Lang Settings_AlwaysOnTopDesc}"
                          TextWrapping="Wrap" />
             </StackPanel>
             <ToggleSwitch Name="OnTopSwitch"
                           Grid.Column="1"
                           VerticalAlignment="Center"
-                          AutomationProperties.Name="{x:Static app:AppText.ALWAYS_ON_TOP}"
+                          AutomationProperties.Name="{l:Lang Settings_AlwaysOnTop}"
                           IsChecked="{Binding AlwaysOnTop}" />
           </Grid>
         </Border>
 
         <Border MinHeight="56"
+                Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1"
                 IsVisible="{Binding ShowsUpdates}">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
             <StackPanel VerticalAlignment="Center">
-              <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.CHECK_UPDATES}" />
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_CheckUpdates}" />
               <TextBlock tok:Typography.Role="Meta"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static app:AppText.CHECK_UPDATES_DESC}"
+                         Text="{l:Lang Settings_CheckUpdatesDesc}"
                          TextWrapping="Wrap" />
             </StackPanel>
             <ToggleSwitch Name="UpdatesSwitch"
                           Grid.Column="1"
                           VerticalAlignment="Center"
-                          AutomationProperties.Name="{x:Static app:AppText.CHECK_UPDATES}"
+                          AutomationProperties.Name="{l:Lang Settings_CheckUpdates}"
                           IsChecked="{Binding CheckForUpdates}" />
           </Grid>
         </Border>
@@ -109,15 +172,15 @@
         <TextBlock Margin="0,18,0,6"
                    tok:Typography.Role="Overline"
                    Foreground="{DynamicResource TextSecondaryBrush}"
-                   Text="{x:Static app:AppText.EXIFTOOL_OVERLINE}" />
+                   Text="{l:Lang Settings_ExifTool}" />
 
         <StackPanel Margin="0,0,0,14"
                     IsVisible="{Binding ShowsExifToolPath}"
                     Spacing="6">
-          <TextBlock tok:Typography.Role="BodyStrong" Text="{x:Static app:AppText.EXECUTABLE_PATH}" />
+          <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_ExecutablePath}" />
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
             <TextBox Name="PathBox"
-                     AutomationProperties.Name="{x:Static app:AppText.EXECUTABLE_PATH}"
+                     AutomationProperties.Name="{l:Lang Settings_ExecutablePath}"
                      FontFamily="{DynamicResource FontMono}"
                      FontSize="{StaticResource FontSizeMono}"
                      PlaceholderText="{Binding ExifToolPlaceholder}"
@@ -125,9 +188,9 @@
             <ui:GlassButton Name="BrowseButton"
                             Grid.Column="1"
                             Click="BrowseButton_Click"
-                            Content="{x:Static app:AppText.BROWSE}"
+                            Content="{l:Lang _Browse}"
                             Icon="{x:Static ui:IconId.FolderOpen}"
-                            ToolTip.Tip="{x:Static app:AppText.BROWSE_TIP}" />
+                            ToolTip.Tip="{l:Lang Settings_BrowseTip}" />
           </Grid>
           <ui:InlineNote Name="PathNote"
                          Icon="{Binding PathHintIcon}"
@@ -140,20 +203,20 @@
                        Icon="{x:Static ui:IconId.LockClosed}"
                        IsVisible="{Binding ShowsSandboxNote}"
                        Kind="Info"
-                       Text="{x:Static app:AppText.SANDBOX_NOTE}" />
+                       Text="{l:Lang Settings_SandboxNote}" />
 
         <StackPanel Spacing="6">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
             <TextBlock VerticalAlignment="Bottom"
                        tok:Typography.Role="BodyStrong"
-                       Text="{x:Static app:AppText.ARGUMENTS}" />
+                       Text="{l:Lang Settings_Arguments}" />
             <TextBlock Grid.Column="1"
                        VerticalAlignment="Bottom"
                        tok:Typography.Role="Meta"
                        Foreground="{DynamicResource TextSecondaryBrush}"
-                       Text="{x:Static app:AppText.ARGUMENTS_KEYS}" />
+                       Text="{l:Lang Settings_ArgumentsKeys}" />
           </Grid>
-          <ui:TokenField Name="ArgumentField" AutomationProperties.Name="{x:Static app:AppText.ARGUMENTS}">
+          <ui:TokenField Name="ArgumentField" AutomationProperties.Name="{l:Lang Settings_Arguments}">
             <ui:TokenField.Note>
               <ui:InlineNote Name="ArgumentNote"
                              Icon="{Binding ArgumentHintIcon}"
@@ -168,15 +231,15 @@
           <TextBlock VerticalAlignment="Center"
                      tok:Typography.Role="Overline"
                      Foreground="{DynamicResource TextSecondaryBrush}"
-                     Text="{x:Static app:AppText.PREVIEW_OVERLINE}" />
+                     Text="{l:Lang Settings_CommandPreview}" />
           <ui:GlassButton Name="CopyPreviewButton"
                           Grid.Column="1"
                           Margin="0,0,-6,0"
-                          AutomationProperties.Name="{x:Static app:AppText.COPY_COMMAND}"
+                          AutomationProperties.Name="{l:Lang _CopyCommand}"
                           Classes="ghost small"
                           Command="{Binding CopyCommandLineCommand}"
                           Icon="{x:Static ui:IconId.Copy}"
-                          ToolTip.Tip="{x:Static app:AppText.COPY_COMMAND}" />
+                          ToolTip.Tip="{l:Lang _CopyCommand}" />
         </Grid>
         <ui:CommandPreview Name="Preview" Tokens="{Binding PreviewTokens}" />
       </StackPanel>
@@ -193,21 +256,21 @@
         <ui:GlassButton Name="ResetButton"
                         Classes="ghost"
                         Command="{Binding ResetCommand}"
-                        Content="{x:Static app:AppText.RESET}"
+                        Content="{l:Lang _Reset}"
                         Foreground="{DynamicResource TextSecondaryBrush}"
                         Icon="{x:Static ui:IconId.ArrowReset}"
-                        ToolTip.Tip="{x:Static app:AppText.RESET_TIP}" />
+                        ToolTip.Tip="{l:Lang Settings_ResetTip}" />
         <ui:GlassButton Name="OkButton"
                         Grid.Column="2"
                         MinWidth="80"
                         Classes="primary"
                         Command="{Binding OkCommand}"
-                        Content="{x:Static app:AppText.OK}" />
+                        Content="{l:Lang _Ok}" />
         <ui:GlassButton Name="CancelButton"
                         Grid.Column="3"
                         MinWidth="80"
                         Command="{Binding CancelCommand}"
-                        Content="{x:Static app:AppText.CANCEL}" />
+                        Content="{l:Lang _Cancel}" />
       </Grid>
     </Border>
 

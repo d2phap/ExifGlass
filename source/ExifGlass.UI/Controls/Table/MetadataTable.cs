@@ -26,7 +26,9 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Query;
+using ExifGlass.UI.Localization;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -131,7 +133,7 @@ public partial class MetadataTable : Panel
             ItemsSource = _source,
         };
         _grid.Classes.Add("table");
-        AutomationProperties.SetName(_grid, UiText.TABLE);
+        LangResources.Bind(_grid, AutomationProperties.NameProperty, LangId.Table_Name);
         ApplyThemes();
         _grid.Sorting += Grid_Sorting;
         _grid.LoadingRow += Grid_LoadingRow;
@@ -157,6 +159,7 @@ public partial class MetadataTable : Panel
         InitializeInput();
         InitializeColumns();
         ConfigureColumns();
+        LangResources.Track(this, RefreshText);
     }
 
     #endregion // Constructors
@@ -577,6 +580,21 @@ public partial class MetadataTable : Panel
         foreach (var chrome in _chromes) chrome.Refresh(animate: true);
         RefreshCopyButtons();
         UpdateRing(fade: true);
+    }
+
+
+    // headers, edit badges and group names are text set in code; the rest follows the resources
+    private void RefreshText()
+    {
+        ApplyHeaders();
+        foreach (var chrome in _chromes) chrome.Refresh(animate: false);
+        if (_sticky.View.Group is { } group) _sticky.View.Show(group, animate: false);
+        if (_presenter is null || _colValue is null) return;
+
+        foreach (var child in _presenter.Children)
+        {
+            if (child is DataGridRow { DataContext: TableItem item } row && _colValue.GetCellContent(row) is ValueCell cell) cell.Update(item);
+        }
     }
 
 

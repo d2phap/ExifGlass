@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
+using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
 using ExifGlass.Services;
@@ -27,11 +29,19 @@ namespace ExifGlass.ViewModels;
 /// <summary>
 /// What OK in Settings saves (DS 6.15).
 /// </summary>
-public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments);
+public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments, string Language = Lang.BUILT_IN);
 
 
 public sealed partial class MainViewModel
 {
+    #region Fields and constants
+
+    private MetadataDocument? _relocalizedFor;
+    private DerivedInfo? _relocalized;
+
+    #endregion // Fields and constants
+
+
     #region Properties
 
     /// <summary>
@@ -50,6 +60,22 @@ public sealed partial class MainViewModel
     public MetadataService? Metadata => _metadata;
 
     public SettingsStore Settings => _settings;
+
+    /// <summary>
+    /// The inspector's readouts in the language on screen: a file read in another one is described again.
+    /// </summary>
+    private DerivedInfo? Derived
+    {
+        get
+        {
+            if (Document is not { } doc) return null;
+            if (ReferenceEquals(doc.Derived.Language, Lang.Current)) return doc.Derived;
+            if (_relocalized is { } derived && ReferenceEquals(_relocalizedFor, doc) && ReferenceEquals(derived.Language, Lang.Current)) return derived;
+
+            _relocalizedFor = doc;
+            return _relocalized = DerivedInfo.From(doc);
+        }
+    }
 
     /// <summary>
     /// The accent on screen, which Settings may be previewing (Appendix A item 84).
@@ -89,6 +115,7 @@ public sealed partial class MainViewModel
         var before = _settings.Current;
         var pathChanged = !string.Equals(before.ExifToolPath.Trim(), change.ExifToolPath.Trim(), StringComparison.Ordinal);
         var argumentsChanged = !string.Equals(before.ExifToolArguments, change.Arguments, StringComparison.Ordinal);
+        var languageChanged = !string.Equals(before.Language, change.Language, StringComparison.OrdinalIgnoreCase);
         var oldArguments = _arguments;
 
         _settings.Update(s =>
@@ -99,14 +126,18 @@ public sealed partial class MainViewModel
             s.CheckForUpdates = change.CheckForUpdates;
             s.ExifToolPath = change.ExifToolPath.Trim();
             s.ExifToolArguments = change.Arguments;
+            s.Language = change.Language;
         });
+
+        // every open window follows at once, before the toast below speaks
+        if (languageChanged) Lang.Current = Lang.FromSetting(change.Language);
 
         PreviewTheme(change.Theme);
         PreviewAccent(change.Accent);
         IsPinned = change.AlwaysOnTop;
         if (argumentsChanged) _arguments = ArgumentPolicy.Analyze(change.Arguments);
 
-        Shell?.ShowToast(AppText.TOAST_SETTINGS_SAVED, AppText.SettingsSavedSub(ArgumentPolicy.Split(change.Arguments).Count, change.ExifToolPath.Trim().Length > 0));
+        Shell?.ShowToast(Lang.Current[LangId.Toast_SettingsSaved], AppText.SettingsSavedSub(ArgumentPolicy.Split(change.Arguments).Count, change.ExifToolPath.Trim().Length > 0));
 
         if (pathChanged && _metadata is not null) await _metadata.RestartAsync();
 
@@ -125,9 +156,27 @@ public sealed partial class MainViewModel
 
 
     /// <summary>
+    /// Reads again every text the main window set from code or computes, after a language change.
+    /// </summary>
+    public void RefreshText()
+    {
+        foreach (var item in RailGroups) item.RefreshText();
+        foreach (var chip in AiQuickFilters.Concat(QuickFilters)) chip.RefreshText();
+        UpdateRail();
+        UpdateChips();
+        UpdateExifToolState();
+        UpdateAddSuggestions();
+
+        // the view's summary and group descriptions are made with the rows
+        Requery();
+        OnPropertyChanged(string.Empty);
+    }
+
+
+    /// <summary>
     /// D10's startup toast when the feed has a newer release.
     /// </summary>
-    public void ShowUpdateToast(string version) => Shell?.ShowToast(AppText.UpdateAvailable(version), AppText.TOAST_UPDATE_SUB, ToastKind.Info);
+    public void ShowUpdateToast(string version) => Shell?.ShowToast(AppText.UpdateAvailable(version), Lang.Current[LangId.Toast_UpdateSub], ToastKind.Info);
 
     #endregion // Public methods
 }

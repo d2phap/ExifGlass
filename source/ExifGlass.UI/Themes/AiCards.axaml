@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:eg="using:ExifGlass.UI"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
@@ -84,7 +85,7 @@
                 <TextBlock VerticalAlignment="Center"
                            tok:Typography.Role="Overline"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
+                           Text="{l:Lang _AiGenerationOverline}" />
               </DockPanel>
               <StackPanel Spacing="10">
                 <ui:Skeleton Width="256" HorizontalAlignment="Left" Index="0" IsPulsing="True" />
@@ -92,7 +93,7 @@
                 <ui:Skeleton Width="232" HorizontalAlignment="Left" Index="2" IsPulsing="True" />
                 <ui:Skeleton Width="166" HorizontalAlignment="Left" Index="3" IsPulsing="True" />
               </StackPanel>
-              <ui:InlineNote Icon="{x:Static ui:IconId.ArrowSync}" Text="{x:Static eg:UiText.AI_LOADING}" />
+              <ui:InlineNote Icon="{x:Static ui:IconId.ArrowSync}" Text="{l:Lang Ai_Loading}" />
             </StackPanel>
 
             <StackPanel Name="PART_Content" Spacing="12">
@@ -120,7 +121,7 @@
                 <TextBlock VerticalAlignment="Center"
                            tok:Typography.Role="Overline"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="{x:Static eg:UiText.AI_GENERATION_OVERLINE}" />
+                           Text="{l:Lang _AiGenerationOverline}" />
               </DockPanel>
 
               <!--  kind chip and the tag the card leads with  -->
@@ -134,7 +135,7 @@
                            DockPanel.Dock="Left"
                            tok:Typography.Role="Meta"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="{x:Static eg:UiText.FROM}" />
+                           Text="{l:Lang Ai_From}" />
                 <ui:SourceLink Margin="2,0,0,0" OtherSources="{TemplateBinding OtherSources}" SourceKey="{TemplateBinding SourceKey}" />
               </DockPanel>
 
@@ -144,8 +145,8 @@
                   <DataTemplate x:DataType="x:String">
                     <ui:InlineNote Icon="{x:Static ui:IconId.AiWarning}" Kind="Warning" Text="{Binding}">
                       <WrapPanel ItemSpacing="6" LineSpacing="4">
-                        <ui:GlassButton Classes="small" Content="{x:Static eg:UiText.USE_BUNDLED_EXIFTOOL}" Tag="{x:Static ui:AiAction.UseBundledExifTool}" />
-                        <ui:GlassButton Classes="link" Content="{x:Static eg:UiText.OPEN_SETTINGS}" Tag="{x:Static ui:AiAction.OpenSettings}" />
+                        <ui:GlassButton Classes="small" Content="{l:Lang Ai_UseBundledExifTool}" Tag="{x:Static ui:AiAction.UseBundledExifTool}" />
+                        <ui:GlassButton Classes="link" Content="{l:Lang _OpenSettings}" Tag="{x:Static ui:AiAction.OpenSettings}" />
                       </WrapPanel>
                     </ui:InlineNote>
                   </DataTemplate>
@@ -163,7 +164,7 @@
               <ui:InlineNote Name="PART_UnknownNote"
                              IsVisible="False"
                              Kind="Info"
-                             Text="{x:Static eg:UiText.UNKNOWN_AI_NOTE}" />
+                             Text="{l:Lang Ai_UnknownNote}" />
 
               <!--  Unknown AI: the raw text as it is  -->
               <ContentPresenter Content="{TemplateBinding Raw}" IsVisible="{TemplateBinding Raw, Converter={x:Static ObjectConverters.IsNotNull}}">
@@ -177,12 +178,12 @@
                                           Foreground="{DynamicResource TextSecondaryBrush}"
                                           Icon="{x:Static ui:IconId.Copy}"
                                           Tag="{x:Static ui:AiAction.CopyText}"
-                                          ToolTip.Tip="{x:Static eg:UiText.COPY_RAW}" />
+                                          ToolTip.Tip="{l:Lang Ai_CopyRaw}" />
                         </StackPanel>
                         <TextBlock VerticalAlignment="Center"
                                    tok:Typography.Role="Overline"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{x:Static eg:UiText.RAW_TEXT_OVERLINE}" />
+                                   Text="{l:Lang Ai_RawTextOverline}" />
                       </DockPanel>
                       <ui:SquircleBorder Background="{DynamicResource EmphasisA05Brush}" ClipToBounds="True" CornerRadius="{StaticResource RadiusWell}">
                         <ScrollViewer MaxHeight="160" Margin="12,10" HorizontalScrollBarVisibility="Disabled">
@@ -199,13 +200,13 @@
                 <DockPanel Height="24">
                   <ui:GlassButton Margin="0,0,-6,0"
                                   Classes="link"
-                                  AutomationProperties.Name="{x:Static eg:UiText.COPY_PROMPT}"
-                                  Content="{x:Static eg:UiText.COPY}"
+                                  AutomationProperties.Name="{l:Lang Ai_CopyPrompt}"
+                                  Content="{l:Lang _Copy}"
                                   DockPanel.Dock="Right"
                                   Icon="{x:Static ui:IconId.Copy}"
                                   IconSize="13"
                                   Tag="{x:Static ui:AiAction.CopyPrompt}"
-                                  ToolTip.Tip="{x:Static eg:UiText.COPY_PROMPT}" />
+                                  ToolTip.Tip="{l:Lang Ai_CopyPrompt}" />
                   <TextBlock VerticalAlignment="Center"
                              tok:Typography.Role="Overline"
                              Foreground="{DynamicResource TextSecondaryBrush}"
@@ -222,7 +223,7 @@
                                 Margin="-6,0,0,0"
                                 HorizontalAlignment="Left"
                                 Classes="link"
-                                Content="{x:Static eg:UiText.SHOW_MORE}"
+                                Content="{l:Lang _ShowMore}"
                                 IsVisible="False" />
               </StackPanel>
 
@@ -231,17 +232,17 @@
                   <ui:GlassButton Name="PART_CopyNegative"
                                   Margin="0,0,-6,0"
                                   Classes="link"
-                                  AutomationProperties.Name="{x:Static eg:UiText.COPY_NEGATIVE}"
-                                  Content="{x:Static eg:UiText.COPY}"
+                                  AutomationProperties.Name="{l:Lang Ai_CopyNegative}"
+                                  Content="{l:Lang _Copy}"
                                   DockPanel.Dock="Right"
                                   Icon="{x:Static ui:IconId.Copy}"
                                   IconSize="13"
                                   Tag="{x:Static ui:AiAction.CopyNegativePrompt}"
-                                  ToolTip.Tip="{x:Static eg:UiText.COPY_NEGATIVE}" />
+                                  ToolTip.Tip="{l:Lang Ai_CopyNegative}" />
                   <TextBlock VerticalAlignment="Center"
                              tok:Typography.Role="Overline"
                              Foreground="{DynamicResource TextSecondaryBrush}"
-                             Text="{x:Static eg:UiText.NEGATIVE_PROMPT_OVERLINE}" />
+                             Text="{l:Lang Ai_NegativePromptOverline}" />
                 </DockPanel>
                 <ui:PromptText Name="PART_Negative"
                                ClampLines="2"
@@ -266,7 +267,7 @@
                              DockPanel.Dock="Right"
                              tok:Typography.Role="Meta"
                              Foreground="{DynamicResource TextTertiaryBrush}"
-                             Text="{x:Static eg:UiText.REGIONAL_PROMPTS}" />
+                             Text="{l:Lang Ai_RegionalPrompts}" />
                   <TextBlock VerticalAlignment="Center"
                              tok:Typography.Role="Overline"
                              Foreground="{DynamicResource TextSecondaryBrush}"
@@ -303,7 +304,7 @@
                                             Foreground="{DynamicResource TextSecondaryBrush}"
                                             Icon="{x:Static ui:IconId.Copy}"
                                             Tag="{Binding Copy}"
-                                            ToolTip.Tip="{x:Static eg:UiText.COPY_CHARACTER}" />
+                                            ToolTip.Tip="{l:Lang Ai_CopyCharacter}" />
                           </Grid>
                         </Border>
                       </DataTemplate>
@@ -318,7 +319,7 @@
                            Padding="0,5,0,0"
                            tok:Typography.Role="Overline"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Text="{x:Static eg:UiText.STYLES_OVERLINE}" />
+                           Text="{l:Lang Ai_StylesOverline}" />
                 <ItemsControl ItemsSource="{TemplateBinding StyleNames}">
                   <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -352,7 +353,7 @@
                           <TextBlock VerticalAlignment="Center"
                                      tok:Typography.Role="Overline"
                                      Foreground="{DynamicResource TextSecondaryBrush}"
-                                     Text="{x:Static eg:UiText.PARAMETERS_OVERLINE}" />
+                                     Text="{l:Lang Ai_ParametersOverline}" />
                         </DockPanel>
                         <ui:SegmentedControl Height="28"
                                              Margin="0,0,0,4"
@@ -390,7 +391,7 @@
                                        HorizontalAlignment="Stretch"
                                        HorizontalContentAlignment="Left"
                                        BorderThickness="0"
-                                       Content="{x:Static eg:UiText.ALL_PARAMETERS}"
+                                       Content="{l:Lang Ai_AllParameters}"
                                        CornerRadius="{StaticResource RadiusMenuItem}"
                                        FontSize="{StaticResource FontSizeCaption}"
                                        FontWeight="Normal"
@@ -463,7 +464,7 @@
                         <TextBlock VerticalAlignment="Center"
                                    tok:Typography.Role="Overline"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{x:Static eg:UiText.WORKFLOW_OVERLINE}" />
+                                   Text="{l:Lang Ai_WorkflowOverline}" />
                       </DockPanel>
                       <ui:SquircleBorder Padding="10" Background="{DynamicResource EmphasisA035Brush}" CornerRadius="{StaticResource RadiusWell}">
                         <StackPanel Spacing="8">
@@ -485,7 +486,7 @@
                             <Border Width="1" Background="{DynamicResource EmphasisA08Brush}" />
                             <StackPanel>
                               <TextBlock tok:Typography.Role="Subtitle" FontFeatures="+tnum" Text="{Binding Size}" />
-                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{x:Static eg:UiText.JSON}" />
+                              <TextBlock tok:Typography.Role="Badge" FontWeight="Normal" Foreground="{DynamicResource TextSecondaryBrush}" Text="{l:Lang _Json}" />
                             </StackPanel>
                           </StackPanel>
                           <TextBlock tok:Typography.Role="Meta"
@@ -495,14 +496,14 @@
                           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
                             <ui:GlassButton HorizontalAlignment="Stretch"
                                             Classes="card"
-                                            Content="{x:Static eg:UiText.SAVE_WORKFLOW}"
+                                            Content="{l:Lang Ai_SaveWorkflow}"
                                             Icon="{x:Static ui:IconId.Save}"
                                             IconSize="15"
                                             Tag="{x:Static ui:AiAction.SaveWorkflow}"
                                             ToolTip.Tip="{Binding SaveTip}" />
                             <ui:GlassButton Grid.Column="1"
                                             Classes="card"
-                                            Content="{x:Static eg:UiText.COPY_JSON}"
+                                            Content="{l:Lang _CopyJson}"
                                             Icon="{x:Static ui:IconId.Copy}"
                                             IconSize="15"
                                             Tag="{x:Static ui:AiAction.CopyWorkflowJson}"
@@ -527,12 +528,12 @@
                                   FontSize="{StaticResource FontSizeBadge}"
                                   Icon="{x:Static ui:IconId.AiShieldQuestion}"
                                   Kind="Neutral"
-                                  Text="{x:Static eg:UiText.NOT_VERIFIED}"
-                                  ToolTip.Tip="{x:Static eg:UiText.NOT_VERIFIED_TIP}" />
+                                  Text="{l:Lang Ai_NotVerified}"
+                                  ToolTip.Tip="{l:Lang Ai_NotVerifiedTip}" />
                         <TextBlock VerticalAlignment="Center"
                                    tok:Typography.Role="Overline"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{x:Static eg:UiText.CREDENTIALS_OVERLINE}" />
+                                   Text="{l:Lang Ai_CredentialsOverline}" />
                       </DockPanel>
                       <ui:SquircleBorder Padding="10"
                                          BorderBrush="{DynamicResource EmphasisA08Brush}"
@@ -559,7 +560,7 @@
                                     <StackPanel Grid.Column="1" Spacing="1">
                                       <TextBlock tok:Typography.Role="Caption" TextWrapping="Wrap">
                                         <Run FontWeight="Medium" Text="{Binding Title}" />
-                                        <Run Foreground="{DynamicResource TextTertiaryBrush}" Text="{x:Static eg:UiText.INGREDIENT_SUFFIX}" />
+                                        <Run Foreground="{DynamicResource TextTertiaryBrush}" Text="{l:Lang Ai_IngredientSuffix}" />
                                       </TextBlock>
                                       <TextBlock tok:Typography.Role="Meta"
                                                  Foreground="{DynamicResource TextSecondaryBrush}"
@@ -579,7 +580,7 @@
                                    tok:Typography.Role="Badge"
                                    FontWeight="Normal"
                                    Foreground="{DynamicResource TextTertiaryBrush}"
-                                   Text="{x:Static eg:UiText.SIGNER_NOT_SHOWN}" />
+                                   Text="{l:Lang Ai_SignerNotShown}" />
                         <ui:SourceLink OtherSources="{Binding OtherSources}" SourceKey="{Binding SourceKey}" />
                       </DockPanel>
                     </StackPanel>
@@ -613,7 +614,7 @@
                         <TextBlock VerticalAlignment="Center"
                                    tok:Typography.Role="Overline"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{x:Static eg:UiText.AIGC_OVERLINE}" />
+                                   Text="{l:Lang Ai_AigcOverline}" />
                       </DockPanel>
                       <ui:KeyValueList Margin="2,0" Items="{Binding Rows}" />
                     </StackPanel>
@@ -630,7 +631,7 @@
                         <TextBlock VerticalAlignment="Center"
                                    tok:Typography.Role="Overline"
                                    Foreground="{DynamicResource TextSecondaryBrush}"
-                                   Text="{x:Static eg:UiText.TRAINING_OVERLINE}" />
+                                   Text="{l:Lang Ai_TrainingOverline}" />
                       </DockPanel>
                       <ui:KeyValueList Margin="2,0" Items="{Binding Rows}" />
                     </StackPanel>
@@ -638,7 +639,7 @@
                 </ContentPresenter.ContentTemplate>
               </ContentPresenter>
 
-              <ui:InlineNote Name="PART_ProvenanceNote" IsVisible="False" Text="{x:Static eg:UiText.PROVENANCE_ONLY}" />
+              <ui:InlineNote Name="PART_ProvenanceNote" IsVisible="False" Text="{l:Lang Ai_ProvenanceOnly}" />
 
               <!--  Copy generation parameters (A1111 text), or Copy AI data as JSON for provenance alone; More opens the rest  -->
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
@@ -651,7 +652,7 @@
                 <ui:GlassDropDownButton Name="PART_Menu"
                                         Grid.Column="1"
                                         Icon="{x:Static ui:IconId.AiMore}"
-                                        ToolTip.Tip="{x:Static eg:UiText.AI_MENU_TIP}" />
+                                        ToolTip.Tip="{l:Lang Ai_MenuTip}" />
               </Grid>
             </StackPanel>
           </Panel>
@@ -722,7 +723,7 @@
     </Style>
     <Style Selector="^:expanded /template/ ui|GlassButton#PART_More">
       <Setter Property="IsVisible" Value="True" />
-      <Setter Property="Content" Value="{x:Static eg:UiText.SHOW_LESS}" />
+      <Setter Property="Content" Value="{l:Lang _ShowLess}" />
     </Style>
   </ControlTheme>
 
@@ -750,7 +751,7 @@
                               DockPanel.Dock="Right"
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Dismiss}"
-                              ToolTip.Tip="{x:Static eg:UiText.CLOSE}" />
+                              ToolTip.Tip="{l:Lang _Close}" />
               <ui:SquircleBorder Height="22"
                                  Padding="9,0"
                                  HorizontalAlignment="Left"
@@ -765,7 +766,7 @@
                   <TextBlock VerticalAlignment="Center"
                              FontSize="{StaticResource FontSizeMeta}"
                              FontWeight="Medium"
-                             Text="{x:Static eg:UiText.AI_GROUP}" />
+                             Text="{l:Lang _AiGeneration}" />
                 </StackPanel>
               </ui:SquircleBorder>
             </DockPanel>
@@ -779,7 +780,7 @@
                               Foreground="{DynamicResource TextSecondaryBrush}"
                               Icon="{x:Static ui:IconId.Copy}"
                               Tag="{x:Static ui:AiAction.CopyText}"
-                              ToolTip.Tip="{x:Static eg:UiText.COPY_VALUE}" />
+                              ToolTip.Tip="{l:Lang _CopyValue}" />
               <TextBlock tok:Typography.Role="Title" Text="{Binding Name}" TextWrapping="Wrap" />
             </DockPanel>
 
@@ -825,13 +826,17 @@
               </ui:SquircleBorder>
             </Panel>
 
-            <!--  Source tag, Parsed as, Length: label 70, gap 12, rows 6 apart  -->
-            <Grid ColumnDefinitions="70,*" RowDefinitions="Auto,6,Auto,6,Auto">
+            <!--  Source tag, Parsed as, Length: label 70 (wider for a longer translation), gap 12, rows 6 apart  -->
+            <Grid RowDefinitions="Auto,6,Auto,6,Auto">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="70" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
               <TextBlock Name="PART_SourceLabel"
                          VerticalAlignment="Center"
                          tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.SOURCE_TAG}" />
+                         Text="{l:Lang Ai_SourceTag}" />
               <DockPanel Name="PART_SourceRow"
                          Grid.Column="1"
                          Height="20"
@@ -842,7 +847,7 @@
                                 Foreground="{DynamicResource TextSecondaryBrush}"
                                 Icon="{x:Static ui:IconId.Copy}"
                                 Tag="{x:Static ui:AiAction.CopyTagKey}"
-                                ToolTip.Tip="{x:Static eg:UiText.COPY_TAG_KEY}" />
+                                ToolTip.Tip="{l:Lang Inspector_CopyTagKey}" />
                 <TextBlock VerticalAlignment="Center"
                            tok:Typography.Role="Mono"
                            Text="{Binding SourceArgument}"
@@ -852,7 +857,7 @@
               <TextBlock Grid.Row="2"
                          tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.PARSED_AS}" />
+                         Text="{l:Lang Ai_ParsedAs}" />
               <TextBlock Grid.Row="2"
                          Grid.Column="1"
                          Margin="12,0,0,0"
@@ -862,7 +867,7 @@
               <TextBlock Grid.Row="4"
                          tok:Typography.Role="Caption"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.LENGTH}" />
+                         Text="{l:Lang Ai_Length}" />
               <TextBlock Grid.Row="4"
                          Grid.Column="1"
                          Margin="12,0,0,0"
@@ -874,7 +879,7 @@
             <ui:GlassButton Name="PART_ShowSource"
                             HorizontalAlignment="Right"
                             Classes="primary"
-                            Content="{x:Static eg:UiText.SHOW_SOURCE_TAG}"
+                            Content="{l:Lang Ai_ShowSourceTag}"
                             Icon="{x:Static ui:IconId.AiSource}"
                             IconSize="15"
                             Tag="{x:Static ui:AiAction.ShowSourceTag}" />
@@ -934,9 +939,9 @@
               <TextBlock VerticalAlignment="Center"
                          tok:Typography.Role="Overline"
                          Foreground="{DynamicResource TextSecondaryBrush}"
-                         Text="{x:Static eg:UiText.CHARACTER_CARD_OVERLINE}" />
+                         Text="{l:Lang Ai_CharacterCardOverline}" />
             </DockPanel>
-            <ui:InlineNote Kind="Info" Text="{x:Static eg:UiText.CHARACTER_NOTE}" />
+            <ui:InlineNote Kind="Info" Text="{l:Lang Ai_CharacterNote}" />
             <StackPanel Spacing="4">
               <TextBlock tok:Typography.Role="Title" Text="{TemplateBinding CharacterName}" TextWrapping="Wrap" />
               <TextBlock Name="PART_Description"
@@ -967,7 +972,7 @@
             <ui:SourceLink OtherSources="{TemplateBinding OtherSources}" SourceKey="{TemplateBinding SourceKey}" />
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
               <ui:GlassButton HorizontalAlignment="Stretch"
-                              Content="{x:Static eg:UiText.COPY_CARD_JSON}"
+                              Content="{l:Lang Ai_CopyCardJson}"
                               Icon="{x:Static ui:IconId.Braces}"
                               IconSize="14"
                               Tag="{x:Static ui:AiAction.CopyCharacterJson}" />
@@ -975,7 +980,7 @@
                               Icon="{x:Static ui:IconId.Save}"
                               IconSize="15"
                               Tag="{x:Static ui:AiAction.SaveCharacterJson}"
-                              ToolTip.Tip="{x:Static eg:UiText.SAVE_CARD_JSON}" />
+                              ToolTip.Tip="{l:Lang Ai_SaveCardJson}" />
             </Grid>
           </StackPanel>
         </ui:SquircleBorder>

@@ -24,6 +24,7 @@ using Avalonia.VisualTree;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Query;
 using ExifGlass.Core.Settings;
 using ExifGlass.Services;
@@ -63,7 +64,7 @@ public class PanelShellTests
 
         Assert.Equal(vm.Rows.Groups.Select(g => g.Name), vm.RailGroups.Select(g => g.Name));
         Assert.Equal("7", vm.GroupCountLabel);
-        Assert.Equal(AppText.HIDE_ALL, vm.AllGroupsLabel);
+        Assert.Equal(Lang.Current[LangId.Rail_HideAll], vm.AllGroupsLabel);
         Assert.Equal(7, vm.Segments.Count);
 
         // a click on the checkbox area hides the group; the same item stays, so its row keeps its state
@@ -75,7 +76,7 @@ public class PanelShellTests
         await shell.WaitForAsync(() => !exif.IsShown);
         Assert.Same(exif, vm.RailGroups.Single(g => g.Name == "EXIF"));
         Assert.Equal("6/7", vm.GroupCountLabel);
-        Assert.Equal(AppText.SHOW_ALL, vm.AllGroupsLabel);
+        Assert.Equal(Lang.Current[LangId._ShowAll], vm.AllGroupsLabel);
         Assert.False(vm.Segments.Single(s => s.Group == "EXIF").IsShown);
         Assert.DoesNotContain(vm.Rows.RowsInView, r => r.Group == "EXIF");
 

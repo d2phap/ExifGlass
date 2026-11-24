@@ -20,6 +20,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.Services;
@@ -66,9 +67,9 @@ public sealed partial class MainViewModel
 
     public bool HasAi => AiInfo is not null;
 
-    public FrameInfo? Frame => Document?.Derived.Frame;
+    public FrameInfo? Frame => Derived?.Frame;
 
-    public IReadOnlyList<ExposureItem>? Exposure => Document?.Derived.Exposure;
+    public IReadOnlyList<ExposureItem>? Exposure => Derived?.Exposure;
 
     /// <summary>
     /// Whether the Preview card shows: an empty card hides (owner at G7), but it stays while a preview that should come is decoding, so the cards below don't jump.
@@ -86,14 +87,14 @@ public sealed partial class MainViewModel
     {
         get
         {
-            if (Document?.Derived.Details is not { } details) return null;
-            if (Document.Ai is not { IsAi: false, Training: { } training }) return details;
+            if (Derived?.Details is not { } details) return null;
+            if (Document?.Ai is not { IsAi: false, Training: { } training }) return details;
 
             var signals = new List<string>(2);
             if (training.DataMining is not null) signals.Add(AppText.PLUS_DATA_MINING);
             if (training.LearningOptOutIn is not null) signals.Add(AppText.EXIF_OPT_OUT);
-            var value = training.IsOptOut ? AppText.NOT_ALLOWED : training.DataMining ?? training.LearningOptOutIn ?? string.Empty;
-            return [.. details, new DetailItem(AppText.AI_TRAINING, value, string.Join(" · ", signals))];
+            var value = training.IsOptOut ? Lang.Current[LangId.Inspector_NotAllowed] : training.DataMining ?? training.LearningOptOutIn ?? string.Empty;
+            return [.. details, new DetailItem(DetailsCard.AI_TRAINING, value, string.Join(" · ", signals))];
         }
     }
 
@@ -119,24 +120,24 @@ public sealed partial class MainViewModel
 
 
     [RelayCommand]
-    private Task CopyFocusValueAsync() => FocusedTag is { } tag ? CopyAndToastAsync(tag.Value, AppText.TOAST_COPIED_VALUE, tag.Name) : Task.CompletedTask;
+    private Task CopyFocusValueAsync() => FocusedTag is { } tag ? CopyAndToastAsync(tag.Value, Lang.Current[LangId.Toast_CopiedValue], tag.Name) : Task.CompletedTask;
 
 
     // "(same as value)" stands for the value itself, so that is what it copies
     [RelayCommand]
     private Task CopyFocusRawAsync() => FocusedTag is { } tag
-        ? CopyAndToastAsync(tag.IsRawSame ? tag.Value : tag.Raw, AppText.TOAST_COPIED_RAW, AppText.Clip(tag.IsRawSame ? tag.Value : tag.Raw))
+        ? CopyAndToastAsync(tag.IsRawSame ? tag.Value : tag.Raw, Lang.Current[LangId.Toast_CopiedRaw], AppText.Clip(tag.IsRawSame ? tag.Value : tag.Raw))
         : Task.CompletedTask;
 
 
     [RelayCommand]
     private Task CopyFocusFormatAsync() => FocusedTag is { } tag && tag.Format != TagIdRule.NONE
-        ? CopyAndToastAsync(tag.Format, AppText.TOAST_COPIED_FORMAT, tag.Format)
+        ? CopyAndToastAsync(tag.Format, Lang.Current[LangId.Toast_CopiedFormat], tag.Format)
         : Task.CompletedTask;
 
 
     [RelayCommand]
-    private Task CopyFocusKeyAsync() => FocusedTag is { IsAi: false } tag ? CopyAndToastAsync(tag.ArgumentKey, AppText.TOAST_COPIED_KEY, tag.ArgumentKey) : Task.CompletedTask;
+    private Task CopyFocusKeyAsync() => FocusedTag is { IsAi: false } tag ? CopyAndToastAsync(tag.ArgumentKey, Lang.Current[LangId.Toast_CopiedKey], tag.ArgumentKey) : Task.CompletedTask;
 
 
     [RelayCommand(CanExecute = nameof(CanEditFocus))]
@@ -163,7 +164,7 @@ public sealed partial class MainViewModel
         {
             IsEditing = false;
             Stage(_edits.Add(added with { Value = value }));
-            Shell?.ShowToast(added.Value == value ? AppText.TOAST_NO_CHANGE : AppText.TOAST_EDIT_STAGED, view.Name, added.Value == value ? ToastKind.Info : ToastKind.Success);
+            Shell?.ShowToast(added.Value == value ? Lang.Current[LangId.Toast_NoChange] : Lang.Current[LangId.Toast_EditStaged], view.Name, added.Value == value ? ToastKind.Info : ToastKind.Success);
             return;
         }
 
@@ -174,7 +175,7 @@ public sealed partial class MainViewModel
         var unchanged = value == original;
         Stage(unchanged ? _edits.Revert(tag.Key) : _edits.Set(tag.Key, tag.WriteName, value, original, _arguments.ShowRawValues));
 
-        Shell?.ShowToast(unchanged ? AppText.TOAST_NO_CHANGE : AppText.TOAST_EDIT_STAGED, view.Name, unchanged ? ToastKind.Info : ToastKind.Success);
+        Shell?.ShowToast(unchanged ? Lang.Current[LangId.Toast_NoChange] : Lang.Current[LangId.Toast_EditStaged], view.Name, unchanged ? ToastKind.Info : ToastKind.Success);
     }
 
 
@@ -218,7 +219,7 @@ public sealed partial class MainViewModel
     /// </summary>
     [RelayCommand]
     private Task CopyGenerationParametersAsync() => AiInfo is { Primary: { IsGeneration: true } source } info
-        ? CopyAndToastAsync(AiExport.ToA1111(source), AppText.TOAST_COPIED_PARAMETERS, AppText.A1111Text(AiCard.GeneratorLabel(info)))
+        ? CopyAndToastAsync(AiExport.ToA1111(source), Lang.Current[LangId.Toast_CopiedParameters], AppText.A1111Text(AiCard.GeneratorLabel(info)))
         : Task.CompletedTask;
 
 
@@ -255,11 +256,11 @@ public sealed partial class MainViewModel
         var tag = row.Tag;
         var view = new SelectedTagView(
             row.Key,
-            row.IsAi ? UiText.AI_GROUP : row.Group,
+            row.IsAi ? Lang.Current[LangId._AiGeneration] : row.Group,
             row.DisplayId,
             row.Name,
             row.Value,
-            tag?.Raw is { } raw && raw != row.Value ? raw : UI.UiText.SAME_AS_VALUE,
+            tag?.Raw ?? row.Value,
             tag is not null && Document is { } doc ? doc.FormatOf(tag) : TagIdRule.NONE,
             tag?.ArgumentKey ?? string.Empty,
             row.IsAi || tag is null || tag.IsReadOnly || TagWriteRules.IsReadOnly(tag, null),
@@ -279,7 +280,7 @@ public sealed partial class MainViewModel
         if (AddedFor(row.Key) is not { } added) return null;
 
         var format = Document?.TagDb is { } tagDb && tagDb.TryFind(added.Group, added.Name, null, out var def) ? def.Format : TagIdRule.NONE;
-        return new SelectedTagView(row.Key, added.Group, TagIdRule.NONE, added.Name, added.Value, UiText.SAME_AS_VALUE, format,
+        return new SelectedTagView(row.Key, added.Group, TagIdRule.NONE, added.Name, added.Value, added.Value, format,
             $"-{added.Group}:{added.Name}", IsReadOnly: false, EditState.Added);
     }
 

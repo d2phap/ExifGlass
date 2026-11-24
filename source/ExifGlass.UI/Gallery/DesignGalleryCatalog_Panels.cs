@@ -22,6 +22,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
@@ -67,7 +68,7 @@ public static partial class DesignGalleryCatalog
         {
             Width = RAIL_CONTENT,
             Group = group,
-            Text = ai ? UiText.AI_GROUP : group,
+            Text = ai ? Lang.Current[LangId._AiGeneration] : group,
             Count = count,
             IsShown = shown,
             IsAi = ai,
@@ -132,7 +133,7 @@ public static partial class DesignGalleryCatalog
             FocusesEditor = false,
         };
 
-        var source = new SelectedTagView("PNG:Parameters", "PNG", "parameters", "Parameters", SAMPLE_PROMPT, UiText.SAME_AS_VALUE, "string", "-PNG:Parameters", true, AiFields: 23);
+        var source = new SelectedTagView("PNG:Parameters", "PNG", "parameters", "Parameters", SAMPLE_PROMPT, SAMPLE_PROMPT, "string", "-PNG:Parameters", true, AiFields: 23);
 
         var frame = new FrameInfo(7728, 5152, "3:2", 39.8, 52, 46);
         DetailItem[] details =

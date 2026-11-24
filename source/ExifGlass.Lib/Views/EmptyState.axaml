@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ExifGlass.UI.Localization"
              xmlns:app="using:ExifGlass"
              xmlns:tok="using:ExifGlass.UI.Tokens"
              xmlns:ui="using:ExifGlass.UI.Controls"
@@ -33,14 +34,14 @@
       <TextBlock Name="TitleText"
                  MaxWidth="320"
                  tok:Typography.Role="EmptyTitle"
-                 Text="{x:Static app:AppText.EMPTY_TITLE}"
+                 Text="{l:Lang Empty_Title}"
                  TextAlignment="Center"
                  TextWrapping="Wrap" />
       <TextBlock Name="CaptionText"
                  MaxWidth="250"
                  tok:Typography.Role="Body"
                  Foreground="{DynamicResource TextSecondaryBrush}"
-                 Text="{x:Static app:AppText.EMPTY_CAPTION}"
+                 Text="{l:Lang Empty_Caption}"
                  TextAlignment="Center"
                  TextWrapping="Wrap" />
     </StackPanel>
@@ -51,20 +52,20 @@
       <ui:GlassButton Name="OpenButton"
                       Classes="primary"
                       Command="{Binding OpenCommand}"
-                      Content="{x:Static app:AppText.OPEN_FILE}"
+                      Content="{l:Lang Toolbar_OpenFile}"
                       Icon="{x:Static ui:IconId.FolderOpen}"
                       IsVisible="{Binding !HasExifToolProblem}"
-                      ToolTip.Tip="{x:Static app:AppText.OpenTooltip}" />
+                      ToolTip.Tip="{l:Lang Toolbar_OpenFileTip}" />
       <ui:GlassButton Name="SettingsButton"
                       Classes="primary"
                       Command="{Binding OpenSettingsCommand}"
-                      Content="{x:Static app:AppText.OPEN_SETTINGS}"
+                      Content="{l:Lang _OpenSettings}"
                       Icon="{x:Static ui:IconId.Settings}"
                       IsVisible="{Binding HasExifToolProblem}"
-                      ToolTip.Tip="{x:Static app:AppText.SettingsTooltip}" />
+                      ToolTip.Tip="{l:Lang Toolbar_SettingsTip}" />
       <ui:GlassButton Name="RetryButton"
                       Command="{Binding RetryExifToolCommand}"
-                      Content="{x:Static app:AppText.RETRY}"
+                      Content="{l:Lang _Retry}"
                       Icon="{x:Static ui:IconId.ArrowSync}"
                       IsVisible="{Binding HasExifToolProblem}" />
     </WrapPanel>

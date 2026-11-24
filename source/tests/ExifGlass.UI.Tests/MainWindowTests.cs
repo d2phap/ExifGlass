@@ -28,6 +28,7 @@ using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Common;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
@@ -254,7 +255,7 @@ public class MainWindowTests
         var open = vm.OpenFileAsync("C:/photos/DSCF4127.JPG");
         shell.Settle();
         Assert.True(shell.Window.Table.LoadLine.IsVisible);
-        Assert.Equal(AppText.SUMMARY_READING, vm.Summary);
+        Assert.Equal(Lang.Current[LangId.Table_SummaryReading], vm.Summary);
         Assert.False(shell.Window.Table.EmptyCard.IsVisible);
 
         shell.Reader.Release("C:/photos/DSCF4127.JPG", tags: 128);
@@ -434,7 +435,7 @@ public class MainWindowTests
         _ = shell.ViewModel.OpenFileAsync("missing.jpg");
         shell.Settle();
 
-        Assert.Equal(AppText.TOAST_READ_FAILED, shell.Window.Toasts.Title);
+        Assert.Equal(Lang.Current[LangId.Toast_ReadFailed], shell.Window.Toasts.Title);
         Assert.Equal(ToastKind.Danger, shell.Window.Toasts.Kind);
         Assert.Equal(LoadPhase.Empty, shell.ViewModel.Phase);
     }
@@ -450,8 +451,8 @@ public class MainWindowTests
 
         Assert.True(shell.Window.Topmost);
         Assert.True(shell.Settings.Current.AlwaysOnTop);
-        Assert.Equal(AppText.TOAST_PINNED, shell.Window.Toasts.Title);
-        Assert.Equal(AppText.UNPIN, shell.ViewModel.PinTooltip);
+        Assert.Equal(Lang.Current[LangId.Toast_Pinned], shell.Window.Toasts.Title);
+        Assert.Equal(Lang.Current[LangId.Toolbar_Unpin], shell.ViewModel.PinTooltip);
     }
 
 

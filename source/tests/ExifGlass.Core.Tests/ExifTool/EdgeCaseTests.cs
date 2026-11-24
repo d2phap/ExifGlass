@@ -108,7 +108,7 @@ public class EdgeCaseTests(ExifToolFixture exifTool)
                 doc = await service.ReadAsync(path, [], null, TestContext.Current.CancellationToken);
             }
 
-            Assert.Equal(ExifToolService.FILE_NOT_OPENED, doc.Error);
+            Assert.Equal(ExifToolService.FileNotOpened, doc.Error);
             Assert.Equal("Canon", (await service.ReadAsync(path, [], null, TestContext.Current.CancellationToken)).Find("EXIF", "Make")!.Value);
         }
         finally

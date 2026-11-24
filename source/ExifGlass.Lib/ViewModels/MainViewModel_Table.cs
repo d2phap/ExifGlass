@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.Core.Settings;
@@ -50,10 +51,10 @@ public sealed partial class MainViewModel
 {
     #region Fields and constants
 
-    private static readonly (TableColumns Column, string Label)[] COLUMN_LABELS =
+    private static readonly (TableColumns Column, LangId Label)[] COLUMN_LABELS =
     [
-        (TableColumns.Index, AppText.COLUMN_INDEX), (TableColumns.TagId, AppText.COLUMN_TAG_ID),
-        (TableColumns.TagName, AppText.COLUMN_TAG_NAME), (TableColumns.Value, AppText.COLUMN_VALUE),
+        (TableColumns.Index, LangId.Table_ColumnIndex), (TableColumns.TagId, LangId.Table_ColumnTagId),
+        (TableColumns.TagName, LangId._TagName), (TableColumns.Value, LangId._Value),
     ];
 
     private readonly HashSet<string> _collapsed = new(StringComparer.Ordinal);
@@ -146,20 +147,20 @@ public sealed partial class MainViewModel
         }
     }
 
-    public string CollapseAllLabel => IsAllCollapsed ? AppText.EXPAND_ALL : AppText.COLLAPSE_ALL;
+    public string CollapseAllLabel => IsAllCollapsed ? Lang.Current[LangId.Table_ExpandAll] : Lang.Current[LangId.Table_CollapseAll];
 
-    public string CollapseAllTip => IsAllCollapsed ? AppText.EXPAND_ALL_TIP : AppText.COLLAPSE_ALL_TIP;
+    public string CollapseAllTip => IsAllCollapsed ? Lang.Current[LangId.Table_ExpandAllTip] : Lang.Current[LangId.Table_CollapseAllTip];
 
     public IconId CollapseAllIcon => IsAllCollapsed ? IconId.ChevronDoubleDown : IconId.ChevronDoubleUp;
 
     // a null label leaves the button icon-only (P4 rules)
     public string? CollapseAllContent => ShowTableLabels ? CollapseAllLabel : null;
 
-    public string? EditContent => ShowTableLabels ? AppText.EDIT : null;
+    public string? EditContent => ShowTableLabels ? Lang.Current[LangId._Edit] : null;
 
-    public string? ColumnsContent => ShowTableLabels ? AppText.COLUMNS : null;
+    public string? ColumnsContent => ShowTableLabels ? Lang.Current[LangId.Table_Columns] : null;
 
-    public string? ExportContent => ShowTableLabels ? AppText.EXPORT : null;
+    public string? ExportContent => ShowTableLabels ? Lang.Current[LangId.Table_Export] : null;
 
     public string ExportHeader => AppText.ExportsInView(Rows.TagsInView, Rows.AiInView);
 
@@ -174,7 +175,7 @@ public sealed partial class MainViewModel
                 var on = (chosen & column) != 0;
                 var last = on && (chosen & ~column) == TableColumns.None;
                 var hidden = on && IdColumnsHidden && column is TableColumns.Index or TableColumns.TagId;
-                list.Add(new ColumnChoice(column, label, on, last, last ? AppText.AT_LEAST_ONE : hidden ? AppText.HIDDEN_AT_WIDTH : null));
+                list.Add(new ColumnChoice(column, Lang.Current[label], on, last, last ? Lang.Current[LangId.Table_AtLeastOne] : hidden ? Lang.Current[LangId.Table_HiddenAtWidth] : null));
             }
 
             return list;
@@ -252,7 +253,7 @@ public sealed partial class MainViewModel
         if (!Selection.HasCell || Selection.CurrentKey is not { } key || FindRow(key) is not { } row) return false;
 
         var text = Exporter.Cell(row, Selection.CurrentColumn);
-        _ = CopyAndToastAsync(text, AppText.TOAST_COPIED_CELL, AppText.Clip(text));
+        _ = CopyAndToastAsync(text, Lang.Current[LangId.Toast_CopiedCell], AppText.Clip(text));
         return true;
     }
 
@@ -260,7 +261,7 @@ public sealed partial class MainViewModel
     /// <summary>
     /// The copy button or a double-click on a row: its value (DS 6.9).
     /// </summary>
-    public Task CopyValueAsync(ViewRow row) => CopyAndToastAsync(row.Value, AppText.TOAST_COPIED_VALUE, row.Name);
+    public Task CopyValueAsync(ViewRow row) => CopyAndToastAsync(row.Value, Lang.Current[LangId.Toast_CopiedValue], row.Name);
 
     #endregion // Public methods
 
@@ -335,7 +336,7 @@ public sealed partial class MainViewModel
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Shell.ShowToast(AppText.TOAST_EXPORT_FAILED, ex.Message, ToastKind.Danger);
+            Shell.ShowToast(Lang.Current[LangId.Toast_ExportFailed], ex.Message, ToastKind.Danger);
         }
     }
 
@@ -347,7 +348,7 @@ public sealed partial class MainViewModel
 
         var (rows, tags, ai) = (Rows.RowsInView, Rows.TagsInView, Rows.AiInView);
         var json = await Task.Run(() => Exporter.ToExifToolJson(rows, document.SourcePath));
-        await CopyAndToastAsync(json, AppText.TOAST_COPIED_AS_JSON, AppText.TagsInView(tags, ai));
+        await CopyAndToastAsync(json, Lang.Current[LangId.Toast_CopiedAsJson], AppText.TagsInView(tags, ai));
     }
 
 
@@ -369,8 +370,8 @@ public sealed partial class MainViewModel
         if (rows.Count == 0) return Task.CompletedTask;
 
         return asJson
-            ? CopyAndToastAsync(Exporter.ToJsonObject(rows), AppText.CopiedAsJson(rows.Count), AppText.TOAST_COPIED_JSON_SUB)
-            : CopyAndToastAsync(Exporter.ToTsv(rows), AppText.CopiedTags(rows.Count), AppText.TOAST_COPIED_TSV_SUB);
+            ? CopyAndToastAsync(Exporter.ToJsonObject(rows), AppText.CopiedAsJson(rows.Count), Lang.Current[LangId.Toast_CopiedJsonSub])
+            : CopyAndToastAsync(Exporter.ToTsv(rows), AppText.CopiedTags(rows.Count), Lang.Current[LangId.Toast_CopiedTsvSub]);
     }
 
 
@@ -461,14 +462,14 @@ public sealed partial class MainViewModel
 
     private static string FilterLabel(QuickFilter filter) => filter switch
     {
-        QuickFilter.DateTime => AppText.FILTER_DATES,
-        QuickFilter.Gps => AppText.FILTER_GPS,
-        QuickFilter.Converted => AppText.FILTER_CONVERTED,
-        QuickFilter.HasTagId => AppText.FILTER_TAG_ID,
-        QuickFilter.AiPrompts => AppText.FILTER_PROMPTS,
-        QuickFilter.AiModels => AppText.FILTER_MODELS,
-        QuickFilter.AiProvenance => AppText.FILTER_PROVENANCE,
-        _ => AppText.FILTER_AI,
+        QuickFilter.DateTime => Lang.Current[LangId.Filter_DateTime],
+        QuickFilter.Gps => Lang.Current[LangId.Filter_Gps],
+        QuickFilter.Converted => Lang.Current[LangId.Filter_Converted],
+        QuickFilter.HasTagId => Lang.Current[LangId.Filter_HasTagId],
+        QuickFilter.AiPrompts => Lang.Current[LangId.Filter_Prompts],
+        QuickFilter.AiModels => Lang.Current[LangId.Filter_Models],
+        QuickFilter.AiProvenance => Lang.Current[LangId.Filter_Provenance],
+        _ => Lang.Current[LangId._AiGeneration],
     };
 
 

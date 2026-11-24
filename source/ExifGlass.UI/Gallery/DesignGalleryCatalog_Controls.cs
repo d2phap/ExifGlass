@@ -23,6 +23,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
 using ExifGlass.UI.Windows;
@@ -206,7 +207,7 @@ public static partial class DesignGalleryCatalog
             Width = 460,
             Suggestions = [.. suggestions.Select(x => x.Flag)],
             NoteProvider = Note,
-            SuggestionHint = t => suggestions.FirstOrDefault(x => x.Flag == t).Label,
+            SuggestionHint = t => suggestions.FirstOrDefault(x => x.Flag == t) is { Flag: not null } s ? Lang.Current[s.Label] : null,
         };
         field.SetTokens(["-fast", "-G", "-t", "-m", "-q", "-H", "-charset", "UTF8"]);
 
@@ -606,11 +607,11 @@ public static partial class DesignGalleryCatalog
         Bind(highlight, HighlightTextBlock.HighlightBrushProperty, TokenKeys.HIGHLIGHT_BRUSH);
 
         var prompt = new PromptText { Width = 300, Prompt = LONG_PROMPT, Embeddings = ["easynegative"], FontSize = 12.5 };
-        var more = new GlassButton { Content = UiText.SHOW_MORE, Classes = { "link" } };
+        var more = new GlassButton { Content = Lang.Current[LangId._ShowMore], Classes = { "link" } };
         more.Click += (_, _) =>
         {
             prompt.IsExpanded = !prompt.IsExpanded;
-            more.Content = prompt.IsExpanded ? UiText.SHOW_LESS : UiText.SHOW_MORE;
+            more.Content = prompt.IsExpanded ? Lang.Current[LangId._ShowLess] : Lang.Current[LangId._ShowMore];
         };
 
         return new GallerySection("c-text", "Highlight and prompt text", "Every search match on a rounded Highlight background (radius 3); prompts tinted: weights AccentText, LoRA tags Accent2 mono on a tint, embeddings dotted, BREAK/AND Accent2, flags mono; 4-line clamp with Show more.",

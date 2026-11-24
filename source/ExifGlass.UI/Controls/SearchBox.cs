@@ -21,6 +21,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using ExifGlass.Core.Localization;
 
 namespace ExifGlass.UI.Controls;
 
@@ -30,8 +31,6 @@ namespace ExifGlass.UI.Controls;
 public class SearchBox : TextBox
 {
     #region Fields and constants
-
-    public const string CLEAR_LABEL = UiText.CLEAR_SEARCH;
 
     public static readonly StyledProperty<string?> ShortcutHintProperty =
         AvaloniaProperty.Register<SearchBox, string?>(nameof(ShortcutHint), UiText.Shortcut("K"));

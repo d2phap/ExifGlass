@@ -25,7 +25,9 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Motion;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
@@ -70,19 +72,19 @@ public sealed record SelectedTagView(
 
     public string ShownValue => ShownText.Well(Value);
 
-    public string ShownRaw => ShownText.Cut(Raw, ShownText.CELL);
+    public string ShownRaw => IsRawSame ? Lang.Current[LangId.Inspector_SameAsValue] : ShownText.Cut(Raw, ShownText.CELL);
 
     public bool IsEdited => State == EditState.Edited;
 
     /// <summary>
     /// Gets whether the raw value says "(same as value)" (AI addendum, owner after G7): ExifTool's print conversion left it alone.
     /// </summary>
-    public bool IsRawSame => Raw == UiText.SAME_AS_VALUE;
+    public bool IsRawSame => Raw == Value;
 
     /// <summary>
     /// Gets "Was: ..." for an edited value.
     /// </summary>
-    public string WasText => string.Format(CultureInfo.InvariantCulture, UiText.WAS, OriginalValue);
+    public string WasText => UiText.Was(OriginalValue);
 
     #endregion // Properties
 }
@@ -144,6 +146,7 @@ public class SelectedTagCard : TemplatedControl
     private Button? _edit;
     private Button? _saveBinary;
     private Button? _close;
+    private Control? _content;
 
     #endregion // Fields and constants
 
@@ -153,6 +156,13 @@ public class SelectedTagCard : TemplatedControl
     public SelectedTagCard()
     {
         UpdatePseudoClasses();
+
+        // the view's computed text (raw, Was, AI fields) is read again only when its DataContext changes
+        LangResources.Track(this, () =>
+        {
+            _content?.SetCurrentValue(DataContextProperty, null);
+            _content?.SetCurrentValue(DataContextProperty, View);
+        });
     }
 
     #endregion // Constructors
@@ -302,6 +312,7 @@ public class SelectedTagCard : TemplatedControl
         _edit = e.NameScope.Find<Button>("PART_Edit");
         _saveBinary = e.NameScope.Find<Button>("PART_SaveBinary");
         _close = e.NameScope.Find<Button>("PART_Close");
+        _content = e.NameScope.Find<Control>("PART_Content");
     }
 
 
@@ -774,7 +785,9 @@ public class ExposureCard : TemplatedControl
     public static readonly StyledProperty<ICommand?> CopyCommandProperty =
         AvaloniaProperty.Register<ExposureCard, ICommand?>(nameof(CopyCommand));
 
+    // DerivedInfo's labels find the readouts; the titles are what the card shows
     private static readonly string[] LABELS = ["Aperture", "Shutter", "ISO", "Focal"];
+    private static readonly LangId[] TITLES = [LangId.Inspector_Aperture, LangId.Inspector_Shutter, LangId.Inspector_Iso, LangId.Inspector_Focal];
 
     public static readonly StyledProperty<IReadOnlyList<ExposureItem>?> ItemsProperty =
         AvaloniaProperty.Register<ExposureCard, IReadOnlyList<ExposureItem>?>(nameof(Items));
@@ -833,14 +846,14 @@ public class ExposureCard : TemplatedControl
             var item = items?.FirstOrDefault(x => x.Label == LABELS[i]);
             if (item is null || !double.IsFinite(item.Number))
             {
-                cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), double.NaN, CountUpFormat.Integer, null, null, item?.Sub ?? string.Empty) { Name = LABELS[i] };
+                cells[i] = new ExposureCellView(Lang.Current[TITLES[i]].ToUpperInvariant(), double.NaN, CountUpFormat.Integer, null, null, item?.Sub ?? string.Empty) { Name = Lang.Current[TITLES[i]] };
                 continue;
             }
 
             // DerivedInfo writes a shutter as "1/" and a whole denominator, which counts as 1/N
             var format = item.Prefix == "1/" ? CountUpFormat.Shutter : item.Decimals > 0 ? CountUpFormat.OneDecimal : CountUpFormat.Integer;
             var prefix = format == CountUpFormat.Shutter ? null : item.Prefix;
-            cells[i] = new ExposureCellView(LABELS[i].ToUpperInvariant(), item.Number, format, prefix, item.Suffix, item.Sub) { Name = LABELS[i] };
+            cells[i] = new ExposureCellView(Lang.Current[TITLES[i]].ToUpperInvariant(), item.Number, format, prefix, item.Suffix, item.Sub) { Name = Lang.Current[TITLES[i]] };
         }
 
         return cells;
@@ -894,10 +907,16 @@ public class DetailsCard : TemplatedControl
     public static readonly StyledProperty<ICommand?> CopyCommandProperty =
         AvaloniaProperty.Register<DetailsCard, ICommand?>(nameof(CopyCommand));
 
-    private static readonly (string Label, IconId Icon)[] ROWS =
+    /// <summary>
+    /// The AI-training row's label, which the main view model adds to DerivedInfo's rows.
+    /// </summary>
+    public const string AI_TRAINING = "AI training";
+
+    // DerivedInfo's labels find the rows; the text is what the card shows
+    private static readonly (string Label, IconId Icon, LangId Text)[] ROWS =
     [
-        ("Camera", IconId.Camera), ("Lens", IconId.Aperture), ("Captured", IconId.Clock), ("Location", IconId.Location), ("Software", IconId.WindowConsole),
-        ("AI training", IconId.AiNoTraining),
+        ("Camera", IconId.Camera, LangId.Inspector_Camera), ("Lens", IconId.Aperture, LangId.Inspector_Lens), ("Captured", IconId.Clock, LangId.Inspector_Captured),
+        ("Location", IconId.Location, LangId.Inspector_Location), ("Software", IconId.WindowConsole, LangId.Inspector_Software), (AI_TRAINING, IconId.AiNoTraining, LangId.Inspector_AiTraining),
     ];
 
     public static readonly StyledProperty<IReadOnlyList<DetailItem>?> ItemsProperty =
@@ -968,7 +987,7 @@ public class DetailsCard : TemplatedControl
         foreach (var item in items)
         {
             var icon = Array.FindIndex(ROWS, r => r.Label == item.Label);
-            if (icon >= 0) rows.Add(new DetailRowView(ROWS[icon].Icon, item.Label, item.Value, item.Sub, item.Link, rows.Count == 0));
+            if (icon >= 0) rows.Add(new DetailRowView(ROWS[icon].Icon, Lang.Current[ROWS[icon].Text], item.Value, item.Sub, item.Link, rows.Count == 0));
         }
 
         return rows;

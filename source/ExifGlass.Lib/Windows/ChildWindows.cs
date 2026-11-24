@@ -19,7 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Windows;
 using ExifGlass.ViewModels;
 using ExifGlass.Views;
@@ -42,7 +44,7 @@ public sealed class SettingsWindow : OwnedWindow
 
     public SettingsWindow(IWindowPlacementStore placements, Window owner, SettingsViewModel viewModel)
     {
-        Title = AppText.SETTINGS;
+        LangResources.Bind(this, TitleProperty, LangId._Settings);
         MinHeight = 320;
         UsePlacement(AppSettings.WINDOW_SETTINGS, FirstSize, placements, owner, fitHeight: true);
 
@@ -79,12 +81,13 @@ public sealed class AboutWindow : OwnedWindow
 
     public AboutWindow(IWindowPlacementStore placements, Window owner, AboutViewModel viewModel)
     {
-        Title = AppText.ABOUT;
+        LangResources.Bind(this, TitleProperty, LangId._About);
         MinHeight = 320;
         UsePlacement(AppSettings.WINDOW_ABOUT, FirstSize, placements, owner);
 
         ViewModel = viewModel;
         Content = new AboutView { DataContext = viewModel };
+        LangResources.Track(this, viewModel.RefreshText);
         Closed += (_, _) => viewModel.Close();
     }
 

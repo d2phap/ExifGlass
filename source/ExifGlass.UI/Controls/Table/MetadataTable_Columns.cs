@@ -22,6 +22,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.VisualTree;
 using Avalonia.Rendering.Composition;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Query;
 using ExifGlass.UI.Tokens;
 using System.Diagnostics;
@@ -110,8 +111,18 @@ public partial class MetadataTable
             _colActions.HeaderStyleClasses.Add("actions");
         }
 
+        ApplyHeaders();
         ApplyColumns(animate: false);
         ApplySortGlyphs();
+    }
+
+
+    // the generated columns carry no header text: an attribute can only hold a constant
+    private void ApplyHeaders()
+    {
+        _colId?.Header = Lang.Current[LangId.Table_HeaderTagId];
+        _colName?.Header = Lang.Current[LangId.Table_HeaderTagName];
+        _colValue?.Header = Lang.Current[LangId.Table_HeaderValue];
     }
 
 

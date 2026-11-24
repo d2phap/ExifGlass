@@ -24,6 +24,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.Threading;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 using System.Windows.Input;
 
@@ -89,6 +91,7 @@ public class CommandPanel : TemplatedControl
     public CommandPanel()
     {
         ActualThemeVariantChanged += (_, _) => BuildInlines();
+        LangResources.Track(this, () => RaisePropertyChanged(ToggleTipProperty, string.Empty, ToggleTip));
     }
 
     #endregion // Constructors
@@ -141,7 +144,7 @@ public class CommandPanel : TemplatedControl
         private set => SetAndRaise(CommandLineProperty, ref _commandLine, value);
     }
 
-    public string ToggleTip => IsExpanded ? UiText.COLLAPSE_COMMAND : UiText.EXPAND_COMMAND;
+    public string ToggleTip => IsExpanded ? Lang.Current[LangId.CommandBar_Collapse] : Lang.Current[LangId.CommandBar_Expand];
 
     #endregion // Properties
 
@@ -203,7 +206,7 @@ public class CommandPanel : TemplatedControl
         }
         else if (change.Property == IsExpandedProperty)
         {
-            RaisePropertyChanged(ToggleTipProperty, IsExpanded ? UiText.EXPAND_COMMAND : UiText.COLLAPSE_COMMAND, ToggleTip);
+            RaisePropertyChanged(ToggleTipProperty, IsExpanded ? Lang.Current[LangId.CommandBar_Expand] : Lang.Current[LangId.CommandBar_Collapse], ToggleTip);
             UpdatePseudoClasses();
             Expand(IsExpanded);
         }

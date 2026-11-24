@@ -25,6 +25,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Transformation;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 
 namespace ExifGlass.UI.Controls;
@@ -46,7 +48,7 @@ public class TokenField : TemplatedControl
         AvaloniaProperty.Register<TokenField, IList<string>?>(nameof(Suggestions));
 
     public static readonly StyledProperty<string?> PlaceholderProperty =
-        AvaloniaProperty.Register<TokenField, string?>(nameof(Placeholder), UiText.ADD_ARGUMENT);
+        AvaloniaProperty.Register<TokenField, string?>(nameof(Placeholder));
 
     public static readonly StyledProperty<object?> NoteProperty =
         AvaloniaProperty.Register<TokenField, object?>(nameof(Note));
@@ -108,6 +110,7 @@ public class TokenField : TemplatedControl
 
     public TokenField()
     {
+        LangResources.Bind(this, PlaceholderProperty, LangId.Settings_AddArgument);
         Tokens.CollectionChanged += (_, _) =>
         {
             if (!_rebuilding) Rebuild(popLast: false);
@@ -334,8 +337,6 @@ public class TokenField : TemplatedControl
 public class TokenChip : Button
 {
     #region Fields and constants
-
-    public const string REMOVE_LABEL = UiText.REMOVE;
 
     public static readonly StyledProperty<string?> TextProperty =
         AvaloniaProperty.Register<TokenChip, string?>(nameof(Text));

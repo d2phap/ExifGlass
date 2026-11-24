@@ -26,6 +26,7 @@ using Avalonia.Styling;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Common;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
 using ExifGlass.Services;
@@ -77,7 +78,7 @@ public class ChildWindowTests
         Assert.True(shell.Settings.Current.AlwaysOnTop);
         Assert.True(shell.ViewModel.IsPinned);
         Assert.Equal("-fast -G -n -u", shell.Settings.Current.ExifToolArguments);
-        Assert.Equal(AppText.TOAST_SETTINGS_SAVED, shell.Window.Toasts.Title);
+        Assert.Equal(Lang.Current[LangId.Toast_SettingsSaved], shell.Window.Toasts.Title);
         Assert.Equal(AppText.SettingsSavedSub(4, false), shell.Window.Toasts.Subtitle);
     }
 
@@ -165,7 +166,7 @@ public class ChildWindowTests
     {
         var shell = new RecordingShell();
         var vm = new SettingsViewModel(new MainViewModel(new SettingsStore(Path.GetTempPath()), new FakeReader()) { Shell = shell });
-        (string Title, string? Subtitle)? toast = null;
+        SettingsToast? toast = null;
         vm.ToastRequested += (_, t) => toast = t;
 
         await vm.CopyCommandLineCommand.ExecuteAsync(null);
@@ -173,7 +174,7 @@ public class ChildWindowTests
         var copied = Assert.Single(shell.Copied);
         Assert.EndsWith("-fast -G -t -m -q -H -charset UTF8 <file>", copied, StringComparison.Ordinal);
         Assert.DoesNotContain(char.ConvertFromUtf32(0x200B), copied, StringComparison.Ordinal);
-        Assert.Equal(AppText.TOAST_COMMAND_COPIED, toast?.Title);
+        Assert.Equal(Lang.Current[LangId.Toast_CommandCopied], toast?.Title);
     }
 
 
@@ -214,7 +215,7 @@ public class ChildWindowTests
         using var shell = TestShell.Open(width);
         var (window, _) = OpenSettings(shell);
 
-        Assert.DoesNotContain(window.GetVisualDescendants().OfType<GlassButton>(), b => Equals(b.Content, AppText.ABOUT));
+        Assert.DoesNotContain(window.GetVisualDescendants().OfType<GlassButton>(), b => Equals(b.Content, Lang.Current[LangId._About]));
         window.Close();
     }
 
@@ -319,13 +320,13 @@ public class ChildWindowTests
         Assert.Equal(15, AboutViewModel.AllNotices.Count);
         Assert.Equal("ExifTool", vm.Notices[2].Name);
         Assert.Equal(AboutViewModel.NOTICES_SHOWN, vm.ShownNotices.Count);
-        Assert.Equal(AppText.SHOW_ALL, vm.NoticesToggleText);
+        Assert.Equal(Lang.Current[LangId._ShowAll], vm.NoticesToggleText);
 
         vm.ToggleNoticesCommand.Execute(null);
         shell.Settle();
         Assert.Equal(all, vm.ShownNotices.Count);
         Assert.Equal(all, window.GetVisualDescendants().OfType<Badge>().Count(b => b.Kind == BadgeKind.Licence));
-        Assert.Equal(AppText.SHOW_FEWER, vm.NoticesToggleText);
+        Assert.Equal(Lang.Current[LangId._ShowFewer], vm.NoticesToggleText);
 
         // the hover reaches 12 past the text column on both sides, not cut at the list's edge (FewerPhotos)
         var list = ((Views.AboutView)window.Content!).FindControl<ItemsControl>("NoticeList")!;
@@ -482,7 +483,7 @@ public class ChildWindowTests
             var vm = new AboutViewModel(new MainViewModel(settings, new FakeReader()) { Channel = updates.Channel, Updates = updates, Shell = shell });
 
             Assert.True(vm.ShowsUpdates);
-            Assert.Equal(AppText.NOT_CHECKED, vm.UpdateText);
+            Assert.Equal(Lang.Current[LangId.About_NotChecked], vm.UpdateText);
 
             await vm.CheckCommand.ExecuteAsync(null);
             Assert.True(vm.IsUpdateAvailable);
@@ -499,7 +500,7 @@ public class ChildWindowTests
             await vm.CheckCommand.ExecuteAsync(null);
             Assert.True(vm.IsUpdateError);
             Assert.True(vm.CanCheck);
-            Assert.Equal(AppText.UPDATE_ERROR, vm.UpdateText);
+            Assert.Equal(Lang.Current[LangId.About_UpdateError], vm.UpdateText);
             vm.Close();
         }
         finally
@@ -522,7 +523,7 @@ public class ChildWindowTests
         var copied = Assert.Single(shell.Copied);
         Assert.StartsWith($"ExifGlass {AboutViewModel.AppVersion} ({AboutViewModel.BuildDate})", copied, StringComparison.Ordinal);
         Assert.Contains($".NET {Environment.Version}", copied, StringComparison.Ordinal);
-        Assert.Equal(AppText.TOAST_VERSION_COPIED, toast);
+        Assert.Equal(Lang.Current[LangId.Toast_VersionCopied], toast);
     }
 
     #endregion // About
@@ -612,17 +613,17 @@ public class ChildWindowTests
         using var shell = TestShell.Open(1400);
 
         var app = MacMenuBar.BuildAppMenu(() => shell.ViewModel).Items;
-        Assert.Equal(AppText.ABOUT, ((NativeMenuItem)app[0]).Header);
+        Assert.Equal(Lang.Current[LangId._About], ((NativeMenuItem)app[0]).Header);
         Assert.IsType<NativeMenuItemSeparator>(app[1]);
         var settings = (NativeMenuItem)app[2];
-        Assert.Equal(AppText.MENU_SETTINGS, settings.Header);
+        Assert.Equal(Lang.Current[LangId.MacMenu_Settings], settings.Header);
         Assert.Equal(new KeyGesture(Key.OemComma, KeyModifiers.Meta), settings.Gesture);
 
         var menus = MacMenuBar.BuildWindowMenu(shell.Window).Items.Cast<NativeMenuItem>().ToList();
-        Assert.Equal([AppText.MENU_FILE, AppText.MENU_EDIT, AppText.MENU_VIEW, AppText.MENU_WINDOW], menus.Select(m => m.Header));
+        Assert.Equal([Lang.Current[LangId.MacMenu_File], Lang.Current[LangId.MacMenu_Edit], Lang.Current[LangId.MacMenu_View], Lang.Current[LangId.MacMenu_Window]], menus.Select(m => m.Header));
 
         var file = menus[0].Menu!.Items.OfType<NativeMenuItem>().ToList();
-        Assert.Equal(AppText.MENU_CLOSE_WINDOW, file[^1].Header);
+        Assert.Equal(Lang.Current[LangId.MacMenu_CloseWindow], file[^1].Header);
         Assert.Equal(new KeyGesture(Key.W, KeyModifiers.Meta), file[^1].Gesture);
 
         var edit = menus[1].Menu!.Items.OfType<NativeMenuItem>().ToList();

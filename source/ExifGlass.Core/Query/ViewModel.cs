@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 
 namespace ExifGlass.Core.Query;
@@ -269,14 +270,14 @@ public sealed class ViewResult
     /// <summary>
     /// "128 tags" or "42 of 128 tags".
     /// </summary>
-    public string Summary => IsFiltering ? $"{TagsInView} of {Total} tags" : Total == 1 ? "1 tag" : $"{Total} tags";
+    public string Summary => IsFiltering ? Lang.Current[LangId.Table_SummaryFiltered, TagsInView, Total] : Total == 1 ? Lang.Current[LangId._TagsOne] : Lang.Current[LangId._Tags, Total];
 
     /// <summary>
     /// "23 AI fields" or "1 of 23 AI fields"; empty without AI fields.
     /// </summary>
     public string AiSummary => AiTotal == 0 ? string.Empty
-        : IsFiltering ? $"{AiInView} of {AiTotal} AI fields"
-        : AiTotal == 1 ? "1 AI field" : $"{AiTotal} AI fields";
+        : IsFiltering ? Lang.Current[LangId.Table_AiSummaryFiltered, AiInView, AiTotal]
+        : AiTotal == 1 ? Lang.Current[LangId._AiFieldsOne] : Lang.Current[LangId._AiFields, AiTotal];
 
     #endregion // Properties
 }

@@ -27,6 +27,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
@@ -549,7 +550,7 @@ public class EditingTests
             Assert.InRange(host.Height, 40, 140);
             Assert.Equal(32, buttons.Width);
             Assert.Equal(new Vector(0, -34), Translation(copy));
-            Assert.Equal(UiText.COLLAPSE_COMMAND, panel.ToggleTip);
+            Assert.Equal(Lang.Current[LangId.CommandBar_Collapse], panel.ToggleTip);
 
             panel.IsExpanded = false;
             Wait(450);

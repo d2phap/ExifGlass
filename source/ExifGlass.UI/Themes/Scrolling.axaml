@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:eg="using:ExifGlass.UI"
                     xmlns:motion="using:ExifGlass.UI.Motion"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
@@ -140,7 +141,7 @@
                             Height="14"
                             MinWidth="14"
                             HorizontalAlignment="Center"
-                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_UP}"
+                            AutomationProperties.Name="{l:Lang _ScrollUp}"
                             Theme="{StaticResource GlassScrollLineButton}">
                 <Path Width="10"
                       Height="7.5"
@@ -173,7 +174,7 @@
                             Height="14"
                             MinWidth="14"
                             HorizontalAlignment="Center"
-                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_DOWN}"
+                            AutomationProperties.Name="{l:Lang _ScrollDown}"
                             Theme="{StaticResource GlassScrollLineButton}">
                 <Path Width="10"
                       Height="7.5"
@@ -212,7 +213,7 @@
                             Width="14"
                             MinHeight="14"
                             VerticalAlignment="Center"
-                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_LEFT}"
+                            AutomationProperties.Name="{l:Lang _ScrollLeft}"
                             Theme="{StaticResource GlassScrollLineButton}">
                 <Path Width="7.5"
                       Height="10"
@@ -244,7 +245,7 @@
                             Width="14"
                             MinHeight="14"
                             VerticalAlignment="Center"
-                            AutomationProperties.Name="{x:Static eg:UiText.SCROLL_RIGHT}"
+                            AutomationProperties.Name="{l:Lang _ScrollRight}"
                             Theme="{StaticResource GlassScrollLineButton}">
                 <Path Width="7.5"
                       Height="10"

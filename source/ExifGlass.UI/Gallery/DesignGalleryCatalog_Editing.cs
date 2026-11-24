@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.UI.Controls;
 
 namespace ExifGlass.UI.Gallery;
@@ -93,9 +94,9 @@ public static partial class DesignGalleryCatalog
             new("command bar, write", Command(write, write: true), "the write Save runs, with the Write chip"),
             new("command bar, expanded", Command(read, expanded: true), "wrapped; Copy above Collapse"),
             new("Expand :pointerover", Pin(Command(read), "PART_Toggle", c => c.Hover()), "State.Hover"),
-            new("binary tag", Tag(new SelectedTagView("EXIF:IFD1:ThumbnailImage", "EXIF", "0x0201", "Thumbnail Image", "(Binary data 8164 bytes, use -b option to extract)", UiText.SAME_AS_VALUE, "undef", "-IFD1:ThumbnailImage", true, IsBinary: true)), "Save binary data… (D12); no Edit"),
+            new("binary tag", Tag(new SelectedTagView("EXIF:IFD1:ThumbnailImage", "EXIF", "0x0201", "Thumbnail Image", "(Binary data 8164 bytes, use -b option to extract)", "(Binary data 8164 bytes, use -b option to extract)", "undef", "-IFD1:ThumbnailImage", true, IsBinary: true)), "Save binary data… (D12); no Edit"),
             new("removed by a bulk action", Tag(new SelectedTagView("EXIF:GPS:GPSLatitude", "EXIF", "0x0002", "GPS Latitude", "22 deg 16' 33.24\"", "22.2759", "rational64u[3]", "-GPS:GPSLatitude", false, EditState.Removed)), "struck through; no Delete or Undo of its own"),
-            new("new tag", Tag(new SelectedTagView("New:XMP:Title", "XMP", "—", "Title", "Lanterns at the harbour", UiText.SAME_AS_VALUE, "lang-alt", "-XMP:Title", false, EditState.Added)), "staged by Add tag; Edit and Delete"),
+            new("new tag", Tag(new SelectedTagView("New:XMP:Title", "XMP", "—", "Title", "Lanterns at the harbour", "Lanterns at the harbour", "lang-alt", "-XMP:Title", false, EditState.Added)), "staged by Add tag; Edit and Delete"),
         ]);
     }
 

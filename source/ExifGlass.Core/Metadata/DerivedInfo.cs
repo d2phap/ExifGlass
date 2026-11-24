@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Globalization;
+using ExifGlass.Core.Localization;
 using System.Text.RegularExpressions;
 
 namespace ExifGlass.Core.Metadata;
@@ -66,11 +67,15 @@ public sealed partial record DerivedInfo(
 {
     #region Fields and constants
 
-    private static readonly string[] MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     private static readonly (int A, int B)[] RATIOS = [(3, 2), (2, 3), (4, 3), (3, 4), (16, 9), (9, 16), (1, 1), (5, 4), (4, 5), (21, 9)];
     private static readonly string[] DEFAULT_GROUPS = ["EXIF", "Composite", "MakerNotes", "File", "XMP", "PNG"];
 
     public static DerivedInfo Empty { get; } = new([], [], new FrameInfo(0, 0, "—", 0, null, null), string.Empty);
+
+    /// <summary>
+    /// The language the text was made in: another one makes it again.
+    /// </summary>
+    public Lang Language { get; init; } = Lang.Current;
 
     #endregion // Fields and constants
 
@@ -120,7 +125,10 @@ public sealed partial record DerivedInfo(
         if (month is < 1 or > 12) return value;
 
         var day = int.Parse(m.Groups[3].ValueSpan, CultureInfo.InvariantCulture);
-        return $"{MONTHS[month - 1]} {day}, {m.Groups[1].Value} · {m.Groups[4].Value}";
+        var months = Lang.Current[LangId.Inspector_MonthNames].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (months.Length != 12) months = Lang.DefaultLangMap[LangId.Inspector_MonthNames].Split(' ');
+
+        return Lang.Current[LangId.Inspector_DateTime, months[month - 1], day, m.Groups[1].Value, m.Groups[4].Value];
     }
 
     #endregion // Public methods
@@ -163,12 +171,12 @@ public sealed partial record DerivedInfo(
         var t = Number(time);
         var items = new List<ExposureItem>(4)
         {
-            new("Aperture", Number(fNumber), 1, "f/", string.Empty, maxAperture is null ? string.Empty : "max f/" + maxAperture.Value),
+            new("Aperture", Number(fNumber), 1, "f/", string.Empty, maxAperture is null ? string.Empty : Lang.Current[LangId.Inspector_MaxAperture, maxAperture.Value]),
             t is > 0 and < 1
                 ? new("Shutter", Math.Round(1 / t), 0, "1/", string.Empty, program?.Value ?? string.Empty)
                 : new("Shutter", t, 1, string.Empty, "s", program?.Value ?? string.Empty),
             new("ISO", Number(iso), 0, string.Empty, string.Empty, compensation is null ? string.Empty : "EV " + compensation.Value),
-            new("Focal", Number(focal), 0, string.Empty, " mm", focal35 is null ? string.Empty : focal35.Value + " full-frame eq."),
+            new("Focal", Number(focal), 0, string.Empty, " mm", focal35 is null ? string.Empty : Lang.Current[LangId.Inspector_FullFrame, focal35.Value]),
         };
 
         return items;
@@ -246,14 +254,14 @@ public sealed partial record DerivedInfo(
             details.Add(new DetailItem("Captured", FormatDate(captured.Value), offset is null ? string.Empty : "UTC" + offset.Value));
         }
 
-        if (doc.Find("MakerNotes", "FilmMode") is { } film) details.Add(new DetailItem("Look", film.Value, "Film simulation"));
+        if (doc.Find("MakerNotes", "FilmMode") is { } film) details.Add(new DetailItem("Look", film.Value, Lang.Current[LangId.Inspector_FilmSimulation]));
 
         if (doc.Find("Composite", "GPSPosition") is { } position && Doubles(position.RawOrValue) is [var lat, var lon])
         {
             var altitude = doc.Find("EXIF", "GPSAltitude") ?? doc.Find("Composite", "GPSAltitude");
             var text = string.Create(CultureInfo.InvariantCulture, $"{Math.Abs(lat):F4}° {(lat < 0 ? 'S' : 'N')}, {Math.Abs(lon):F4}° {(lon < 0 ? 'W' : 'E')}");
             var link = string.Create(CultureInfo.InvariantCulture, $"https://www.openstreetmap.org/?mlat={lat}&mlon={lon}#map=15/{lat}/{lon}");
-            details.Add(new DetailItem("Location", text, altitude is null ? string.Empty : altitude.Value + " altitude", link));
+            details.Add(new DetailItem("Location", text, altitude is null ? string.Empty : Lang.Current[LangId.Inspector_Altitude, altitude.Value], link));
         }
 
         if (doc.Find("EXIF", "Software") is { } software) details.Add(new DetailItem("Software", software.Value));

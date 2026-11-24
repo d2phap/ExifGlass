@@ -56,6 +56,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        AppText.RegisterResources();
         DesignSystem.Initialize(this);
         if (OperatingSystem.IsMacOS()) Windows.MacMenuBar.AttachAppMenu(this, () => Services?.ViewModel);
     }

@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:eg="using:ExifGlass.UI"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls">
@@ -197,10 +198,10 @@
             <Button Name="PART_ClearButton"
                     Margin="6,0,0,0"
                     VerticalAlignment="Center"
-                    AutomationProperties.Name="{x:Static ui:SearchBox.CLEAR_LABEL}"
+                    AutomationProperties.Name="{l:Lang _ClearSearch}"
                     DockPanel.Dock="Right"
                     Theme="{StaticResource ClearButton}"
-                    ToolTip.Tip="{x:Static ui:SearchBox.CLEAR_LABEL}" />
+                    ToolTip.Tip="{l:Lang _ClearSearch}" />
             <ui:Kbd Name="PART_Hint"
                     Margin="6,0,1,0"
                     VerticalAlignment="Center"
@@ -287,7 +288,7 @@
               </ui:SquircleBorder.Transitions>
             </ui:SquircleBorder>
             <WrapPanel Name="PART_Panel" Margin="{TemplateBinding Padding}" ItemSpacing="6" LineSpacing="6" Orientation="Horizontal">
-              <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" AutomationProperties.Name="{x:Static eg:UiText.ADD_ARGUMENT}" PlaceholderText="{TemplateBinding Placeholder}" />
+              <TextBox Name="PART_Input" Theme="{StaticResource TokenInput}" AutomationProperties.Name="{l:Lang Settings_AddArgument}" PlaceholderText="{TemplateBinding Placeholder}" />
             </WrapPanel>
           </Panel>
           <ContentPresenter Name="PART_Note"
@@ -372,7 +373,7 @@
                     MinHeight="0"
                     Margin="-2,0,-5,0"
                     VerticalAlignment="Center"
-                    AutomationProperties.Name="{x:Static ui:TokenChip.REMOVE_LABEL}"
+                    AutomationProperties.Name="{l:Lang _Remove}"
                     CornerRadius="{StaticResource RadiusControl20}"
                     Focusable="False"
                     Opacity="0.55">

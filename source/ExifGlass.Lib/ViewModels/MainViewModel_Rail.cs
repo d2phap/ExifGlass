@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.UI;
@@ -37,7 +38,6 @@ public sealed partial class RailGroupItem : ObservableObject
     public RailGroupItem(string name)
     {
         Name = name;
-        Label = IsAi ? UiText.AI_GROUP : name;
     }
 
     #endregion // Constructors
@@ -47,7 +47,7 @@ public sealed partial class RailGroupItem : ObservableObject
 
     public string Name { get; }
 
-    public string Label { get; }
+    public string Label => IsAi ? Lang.Current[LangId._AiGeneration] : Name;
 
     public bool IsAi => Name == GroupInfo.AI_GROUP;
 
@@ -66,23 +66,30 @@ public sealed partial class RailGroupItem : ObservableObject
     public string JumpTip => AppText.JumpTo(Label);
 
     #endregion // Properties
+
+
+    #region Public methods
+
+    public void RefreshText() => OnPropertyChanged(string.Empty);
+
+    #endregion // Public methods
 }
 
 
 /// <summary>
 /// One rail quick filter (DS 6.6): its chip, live count and state.
 /// </summary>
-public sealed partial class QuickFilterItem(QuickFilter filter, string label, IconId icon, string? tip = null) : ObservableObject
+public sealed partial class QuickFilterItem(QuickFilter filter, LangId label, IconId icon, LangId? tip = null) : ObservableObject
 {
     #region Properties
 
     public QuickFilter Filter { get; } = filter;
 
-    public string Label { get; } = label;
+    public string Label => Lang.Current[label];
 
     public IconId Icon { get; } = icon;
 
-    public string? Tip { get; } = tip;
+    public string? Tip => tip is { } key ? Lang.Current[key] : null;
 
     /// <summary>
     /// The AI chips take Accent2 when on (AI addendum).
@@ -107,6 +114,17 @@ public sealed partial class QuickFilterItem(QuickFilter filter, string label, Ic
     public partial bool IsAvailable { get; set; }
 
     #endregion // Properties
+
+
+    #region Public methods
+
+    public void RefreshText()
+    {
+        OnPropertyChanged(nameof(Label));
+        OnPropertyChanged(nameof(Tip));
+    }
+
+    #endregion // Public methods
 }
 
 
@@ -127,7 +145,7 @@ public sealed partial class MainViewModel
     public partial string GroupCountLabel { get; private set; } = string.Empty;
 
     [ObservableProperty]
-    public partial string AllGroupsLabel { get; private set; } = AppText.HIDE_ALL;
+    public partial string AllGroupsLabel { get; private set; } = Lang.Current[LangId.Rail_HideAll];
 
     /// <summary>
     /// The composition bar: every real group by tag count, hidden ones at zero; the AI group is left out (P7 question 2).
@@ -140,10 +158,10 @@ public sealed partial class MainViewModel
     /// </summary>
     public IReadOnlyList<QuickFilterItem> AiQuickFilters { get; } =
     [
-        new(QuickFilter.Ai, AppText.FILTER_AI, IconId.Sparkle, AppText.FILTER_AI_TIP),
-        new(QuickFilter.AiPrompts, AppText.FILTER_PROMPTS, IconId.AiPrompt, AppText.FILTER_PROMPTS_TIP),
-        new(QuickFilter.AiModels, AppText.FILTER_MODELS, IconId.AiModel, AppText.FILTER_MODELS_TIP),
-        new(QuickFilter.AiProvenance, AppText.FILTER_PROVENANCE, IconId.AiShieldCheck, AppText.FILTER_PROVENANCE_TIP),
+        new(QuickFilter.Ai, LangId._AiGeneration, IconId.Sparkle, LangId.Filter_AiTip),
+        new(QuickFilter.AiPrompts, LangId.Filter_Prompts, IconId.AiPrompt, LangId.Filter_PromptsTip),
+        new(QuickFilter.AiModels, LangId.Filter_Models, IconId.AiModel, LangId.Filter_ModelsTip),
+        new(QuickFilter.AiProvenance, LangId.Filter_Provenance, IconId.AiShieldCheck, LangId.Filter_ProvenanceTip),
     ];
 
     /// <summary>
@@ -154,15 +172,15 @@ public sealed partial class MainViewModel
 
     public IReadOnlyList<QuickFilterItem> QuickFilters { get; } =
     [
-        new(QuickFilter.DateTime, AppText.FILTER_DATES, IconId.Clock),
-        new(QuickFilter.Gps, AppText.FILTER_GPS, IconId.Location),
-        new(QuickFilter.Converted, AppText.FILTER_CONVERTED, IconId.ArrowSync),
-        new(QuickFilter.HasTagId, AppText.FILTER_TAG_ID, IconId.Key),
+        new(QuickFilter.DateTime, LangId.Filter_DateTime, IconId.Clock),
+        new(QuickFilter.Gps, LangId.Filter_Gps, IconId.Location),
+        new(QuickFilter.Converted, LangId.Filter_Converted, IconId.ArrowSync),
+        new(QuickFilter.HasTagId, LangId.Filter_HasTagId, IconId.Key),
     ];
 
-    public string FileTitle => Document?.FileName ?? (IsLoading ? AppText.FILE_READING : AppText.FILE_NONE);
+    public string FileTitle => Document?.FileName ?? (IsLoading ? Lang.Current[LangId.Rail_FileReading] : Lang.Current[LangId.Rail_FileNone]);
 
-    public string FileMeta => Document?.Derived.MetaLine ?? (IsLoading ? AppText.FILE_READING_SUB : AppText.FILE_NONE_SUB);
+    public string FileMeta => Derived?.MetaLine ?? (IsLoading ? Lang.Current[LangId.Rail_FileReadingSub] : Lang.Current[LangId.Rail_FileNoneSub]);
 
     /// <summary>
     /// The thumbnail's label until the preview comes: the file's extension (Proto).
@@ -269,7 +287,7 @@ public sealed partial class MainViewModel
         GroupCountLabel = groups.Count == 0 ? string.Empty
             : shown < groups.Count ? string.Create(CultureInfo.InvariantCulture, $"{shown}/{groups.Count}")
             : groups.Count.ToString(CultureInfo.InvariantCulture);
-        AllGroupsLabel = shown < groups.Count ? AppText.SHOW_ALL : AppText.HIDE_ALL;
+        AllGroupsLabel = shown < groups.Count ? Lang.Current[LangId._ShowAll] : Lang.Current[LangId.Rail_HideAll];
         if (!segments.SequenceEqual(Segments)) Segments = segments;
 
         var filters = Rows.Query.Filters;

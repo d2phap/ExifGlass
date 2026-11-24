@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using Avalonia.Controls;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Query;
 using ProDataGrid.SourceGeneration;
 
@@ -74,15 +75,15 @@ public sealed class TableItem
         IsReadOnly = true, CanUserSort = true, TemplateFactoryMethod = nameof(CreateIndexCell), ReuseCellContent = true)]
     public int Index => Row?.Index ?? 0;
 
-    [DataGridColumn(DataGridColumnKind.Template, Header = UiText.COLUMN_TAG_ID, ColumnKey = COLUMN_ID, Order = 1, Width = "88",
+    [DataGridColumn(DataGridColumnKind.Template, Header = "", ColumnKey = COLUMN_ID, Order = 1, Width = "88",
         IsReadOnly = true, CanUserSort = true, TemplateFactoryMethod = nameof(CreateIdCell), ReuseCellContent = true)]
     public string TagId => Row?.DisplayId ?? string.Empty;
 
-    [DataGridColumn(DataGridColumnKind.Template, Header = UiText.COLUMN_TAG_NAME, ColumnKey = COLUMN_NAME, Order = 2, Width = "260",
+    [DataGridColumn(DataGridColumnKind.Template, Header = "", ColumnKey = COLUMN_NAME, Order = 2, Width = "260",
         IsReadOnly = true, CanUserSort = true, TemplateFactoryMethod = nameof(CreateNameCell), ReuseCellContent = true)]
     public string TagName => Row?.Name ?? string.Empty;
 
-    [DataGridColumn(DataGridColumnKind.Template, Header = UiText.COLUMN_VALUE, ColumnKey = COLUMN_VALUE, Order = 3, Width = "*",
+    [DataGridColumn(DataGridColumnKind.Template, Header = "", ColumnKey = COLUMN_VALUE, Order = 3, Width = "*",
         IsReadOnly = true, CanUserSort = true, TemplateFactoryMethod = nameof(CreateValueCell), ReuseCellContent = true)]
     public string Value => Row?.Value ?? string.Empty;
 

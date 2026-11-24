@@ -20,12 +20,36 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.Services;
 using ExifGlass.UI.Controls;
 using System.ComponentModel;
 
 namespace ExifGlass.ViewModels;
+
+/// <summary>
+/// A toast in the Settings window: "Command copied", "Installed 1 language pack".
+/// </summary>
+public sealed record SettingsToast(string Title, string? Subtitle, ToastKind Kind = ToastKind.Success);
+
+
+/// <summary>
+/// One language in the Settings list: its own name first, then the English one when they differ.
+/// </summary>
+public sealed class LanguageChoice(Lang pack)
+{
+    #region Properties
+
+    public Lang Pack { get; } = pack;
+
+    public string Name => Pack.Metadata.LocalName;
+
+    public string? EnglishName => string.Equals(Pack.Metadata.EnglishName, Name, StringComparison.OrdinalIgnoreCase) ? null : Pack.Metadata.EnglishName;
+
+    #endregion // Properties
+}
+
 
 /// <summary>
 /// The Settings window (DS 6.15): a draft of the settings that OK saves; the theme and the accent apply at once and Cancel restores them (Appendix B item 18).
@@ -56,12 +80,15 @@ public sealed partial class SettingsViewModel : ObservableObject
         CheckForUpdates = current.CheckForUpdates;
         ExifToolPath = current.ExifToolPath;
         Arguments = ArgumentPolicy.Split(current.ExifToolArguments);
+        Languages = [new LanguageChoice(Lang.Current)];
+        SelectedLanguage = Languages[0];
 
         main.PropertyChanged += Main_PropertyChanged;
         if (main.Metadata is { } metadata) metadata.StatusChanged += Metadata_StatusChanged;
         AccentService.SystemAccentChanged += AccentService_SystemAccentChanged;
         UpdateArguments();
         _ = UpdatePathHintAsync();
+        _ = LoadLanguagesAsync(current.Language);
     }
 
     #endregion // Constructors
@@ -120,6 +147,23 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// The built-in English and every installed pack; OK applies the chosen one to every window.
+    /// </summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<LanguageChoice> Languages { get; private set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(LanguageContributors), nameof(HasLanguageContributors))]
+    public partial LanguageChoice? SelectedLanguage { get; set; }
+
+    /// <summary>
+    /// The Language row's line: who translated the chosen language.
+    /// </summary>
+    public string LanguageContributors => SelectedLanguage is { } choice ? AppText.Contributors(choice.Pack.Metadata.Contributors) : string.Empty;
+
+    public bool HasLanguageContributors => LanguageContributors.Length > 0;
+
     [ObservableProperty]
     public partial bool AlwaysOnTop { get; set; }
 
@@ -139,7 +183,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// The line under the argument field: a refused argument, a warning, or how hover helps.
     /// </summary>
     [ObservableProperty]
-    public partial string ArgumentHint { get; private set; } = AppText.ARGUMENTS_HINT;
+    public partial string ArgumentHint { get; private set; } = Lang.Current[LangId.Settings_ArgumentsHint];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ArgumentHintIcon))]
@@ -188,7 +232,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     /// <summary>
     /// Occurs when Settings says something in its own toast: "Command copied".
     /// </summary>
-    public event EventHandler<(string Title, string? Subtitle)>? ToastRequested;
+    public event EventHandler<SettingsToast>? ToastRequested;
 
     #endregion // Events
 
@@ -209,11 +253,56 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         foreach (var (flag, label) in ArgumentPolicy.SUGGESTIONS)
         {
-            if (flag == suggestion) return label;
+            if (flag == suggestion) return Lang.Current[label];
         }
 
         return null;
     }
+
+
+    /// <summary>
+    /// Lists the languages again and picks <paramref name="select"/>, a Language setting, or keeps the choice.
+    /// </summary>
+    public async Task LoadLanguagesAsync(string? select = null)
+    {
+        var wanted = select ?? SelectedLanguage?.Pack.SettingValue ?? Lang.BUILT_IN;
+        var packs = await Task.Run(Lang.LoadAll);
+        Languages = [.. packs.Select(p => new LanguageChoice(p))];
+        SelectedLanguage = Languages.FirstOrDefault(c => c.Pack.SettingValue.Equals(wanted, StringComparison.OrdinalIgnoreCase)) ?? Languages[0];
+    }
+
+
+    /// <summary>
+    /// Copies the picked packs into the user folder and selects the first one; OK still applies it.
+    /// </summary>
+    public async Task InstallLanguagesAsync(IReadOnlyList<string> files)
+    {
+        if (files.Count == 0) return;
+
+        var result = await Task.Run(() => Lang.Install(files));
+        await LoadLanguagesAsync(result.Installed.FirstOrDefault());
+
+        if (result.Incompatible.Count > 0) ToastRequested?.Invoke(this, new SettingsToast(Lang.Current[LangId.Toast_LanguageIncompatible], string.Join(", ", result.Incompatible), ToastKind.Danger));
+        else ToastRequested?.Invoke(this, new SettingsToast(AppText.LanguagesInstalled(result.Installed.Count), SelectedLanguage?.Name));
+    }
+
+
+    /// <summary>
+    /// Writes the chosen language as a pack to translate from: every key, English where the pack has no text.
+    /// </summary>
+    public void ExportLanguage(Stream stream, string fileName)
+    {
+        if (SelectedLanguage is not { } choice) return;
+
+        choice.Pack.Export(stream);
+        ToastRequested?.Invoke(this, new SettingsToast(AppText.Exported(fileName), choice.Name));
+    }
+
+
+    /// <summary>
+    /// The file name Export suggests: the pack's own, or English.eglang.json for the template.
+    /// </summary>
+    public string ExportFileName => SelectedLanguage is { Pack.IsBuiltIn: false } choice ? choice.Pack.FileName : Lang.BUILT_IN + Lang.FILE_EXTENSION;
 
 
     /// <summary>
@@ -246,6 +335,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         CheckForUpdates = defaults.CheckForUpdates;
         ExifToolPath = defaults.ExifToolPath;
         Arguments = ArgumentPolicy.Split(defaults.ExifToolArguments);
+        SelectedLanguage = Languages.FirstOrDefault(c => c.Pack.IsBuiltIn) ?? SelectedLanguage;
     }
 
 
@@ -253,7 +343,8 @@ public sealed partial class SettingsViewModel : ObservableObject
     private async Task OkAsync()
     {
         _committed = true;
-        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, Accent, AlwaysOnTop, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments)));
+        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, Accent, AlwaysOnTop, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments),
+            SelectedLanguage?.Pack.SettingValue ?? _main.Settings.Current.Language));
 
         // the window goes at once; ExifTool restarts and the file is read again behind it
         CloseRequested?.Invoke(this, EventArgs.Empty);
@@ -271,7 +362,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         if (_main.Shell is not { } shell) return;
 
         await shell.CopyTextAsync(WritePlan.ToCommandLine(PreviewTokens));
-        ToastRequested?.Invoke(this, (AppText.TOAST_COMMAND_COPIED, AppText.TOAST_COMMAND_COPIED_SUB));
+        ToastRequested?.Invoke(this, new SettingsToast(Lang.Current[LangId.Toast_CommandCopied], Lang.Current[LangId.Toast_CommandCopiedSub]));
     }
 
     #endregion // Commands
@@ -324,7 +415,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
         else
         {
-            ArgumentHint = AppText.ARGUMENTS_HINT;
+            ArgumentHint = Lang.Current[LangId.Settings_ArgumentsHint];
             ArgumentHintKind = NoteKind.Plain;
         }
 
@@ -355,16 +446,16 @@ public sealed partial class SettingsViewModel : ObservableObject
         var running = metadata?.Location;
         if (!exists)
         {
-            (PathHint, PathHintKind) = (AppText.PATH_NOT_FOUND, NoteKind.Danger);
+            (PathHint, PathHintKind) = (Lang.Current[LangId.Settings_PathNotFound], NoteKind.Danger);
         }
         else if (path.Length == 0 && metadata?.Status == ExifToolStatus.Missing)
         {
-            (PathHint, PathHintKind) = (AppText.NO_EXIFTOOL, NoteKind.Danger);
+            (PathHint, PathHintKind) = (Lang.Current[LangId.Settings_NoExifTool], NoteKind.Danger);
         }
         else if (path.Length > 0 && running is { Source: ExifToolSource.Custom } && SamePath(running.Path, path)
             && metadata?.Version is { } version && ExifToolVersion.MissingAiFeatures(version) is { Count: > 0 } missing)
         {
-            (PathHint, PathHintKind) = ($"{AppText.OldExifTool(version, missing)} {AppText.USE_BUNDLED}", NoteKind.Warning);
+            (PathHint, PathHintKind) = ($"{AppText.OldExifTool(version, missing)} {Lang.Current[LangId.Settings_UseBundled]}", NoteKind.Warning);
         }
         else
         {

@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Common;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Platform;
 using ExifGlass.Core.Settings;
 using ExifGlass.Core.Update;
@@ -105,6 +106,11 @@ public sealed class AppServices
         settingsDirectory ??= Environment.GetEnvironmentVariable(SETTINGS_DIR_VARIABLE) is { Length: > 0 } dir ? dir : SettingsStore.DefaultDirectory();
         var settings = new SettingsStore(settingsDirectory);
         settings.Load(overrides);
+
+        // installed packs sit next to the settings, so a portable or test run keeps its own
+        Lang.UserDirectory = Path.Combine(settings.DirectoryPath, Lang.FOLDER);
+        var lang = Lang.FromSetting(settings.Current.Language);
+        if (!lang.IsBuiltIn || !Lang.Current.IsBuiltIn) Lang.Current = lang;
 
         var channel = DetectChannel();
         var metadata = new MetadataService(() => settings.Current)

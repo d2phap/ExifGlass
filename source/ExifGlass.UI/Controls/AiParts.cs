@@ -25,6 +25,8 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using ExifGlass.Core.Ai;
+using ExifGlass.Core.Localization;
+using ExifGlass.UI.Localization;
 using ExifGlass.UI.Tokens;
 using System.Globalization;
 using System.Windows.Input;
@@ -98,6 +100,7 @@ public class SourceLink : GlassButton
     // its look is set here, not by a class style, which every GlassButton would carry (G6 finding 2)
     public SourceLink()
     {
+        LangResources.Track(this, UpdateLink);
         Icon = IconId.AiSource;
         IconSize = 11;
         Height = 20;
@@ -150,8 +153,8 @@ public class SourceLink : GlassButton
     /// </summary>
     public static string Tip(string key, IReadOnlyList<string>? others)
     {
-        var tip = $"{UiText.SHOW_SOURCE_TAG} · -{AiRows.SourceLabel(key)}";
-        return others is { Count: > 0 } ? tip + "\n" + UiText.ALSO + string.Join(", ", others.Select(AiRows.SourceLabel)) : tip;
+        var tip = $"{Lang.Current[LangId.Ai_ShowSourceTag]} · -{AiRows.SourceLabel(key)}";
+        return others is { Count: > 0 } ? tip + "\n" + Lang.Current[LangId.Ai_Also] + string.Join(", ", others.Select(AiRows.SourceLabel)) : tip;
     }
 
     #endregion // Public methods
@@ -184,22 +187,26 @@ public class SourceLink : GlassButton
             SetForeground(IsPointerOver || InteractionOverlay.GetForcedState(this) is InteractionState.Hover or InteractionState.Pressed);
         }
 
-        if (change.Property != SourceKeyProperty && change.Property != OtherSourcesProperty) return;
-
-        var key = SourceKey;
-        var more = OtherSources?.Count ?? 0;
-        _label.Text = key is null ? null : AiRows.SourceLabel(key);
-        _moreChip.IsVisible = more > 0;
-        _more.Text = more > 0 ? "+" + more.ToString(CultureInfo.InvariantCulture) : null;
-        ToolTip.SetTip(this, key is null ? null : Tip(key, OtherSources));
-        AutomationProperties.SetName(this, key is null ? null : $"{UiText.SHOW_SOURCE_TAG} {AiRows.SourceLabel(key)}");
-        Tag = key is null ? null : new AiActionRequest(AiAction.ShowSourceTag, Key: key);
+        if (change.Property == SourceKeyProperty || change.Property == OtherSourcesProperty) UpdateLink();
     }
 
     #endregion // Protected methods
 
 
     #region Private methods
+
+    private void UpdateLink()
+    {
+        var key = SourceKey;
+        var more = OtherSources?.Count ?? 0;
+        _label.Text = key is null ? null : AiRows.SourceLabel(key);
+        _moreChip.IsVisible = more > 0;
+        _more.Text = more > 0 ? "+" + more.ToString(CultureInfo.InvariantCulture) : null;
+        ToolTip.SetTip(this, key is null ? null : Tip(key, OtherSources));
+        AutomationProperties.SetName(this, key is null ? null : $"{Lang.Current[LangId.Ai_ShowSourceTag]} {AiRows.SourceLabel(key)}");
+        Tag = key is null ? null : new AiActionRequest(AiAction.ShowSourceTag, Key: key);
+    }
+
 
     // TextTertiary at rest, AccentText on hover (AI addendum); the theme's brush transition fades it
     private void SetForeground(bool hover) =>
@@ -431,7 +438,7 @@ internal sealed class HoverCopy
 
     private readonly Panel _host;
     private readonly Func<AiActionRequest?> _request;
-    private readonly string _tip;
+    private readonly LangId _tip;
     private readonly bool _centred;
     private GlassButton? _button;
 
@@ -440,7 +447,7 @@ internal sealed class HoverCopy
 
     #region Constructors
 
-    public HoverCopy(Panel host, string tip, Func<AiActionRequest?> request, bool centred = false)
+    public HoverCopy(Panel host, LangId tip, Func<AiActionRequest?> request, bool centred = false)
     {
         _host = host;
         _tip = tip;
@@ -482,7 +489,7 @@ internal sealed class HoverCopy
                 Opacity = 0,
                 Transitions = [new DoubleTransition { Property = Visual.OpacityProperty, Duration = MotionTokens.Hover, Easing = MotionTokens.HoverEasing }],
             };
-            ToolTip.SetTip(_button, _tip);
+            LangResources.Bind(_button, ToolTip.TipProperty, _tip);
             _button[!TemplatedControl.ForegroundProperty] = _button.GetResourceObservable(TokenKeys.TEXT_SECONDARY_BRUSH).ToBinding();
 
             // the card's click handler reads the request from the tag; this one runs first, on the button itself
@@ -520,7 +527,7 @@ public sealed class CopyHost : Panel
     public CopyHost()
     {
         Background = Brushes.Transparent;
-        _ = new HoverCopy(this, UiText.COPY_VALUE, () => CopyText is { Length: > 0 } text ? new AiActionRequest(AiAction.CopyText, text, CopyLabel) : null);
+        _ = new HoverCopy(this, LangId._CopyValue, () => CopyText is { Length: > 0 } text ? new AiActionRequest(AiAction.CopyText, text, CopyLabel) : null);
     }
 
     #endregion // Constructors
@@ -590,7 +597,7 @@ public sealed class ParameterTile : Panel
 
         Children.Add(new StackPanel { Spacing = 1, Margin = new Thickness(10, 7), Children = { _label, _value } });
         this[!BackgroundProperty] = this.GetResourceObservable(TokenKeys.BG_PANEL_BRUSH).ToBinding();
-        _ = new HoverCopy(this, UiText.COPY_VALUE, () => View is { } v ? new AiActionRequest(AiAction.CopyText, v.Value, v.Label) : null);
+        _ = new HoverCopy(this, LangId._CopyValue, () => View is { } v ? new AiActionRequest(AiAction.CopyText, v.Value, v.Label) : null);
     }
 
     #endregion // Constructors
@@ -670,7 +677,7 @@ public sealed class ModelRow : Panel
         Children.AddRange([_line, grid]);
 
         Background = Brushes.Transparent;
-        _ = new HoverCopy(this, UiText.COPY_HASH, () => View is { Hash: { } hash } v ? new AiActionRequest(AiAction.CopyText, hash, UiText.CopiedHash(v.Name)) : null, centred: true);
+        _ = new HoverCopy(this, LangId.Ai_CopyHash, () => View is { Hash: { } hash } v ? new AiActionRequest(AiAction.CopyText, hash, UiText.CopiedHash(v.Name)) : null, centred: true);
     }
 
     #endregion // Constructors

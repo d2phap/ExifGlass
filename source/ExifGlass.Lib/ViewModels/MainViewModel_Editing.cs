@@ -21,6 +21,7 @@ using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.UI.Controls;
 
@@ -91,7 +92,7 @@ public sealed partial class MainViewModel
             if (Document is not { } doc) return null;
 
             var notes = new List<string>(2);
-            if (_edits.RemoveGps && !_edits.StripAll && EditTargets.HasManifestGps(doc)) notes.Add(AppText.NOTE_MANIFEST_GPS);
+            if (_edits.RemoveGps && !_edits.StripAll && EditTargets.HasManifestGps(doc)) notes.Add(Lang.Current[LangId.Edit_ManifestGpsNote]);
             if (_edits.AiRedaction is { Warnings.Count: > 0 } plan && !_edits.StripAll) notes.AddRange(plan.Warnings);
             return notes.Count == 0 ? null : AppText.FirstOf(notes);
         }
@@ -99,19 +100,19 @@ public sealed partial class MainViewModel
 
     public bool CanRemoveGps => Document is { } doc && !_edits.RemoveGps && !_edits.StripAll && EditTargets.GpsCount(doc) > 0;
 
-    public string GpsDescription => Document is not { } doc ? AppText.EDIT_GPS_NONE
-        : _edits.RemoveGps ? AppText.EDIT_STAGED
+    public string GpsDescription => Document is not { } doc ? Lang.Current[LangId.Edit_RemoveGpsNone]
+        : _edits.RemoveGps ? Lang.Current[LangId.Edit_Staged]
         : EditTargets.GpsCount(doc) is var gps and > 0 ? AppText.GpsTags(gps)
-        : EditTargets.HasManifestGps(doc) ? AppText.EDIT_GPS_MANIFEST
-        : AppText.EDIT_GPS_NONE;
+        : EditTargets.HasManifestGps(doc) ? Lang.Current[LangId.Edit_RemoveGpsManifest]
+        : Lang.Current[LangId.Edit_RemoveGpsNone];
 
     public bool CanRemoveAi => !_edits.RemoveAi && !_edits.StripAll && RedactionPlan() is { IsEmpty: false };
 
-    public string AiRemovalDescription => _edits.RemoveAi ? AppText.EDIT_STAGED : RedactionPlan() is { IsEmpty: false } ? AppText.EDIT_AI_DESC : AppText.EDIT_AI_NONE;
+    public string AiRemovalDescription => _edits.RemoveAi ? Lang.Current[LangId.Edit_Staged] : RedactionPlan() is { IsEmpty: false } ? Lang.Current[LangId.Edit_RemoveAiDesc] : Lang.Current[LangId.Edit_RemoveAiNone];
 
     public bool CanStripAll => Document is not null && !_edits.StripAll;
 
-    public string StripDescription => _edits.StripAll ? AppText.EDIT_STAGED : AppText.EDIT_STRIP_DESC;
+    public string StripDescription => _edits.StripAll ? Lang.Current[LangId.Edit_Staged] : Lang.Current[LangId.Edit_StripAllDesc];
 
     /// <summary>
     /// The command bar shows the write Save runs (DS 6.12 Write chip).
@@ -132,7 +133,7 @@ public sealed partial class MainViewModel
         if (!HasPending || Shell is null || Document is not { } doc) return true;
 
         var answer = await Shell.AskAsync(new DialogRequest(AppText.UnsavedTitle(doc.FileName), AppText.UnsavedBody(PendingCount),
-            AppText.SAVE, AppText.DISCARD, Icon: IconId.Save));
+            Lang.Current[LangId._Save], Lang.Current[LangId._Discard], Icon: IconId.Save));
 
         switch (answer)
         {
@@ -197,7 +198,7 @@ public sealed partial class MainViewModel
         _hiddenGroups.Remove(group);
         _collapsed.Remove(group);
         Stage(_edits.Add(added));
-        Shell?.ShowToast(AppText.TOAST_TAG_STAGED, AppText.TagStaged(group, name));
+        Shell?.ShowToast(Lang.Current[LangId.Toast_TagStaged], AppText.TagStaged(group, name));
         _ = RevealAddedAsync("New:" + added.Key);
     }
 
@@ -245,22 +246,22 @@ public sealed partial class MainViewModel
 
         if (data is not { Length: > 0 })
         {
-            Shell.ShowToast(AppText.TOAST_BINARY_FAILED, tag.ArgumentKey, ToastKind.Danger);
+            Shell.ShowToast(Lang.Current[LangId.Toast_BinaryFailed], tag.ArgumentKey, ToastKind.Danger);
             return;
         }
 
         var name = BinaryData.SuggestedName(doc.SourcePath, tag.Name, data);
         try
         {
-            await using var target = await Shell.PickSaveFileAsync(name, BinaryData.Extension(data), AppText.BINARY_FILES);
+            await using var target = await Shell.PickSaveFileAsync(name, BinaryData.Extension(data), Lang.Current[LangId.Picker_BinaryData]);
             if (target is null) return;
 
             await target.Stream.WriteAsync(data);
-            Shell.ShowToast(AppText.TOAST_SAVED_BINARY, AppText.SavedBinary(target.Name, data.Length));
+            Shell.ShowToast(Lang.Current[LangId.Toast_SavedBinary], AppText.SavedBinary(target.Name, data.Length));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Shell.ShowToast(AppText.TOAST_EXPORT_FAILED, ex.Message, ToastKind.Danger);
+            Shell.ShowToast(Lang.Current[LangId.Toast_ExportFailed], ex.Message, ToastKind.Danger);
         }
     }
 
@@ -327,7 +328,7 @@ public sealed partial class MainViewModel
         if (Shell is { } shell && doc.HasChangedOnDisk())
         {
             var answer = await shell.AskAsync(new DialogRequest(AppText.ChangedTitle(doc.FileName), AppText.ChangedBody(edits.PendingCount),
-                AppText.SAVE, AppText.RELOAD, Icon: IconId.ArrowSync));
+                Lang.Current[LangId._Save], Lang.Current[LangId._Reload], Icon: IconId.ArrowSync));
 
             if (answer == DialogAnswer.Secondary)
             {
@@ -359,8 +360,8 @@ public sealed partial class MainViewModel
                 return false;
             }
 
-            if (result.Outcome == SaveOutcome.Unchanged) Shell?.ShowToast(AppText.TOAST_NOTHING_SAVED, AppText.TOAST_NOTHING_SAVED_SUB, ToastKind.Info);
-            else Shell?.ShowToast(AppText.Saved(edits.PendingCount), SaveNote(result) ?? (Channel.BackupInContainer ? AppText.BACKUP_KEPT_IN_CONTAINER : AppText.BackupKept(doc.FileName)));
+            if (result.Outcome == SaveOutcome.Unchanged) Shell?.ShowToast(Lang.Current[LangId.Toast_NothingSaved], Lang.Current[LangId.Toast_NothingSavedSub], ToastKind.Info);
+            else Shell?.ShowToast(AppText.Saved(edits.PendingCount), SaveNote(result) ?? (Channel.BackupInContainer ? Lang.Current[LangId.Toast_BackupKeptInContainer] : AppText.BackupKept(doc.FileName)));
 
             // the read that follows keeps the groups, filters and selection, and drops what was staged
             if (reload)

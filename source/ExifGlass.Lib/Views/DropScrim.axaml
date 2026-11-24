@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="using:ExifGlass.UI.Localization"
              xmlns:app="using:ExifGlass"
              xmlns:ui="using:ExifGlass.UI.Controls"
              x:Class="ExifGlass.Views.DropScrim"
@@ -27,7 +28,7 @@
       <TextBlock HorizontalAlignment="Center"
                  FontSize="18"
                  FontWeight="Medium"
-                 Text="{x:Static app:AppText.RELEASE_TO_INSPECT}" />
+                 Text="{l:Lang Empty_ReleaseToInspect}" />
     </StackPanel>
   </Panel>
 

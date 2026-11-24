@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia.Controls;
 using Avalonia.Layout;
 using ExifGlass.Core.Ai;
+using ExifGlass.Core.Localization;
 using ExifGlass.UI.Controls;
 
 namespace ExifGlass.UI.Gallery;
@@ -89,8 +90,8 @@ public static partial class DesignGalleryCatalog
             new("selected AI field, a value", new AiFieldCard { Width = CARD_WIDTH, View = new AiFieldView("AI:seed", "Seed", "2841937305", "PNG:Parameters", "A1111 infotext", false, []) }),
             new("character card", new CharacterCard { Width = CARD_WIDTH, Source = CharacterSample() }, "neutral; not AI generation"),
             new("notes", Column(
-                new InlineNote { Width = CARD_WIDTH, Text = UiText.PROVENANCE_ONLY },
-                new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Info, Text = UiText.UNKNOWN_AI_NOTE },
+                new InlineNote { Width = CARD_WIDTH, Text = Lang.Current[LangId.Ai_ProvenanceOnly] },
+                new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Info, Text = Lang.Current[LangId.Ai_UnknownNote] },
                 new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Warning, Icon = IconId.AiWarning, Text = "The UI workflow isn't valid JSON (character 18,204)." },
                 new InlineNote { Width = CARD_WIDTH, Kind = NoteKind.Danger, Icon = IconId.Delete, Text = "Prompts, workflows and parameters are removed when you save." }), "plain, info, warning, danger"),
             new("source link", Row(Link(), Link().Hover(), Link().Pressed(), Link().FocusVisible()), "rest, :pointerover (AccentText), :pressed, :focus-visible"),

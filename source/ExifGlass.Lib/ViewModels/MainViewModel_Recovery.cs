@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.UI.Controls;
 
 namespace ExifGlass.ViewModels;
@@ -64,13 +65,13 @@ public sealed partial class MainViewModel
         if (Exists(recovery.SourcePath) is not { } file)
         {
             RecoveryFile.Delete(directory);
-            Shell.ShowToast(AppText.TOAST_RECOVERY_GONE, AppText.RecoveryGone(recovery.FileName), ToastKind.Danger);
+            Shell.ShowToast(Lang.Current[LangId.Toast_RecoveryGone], AppText.RecoveryGone(recovery.FileName), ToastKind.Danger);
             return false;
         }
 
         var changed = recovery.FileChanged(file.Length, file.LastWriteTimeUtc);
         var answer = await Shell.AskAsync(new DialogRequest(AppText.RecoveryTitle(recovery.FileName), AppText.RecoveryBody(recovery.PendingCount, changed),
-            AppText.RESTORE, AppText.DISCARD, AppText.NOT_NOW, Icon: IconId.History));
+            Lang.Current[LangId._Restore], Lang.Current[LangId._Discard], Lang.Current[LangId._NotNow], Icon: IconId.History));
 
         if (answer == DialogAnswer.Secondary) RecoveryFile.Delete(directory);
         if (answer != DialogAnswer.Primary) return false;
@@ -110,7 +111,7 @@ public sealed partial class MainViewModel
         if (!doc.IsSameRead(Document)) await RunQueryAsync(doc);
 
         Stage(recovery.ToEditSet(key => doc.GetByKey(key) is not null, out var dropped));
-        Shell?.ShowToast(AppText.Restored(PendingCount), dropped > 0 ? AppText.RestoreDropped(dropped) : AppText.RESTORED_SUB);
+        Shell?.ShowToast(AppText.Restored(PendingCount), dropped > 0 ? AppText.RestoreDropped(dropped) : Lang.Current[LangId.Toast_RestoredSub]);
         return true;
     }
 

@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using ExifGlass.Core.Localization;
 using System.Collections.Frozen;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -109,64 +110,64 @@ public static partial class ArgumentPolicy
     /// <summary>
     /// The dashed suggestions under the Settings argument field (DS 6.15) with their short labels (Proto).
     /// </summary>
-    public static readonly IReadOnlyList<(string Flag, string Label)> SUGGESTIONS =
+    public static readonly IReadOnlyList<(string Flag, LangId Label)> SUGGESTIONS =
     [
-        ("-n", "raw values"), ("-a", "duplicates"), ("-u", "unknown tags"), ("-U", "unknown binary"), ("-ee", "embedded"), ("-ee3", "all embedded"),
-        ("-s", "short names"), ("-e", "no composite"), ("-fast", "faster"), ("-fast2", "fastest"), ("-m", "minor errors"), ("-q", "quiet"),
+        ("-n", LangId.Argument_HintRaw), ("-a", LangId.Argument_HintDuplicates), ("-u", LangId.Argument_HintUnknown), ("-U", LangId.Argument_HintUnknownBinary), ("-ee", LangId.Argument_HintEmbedded), ("-ee3", LangId.Argument_HintAllEmbedded),
+        ("-s", LangId.Argument_HintShort), ("-e", LangId.Argument_HintNoComposite), ("-fast", LangId.Argument_HintFaster), ("-fast2", LangId.Argument_HintFastest), ("-m", LangId.Argument_HintMinorErrors), ("-q", LangId.Argument_HintQuiet),
     ];
 
-    private const string REASON_OUTPUT = "Changes the output format the app reads";
-    private const string REASON_WRITE = "Writes or changes files";
-    private const string REASON_PROTOCOL = "Belongs to the app's own ExifTool session";
-    private const string REASON_CODE = "Runs Perl code";
-    private const string REASON_UNKNOWN = "Not supported in the argument field";
+    private const LangId REASON_OUTPUT = LangId.Argument_ReasonOutput;
+    private const LangId REASON_WRITE = LangId.Argument_ReasonWrite;
+    private const LangId REASON_PROTOCOL = LangId.Argument_ReasonProtocol;
+    private const LangId REASON_CODE = LangId.Argument_ReasonCode;
+    private const LangId REASON_UNKNOWN = LangId.Argument_ReasonUnknown;
 
-    private static readonly FrozenDictionary<string, string> LOCKED = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> LOCKED = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
-        ["-G"] = "Print the group name for each tag",
-        ["-t"] = "Tab-delimited output",
-        ["-H"] = "Show tag IDs in hexadecimal",
-        ["-j"] = "JSON output",
-        ["-l"] = "Long output: descriptions and raw values",
+        ["-G"] = LangId.Argument_Group,
+        ["-t"] = LangId.Argument_Tab,
+        ["-H"] = LangId.Argument_Hex,
+        ["-j"] = LangId.Argument_Json,
+        ["-l"] = LangId.Argument_Long,
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private static readonly FrozenDictionary<string, string> DISPLAY = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> DISPLAY = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
-        ["-n"] = "Raw numerical values, no print conversion",
-        ["-s"] = "Short tag names instead of descriptions",
-        ["-a"] = "Allow duplicate tags",
+        ["-n"] = LangId.Argument_Raw,
+        ["-s"] = LangId.Argument_Short,
+        ["-a"] = LangId.Argument_Duplicates,
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private static readonly FrozenDictionary<string, string> FLAGS = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> FLAGS = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
-        ["-fast"] = "Skip scanning for trailers, for faster reads",
-        ["-fast2"] = "Also skip maker notes and late chunks",
-        ["-fast3"] = "Read only the file system and format tags",
-        ["-m"] = "Ignore minor errors and warnings",
-        ["-q"] = "Quiet: suppress informational messages",
-        ["-u"] = "Extract unknown tags",
-        ["-U"] = "Extract unknown binary tags too",
-        ["-ee"] = "Extract embedded data (e.g. video streams)",
-        ["-ee2"] = "Extract embedded data, level 2",
-        ["-ee3"] = "Extract embedded data, level 3",
-        ["-e"] = "Don't generate composite tags",
-        ["--e"] = "Only generate composite tags",
-        ["-L"] = "Use Windows Latin1 encoding",
-        ["-struct"] = "Keep structures as JSON objects",
-        ["--struct"] = "Flatten structures",
+        ["-fast"] = LangId.Argument_Fast,
+        ["-fast2"] = LangId.Argument_Fast2,
+        ["-fast3"] = LangId.Argument_Fast3,
+        ["-m"] = LangId.Argument_MinorErrors,
+        ["-q"] = LangId.Argument_Quiet,
+        ["-u"] = LangId.Argument_Unknown,
+        ["-U"] = LangId.Argument_UnknownBinary,
+        ["-ee"] = LangId.Argument_Embedded,
+        ["-ee2"] = LangId.Argument_Embedded2,
+        ["-ee3"] = LangId.Argument_Embedded3,
+        ["-e"] = LangId.Argument_NoComposite,
+        ["--e"] = LangId.Argument_OnlyComposite,
+        ["-L"] = LangId.Argument_Latin1,
+        ["-struct"] = LangId.Argument_Struct,
+        ["--struct"] = LangId.Argument_Flatten,
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
-    private static readonly FrozenDictionary<string, string> WITH_VALUE = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> WITH_VALUE = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
-        ["-api"] = "Set an ExifTool API option",
-        ["-charset"] = "Character set for output",
-        ["-lang"] = "Language of tag descriptions and values",
-        ["-d"] = "Date and time format",
-        ["-c"] = "GPS coordinate format",
-        ["-sep"] = "Separator for list items",
-        ["-listItem"] = "Show one item of each list",
-        ["-x"] = "Exclude a tag",
-        ["-ext"] = "Process files with this extension",
+        ["-api"] = LangId.Argument_Api,
+        ["-charset"] = LangId.Argument_Charset,
+        ["-lang"] = LangId.Argument_Lang,
+        ["-d"] = LangId.Argument_DateFormat,
+        ["-c"] = LangId.Argument_GpsFormat,
+        ["-sep"] = LangId.Argument_Separator,
+        ["-listItem"] = LangId.Argument_ListItem,
+        ["-x"] = LangId.Argument_Exclude,
+        ["-ext"] = LangId.Argument_Extension,
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     // -lang and -charset take a value only when one follows
@@ -178,7 +179,7 @@ public static partial class ArgumentPolicy
         "LargeFileSupport", "QuickTimeUTC", "KeepUTCTime", "RequestAll", "IgnoreTags", "LimitLongValues", "StructFormat", "TimeZone", "NoMultiExif", "MissingTagValue",
     }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
-    private static readonly FrozenDictionary<string, string> REFUSED = new Dictionary<string, string>(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, LangId> REFUSED = new Dictionary<string, LangId>(StringComparer.Ordinal)
     {
         ["-o"] = REASON_WRITE, ["-out"] = REASON_WRITE, ["-w"] = REASON_WRITE, ["-W"] = REASON_WRITE, ["-textOut"] = REASON_WRITE,
         ["-tagsFromFile"] = REASON_WRITE, ["-geotag"] = REASON_WRITE, ["-overwrite_original"] = REASON_WRITE,
@@ -264,7 +265,7 @@ public static partial class ArgumentPolicy
 
             if (TryGet(LOCKED, arg, out var lockedDesc) || IsGroupFlag(arg))
             {
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Locked, lockedDesc ?? LOCKED["-G"]) { Index = start });
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Locked, lockedDesc ?? Lang.Current[LOCKED["-G"]]) { Index = start });
                 continue;
             }
 
@@ -274,13 +275,13 @@ public static partial class ArgumentPolicy
                 else if (arg == "-a") dups = true;
                 else names = true;
 
-                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Display, displayDesc ?? DISPLAY["-s"]) { Index = start });
+                tokens.Add(new ArgumentToken(arg, null, ArgumentClass.Display, displayDesc ?? Lang.Current[DISPLAY["-s"]]) { Index = start });
                 continue;
             }
 
             if (TryGet(FLAGS, arg, out var flagDesc))
             {
-                if (arg is "-fast2" or "-fast3") warnings.Add($"{arg} can hide AI data in the table: late PNG text and MP4 keys aren't read (the AI card still shows it)");
+                if (arg is "-fast2" or "-fast3") warnings.Add(Lang.Current[LangId.Argument_FastHidesAi, arg]);
                 tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, flagDesc) { Index = start });
                 pass.Add(arg);
                 continue;
@@ -314,7 +315,7 @@ public static partial class ArgumentPolicy
             }
 
             var exclude = arg.StartsWith("--", StringComparison.Ordinal);
-            tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, exclude ? "Exclude tags" : "Read only these tags") { Index = start });
+            tokens.Add(new ArgumentToken(arg, null, ArgumentClass.PassThrough, Lang.Current[exclude ? LangId.Argument_ExcludeTags : LangId.Argument_ReadTags]) { Index = start });
             pass.Add(arg);
         }
 
@@ -326,7 +327,7 @@ public static partial class ArgumentPolicy
     /// A description for a chip, from the token text alone (the Settings suggestions use it).
     /// </summary>
     public static string Describe(string flag) =>
-        LOCKED.GetValueOrDefault(flag) ?? DISPLAY.GetValueOrDefault(flag) ?? FLAGS.GetValueOrDefault(flag) ?? WITH_VALUE.GetValueOrDefault(flag) ?? string.Empty;
+        LOCKED.TryGetValue(flag, out var key) || DISPLAY.TryGetValue(flag, out key) || FLAGS.TryGetValue(flag, out key) || WITH_VALUE.TryGetValue(flag, out key) ? Lang.Current[key] : string.Empty;
 
 
     /// <summary>
@@ -341,7 +342,7 @@ public static partial class ArgumentPolicy
         {
             var isLocked = token.Class == ArgumentClass.Locked && locked.Add(token.Flag);
             chips[token.Index] = new ArgumentChip(token.Description, token.Reason, isLocked);
-            if (token.Value is not null) chips[token.Index + 1] = new ArgumentChip($"Value for {token.Flag}", token.Reason, false);
+            if (token.Value is not null) chips[token.Index + 1] = new ArgumentChip(Lang.Current[LangId.Argument_ValueFor, token.Flag], token.Reason, false);
         }
 
         return chips;
@@ -375,16 +376,22 @@ public static partial class ArgumentPolicy
 
 
     // ExifTool matches long option names in any case and single letters exactly (-n is not -N)
-    private static bool TryGet(FrozenDictionary<string, string> map, string arg, out string value)
+    private static bool TryGet(FrozenDictionary<string, LangId> map, string arg, out string value)
     {
-        if (map.TryGetValue(arg, out value!)) return true;
+        value = null!;
+        if (map.TryGetValue(arg, out var text))
+        {
+            value = Lang.Current[text];
+            return true;
+        }
+
         if (arg.Length <= 2) return false;
 
         foreach (var (key, v) in map)
         {
             if (key.Length > 2 && key.Equals(arg, StringComparison.OrdinalIgnoreCase))
             {
-                value = v;
+                value = Lang.Current[v];
                 return true;
             }
         }
@@ -393,25 +400,25 @@ public static partial class ArgumentPolicy
     }
 
 
-    private static string Canonical(FrozenDictionary<string, string> map, string arg) =>
+    private static string Canonical(FrozenDictionary<string, LangId> map, string arg) =>
         map.ContainsKey(arg) ? arg : map.Keys.First(k => k.Length > 2 && k.Equals(arg, StringComparison.OrdinalIgnoreCase));
 
 
     private static string? ValueReason(string flag, string? value)
     {
-        if (value is null) return flag is "-lang" or "-charset" ? null : "Needs a value";
-        if (value.AsSpan().IndexOfAny('\r', '\n') >= 0) return "A value can't span lines";
+        if (value is null) return flag is "-lang" or "-charset" ? null : Lang.Current[LangId.Argument_NeedsValue];
+        if (value.AsSpan().IndexOfAny('\r', '\n') >= 0) return Lang.Current[LangId.Argument_ValueLines];
 
         switch (flag)
         {
             case "-api":
             {
                 var name = value.Split('=', 2)[0].TrimEnd('^');
-                return API_OPTIONS.Contains(name) ? null : $"The API option {name} isn't allowed here";
+                return API_OPTIONS.Contains(name) ? null : Lang.Current[LangId.Argument_ApiNotAllowed, name];
             }
 
             case "-charset" when value.StartsWith("filename", StringComparison.OrdinalIgnoreCase):
-                return "The app sets the file-name character set itself";
+                return Lang.Current[LangId.Argument_FileNameCharset];
 
             default:
                 return null;
@@ -422,13 +429,13 @@ public static partial class ArgumentPolicy
     private static string? RefusedReason(string arg)
     {
         if (TryGet(REFUSED, arg, out var reason)) return reason;
-        if (NumberedOption().IsMatch(arg)) return REASON_OUTPUT;
+        if (NumberedOption().IsMatch(arg)) return Lang.Current[REASON_OUTPUT];
 
-        if (!arg.StartsWith('-')) return "A file name: the app passes the file itself";
-        if (arg.AsSpan().IndexOfAny('=', '<', '>') >= 0) return REASON_WRITE;
-        if (arg.StartsWith("-list", StringComparison.OrdinalIgnoreCase)) return REASON_OUTPUT;
+        if (!arg.StartsWith('-')) return Lang.Current[LangId.Argument_ReasonFileName];
+        if (arg.AsSpan().IndexOfAny('=', '<', '>') >= 0) return Lang.Current[REASON_WRITE];
+        if (arg.StartsWith("-list", StringComparison.OrdinalIgnoreCase)) return Lang.Current[REASON_OUTPUT];
 
-        return TagSelection().IsMatch(arg) ? null : REASON_UNKNOWN;
+        return TagSelection().IsMatch(arg) ? null : Lang.Current[REASON_UNKNOWN];
     }
 
     #endregion // Private methods

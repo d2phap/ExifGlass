@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:l="using:ExifGlass.UI.Localization"
                     xmlns:tok="using:ExifGlass.UI.Tokens"
                     xmlns:ui="using:ExifGlass.UI.Controls"
                     xmlns:eg="using:ExifGlass.UI">
@@ -114,8 +115,8 @@
   <ControlTheme x:Key="{x:Type ToggleSwitch}" TargetType="ToggleSwitch">
     <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
     <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}" />
-    <Setter Property="OnContent" Value="{x:Static eg:UiText.SWITCH_ON}" />
-    <Setter Property="OffContent" Value="{x:Static eg:UiText.SWITCH_OFF}" />
+    <Setter Property="OnContent" Value="{l:Lang _On}" />
+    <Setter Property="OffContent" Value="{l:Lang _Off}" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
@@ -552,7 +553,7 @@
                     MinWidth="0"
                     MinHeight="0"
                     VerticalAlignment="Center"
-                    AutomationProperties.Name="{x:Static ui:TokenChip.REMOVE_LABEL}"
+                    AutomationProperties.Name="{l:Lang _Remove}"
                     CornerRadius="{StaticResource RadiusControl18}"
                     Foreground="{TemplateBinding Foreground}">
               <Button.Template>

@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Settings;
 using ExifGlass.UI.Controls;
 using ExifGlass.UI.Tokens;
@@ -28,7 +29,7 @@ namespace ExifGlass.Services;
 /// <summary>
 /// One accent the Settings row offers.
 /// </summary>
-public sealed record AccentPreset(string Id, string Label, Color Color);
+public sealed record AccentPreset(string Id, LangId Label, Color Color);
 
 
 /// <summary>
@@ -43,13 +44,13 @@ public static class AccentService
     /// </summary>
     public static IReadOnlyList<AccentPreset> Presets { get; } =
     [
-        new("Blue", AppText.ACCENT_BLUE, AccentPalette.DefaultAccent),
-        new("Purple", AppText.ACCENT_PURPLE, Color.Parse("#7C3AED")),
-        new("Pink", AppText.ACCENT_PINK, Color.Parse("#C2185B")),
-        new("Orange", AppText.ACCENT_ORANGE, Color.Parse("#C2410C")),
-        new("Yellow", AppText.ACCENT_YELLOW, Color.Parse("#FFB900")),
-        new("Green", AppText.ACCENT_GREEN, Color.Parse("#15803D")),
-        new("Graphite", AppText.ACCENT_GRAPHITE, Color.Parse("#4B5563")),
+        new("Blue", LangId.Settings_AccentBlue, AccentPalette.DefaultAccent),
+        new("Purple", LangId.Settings_AccentPurple, Color.Parse("#7C3AED")),
+        new("Pink", LangId.Settings_AccentPink, Color.Parse("#C2185B")),
+        new("Orange", LangId.Settings_AccentOrange, Color.Parse("#C2410C")),
+        new("Yellow", LangId.Settings_AccentYellow, Color.Parse("#FFB900")),
+        new("Green", LangId.Settings_AccentGreen, Color.Parse("#15803D")),
+        new("Graphite", LangId.Settings_AccentGraphite, Color.Parse("#4B5563")),
     ];
 
     #endregion // Fields and constants
@@ -121,10 +122,10 @@ public static class AccentService
     {
         var list = new List<SwatchItem>(Presets.Count + 1)
         {
-            new(AppText.ACCENT_SYSTEM, AccentPalette.Fill(SystemAccent() ?? AccentPalette.DefaultAccent), IconId.DarkTheme),
+            new(Lang.Current[LangId.Settings_AccentSystem], AccentPalette.Fill(SystemAccent() ?? AccentPalette.DefaultAccent), IconId.DarkTheme),
         };
 
-        foreach (var preset in Presets) list.Add(new SwatchItem(preset.Label, preset.Color));
+        foreach (var preset in Presets) list.Add(new SwatchItem(Lang.Current[preset.Label], preset.Color));
         return list;
     }
 

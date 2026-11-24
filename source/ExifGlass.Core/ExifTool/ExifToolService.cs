@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using System.Buffers;
 using System.Buffers.Text;
@@ -39,7 +40,7 @@ public sealed class ExifToolService : IAsyncDisposable
     /// <summary>
     /// The read error of a file ExifTool can't open though it exists: another app holds it, or the user may not read it.
     /// </summary>
-    public const string FILE_NOT_OPENED = "Another app is using it, or it can't be read";
+    public static string FileNotOpened => Lang.Current[LangId.Read_FileNotOpened];
 
     private readonly ExifToolDaemon _daemon;
     private readonly StringPool _pool = new();
@@ -111,7 +112,7 @@ public sealed class ExifToolService : IAsyncDisposable
         if (!string.Equals(exifToolPath, shownPath, StringComparison.Ordinal)) ShowAs(read, shownPath);
 
         // ExifTool says "File not found" for any file it can't open
-        if (read.Error == FILE_NOT_FOUND && File.Exists(exifToolPath)) read.Error = FILE_NOT_OPENED;
+        if (read.Error == FILE_NOT_FOUND && File.Exists(exifToolPath)) read.Error = FileNotOpened;
         return MetadataDocument.Create(shownPath, read, tagDb, watch.Elapsed);
     }
 

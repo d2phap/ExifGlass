@@ -22,6 +22,7 @@ using CommunityToolkit.Mvvm.Input;
 using ExifGlass.Core.Ai;
 using ExifGlass.Core.Export;
 using ExifGlass.Core.ExifTool;
+using ExifGlass.Core.Localization;
 using ExifGlass.Core.Metadata;
 using ExifGlass.Core.Query;
 using ExifGlass.UI.Controls;
@@ -88,7 +89,7 @@ public sealed partial class MainViewModel
 
     public AiKind AiBadgeKind => AiInfo?.Kind ?? (HasCharacterCard ? AiKind.CharacterCard : AiKind.None);
 
-    public string? AiBadgeTip => AiBadge is null ? null : $"{AiGenerationInfo.KindLabel(AiBadgeKind)} · {AiInfo?.Generator ?? AiBadge}\n{UI.UiText.JUMP_TO_AI}";
+    public string? AiBadgeTip => AiBadge is null ? null : $"{AiGenerationInfo.KindLabel(AiBadgeKind)} · {AiInfo?.Generator ?? AiBadge}\n{Lang.Current[LangId.Ai_JumpTo]}";
 
     /// <summary>
     /// R19: a custom ExifTool older than the AI read needs, said in the AI card; the bundled one always reads everything.
@@ -172,11 +173,11 @@ public sealed partial class MainViewModel
         switch (request.Action)
         {
             case AiAction.CopyPrompt when (request.Text ?? AiInfo?.Prompt?.Text) is { } prompt:
-                await CopyAndToastAsync(prompt, AppText.TOAST_COPIED_PROMPT, AppText.Characters(prompt.Length));
+                await CopyAndToastAsync(prompt, Lang.Current[LangId.Toast_CopiedPrompt], AppText.Characters(prompt.Length));
                 break;
 
             case AiAction.CopyNegativePrompt when (request.Text ?? AiInfo?.NegativePrompt?.Text) is { } negative:
-                await CopyAndToastAsync(negative, AppText.TOAST_COPIED_NEGATIVE, AppText.Characters(negative.Length));
+                await CopyAndToastAsync(negative, Lang.Current[LangId.Toast_CopiedNegative], AppText.Characters(negative.Length));
                 break;
 
             case AiAction.CopyText when request.Text is { } text:
@@ -184,7 +185,7 @@ public sealed partial class MainViewModel
                 break;
 
             case AiAction.CopyTagKey when request.Text is { } key:
-                await CopyAndToastAsync(key, AppText.TOAST_COPIED_KEY, key);
+                await CopyAndToastAsync(key, Lang.Current[LangId.Toast_CopiedKey], key);
                 break;
 
             case AiAction.CopyGenerationParameters:
@@ -193,11 +194,11 @@ public sealed partial class MainViewModel
 
             case AiAction.CopyJson when ai is not null:
                 var json = await Task.Run(() => AiExport.ToJson(ai));
-                await CopyAndToastAsync(json, AppText.TOAST_COPIED_AI_JSON, AppText.AiFields(Rows.AiTotal));
+                await CopyAndToastAsync(json, Lang.Current[LangId.Toast_CopiedAiJson], AppText.AiFields(Rows.AiTotal));
                 break;
 
             case AiAction.CopyWorkflowJson when AiCard.SavedWorkflow(ai) is { } workflow:
-                await CopyAndToastAsync(workflow.Json, AppText.TOAST_COPIED_WORKFLOW, $"{workflow.FormatLabel} · {AiRows.FormatSize(workflow.Size)}");
+                await CopyAndToastAsync(workflow.Json, Lang.Current[LangId.Toast_CopiedWorkflow], $"{workflow.FormatLabel} · {AiRows.FormatSize(workflow.Size)}");
                 break;
 
             case AiAction.SaveWorkflow:
@@ -226,11 +227,11 @@ public sealed partial class MainViewModel
                 break;
 
             case AiAction.CopyCharacterJson when CharacterSource?.Character is { } card:
-                await CopyAndToastAsync(card.Json, AppText.TOAST_COPIED_CHARACTER, card.Name ?? AppText.Characters(card.Json.Length));
+                await CopyAndToastAsync(card.Json, Lang.Current[LangId.Toast_CopiedCharacter], card.Name ?? AppText.Characters(card.Json.Length));
                 break;
 
             case AiAction.SaveCharacterJson when CharacterSource?.Character is { } card:
-                await SaveTextAsync(FileStem() + "_character.json", card.Json, AppText.TOAST_SAVED_CHARACTER);
+                await SaveTextAsync(FileStem() + "_character.json", card.Json, Lang.Current[LangId.Toast_SavedCharacter]);
                 break;
         }
     }
@@ -247,15 +248,15 @@ public sealed partial class MainViewModel
         switch (kind)
         {
             case AiExportKind.Parameters when ai.Primary is { IsGeneration: true } primary:
-                await SaveTextAsync(FileStem() + "_parameters.txt", AiExport.ToA1111(primary), AppText.TOAST_SAVED_PARAMETERS);
+                await SaveTextAsync(FileStem() + "_parameters.txt", AiExport.ToA1111(primary), Lang.Current[LangId.Toast_SavedParameters]);
                 break;
 
             case AiExportKind.Json:
-                await SaveTextAsync(FileStem() + "_ai.json", await Task.Run(() => AiExport.ToJson(ai)), AppText.TOAST_SAVED_AI_JSON);
+                await SaveTextAsync(FileStem() + "_ai.json", await Task.Run(() => AiExport.ToJson(ai)), Lang.Current[LangId.Toast_SavedAiJson]);
                 break;
 
             case AiExportKind.Workflow when AiCard.SavedWorkflow(ai) is { } workflow:
-                await SaveTextAsync(FileStem() + "_workflow.json", workflow.Json, AppText.TOAST_SAVED_WORKFLOW);
+                await SaveTextAsync(FileStem() + "_workflow.json", workflow.Json, Lang.Current[LangId.Toast_SavedWorkflow]);
                 break;
         }
     }
@@ -282,7 +283,7 @@ public sealed partial class MainViewModel
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            Shell.ShowToast(AppText.TOAST_EXPORT_FAILED, ex.Message, ToastKind.Danger);
+            Shell.ShowToast(Lang.Current[LangId.Toast_ExportFailed], ex.Message, ToastKind.Danger);
         }
     }
 

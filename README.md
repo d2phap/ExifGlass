@@ -16,11 +16,11 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 <div align="center">
 
 <a href="https://apps.microsoft.com/detail/9MX8S9HZ57W8?launch=true&amp;cid=eg_github_readme&amp;mode=full">
-  <img width="215" src=".github/badge-ms-store.svg" alt="Download ExifGlass on the Microsoft Store" />
+  <img width="168" src=".github/badge-ms-store.svg" alt="Download ExifGlass on the Microsoft Store" />
 </a>
 &nbsp;&nbsp;
 <a href="https://apps.apple.com/app/apple-store/id6790062127?pt=128974924&amp;ct=eg_github_readme&amp;mt=8">
-  <img width="215" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
+  <img width="168" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
 </a>
 <br/>
 

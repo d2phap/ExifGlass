@@ -3,6 +3,13 @@
 ExifGlass - AI & EXIF metadata viewer
 ===
 
+<a href="https://imageglass.org/exifglass">
+  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads" />
+</a>
+
+<a href="https://imageglass.org/exifglass">
+  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version" />
+</a>
 </div>
 
 ExifGlass is a cross-platform EXIF metadata viewing tool, designed to work seamlessly with [ImageGlass - A Fast, Seamless Photo Viewer](https://imageglass.org), but can also be used as a standalone software on your computer. 
@@ -22,16 +29,7 @@ ExifGlass is open source. Buying it here supports its development, and the [Micr
 <a href="https://apps.apple.com/app/apple-store/id6790062127?pt=128974924&amp;ct=eg_github_readme&amp;mt=8">
   <img width="168" src=".github/badge-app-store.svg" alt="Download ExifGlass on the App Store" />
 </a>
-<br/>
 
-
-<a href="https://imageglass.org/exifglass">
-  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/total?color=%23ed604c&label=total%20downloads&style=for-the-badge" />
-</a>
-&nbsp;
-<a href="https://imageglass.org/exifglass">
-  <img src="https://img.shields.io/github/downloads/d2phap/exifglass/latest/total?color=%23ed604c&label=latest%20version&style=for-the-badge" />
-</a>
 <br/><br/>
 
 

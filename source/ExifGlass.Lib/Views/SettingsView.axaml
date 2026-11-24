@@ -18,64 +18,6 @@
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    Text="{l:Lang Settings_General}" />
 
-        <!--  the language applies with OK, to every open window; the line under it credits the translators  -->
-        <Border MinHeight="56"
-                Padding="0,8"
-                BorderBrush="{DynamicResource EmphasisA07Brush}"
-                BorderThickness="0,0,0,1">
-          <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
-            <StackPanel VerticalAlignment="Center">
-              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_Language}" />
-              <TextBlock Name="ContributorsText"
-                         tok:Typography.Role="Meta"
-                         Foreground="{DynamicResource TextSecondaryBrush}"
-                         IsVisible="{Binding HasLanguageContributors}"
-                         Text="{Binding LanguageContributors}"
-                         TextWrapping="Wrap" />
-            </StackPanel>
-            <ComboBox Name="LanguageChoice"
-                      Grid.Column="1"
-                      Width="246"
-                      VerticalAlignment="Center"
-                      AutomationProperties.Name="{l:Lang Settings_Language}"
-                      ItemsSource="{Binding Languages}"
-                      SelectedItem="{Binding SelectedLanguage}">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:LanguageChoice">
-                  <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
-                               IsVisible="{Binding EnglishName, Converter={x:Static ObjectConverters.IsNotNull}}"
-                               Text="{Binding EnglishName}"
-                               TextTrimming="CharacterEllipsis" />
-                  </StackPanel>
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <ui:GlassButton Name="LanguageMenuButton"
-                            Grid.Column="2"
-                            Margin="0,0,-6,0"
-                            VerticalAlignment="Center"
-                            AutomationProperties.Name="{l:Lang Settings_LanguageMore}"
-                            Classes="ghost"
-                            Icon="{x:Static ui:IconId.MoreHorizontal}"
-                            ToolTip.Tip="{l:Lang Settings_LanguageMore}">
-              <ui:GlassButton.Flyout>
-                <MenuFlyout Placement="BottomEdgeAlignedRight">
-                  <ui:GlassMenuItem Name="InstallLanguageItem"
-                                    Click="InstallLanguageItem_Click"
-                                    Glyph="{x:Static ui:IconId.ArrowDownload}"
-                                    Header="{l:Lang Settings_LanguageInstall}" />
-                  <ui:GlassMenuItem Name="ExportLanguageItem"
-                                    Click="ExportLanguageItem_Click"
-                                    Glyph="{x:Static ui:IconId.ArrowUpload}"
-                                    Header="{l:Lang Settings_LanguageExport}" />
-                </MenuFlyout>
-              </ui:GlassButton.Flyout>
-            </ui:GlassButton>
-          </Grid>
-        </Border>
-
         <Border MinHeight="56"
                 Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
@@ -90,7 +32,7 @@
             </StackPanel>
             <ui:SegmentedControl Name="ThemeChoice"
                                  Grid.Column="1"
-                                 Width="246"
+                                 MinWidth="246"
                                  VerticalAlignment="Center"
                                  AutomationProperties.Name="{l:Lang Settings_AppTheme}"
                                  SelectedIndex="{Binding ThemeIndex}">
@@ -125,6 +67,63 @@
                              AutomationProperties.Name="{l:Lang Settings_AccentColor}"
                              ItemsSource="{Binding AccentChoices}"
                              SelectedIndex="{Binding AccentIndex}" />
+          </Grid>
+        </Border>
+
+        <!--  the language applies with OK, to every open window; the line under it credits the translators  -->
+        <Border MinHeight="56"
+                Padding="0,8"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_Language}" />
+              <TextBlock Name="ContributorsText"
+                         tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         IsVisible="{Binding HasLanguageContributors}"
+                         Text="{Binding LanguageContributors}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+              <ui:GlassButton Name="LanguageMenuButton"
+                              VerticalAlignment="Center"
+                              AutomationProperties.Name="{l:Lang Settings_LanguageMore}"
+                              Classes="ghost"
+                              Icon="{x:Static ui:IconId.MoreHorizontal}"
+                              ToolTip.Tip="{l:Lang Settings_LanguageMore}">
+                <ui:GlassButton.Flyout>
+                  <MenuFlyout Placement="BottomEdgeAlignedLeft">
+                    <ui:GlassMenuItem Name="InstallLanguageItem"
+                                      Click="InstallLanguageItem_Click"
+                                      Glyph="{x:Static ui:IconId.ArrowDownload}"
+                                      Header="{l:Lang Settings_LanguageInstall}" />
+                    <ui:GlassMenuItem Name="ExportLanguageItem"
+                                      Click="ExportLanguageItem_Click"
+                                      Glyph="{x:Static ui:IconId.ArrowUpload}"
+                                      Header="{l:Lang Settings_LanguageExport}" />
+                  </MenuFlyout>
+                </ui:GlassButton.Flyout>
+              </ui:GlassButton>
+              <ComboBox Name="LanguageChoice"
+                        Width="246"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="{l:Lang Settings_Language}"
+                        ItemsSource="{Binding Languages}"
+                        SelectedItem="{Binding SelectedLanguage}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:LanguageChoice">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Foreground="{DynamicResource TextSecondaryBrush}"
+                                 IsVisible="{Binding EnglishName, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                 Text="{Binding EnglishName}"
+                                 TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </StackPanel>
           </Grid>
         </Border>
 

@@ -2,6 +2,10 @@
   <Configurations>
     <Platform Name="x64" />
     <Platform Name="ARM64" />
+    <ProjectType Extension=".csproj" BasedOn="C#">
+      <Platform Solution="*|x64" Project="x64" />
+      <Platform Solution="*|ARM64" Project="ARM64" />
+    </ProjectType>
   </Configurations>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

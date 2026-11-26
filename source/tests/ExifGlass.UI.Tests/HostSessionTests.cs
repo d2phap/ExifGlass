@@ -20,6 +20,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using ExifGlass.Core.Editing;
 using ExifGlass.Core.Export;
+using ExifGlass.Core.Integration;
 using ExifGlass.Core.Settings;
 using ExifGlass.Integration;
 using ExifGlass.UI.Controls;
@@ -274,6 +275,28 @@ public sealed class HostSessionTests : IDisposable
         Assert.True(_window.Closed);
         Assert.False(_window.ClosedForHost);
         Assert.Equal(0, _exifToolStops);
+    }
+
+
+    [AvaloniaFact]
+    public async Task ALaterLaunchBringsTheWindowForwardAndOpensItsFile()
+    {
+        var first = new AppInstance(_folder);
+        Assert.True(first.TryClaim());
+        first.Listen();
+        using var session = new HostSession(new StandaloneHost(null, first), _vm, _window, StopExifTool);
+        session.Start();
+
+        var path = Touch("later.jpg");
+        using var later = new AppInstance(_folder);
+        Assert.True(await Task.Run(() => later.Send([path])));
+        await WaitForAsync(() => _vm.Document?.SourcePath == path);
+        Assert.Equal(1, _window.Activations);
+
+        // the same file again only brings the window forward
+        Assert.True(await Task.Run(() => later.Send([path])));
+        await WaitForAsync(() => _window.Activations == 2);
+        Assert.Equal(1, _reader.Reads);
     }
 
     #endregion // Tests

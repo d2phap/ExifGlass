@@ -30,6 +30,8 @@ internal static partial class User32
     public const int GWL_EXSTYLE = -20;
     public const long WS_EX_TOPMOST = 0x8;
 
+    public const uint ASFW_ANY = uint.MaxValue;
+
     #endregion // Constants
 
 
@@ -41,6 +43,10 @@ internal static partial class User32
 
     [LibraryImport("user32.dll")]
     public static partial nint GetWindowLongPtrW(nint windowHandle, int index);
+
+    [LibraryImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool AllowSetForegroundWindow(uint processId);
 
     #endregion // Native methods
 }

@@ -39,6 +39,7 @@ internal static class Program
         AppServices.HostFactory = static options => options.Mode == AppMode.ImageGlass9 ? new ImageGlass9Host(options.File) : null;
 
         if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
+        if (AppBootstrap.HandOffToRunningInstance(args)) return 0;
 
         var builder = BuildAvaloniaApp();
 

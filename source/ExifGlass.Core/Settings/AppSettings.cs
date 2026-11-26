@@ -120,6 +120,11 @@ public sealed class AppSettings
     public bool AlwaysOnTop { get; set; }
 
     /// <summary>
+    /// Off: a launch from another app hands its file to the window already open; an ImageGlass tool launch always gets its own.
+    /// </summary>
+    public bool EnableMultiInstances { get; set; }
+
+    /// <summary>
     /// The language pack's file name in the user or app _lang folder, or "English" for the built-in text.
     /// </summary>
     public string Language { get; set; } = Lang.BUILT_IN;

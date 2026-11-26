@@ -52,6 +52,9 @@ internal sealed class Win32ShellProvider : IShellProvider
 
     public bool IsTopmost(nint windowHandle) => windowHandle != 0 && (User32.GetWindowLongPtrW(windowHandle, User32.GWL_EXSTYLE) & User32.WS_EX_TOPMOST) != 0;
 
+
+    public void AllowForegroundActivation() => User32.AllowSetForegroundWindow(User32.ASFW_ANY);
+
     #endregion // Public methods
 
 

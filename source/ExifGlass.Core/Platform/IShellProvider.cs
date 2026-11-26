@@ -50,5 +50,12 @@ public interface IShellProvider
     /// </summary>
     bool IsTopmost(nint windowHandle) => false;
 
+    /// <summary>
+    /// Lets the open window come to the front when this launch hands it a file: Windows refuses a background process otherwise.
+    /// </summary>
+    void AllowForegroundActivation()
+    {
+    }
+
     #endregion // Methods
 }

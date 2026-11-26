@@ -16,22 +16,23 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+using Avalonia.Threading;
+using ExifGlass.Core.Common;
+using ExifGlass.Core.Integration;
+using ExifGlass.Diagnostics;
+
 namespace ExifGlass.Integration;
 
 /// <summary>
-/// Started by the user: the command-line file, if any. The picker, drops and macOS Open With go to the view model directly.
+/// Started by the user: the command-line file, if any, then the files later launches hand over (single instance). The picker, drops and macOS Open With go to the view model directly.
 /// </summary>
-public sealed class StandaloneHost(string? file) : IImageSourceHost
+public sealed class StandaloneHost(string? file, AppInstance? instance = null) : IImageSourceHost
 {
     #region Events
 
     public event EventHandler<FileRequestedEventArgs>? FileRequested;
 
-    public event EventHandler? ActivateRequested
-    {
-        add { }
-        remove { }
-    }
+    public event EventHandler? ActivateRequested;
 
     public event EventHandler<CloseRequestedEventArgs>? CloseRequested
     {
@@ -47,12 +48,29 @@ public sealed class StandaloneHost(string? file) : IImageSourceHost
     public void Start()
     {
         if (!string.IsNullOrEmpty(file)) FileRequested?.Invoke(this, new FileRequestedEventArgs(file, isNavigation: false));
+        instance?.Attach(Instance_Invoked);
     }
 
 
-    public void Dispose()
-    {
-    }
+    public void Dispose() => instance?.Dispose();
 
     #endregion // Public methods
+
+
+    #region Event handlers
+
+    // a pool thread: the window comes forward first, then the file goes through the session's D8 and D29 like any request
+    private void Instance_Invoked(string[] args)
+    {
+        var path = CommandLine.Parse(args).File;
+        IpcLog.Write("INSTANCE_INVOKED", ("path", path));
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            ActivateRequested?.Invoke(this, EventArgs.Empty);
+            if (!string.IsNullOrEmpty(path)) FileRequested?.Invoke(this, new FileRequestedEventArgs(path, isNavigation: false));
+        });
+    }
+
+    #endregion // Event handlers
 }

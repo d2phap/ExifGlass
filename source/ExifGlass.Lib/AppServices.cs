@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using ExifGlass.Core.Common;
 using ExifGlass.Core.Editing;
+using ExifGlass.Core.Integration;
 using ExifGlass.Core.Localization;
 using ExifGlass.Core.Platform;
 using ExifGlass.Core.Settings;
@@ -68,6 +69,11 @@ public sealed class AppServices
     /// </summary>
     public static Func<StartupOptions, IImageSourceHost?>? HostFactory { get; set; }
 
+    /// <summary>
+    /// The single-instance slot this launch took before Avalonia started; null for tool launches, test runs and the ones beside an open window.
+    /// </summary>
+    public static AppInstance? Instance { get; set; }
+
     public StartupOptions Options { get; }
 
     public SettingsStore Settings { get; }
@@ -103,7 +109,7 @@ public sealed class AppServices
         var overrides = new Dictionary<string, string>(options.Overrides, StringComparer.OrdinalIgnoreCase);
         if (options.Theme is { } theme) overrides[nameof(AppSettings.Theme)] = theme;
 
-        settingsDirectory ??= Environment.GetEnvironmentVariable(SETTINGS_DIR_VARIABLE) is { Length: > 0 } dir ? dir : SettingsStore.DefaultDirectory();
+        settingsDirectory ??= SettingsDirectory();
         var settings = new SettingsStore(settingsDirectory);
         settings.Load(overrides);
 
@@ -122,6 +128,9 @@ public sealed class AppServices
 
         return new AppServices(options, settings, metadata, channel);
     }
+
+
+    public static string SettingsDirectory() => Environment.GetEnvironmentVariable(SETTINGS_DIR_VARIABLE) is { Length: > 0 } dir ? dir : SettingsStore.DefaultDirectory();
 
 
     /// <summary>
@@ -178,7 +187,7 @@ public sealed class AppServices
 #if !EG_MAS
         { Mode: AppMode.ImageGlass10, PipeName: { } pipe } => new ImageGlass10Host(pipe),
 #endif
-        _ => new StandaloneHost(Options.File),
+        _ => new StandaloneHost(Options.File, Instance),
     };
 
     #endregion // Private methods

@@ -21,6 +21,9 @@ using Avalonia.Styling;
 using ExifGlass.UI.Tokens;
 using ExifGlass.Core.Common;
 using ExifGlass.Core.Diagnostics;
+using ExifGlass.Core.Integration;
+using ExifGlass.Core.Platform;
+using ExifGlass.Core.Settings;
 using ExifGlass.Diagnostics;
 
 namespace ExifGlass;
@@ -51,6 +54,48 @@ public static class AppBootstrap
 
 
     public static bool IsSoftwareRendering(string[] args) => CommandLine.Parse(args).SoftwareRendering;
+
+
+    /// <summary>
+    /// Single instance: a plain launch hands its file to the window already open and returns true, so the head exits; a first one keeps the slot in <see cref="AppServices.Instance"/>.
+    /// </summary>
+    public static bool HandOffToRunningInstance(string[] args)
+    {
+        var options = CommandLine.Parse(args);
+        if (!JoinsSingleInstance(options, args)) return false;
+
+        var directory = AppServices.SettingsDirectory();
+        var instance = new AppInstance(directory);
+        if (!instance.TryClaim())
+        {
+            if (!SettingsStore.Peek(directory).EnableMultiInstances)
+            {
+                PlatformServices.Shell?.AllowForegroundActivation();
+                if (instance.Send(HandOffArgs(options))) return true;
+            }
+
+            // no answer: the open window may have closed since, so its slot can be free
+            if (!instance.TryClaim()) return false;
+        }
+
+        instance.Listen();
+        AppServices.Instance = instance;
+        return false;
+    }
+
+
+    /// <summary>
+    /// Only a launch with nothing but a file joins: ImageGlass tools own their process (it must be the one they started), and test or styling flags describe a run of their own.
+    /// </summary>
+    public static bool JoinsSingleInstance(StartupOptions options, IReadOnlyList<string> args) => options is
+    {
+        Mode: AppMode.Standalone,
+        SelfTest: false,
+        Gallery: false,
+        SoftwareRendering: false,
+        Theme: null,
+        Overrides.Count: 0,
+    } && !PerfRun.IsPerf(args);
 
 
     /// <summary>
@@ -99,4 +144,24 @@ public static class AppBootstrap
     }
 
     #endregion // Public methods
+
+
+    #region Private methods
+
+    // the open window has its own working folder, so a relative path is resolved here
+    private static string[] HandOffArgs(StartupOptions options)
+    {
+        if (string.IsNullOrEmpty(options.File)) return [];
+
+        try
+        {
+            return [Path.GetFullPath(options.File)];
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            return [options.File];
+        }
+    }
+
+    #endregion // Private methods
 }

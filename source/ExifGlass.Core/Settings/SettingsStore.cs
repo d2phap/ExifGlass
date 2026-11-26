@@ -104,6 +104,12 @@ public sealed class SettingsStore : IAsyncDisposable
 
 
     /// <summary>
+    /// The saved settings without migrating or writing anything, for a launch that may hand off and exit.
+    /// </summary>
+    public static AppSettings Peek(string directory) => new SettingsStore(directory).ReadFile() ?? new AppSettings();
+
+
+    /// <summary>
     /// Loads the file, or migrates v2's, or starts from defaults when neither reads; then applies the overrides.
     /// </summary>
     public AppSettings Load(IReadOnlyDictionary<string, string>? overrides = null)

@@ -129,6 +129,26 @@ public sealed class SettingsTests : IDisposable
 
 
     [Fact]
+    public async Task PeekReadsTheFileWithoutMigratingOrWriting()
+    {
+        Assert.False(SettingsStore.Peek(_dir).EnableMultiInstances);
+
+        File.WriteAllText(Path.Combine(_dir, SettingsStore.V2_FILE_NAME), """{ "Theme": "Dark" }""");
+        Assert.Equal(AppTheme.System, SettingsStore.Peek(_dir).Theme);
+
+        await using (var store = new SettingsStore(_dir))
+        {
+            store.Load();
+            store.Update(s => s.EnableMultiInstances = true);
+        }
+
+        var before = File.GetLastWriteTimeUtc(Path.Combine(_dir, SettingsStore.FILE_NAME));
+        Assert.True(SettingsStore.Peek(_dir).EnableMultiInstances);
+        Assert.Equal(before, File.GetLastWriteTimeUtc(Path.Combine(_dir, SettingsStore.FILE_NAME)));
+    }
+
+
+    [Fact]
     public async Task MigratesV2Settings()
     {
         File.WriteAllText(Path.Combine(_dir, SettingsStore.V2_FILE_NAME), """

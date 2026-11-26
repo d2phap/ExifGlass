@@ -36,6 +36,7 @@ internal static class Program
         BundledExifTool.EnsureExecutable();
 
         if (AppBootstrap.IsSelfTest(args)) return AppBootstrap.RunSelfTest(args);
+        if (AppBootstrap.HandOffToRunningInstance(args)) return 0;
 
         var builder = BuildAvaloniaApp();
 

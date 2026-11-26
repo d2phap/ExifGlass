@@ -73,6 +73,24 @@ public class MainWindowTests
 
 
     [AvaloniaTheory]
+    [InlineData(new string[0], true)]
+    [InlineData(new[] { "photo.jpg" }, true)]
+    [InlineData(new[] { "exifglass:C%3A%2Fa.jpg" }, true)]
+    [InlineData(new[] { "--pipe", "ig_abc" }, false)]
+    [InlineData(new[] { "--ig-tool-pipe-code=123", "photo.jpg" }, false)]
+    [InlineData(new[] { "--theme", "dark" }, false)]
+    [InlineData(new[] { "-p:Theme=dark", "photo.jpg" }, false)]
+    [InlineData(new[] { "--render", "software" }, false)]
+    [InlineData(new[] { "--perf", "photo.jpg" }, false)]
+    [InlineData(new[] { "--selftest" }, false)]
+    [InlineData(new[] { "--gallery" }, false)]
+    public void OnlyAPlainLaunchJoinsSingleInstance(string[] args, bool joins)
+    {
+        Assert.Equal(joins, AppBootstrap.JoinsSingleInstance(CommandLine.Parse(args), args));
+    }
+
+
+    [AvaloniaTheory]
     [InlineData(1400, true, true, true, true)]
     [InlineData(1100, true, true, true, true)]
     [InlineData(900, true, false, true, true)]

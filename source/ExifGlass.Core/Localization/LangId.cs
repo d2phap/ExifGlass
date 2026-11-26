@@ -503,6 +503,8 @@ public enum LangId
     Settings_AccentGraphite,
     Settings_AlwaysOnTop,
     Settings_AlwaysOnTopDesc,
+    Settings_EnableMultiInstances,
+    Settings_EnableMultiInstancesDesc,
     Settings_CheckUpdates,
     Settings_CheckUpdatesDesc,
     Settings_ExecutablePath,

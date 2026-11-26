@@ -503,6 +503,8 @@ public sealed partial class Lang
         new(LangId.Settings_AccentGraphite, "Graphite"),
         new(LangId.Settings_AlwaysOnTop, "Keep window always on top"),
         new(LangId.Settings_AlwaysOnTopDesc, "Float above other apps while you compare files."),
+        new(LangId.Settings_EnableMultiInstances, "Allow multiple instances of the program"),
+        new(LangId.Settings_EnableMultiInstancesDesc, "Open files from other apps in a new window."),
         new(LangId.Settings_CheckUpdates, "Check for updates on startup"),
         new(LangId.Settings_CheckUpdatesDesc, "A quiet check against GitHub releases."),
         new(LangId.Settings_ExecutablePath, "Executable path"),

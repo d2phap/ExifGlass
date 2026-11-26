@@ -412,6 +412,8 @@
     "Settings_AccentGraphite": "Than chì",
     "Settings_AlwaysOnTop": "Giữ cửa sổ luôn ở trên",
     "Settings_AlwaysOnTopDesc": "Nằm trên các ứng dụng khác khi bạn so sánh tệp.",
+    "Settings_EnableMultiInstances": "Cho phép chạy nhiều phiên bản của chương trình",
+    "Settings_EnableMultiInstancesDesc": "Mở tệp từ ứng dụng khác trong một cửa sổ mới.",
     "Settings_CheckUpdates": "Kiểm tra cập nhật khi khởi động",
     "Settings_CheckUpdatesDesc": "Một lần kiểm tra nhẹ với bản phát hành trên GitHub.",
     "Settings_ExecutablePath": "Đường dẫn tệp chạy",

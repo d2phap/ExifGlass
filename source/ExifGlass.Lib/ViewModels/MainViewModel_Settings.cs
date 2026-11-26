@@ -29,7 +29,7 @@ namespace ExifGlass.ViewModels;
 /// <summary>
 /// What OK in Settings saves (DS 6.15).
 /// </summary>
-public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool CheckForUpdates, string ExifToolPath, string Arguments, string Language);
+public sealed record SettingsChange(AppTheme Theme, string Accent, bool AlwaysOnTop, bool EnableMultiInstances, bool CheckForUpdates, string ExifToolPath, string Arguments, string Language);
 
 
 public sealed partial class MainViewModel
@@ -129,6 +129,7 @@ public sealed partial class MainViewModel
             s.Theme = change.Theme;
             s.Accent = change.Accent;
             s.AlwaysOnTop = change.AlwaysOnTop;
+            s.EnableMultiInstances = change.EnableMultiInstances;
             s.CheckForUpdates = change.CheckForUpdates;
             s.ExifToolPath = change.ExifToolPath.Trim();
             s.ExifToolArguments = change.Arguments;

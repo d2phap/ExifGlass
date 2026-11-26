@@ -78,6 +78,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Theme = main.Theme;
         Accent = main.Accent;
         AlwaysOnTop = main.IsPinned;
+        EnableMultiInstances = current.EnableMultiInstances;
         CheckForUpdates = current.CheckForUpdates;
         ExifToolPath = current.ExifToolPath;
         Arguments = ArgumentPolicy.Split(current.ExifToolArguments);
@@ -167,6 +168,9 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool AlwaysOnTop { get; set; }
+
+    [ObservableProperty]
+    public partial bool EnableMultiInstances { get; set; }
 
     [ObservableProperty]
     public partial bool CheckForUpdates { get; set; }
@@ -357,6 +361,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Theme = defaults.Theme;
         Accent = defaults.Accent;
         AlwaysOnTop = defaults.AlwaysOnTop;
+        EnableMultiInstances = defaults.EnableMultiInstances;
         CheckForUpdates = defaults.CheckForUpdates;
         ExifToolPath = defaults.ExifToolPath;
         Arguments = ArgumentPolicy.Split(defaults.ExifToolArguments);
@@ -368,7 +373,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private async Task OkAsync()
     {
         _committed = true;
-        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, Accent, AlwaysOnTop, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments),
+        var apply = _main.ApplySettingsAsync(new SettingsChange(Theme, Accent, AlwaysOnTop, EnableMultiInstances, CheckForUpdates, ExifToolPath.Trim().Trim('"'), ArgumentPolicy.Join(Arguments),
             SelectedLanguage?.Pack.SettingValue ?? _main.Settings.Current.Language));
 
         // the window goes at once; ExifTool restarts and the file is read again behind it

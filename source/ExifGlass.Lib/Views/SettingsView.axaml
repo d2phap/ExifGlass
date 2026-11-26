@@ -150,6 +150,26 @@
         <Border MinHeight="56"
                 Padding="0,8"
                 BorderBrush="{DynamicResource EmphasisA07Brush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock tok:Typography.Role="BodyStrong" Text="{l:Lang Settings_EnableMultiInstances}" />
+              <TextBlock tok:Typography.Role="Meta"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Text="{l:Lang Settings_EnableMultiInstancesDesc}"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+            <ToggleSwitch Name="MultiInstancesSwitch"
+                          Grid.Column="1"
+                          VerticalAlignment="Center"
+                          AutomationProperties.Name="{l:Lang Settings_EnableMultiInstances}"
+                          IsChecked="{Binding EnableMultiInstances}" />
+          </Grid>
+        </Border>
+
+        <Border MinHeight="56"
+                Padding="0,8"
+                BorderBrush="{DynamicResource EmphasisA07Brush}"
                 BorderThickness="0,0,0,1"
                 IsVisible="{Binding ShowsUpdates}">
           <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">

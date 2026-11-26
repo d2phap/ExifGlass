@@ -35,6 +35,9 @@ public sealed class AppInstance : IDisposable
     private static readonly TimeSpan READ_TIMEOUT = TimeSpan.FromSeconds(2);
     private const int MAX_MESSAGE_BYTES = 64 * 1024;
 
+    // two are live while a handover overlaps; the rest is headroom
+    private const int MAX_SERVERS = 4;
+
     // paths never hold a NUL on any OS
     private const char SEPARATOR = '\0';
 
@@ -232,28 +235,16 @@ public sealed class AppInstance : IDisposable
 
     private async Task ListenAsync(CancellationToken token)
     {
-        while (!token.IsCancellationRequested)
-        {
-            NamedPipeServerStream server;
-            try
-            {
-                server = new NamedPipeServerStream(_pipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
-            }
-            catch (Exception ex) when (ex is not OutOfMemoryException)
-            {
-                // the name is taken or the folder unusable: later launches find no pipe and open their own window
-                return;
-            }
+        var server = TryOpen();
+        if (server is null) return;
 
-            await using (server.ConfigureAwait(false))
+        try
+        {
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
                     await server.WaitForConnectionAsync(token).ConfigureAwait(false);
-                    if (await ReadAsync(server, token).ConfigureAwait(false) is { } args) Deliver(args);
-                }
-                catch (OperationCanceledException) when (!token.IsCancellationRequested)
-                {
                 }
                 catch (OperationCanceledException)
                 {
@@ -261,8 +252,55 @@ public sealed class AppInstance : IDisposable
                 }
                 catch (IOException)
                 {
+                    // this one is unusable; a fresh server takes over the name
+                    server.Dispose();
+                    if (TryOpen() is not { } replacement) return;
+                    server = replacement;
+                    continue;
+                }
+
+                // Unix frees the socket with the last server on it, dropping the launches queued behind
+                // this one, so the next server binds before this one closes
+                var accepted = server;
+                if (TryOpen() is not { } next) return;
+                server = next;
+
+                await using (accepted.ConfigureAwait(false))
+                {
+                    try
+                    {
+                        if (await ReadAsync(accepted, token).ConfigureAwait(false) is { } args) Deliver(args);
+                    }
+                    catch (OperationCanceledException) when (!token.IsCancellationRequested)
+                    {
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                    }
                 }
             }
+        }
+        finally
+        {
+            server.Dispose();
+        }
+    }
+
+
+    // null when the name is taken or the folder unusable: later launches find no pipe and open their own window
+    private NamedPipeServerStream? TryOpen()
+    {
+        try
+        {
+            return new NamedPipeServerStream(_pipeName, PipeDirection.In, MAX_SERVERS, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            return null;
         }
     }
 
